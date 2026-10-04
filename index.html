@@ -1,160 +1,837 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
 
-<title>JARVIS</title>
+<title>J.A.R.V.I.S.</title>
 
 <style>
 
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #02060d;
+    color: #00d9ff;
+}
+
+/* ANA EKRAN */
+
 body {
-    margin:0;
-    background:#05080d;
-    color:#00d9ff;
-    font-family:Arial;
+    position: relative;
+    background:
+        radial-gradient(
+            circle at center,
+            #071b2c 0%,
+            #020811 42%,
+            #010308 100%
+        );
 }
 
-header {
-    text-align:center;
-    padding:25px;
-    border-bottom:1px solid #123b48;
+/* Teknolojik çizgiler */
+
+body::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(0, 180, 255, 0.18);
+    pointer-events: none;
 }
 
-#chat {
-    height:70vh;
-    overflow:auto;
-    padding:15px;
+/* ÜST BAR */
+
+.top {
+    position: absolute;
+    top: 22px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+}
+
+/* MENÜ BUTONU */
+
+.menu-button {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
+    border: 1px solid #00cfff;
+
+    background: rgba(0, 20, 35, 0.75);
+
+    box-shadow:
+        0 0 12px rgba(0, 200, 255, 0.4),
+        inset 0 0 15px rgba(0, 150, 255, 0.15);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 6px;
+
+    cursor: pointer;
+}
+
+.menu-button span {
+    width: 27px;
+    height: 3px;
+    border-radius: 5px;
+    background: #00d9ff;
+
+    box-shadow: 0 0 8px #00cfff;
+
+    transition: 0.3s;
+}
+
+/* MENÜ */
+
+.menu {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 290px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(3, 20, 35, 0.98),
+            rgba(1, 7, 15, 0.98)
+        );
+
+    border-right: 1px solid #00bfff;
+
+    box-shadow:
+        8px 0 35px rgba(0, 160, 255, 0.18);
+
+    transform: translateX(-105%);
+
+    transition: transform 0.35s ease;
+
+    z-index: 100;
+
+    padding: 25px;
+}
+
+.menu.active {
+    transform: translateX(0);
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+
+    color: #00d9ff;
+}
+
+.menu-header h2 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 4px;
+}
+
+.close-menu {
+    border: none;
+    background: transparent;
+    color: #00d9ff;
+    font-size: 30px;
+}
+
+/* MENÜ SEÇENEKLERİ */
+
+.menu-item {
+    width: 100%;
+
+    padding: 17px;
+
+    margin-bottom: 12px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(0, 200, 255, 0.3);
+
+    background: rgba(0, 100, 150, 0.08);
+
+    color: #d9faff;
+
+    text-align: left;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background: rgba(0, 180, 255, 0.15);
+}
+
+.menu-item .icon {
+    margin-right: 12px;
+}
+
+/* KARANLIK ARKA PLAN */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.55);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: 0.3s;
+
+    z-index: 90;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* MERKEZ */
+
+.center {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -52%);
+
+    width: min(80vw, 370px);
+    height: min(80vw, 370px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* DIŞ HALKA */
+
+.ring {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(0, 174, 255, 0.45);
+
+    box-shadow:
+        0 0 20px rgba(0, 174, 255, 0.25),
+        inset 0 0 20px rgba(0, 174, 255, 0.15);
+
+    animation: rotate 12s linear infinite;
+}
+
+/* KESİKLİ HALKA */
+
+.ring::before {
+    content: "";
+
+    position: absolute;
+    inset: 15px;
+
+    border-radius: 50%;
+
+    border: 4px dashed #00cfff;
+
+    opacity: 0.7;
+
+    animation: rotateReverse 8s linear infinite;
+}
+
+/* İÇ HALKA */
+
+.ring::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 42px;
+
+    border-radius: 50%;
+
+    border: 2px solid #008cff;
+
+    box-shadow:
+        0 0 20px #008cff,
+        inset 0 0 20px rgba(0, 180, 255, 0.25);
+
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* K LOGOSU */
+
+.logo {
+    position: relative;
+
+    width: 145px;
+    height: 145px;
+
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle,
+            #0b3048,
+            #03101d 65%,
+            #01060b
+        );
+
+    border: 2px solid #00d9ff;
+
+    box-shadow:
+        0 0 25px #00bfff,
+        0 0 60px rgba(0, 180, 255, 0.45),
+        inset 0 0 30px rgba(0, 180, 255, 0.35);
+
+    animation: logoPulse 2.5s ease-in-out infinite;
+}
+
+.logo span {
+    font-size: 92px;
+
+    font-weight: bold;
+
+    color: #00d9ff;
+
+    text-shadow:
+        0 0 8px #00d9ff,
+        0 0 25px #008cff,
+        0 0 50px #008cff;
+}
+
+/* JARVIS YAZISI */
+
+.brand {
+    position: absolute;
+
+    top: calc(50% + 190px);
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+.brand-title {
+    font-size: 27px;
+
+    letter-spacing: 8px;
+
+    color: #00cfff;
+
+    text-shadow:
+        0 0 10px #00cfff,
+        0 0 25px rgba(0, 200, 255, 0.7);
+}
+
+.brand-subtitle {
+    margin-top: 8px;
+
+    font-size: 11px;
+
+    letter-spacing: 4px;
+
+    color: rgba(130, 220, 255, 0.7);
+}
+
+/* MESAJ ALANI */
+
+.chat {
+    position: absolute;
+
+    left: 18px;
+    right: 18px;
+    bottom: 22px;
+
+    display: flex;
+    gap: 8px;
+
+    z-index: 30;
+}
+
+.chat input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 58px;
+
+    border-radius: 30px;
+
+    border: 1px solid #00bfff;
+
+    background: rgba(2, 20, 32, 0.9);
+
+    color: white;
+
+    padding: 0 20px;
+
+    font-size: 16px;
+
+    outline: none;
+
+    box-shadow:
+        0 0 15px rgba(0, 180, 255, 0.2);
+}
+
+.chat input::placeholder {
+    color: rgba(180, 230, 255, 0.55);
+}
+
+.send {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
+    border: 1px solid #00d9ff;
+
+    background: #00a8d4;
+
+    color: white;
+
+    font-size: 23px;
+
+    box-shadow:
+        0 0 18px rgba(0, 210, 255, 0.55);
+
+    cursor: pointer;
+}
+
+/* MESAJLAR */
+
+.messages {
+    position: absolute;
+
+    left: 18px;
+    right: 18px;
+
+    top: 90px;
+    bottom: 100px;
+
+    overflow-y: auto;
+
+    padding: 10px;
+
+    z-index: 10;
+
+    pointer-events: none;
 }
 
 .message {
-    padding:12px;
-    margin:10px 0;
-    border-radius:12px;
-    white-space:pre-wrap;
+    max-width: 85%;
+
+    margin: 8px 0;
+
+    padding: 12px 15px;
+
+    border-radius: 14px;
+
+    white-space: pre-wrap;
+
+    pointer-events: auto;
 }
 
 .user {
-    background:#07516a;
-    color:white;
-    text-align:right;
+    margin-left: auto;
+
+    background: rgba(0, 130, 180, 0.35);
+
+    border: 1px solid rgba(0, 200, 255, 0.4);
+
+    color: white;
 }
 
 .jarvis {
-    background:#08151b;
-    border:1px solid #0b5364;
+    margin-right: auto;
+
+    background: rgba(3, 20, 30, 0.9);
+
+    border: 1px solid rgba(0, 190, 255, 0.3);
+
+    color: #bcefff;
 }
 
-#bar {
-    display:flex;
-    gap:8px;
-    padding:10px;
+/* ANİMASYONLAR */
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-input {
-    flex:1;
-    padding:14px;
-    border-radius:10px;
-    border:1px solid #164452;
-    background:#101820;
-    color:white;
+@keyframes rotateReverse {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
 }
 
-button {
-    border:0;
-    border-radius:10px;
-    padding:0 18px;
-    background:#00a8cc;
-    font-weight:bold;
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(0.96);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.04);
+    }
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 25px #00bfff,
+            0 0 60px rgba(0, 180, 255, 0.35),
+            inset 0 0 30px rgba(0, 180, 255, 0.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 35px #00d9ff,
+            0 0 90px rgba(0, 180, 255, 0.65),
+            inset 0 0 45px rgba(0, 180, 255, 0.4);
+    }
+}
+
+/* KÜÇÜK EKRAN */
+
+@media (max-height: 700px) {
+
+    .center {
+        width: 270px;
+        height: 270px;
+    }
+
+    .logo {
+        width: 110px;
+        height: 110px;
+    }
+
+    .logo span {
+        font-size: 70px;
+    }
+
+    .brand {
+        top: calc(50% + 145px);
+    }
+
+    .brand-title {
+        font-size: 22px;
+    }
 }
 
 </style>
-
 </head>
 
 <body>
 
-<header>
-<h1>J.A.R.V.I.S.</h1>
-<p>ONLINE</p>
-</header>
+<!-- MENÜ -->
 
-<div id="chat"></div>
+<div class="menu" id="menu">
 
-<div id="bar">
+    <div class="menu-header">
 
-<input
-id="input"
-placeholder="JARVIS'e yaz..."
->
+        <h2>JARVIS</h2>
 
-<button onclick="sendMessage()">
-GÖNDER
-</button>
+        <button
+            class="close-menu"
+            onclick="closeMenu()">
+            ×
+        </button>
+
+    </div>
+
+    <button class="menu-item">
+        <span class="icon">⚙️</span>
+        Ayarlar
+    </button>
 
 </div>
 
+<!-- MENÜ ARKASI -->
+
+<div
+    class="overlay"
+    id="overlay"
+    onclick="closeMenu()">
+</div>
+
+
+<!-- ÜST -->
+
+<div class="top">
+
+    <button
+        class="menu-button"
+        onclick="openMenu()">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+    </button>
+
+</div>
+
+
+<!-- MERKEZ LOGO -->
+
+<div class="center">
+
+    <div class="ring"></div>
+
+    <div class="logo">
+        <span>K</span>
+    </div>
+
+</div>
+
+
+<!-- MARKA -->
+
+<div class="brand">
+
+    <div class="brand-title">
+        J.A.R.V.I.S.
+    </div>
+
+    <div class="brand-subtitle">
+        KARAHAN INC.
+    </div>
+
+</div>
+
+
+<!-- MESAJLAR -->
+
+<div
+    class="messages"
+    id="messages">
+</div>
+
+
+<!-- CHAT -->
+
+<div class="chat">
+
+    <input
+        id="input"
+        type="text"
+        placeholder="JARVIS'e yaz..."
+        autocomplete="off"
+    >
+
+    <button
+        class="send"
+        onclick="sendMessage()">
+        ➤
+    </button>
+
+</div>
+
+
 <script>
+
+/* =========================
+   MENÜ
+========================= */
+
+function openMenu() {
+
+    document
+        .getElementById("menu")
+        .classList.add("active");
+
+    document
+        .getElementById("overlay")
+        .classList.add("active");
+
+}
+
+function closeMenu() {
+
+    document
+        .getElementById("menu")
+        .classList.remove("active");
+
+    document
+        .getElementById("overlay")
+        .classList.remove("active");
+
+}
+
+
+/* =========================
+   JARVIS CHAT
+========================= */
 
 async function sendMessage() {
 
     const input =
         document.getElementById("input");
 
-    const chat =
-        document.getElementById("chat");
+    const messages =
+        document.getElementById("messages");
 
     const message =
         input.value.trim();
 
     if (!message) return;
 
-    chat.innerHTML +=
-        `<div class="message user">
-        ${message}
-        </div>`;
+
+    /* Kullanıcı mesajı */
+
+    const userMessage =
+        document.createElement("div");
+
+    userMessage.className =
+        "message user";
+
+    userMessage.textContent =
+        message;
+
+    messages.appendChild(
+        userMessage
+    );
 
     input.value = "";
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+
+    /* Bekliyor mesajı */
+
+    const loading =
+        document.createElement("div");
+
+    loading.className =
+        "message jarvis";
+
+    loading.textContent =
+        "JARVIS düşünüyor...";
+
+    messages.appendChild(
+        loading
+    );
+
 
     try {
 
         const response =
             await fetch("/chat", {
 
-                method:"POST",
+                method: "POST",
 
-                headers:{
+                headers: {
                     "Content-Type":
-                    "application/json"
+                        "application/json"
                 },
 
-                body:JSON.stringify({
-                    message:message
+                body: JSON.stringify({
+                    message: message
                 })
 
             });
 
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Sunucu hatası: " +
+                response.status
+            );
+
+        }
+
+
         const data =
             await response.json();
 
-        chat.innerHTML +=
-            `<div class="message jarvis">
-            ${data.response}
-            </div>`;
+
+        loading.textContent =
+            data.response ||
+            "Cevap alınamadı.";
+
 
     }
 
     catch(error) {
 
-        chat.innerHTML +=
-            `<div class="message jarvis">
-            Sunucuya bağlanılamadı.
-            </div>`;
+        loading.textContent =
+            "Sunucuya bağlanılamadı.";
+
+        console.error(error);
 
     }
 
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
 }
+
+
+/* ENTER İLE GÖNDER */
+
+document
+    .getElementById("input")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                sendMessage();
+
+            }
+
+        }
+    );
 
 </script>
 
