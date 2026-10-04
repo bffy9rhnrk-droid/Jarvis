@@ -1,122 +1,80 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#05080d">
-<title>J.A.R.V.I.S. — Karahan Inc.</title>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover"
+>
+
+<title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
 
 :root{
-    --bg:#03060a;
-    --panel:rgba(8,13,20,.82);
-    --panel2:rgba(12,19,28,.94);
-    --border:rgba(100,190,255,.16);
-    --blue:#35c7ff;
-    --blue2:#1677ff;
-    --cyan:#7ce8ff;
-    --text:#eef8ff;
-    --muted:#718497;
-    --danger:#ff5364;
-    --green:#35e6a1;
-    --shadow:0 0 50px rgba(0,150,255,.08);
+    --cyan:#00eaff;
+    --cyan2:#007dff;
+    --red:#ff1838;
+    --bg:#02070d;
+    --panel:rgba(3,16,27,.82);
+    --text:#e9fbff;
+    --muted:#72a9b7;
+    --border:rgba(0,234,255,.25);
 }
 
-body.light{
-    --bg:#eaf1f7;
-    --panel:rgba(255,255,255,.82);
-    --panel2:rgba(247,251,255,.96);
-    --border:rgba(20,90,140,.15);
-    --blue:#007fc7;
-    --blue2:#1769e0;
-    --cyan:#007eac;
-    --text:#091522;
-    --muted:#647587;
-    --shadow:0 0 40px rgba(0,100,180,.10);
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
 
-html,body{
+html,
+body{
+    margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 
 body{
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-    color:var(--text);
-    background:
-        radial-gradient(
-            circle at 50% 42%,
-            rgba(0,145,255,.11),
-            transparent 25%
-        ),
-        radial-gradient(
-            circle at 90% 10%,
-            rgba(0,200,255,.05),
-            transparent 25%
-        ),
-        linear-gradient(
-            135deg,
-            var(--bg),
-            #071019
-        );
+    min-height:100dvh;
 }
 
-/* =====================================================
-   BACKGROUND HUD
-===================================================== */
+/* =========================
+   BACKGROUND
+========================= */
 
-.background-grid{
+body::before{
+    content:"";
     position:fixed;
     inset:0;
     pointer-events:none;
-    opacity:.16;
-    background-image:
-        linear-gradient(
-            rgba(70,180,255,.07) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(70,180,255,.07) 1px,
-            transparent 1px
-        );
-    background-size:42px 42px;
-    mask-image:linear-gradient(
-        to bottom,
-        transparent,
-        black 25%,
-        black 75%,
-        transparent
-    );
+    background:
+        linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,234,255,.035) 1px,transparent 1px);
+    background-size:35px 35px;
+    z-index:0;
 }
 
-.scan-line{
+.scanline{
     position:fixed;
     left:0;
-    right:0;
-    height:1px;
+    width:100%;
+    height:2px;
     background:linear-gradient(
         90deg,
         transparent,
-        rgba(53,199,255,.3),
+        var(--cyan),
         transparent
     );
-    animation:scan 7s linear infinite;
+    opacity:.18;
+    animation:scan 6s linear infinite;
+    z-index:5;
     pointer-events:none;
-    opacity:.35;
 }
 
 @keyframes scan{
@@ -124,199 +82,13 @@ body{
     100%{top:105%}
 }
 
-/* =====================================================
-   HEADER
-===================================================== */
-
-.topbar{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    height:76px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 28px;
-    z-index:20;
-    background:linear-gradient(
-        to bottom,
-        rgba(2,6,11,.95),
-        transparent
-    );
-}
-
-.left-header,
-.right-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.menu-button{
-    width:44px;
-    height:44px;
-    border:1px solid var(--border);
-    background:var(--panel);
-    color:var(--text);
-    border-radius:12px;
-    cursor:pointer;
-    font-size:20px;
-    backdrop-filter:blur(20px);
-}
-
-.menu-button:hover{
-    border-color:rgba(53,199,255,.5);
-}
-
-.logo-title{
-    line-height:1;
-}
-
-.logo-title strong{
-    display:block;
-    font-size:18px;
-    letter-spacing:4px;
-}
-
-.logo-title span{
-    display:block;
-    margin-top:5px;
-    font-size:8px;
-    letter-spacing:3px;
-    color:var(--blue);
-}
-
-.system-status{
-    display:flex;
-    align-items:center;
-    gap:7px;
-    border:1px solid var(--border);
-    background:var(--panel);
-    padding:9px 12px;
-    border-radius:20px;
-    font-size:9px;
-    letter-spacing:2px;
-    color:var(--muted);
-    backdrop-filter:blur(20px);
-}
-
-.status-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 12px var(--green);
-}
-
-/* =====================================================
-   LEFT NAV
-===================================================== */
-
-.sidebar{
-    position:fixed;
-    top:0;
-    left:0;
-    width:285px;
-    height:100%;
-    z-index:100;
-    padding:25px 18px;
-    background:var(--panel2);
-    border-right:1px solid var(--border);
-    backdrop-filter:blur(30px);
-    transform:translateX(-105%);
-    transition:.35s ease;
-}
-
-.sidebar.open{
-    transform:translateX(0);
-}
-
-.sidebar-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:35px;
-}
-
-.sidebar-brand{
-    font-size:22px;
-    font-weight:800;
-    letter-spacing:3px;
-}
-
-.sidebar-brand small{
-    display:block;
-    margin-top:5px;
-    font-size:8px;
-    letter-spacing:3px;
-    color:var(--blue);
-}
-
-.close{
-    border:0;
-    background:none;
-    color:var(--muted);
-    font-size:25px;
-    cursor:pointer;
-}
-
-.nav-label{
-    color:var(--muted);
-    font-size:8px;
-    letter-spacing:3px;
-    margin:20px 5px 9px;
-}
-
-.nav-button{
-    width:100%;
-    display:flex;
-    align-items:center;
-    gap:13px;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid transparent;
-    background:transparent;
-    color:var(--text);
-    text-align:left;
-    cursor:pointer;
-    margin-bottom:5px;
-}
-
-.nav-button:hover,
-.nav-button.active{
-    background:rgba(53,199,255,.08);
-    border-color:var(--border);
-}
-
-.nav-icon{
-    width:30px;
-    text-align:center;
-    color:var(--blue);
-}
-
-/* =====================================================
-   OVERLAY
-===================================================== */
-
-.overlay{
-    position:fixed;
-    inset:0;
-    z-index:90;
-    background:rgba(0,0,0,.52);
-    backdrop-filter:blur(3px);
-    display:none;
-}
-
-.overlay.show{
-    display:block;
-}
-
-/* =====================================================
+/* =========================
    MAIN
-===================================================== */
+========================= */
 
 .main{
+    position:fixed;
+    inset:0;
     width:100%;
     height:100%;
     display:flex;
@@ -324,245 +96,417 @@ body{
     align-items:center;
     justify-content:center;
     padding:80px 20px 130px;
+    overflow:hidden;
+    z-index:2;
 }
 
-/* =====================================================
-   CORE
-===================================================== */
+/* =========================
+   HEADER
+========================= */
 
-.core-wrapper{
+.header{
+    position:absolute;
+    top:18px;
+    left:20px;
+    right:20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:20;
+}
+
+.brand{
+    display:flex;
+    flex-direction:column;
+}
+
+.brand-title{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:5px;
+    color:var(--cyan);
+    text-shadow:0 0 15px rgba(0,234,255,.7);
+}
+
+.brand-sub{
+    margin-top:3px;
+    font-size:9px;
+    letter-spacing:4px;
+    color:var(--muted);
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:10px;
+    letter-spacing:2px;
+    color:#7dffbf;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#42ff9c;
+    box-shadow:0 0 12px #42ff9c;
+}
+
+/* =========================
+   CORE
+========================= */
+
+.core-area{
     position:relative;
-    width:310px;
-    height:310px;
+    width:min(72vw,330px);
+    height:min(72vw,330px);
     display:flex;
     align-items:center;
     justify-content:center;
-    margin-bottom:5px;
 }
 
 .core-glow{
     position:absolute;
-    width:130px;
-    height:130px;
+    width:125px;
+    height:125px;
     border-radius:50%;
-    background:rgba(0,160,255,.13);
-    filter:blur(40px);
-    animation:pulse 3s ease-in-out infinite;
+    background:radial-gradient(
+        circle,
+        rgba(0,234,255,.35),
+        rgba(0,120,255,.12) 45%,
+        transparent 72%
+    );
+    filter:blur(5px);
+    animation:pulse 2.5s ease-in-out infinite;
 }
 
 @keyframes pulse{
     0%,100%{
-        transform:scale(.85);
-        opacity:.55;
+        transform:scale(.95);
+        opacity:.7;
     }
     50%{
-        transform:scale(1.15);
+        transform:scale(1.08);
         opacity:1;
     }
 }
 
 .core{
-    position:absolute;
-    width:135px;
-    height:135px;
+    position:relative;
+    width:100px;
+    height:100px;
     border-radius:50%;
     display:flex;
     align-items:center;
     justify-content:center;
     background:
         radial-gradient(
-            circle,
-            rgba(41,185,255,.25),
-            rgba(2,9,17,.95) 68%
+            circle at 50% 45%,
+            #cfffff 0%,
+            var(--cyan) 8%,
+            #006cff 34%,
+            #031526 65%,
+            #000 100%
         );
-    border:1px solid rgba(80,210,255,.65);
     box-shadow:
-        0 0 45px rgba(0,165,255,.25),
-        inset 0 0 35px rgba(0,180,255,.12);
+        0 0 20px var(--cyan),
+        0 0 60px rgba(0,234,255,.55),
+        inset 0 0 20px rgba(255,255,255,.5);
+    z-index:5;
 }
 
-.core-k{
-    font-size:65px;
-    font-weight:800;
-    color:#f2fcff;
+.core-letter{
+    font-size:52px;
+    font-weight:900;
+    color:white;
     text-shadow:
-        0 0 10px var(--cyan),
-        0 0 35px var(--blue);
+        0 0 10px white,
+        0 0 25px var(--cyan);
 }
+
+/* RINGS */
 
 .ring{
     position:absolute;
+    border:1px solid var(--cyan);
     border-radius:50%;
-    border:1px solid rgba(53,199,255,.18);
+    box-shadow:
+        0 0 10px rgba(0,234,255,.35),
+        inset 0 0 10px rgba(0,234,255,.1);
 }
 
-.ring.one{
-    width:200px;
-    height:200px;
-    border-top-color:var(--blue);
-    border-bottom-color:rgba(53,199,255,.05);
-    animation:spin 9s linear infinite;
+.ring1{
+    width:145px;
+    height:145px;
+    border-style:dashed;
+    animation:rotate1 8s linear infinite;
 }
 
-.ring.two{
+.ring2{
+    width:190px;
+    height:190px;
+    border-color:rgba(0,234,255,.65);
+    border-top-color:transparent;
+    border-bottom-color:transparent;
+    animation:rotate2 12s linear infinite;
+}
+
+.ring3{
     width:240px;
     height:240px;
-    border-left-color:var(--blue);
-    border-right-color:rgba(53,199,255,.04);
-    border-style:dashed;
-    animation:spinReverse 15s linear infinite;
+    border-style:dotted;
+    opacity:.6;
+    animation:rotate1 18s linear infinite reverse;
 }
 
-.ring.three{
+.ring4{
     width:285px;
     height:285px;
-    border-top-color:rgba(53,199,255,.3);
-    border-bottom-color:rgba(53,199,255,.3);
-    animation:spin 25s linear infinite;
+    border-color:rgba(0,234,255,.3);
+    border-left-color:transparent;
+    border-right-color:transparent;
+    animation:rotate2 22s linear infinite;
 }
 
-@keyframes spin{
+@keyframes rotate1{
+    from{transform:rotate(0deg)}
     to{transform:rotate(360deg)}
 }
 
-@keyframes spinReverse{
-    to{transform:rotate(-360deg)}
+@keyframes rotate2{
+    from{transform:rotate(360deg)}
+    to{transform:rotate(0deg)}
 }
 
-.core-mark{
+/* =========================
+   FUN MODE
+========================= */
+
+body.fun-mode{
+    --cyan:#ff1838;
+    --cyan2:#ff001f;
+    --border:rgba(255,24,56,.35);
+}
+
+body.fun-mode .core{
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #fff 0%,
+            #ff5066 8%,
+            #ff002b 34%,
+            #30030b 65%,
+            #000 100%
+        );
+
+    box-shadow:
+        0 0 20px var(--red),
+        0 0 60px rgba(255,24,56,.65),
+        inset 0 0 20px rgba(255,255,255,.5);
+}
+
+body.fun-mode .core-glow{
+    background:radial-gradient(
+        circle,
+        rgba(255,24,56,.42),
+        rgba(180,0,30,.14) 45%,
+        transparent 72%
+    );
+}
+
+body.fun-mode .ring{
+    border-color:var(--red);
+    box-shadow:
+        0 0 12px rgba(255,24,56,.45),
+        inset 0 0 10px rgba(255,24,56,.12);
+}
+
+body.fun-mode .ring2,
+body.fun-mode .ring4{
+    border-top-color:transparent;
+    border-bottom-color:transparent;
+}
+
+body.fun-mode .status{
+    color:#ff6075;
+}
+
+body.fun-mode .status-dot{
+    background:#ff1838;
+    box-shadow:0 0 12px #ff1838;
+}
+
+.fun-label{
     position:absolute;
-    width:7px;
-    height:7px;
-    background:var(--cyan);
-    border-radius:50%;
-    box-shadow:0 0 15px var(--cyan);
-}
-
-.core-mark.m1{
-    top:24px;
+    bottom:-42px;
     left:50%;
+    transform:translateX(-50%);
+    padding:7px 14px;
+    border:1px solid var(--red);
+    color:#ff5a6d;
+    font-size:9px;
+    letter-spacing:3px;
+    white-space:nowrap;
+    border-radius:20px;
+    opacity:0;
+    transition:.3s;
+    box-shadow:0 0 15px rgba(255,24,56,.2);
 }
 
-.core-mark.m2{
-    bottom:24px;
-    right:20%;
+body.fun-mode .fun-label{
+    opacity:1;
 }
 
-.core-mark.m3{
-    left:20%;
-    top:50%;
+/* =========================
+   SIDE MENU
+========================= */
+
+.menu-button{
+    position:fixed;
+    top:17px;
+    right:18px;
+    width:42px;
+    height:42px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:rgba(0,20,32,.65);
+    color:var(--cyan);
+    font-size:22px;
+    z-index:100;
+    cursor:pointer;
 }
 
-.core-status{
-    position:absolute;
-    bottom:0;
-    font-size:8px;
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:280px;
+    height:100%;
+    padding:80px 20px 30px;
+    background:rgba(2,10,17,.96);
+    border-right:1px solid var(--border);
+    backdrop-filter:blur(18px);
+    transform:translateX(-105%);
+    transition:.35s ease;
+    z-index:90;
+}
+
+.sidebar.open{
+    transform:translateX(0);
+}
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+    z-index:80;
+}
+
+.overlay.open{
+    opacity:1;
+    pointer-events:auto;
+}
+
+.menu-title{
+    color:var(--cyan);
     letter-spacing:4px;
-    color:var(--blue);
+    font-size:12px;
+    margin-bottom:25px;
 }
 
-/* =====================================================
+.menu-item{
+    width:100%;
+    padding:15px;
+    margin-bottom:9px;
+    border:1px solid rgba(0,234,255,.13);
+    background:rgba(0,234,255,.025);
+    border-radius:10px;
+    color:#bfeaf2;
+    text-align:left;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.menu-item:hover,
+.menu-item.active{
+    border-color:var(--cyan);
+    color:var(--cyan);
+    box-shadow:0 0 15px rgba(0,234,255,.1);
+}
+
+/* =========================
    CHAT
-===================================================== */
+========================= */
 
 .chat-panel{
-    width:min(760px,100%);
-    height:260px;
+    position:fixed;
+    left:50%;
+    bottom:92px;
+    transform:translateX(-50%);
+    width:min(92%,700px);
+    max-height:42vh;
     overflow-y:auto;
-    padding:5px 5px 20px;
-    scrollbar-width:thin;
-}
-
-.chat-panel::-webkit-scrollbar{
-    width:3px;
-}
-
-.chat-panel::-webkit-scrollbar-thumb{
-    background:var(--blue);
+    padding:12px;
+    z-index:30;
+    pointer-events:none;
 }
 
 .message{
-    max-width:82%;
-    padding:13px 16px;
-    margin:8px 0;
-    border-radius:14px;
-    line-height:1.5;
+    width:fit-content;
+    max-width:90%;
+    margin:7px 0;
+    padding:10px 13px;
+    border-radius:12px;
     font-size:14px;
-    animation:messageIn .25s ease;
+    line-height:1.45;
+    pointer-events:auto;
+    backdrop-filter:blur(10px);
 }
 
-.message.ai{
+.jarvis-message{
     margin-right:auto;
-    background:var(--panel);
     border:1px solid var(--border);
-    border-left:2px solid var(--blue);
+    background:rgba(0,30,45,.68);
+    color:#dffaff;
 }
 
-.message.user{
+.user-message{
     margin-left:auto;
-    background:rgba(20,83,125,.4);
-    border:1px solid rgba(53,199,255,.15);
-    border-right:2px solid var(--blue);
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06);
+    color:white;
 }
 
-.message-header{
-    font-size:8px;
-    letter-spacing:2px;
-    color:var(--blue);
-    margin-bottom:5px;
-}
-
-@keyframes messageIn{
-    from{
-        opacity:0;
-        transform:translateY(8px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-/* =====================================================
+/* =========================
    COMMAND BAR
-===================================================== */
+========================= */
 
 .command-area{
     position:fixed;
-    bottom:25px;
     left:50%;
+    bottom:max(18px,env(safe-area-inset-bottom));
     transform:translateX(-50%);
-    width:min(760px,calc(100% - 30px));
-    z-index:30;
+    width:min(94%,700px);
+    display:flex;
+    gap:8px;
+    z-index:50;
 }
 
 .command-box{
+    flex:1;
+    min-width:0;
+    height:52px;
     display:flex;
     align-items:center;
-    gap:8px;
-    padding:8px;
+    padding:0 8px 0 15px;
     border:1px solid var(--border);
-    background:var(--panel);
-    border-radius:17px;
-    backdrop-filter:blur(25px);
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.3),
-        var(--shadow);
-}
-
-.command-box:focus-within{
-    border-color:rgba(53,199,255,.42);
-    box-shadow:
-        0 0 30px rgba(0,160,255,.1);
-}
-
-.command-icon{
-    width:42px;
-    height:42px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:var(--blue);
+    border-radius:15px;
+    background:rgba(2,15,25,.9);
+    box-shadow:0 0 20px rgba(0,234,255,.06);
+    backdrop-filter:blur(15px);
 }
 
 #messageInput{
@@ -573,167 +517,166 @@ body{
     outline:none;
     background:none;
     color:var(--text);
-    font-size:14px;
+    font-size:16px;
+    line-height:42px;
+    transform:none;
+    zoom:1;
 }
 
 #messageInput::placeholder{
-    color:var(--muted);
+    color:#557d87;
 }
 
 .command-button{
     width:42px;
     height:42px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    background:rgba(53,199,255,.06);
-    color:var(--text);
+    border:0;
+    border-radius:10px;
+    background:rgba(0,234,255,.08);
+    color:var(--cyan);
+    font-size:18px;
     cursor:pointer;
 }
 
-.command-button:hover{
-    background:rgba(53,199,255,.15);
+.send-button{
+    width:52px;
+    height:52px;
+    border:1px solid var(--border);
+    border-radius:15px;
+    background:rgba(0,234,255,.08);
+    color:var(--cyan);
+    font-size:20px;
+    cursor:pointer;
 }
 
-.send{
-    background:linear-gradient(
-        135deg,
-        var(--blue2),
-        var(--blue)
-    );
-    border:0;
-    color:white;
-}
-
-/* =====================================================
+/* =========================
    SETTINGS
-===================================================== */
+========================= */
 
 .settings{
     position:fixed;
     inset:0;
-    z-index:200;
+    padding:80px 20px 110px;
+    overflow-y:auto;
+    background:rgba(2,7,13,.97);
+    z-index:70;
     display:none;
-    overflow:auto;
-    padding:35px 20px;
-    background:
-        radial-gradient(
-            circle at 50% 20%,
-            rgba(0,150,255,.08),
-            transparent 30%
-        ),
-        var(--bg);
 }
 
 .settings.open{
     display:block;
 }
 
-.settings-inner{
-    width:min(720px,100%);
-    margin:auto;
+.settings-title{
+    font-size:25px;
+    letter-spacing:3px;
+    color:var(--cyan);
+    margin-bottom:8px;
 }
 
-.settings-header{
+.settings-subtitle{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:28px;
+}
+
+.setting-card{
+    max-width:700px;
+    margin:0 auto 14px;
+    padding:18px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:rgba(0,20,32,.5);
+}
+
+.setting-row{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:30px;
+    gap:15px;
 }
 
-.settings-title{
-    font-size:28px;
-    font-weight:700;
-}
-
-.back{
-    border:1px solid var(--border);
-    background:var(--panel);
-    color:var(--text);
-    padding:10px 15px;
-    border-radius:11px;
-    cursor:pointer;
-}
-
-.setting{
-    padding:20px;
-    margin-bottom:14px;
-    border:1px solid var(--border);
-    border-radius:16px;
-    background:var(--panel);
-}
-
-.setting h3{
+.setting-name{
     font-size:15px;
-    margin-bottom:7px;
 }
 
-.setting p{
+.setting-description{
     color:var(--muted);
-    font-size:12px;
-    line-height:1.5;
-    margin-bottom:15px;
+    font-size:11px;
+    margin-top:5px;
 }
 
-.options{
-    display:flex;
-    gap:8px;
-}
-
-.option{
-    flex:1;
-    padding:12px;
+select{
+    min-width:150px;
+    padding:10px;
+    border-radius:9px;
     border:1px solid var(--border);
-    background:transparent;
+    background:#06141e;
     color:var(--text);
-    border-radius:10px;
-    cursor:pointer;
-}
-
-.option.active{
-    border-color:var(--blue);
-    color:var(--blue);
-    background:rgba(53,199,255,.07);
-}
-
-.custom-address{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-}
-
-.custom-address input{
-    flex:1;
-    min-width:0;
-    border:1px solid var(--border);
-    background:transparent;
-    color:var(--text);
-    border-radius:10px;
-    padding:12px;
     outline:none;
 }
 
-.save{
-    border:0;
-    background:var(--blue2);
-    color:white;
-    padding:0 17px;
-    border-radius:10px;
+/* TOGGLE */
+
+.switch{
+    position:relative;
+    width:52px;
+    height:28px;
+    flex-shrink:0;
 }
 
-/* =====================================================
+.switch input{
+    display:none;
+}
+
+.slider{
+    position:absolute;
+    inset:0;
+    background:#17252c;
+    border:1px solid #34505a;
+    border-radius:30px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.slider::before{
+    content:"";
+    position:absolute;
+    width:20px;
+    height:20px;
+    left:3px;
+    top:3px;
+    border-radius:50%;
+    background:#78949c;
+    transition:.3s;
+}
+
+.switch input:checked + .slider{
+    background:rgba(255,24,56,.15);
+    border-color:var(--red);
+}
+
+.switch input:checked + .slider::before{
+    transform:translateX(24px);
+    background:var(--red);
+    box-shadow:0 0 12px var(--red);
+}
+
+/* =========================
    TYPING
-===================================================== */
+========================= */
 
 .typing{
     display:flex;
     gap:4px;
+    align-items:center;
 }
 
 .typing span{
     width:5px;
     height:5px;
-    background:var(--blue);
     border-radius:50%;
+    background:var(--cyan);
     animation:typing 1s infinite;
 }
 
@@ -747,434 +690,306 @@ body{
 
 @keyframes typing{
     0%,100%{
+        opacity:.25;
         transform:translateY(0);
-        opacity:.35;
     }
     50%{
-        transform:translateY(-4px);
         opacity:1;
+        transform:translateY(-3px);
     }
 }
 
-/* =====================================================
+/* =========================
    MOBILE
-===================================================== */
+========================= */
 
 @media(max-width:600px){
 
-    .topbar{
-        height:65px;
-        padding:0 14px;
+    .main{
+        padding:75px 12px 125px;
     }
 
-    .logo-title strong{
-        font-size:15px;
-        letter-spacing:3px;
+    .brand-title{
+        font-size:18px;
+        letter-spacing:4px;
     }
 
-    .logo-title span{
+    .brand-sub{
         font-size:7px;
     }
 
-    .system-status{
-        padding:8px;
-        font-size:0;
-    }
-
-    .system-status .status-dot{
-        width:8px;
-        height:8px;
-    }
-
-    .main{
-        padding:65px 12px 115px;
-    }
-
-    .core-wrapper{
-        width:260px;
-        height:260px;
-    }
-
-    .ring.one{
-        width:175px;
-        height:175px;
-    }
-
-    .ring.two{
-        width:215px;
-        height:215px;
-    }
-
-    .ring.three{
-        width:250px;
-        height:250px;
+    .core-area{
+        width:82vw;
+        height:82vw;
     }
 
     .core{
-        width:110px;
-        height:110px;
+        width:82px;
+        height:82px;
     }
 
-    .core-k{
-        font-size:53px;
+    .core-letter{
+        font-size:43px;
+    }
+
+    .ring1{
+        width:120px;
+        height:120px;
+    }
+
+    .ring2{
+        width:158px;
+        height:158px;
+    }
+
+    .ring3{
+        width:198px;
+        height:198px;
+    }
+
+    .ring4{
+        width:235px;
+        height:235px;
     }
 
     .chat-panel{
-        height:275px;
+        max-height:35vh;
+        bottom:90px;
     }
 
-    .message{
-        max-width:91%;
-        font-size:13px;
+    #messageInput{
+        font-size:16px !important;
+        transform:none !important;
+        zoom:1 !important;
     }
 
-    .command-area{
-        bottom:12px;
-        width:calc(100% - 20px);
-    }
-
-    .command-box{
-        border-radius:15px;
-    }
-
-    .command-icon{
-        display:none;
+    .sidebar{
+        width:82%;
+        max-width:300px;
     }
 
     .settings{
-        padding:22px 15px;
-    }
-
-    .options{
-        flex-direction:column;
-    }
-
-    .custom-address{
-        flex-direction:column;
-    }
-
-    .save{
-        height:43px;
+        padding-top:75px;
     }
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="background-grid"></div>
-<div class="scan-line"></div>
+<div class="scanline"></div>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
+<!-- HEADER -->
 
-<header class="topbar">
+<header class="header">
 
-    <div class="left-header">
-
-        <button
-            class="menu-button"
-            onclick="openSidebar()"
-        >
-            ☰
-        </button>
-
-        <div class="logo-title">
-            <strong>J.A.R.V.I.S.</strong>
-            <span>KARAHAN INC.</span>
-        </div>
-
+    <div class="brand">
+        <div class="brand-title">J.A.R.V.I.S.</div>
+        <div class="brand-sub">KARAHAN INC.</div>
     </div>
 
-    <div class="right-header">
-
-        <div class="system-status">
-            <span class="status-dot"></span>
-            SYSTEM ONLINE
-        </div>
-
+    <div class="status">
+        <div class="status-dot"></div>
+        <span id="statusText">SYSTEM ONLINE</span>
     </div>
 
 </header>
 
+<!-- MENU BUTTON -->
 
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
+<button class="menu-button" onclick="toggleMenu()">☰</button>
 
-<div
-    class="overlay"
-    id="overlay"
-    onclick="closeSidebar()"
-></div>
+<!-- SIDEBAR -->
 
-<aside
-    class="sidebar"
-    id="sidebar"
->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
-    <div class="sidebar-head">
+<aside class="sidebar" id="sidebar">
 
-        <div class="sidebar-brand">
-            JARVIS
-            <small>KARAHAN INC.</small>
-        </div>
-
-        <button
-            class="close"
-            onclick="closeSidebar()"
-        >
-            ×
-        </button>
-
+    <div class="menu-title">
+        KARAHAN INC. // CONTROL
     </div>
 
-    <div class="nav-label">
-        SYSTEM
-    </div>
-
-    <button
-        class="nav-button active"
-        onclick="goHome()"
-    >
-        <span class="nav-icon">◉</span>
-        Ana Ekran
+    <button class="menu-item active" onclick="showHome()">
+        ◈ Ana Ekran
     </button>
 
-    <button
-        class="nav-button"
-        onclick="focusChat()"
-    >
-        <span class="nav-icon">⌁</span>
-        JARVIS Chat
+    <button class="menu-item" onclick="focusChat()">
+        ◉ JARVIS Chat
     </button>
 
-    <div class="nav-label">
-        CONFIGURATION
-    </div>
-
-    <button
-        class="nav-button"
-        onclick="openSettings()"
-    >
-        <span class="nav-icon">⚙</span>
-        Ayarlar
+    <button class="menu-item" onclick="openSettings()">
+        ⚙ Ayarlar
     </button>
 
 </aside>
 
+<!-- MAIN -->
 
-<!-- =====================================================
-     MAIN
-===================================================== -->
+<main class="main" id="main">
 
-<main class="main">
-
-    <!-- CORE -->
-
-    <section class="core-wrapper">
+    <div class="core-area">
 
         <div class="core-glow"></div>
 
-        <div class="ring one"></div>
-        <div class="ring two"></div>
-        <div class="ring three"></div>
+        <div class="ring ring4"></div>
+        <div class="ring ring3"></div>
+        <div class="ring ring2"></div>
+        <div class="ring ring1"></div>
 
         <div class="core">
-            <div class="core-k">K</div>
+            <div class="core-letter">K</div>
         </div>
 
-        <span class="core-mark m1"></span>
-        <span class="core-mark m2"></span>
-        <span class="core-mark m3"></span>
-
-        <div class="core-status">
-            ARTIFICIAL INTELLIGENCE
+        <div class="fun-label">
+            EĞLENCE MODU
         </div>
 
-    </section>
-
-
-    <!-- CHAT -->
-
-    <section
-        class="chat-panel"
-        id="messages"
-    >
-
-        <div class="message ai">
-
-            <div class="message-header">
-                J.A.R.V.I.S.
-            </div>
-
-            <div>
-                Merhaba Efendim, nasıl yardımcı olabilirim?
-            </div>
-
-        </div>
-
-    </section>
+    </div>
 
 </main>
 
+<!-- CHAT -->
 
-<!-- =====================================================
-     COMMAND BAR
-===================================================== -->
+<div class="chat-panel" id="chatPanel">
+
+    <div class="message jarvis-message" id="welcomeMessage">
+        Merhaba Efendim, nasıl yardımcı olabilirim?
+    </div>
+
+</div>
+
+<!-- COMMAND -->
 
 <div class="command-area">
 
     <div class="command-box">
 
-        <div class="command-icon">
-            ◇
-        </div>
-
         <input
             id="messageInput"
             type="text"
             autocomplete="off"
-            placeholder="JARVIS'e bir komut verin..."
+            autocorrect="off"
+            autocapitalize="sentences"
+            spellcheck="false"
+            placeholder="JARVIS'e bir şey söyle..."
         >
 
         <button
             class="command-button"
-            onclick="voiceCommand()"
+            onclick="startVoice()"
             title="Sesli komut"
         >
             🎙
         </button>
 
-        <button
-            class="command-button send"
-            id="sendButton"
-            onclick="sendMessage()"
-        >
-            ➤
-        </button>
-
     </div>
+
+    <button
+        class="send-button"
+        onclick="sendMessage()"
+    >
+        ➤
+    </button>
 
 </div>
 
+<!-- SETTINGS -->
 
-<!-- =====================================================
-     SETTINGS
-===================================================== -->
+<section class="settings" id="settings">
 
-<section
-    class="settings"
-    id="settings"
->
+    <div class="settings-title">
+        AYARLAR
+    </div>
 
-    <div class="settings-inner">
+    <div class="settings-subtitle">
+        J.A.R.V.I.S. kişisel sistem yapılandırması
+    </div>
 
-        <div class="settings-header">
+    <!-- HITAP -->
 
-            <div class="settings-title">
-                Ayarlar
+    <div class="setting-card">
+
+        <div class="setting-row">
+
+            <div>
+                <div class="setting-name">
+                    Hitap şekli
+                </div>
+
+                <div class="setting-description">
+                    JARVIS'in sana nasıl hitap edeceğini seç.
+                </div>
             </div>
 
-            <button
-                class="back"
-                onclick="closeSettings()"
-            >
-                ← Geri
-            </button>
+            <select id="addressSelect" onchange="changeAddress()">
+                <option value="Efendim">Efendim</option>
+                <option value="Komutanım">Komutanım</option>
+                <option value="Patron">Patron</option>
+                <option value="custom">Özel</option>
+            </select>
 
         </div>
 
+    </div>
 
-        <div class="setting">
+    <!-- EĞLENCE -->
 
-            <h3>
-                Görünüm
-            </h3>
+    <div class="setting-card">
 
-            <p>
-                J.A.R.V.I.S. arayüzünün görünümünü
-                değiştirebilirsiniz.
-            </p>
+        <div class="setting-row">
 
-            <div class="options">
+            <div>
 
-                <button
-                    class="option"
-                    id="darkOption"
-                    onclick="setTheme('dark')"
-                >
-                    ◐ Gece Modu
-                </button>
+                <div class="setting-name">
+                    🔴 Eğlence Modu
+                </div>
 
-                <button
-                    class="option"
-                    id="lightOption"
-                    onclick="setTheme('light')"
-                >
-                    ☀ Gündüz Modu
-                </button>
+                <div class="setting-description">
+                    JARVIS daha esprili, samimi ve hafif alaycı konuşur.
+                    Çekirdek kırmızıya dönüşür.
+                </div>
 
             </div>
 
-        </div>
-
-
-        <div class="setting">
-
-            <h3>
-                Hitap şekli
-            </h3>
-
-            <p>
-                JARVIS'in size nasıl hitap edeceğini
-                belirleyin. Varsayılan değer Efendim'dir.
-            </p>
-
-            <div class="options">
-
-                <button
-                    class="option"
-                    id="efendim"
-                    onclick="setAddress('Efendim')"
-                >
-                    Efendim
-                </button>
-
-                <button
-                    class="option"
-                    id="komutan"
-                    onclick="setAddress('Komutanım')"
-                >
-                    Komutanım
-                </button>
-
-                <button
-                    class="option"
-                    id="patron"
-                    onclick="setAddress('Patron')"
-                >
-                    Patron
-                </button>
-
-            </div>
-
-            <div class="custom-address">
+            <label class="switch">
 
                 <input
-                    id="customAddress"
-                    placeholder="Özel hitap..."
+                    type="checkbox"
+                    id="funMode"
+                    onchange="toggleFunMode()"
                 >
 
-                <button
-                    class="save"
-                    onclick="saveAddress()"
-                >
-                    Kaydet
-                </button>
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- THEME -->
+
+    <div class="setting-card">
+
+        <div class="setting-row">
+
+            <div>
+
+                <div class="setting-name">
+                    Görünüm
+                </div>
+
+                <div class="setting-description">
+                    Arayüz görünümünü seç.
+                </div>
 
             </div>
+
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="dark">Gece</option>
+                <option value="light">Gündüz</option>
+            </select>
 
         </div>
 
@@ -1182,60 +997,60 @@ body{
 
 </section>
 
-
 <script>
 
-/* =====================================================
-   STATE
-===================================================== */
+/* =========================
+   STORAGE
+========================= */
 
 let address =
-    localStorage.getItem("jarvis_address")
-    || "Efendim";
+    localStorage.getItem("jarvis_address") || "Efendim";
 
 let theme =
-    localStorage.getItem("jarvis_theme")
-    || "dark";
+    localStorage.getItem("jarvis_theme") || "dark";
+
+let funMode =
+    localStorage.getItem("jarvis_fun_mode") === "true";
 
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
+/* =========================
+   INIT
+========================= */
 
-const input =
-    document.getElementById("messageInput");
+document.addEventListener("DOMContentLoaded", () => {
 
-const messages =
-    document.getElementById("messages");
+    document.getElementById("addressSelect").value =
+        ["Efendim","Komutanım","Patron"].includes(address)
+        ? address
+        : "custom";
 
-const sendButton =
-    document.getElementById("sendButton");
+    document.getElementById("themeSelect").value = theme;
+
+    document.getElementById("funMode").checked = funMode;
+
+    applyFunMode();
+    applyTheme();
+
+});
 
 
-/* =====================================================
-   START
-===================================================== */
+/* =========================
+   MENU
+========================= */
 
-applyTheme();
-updateAddressButtons();
-
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-function openSidebar(){
+function toggleMenu(){
 
     document
         .getElementById("sidebar")
-        .classList.add("open");
+        .classList.toggle("open");
 
     document
         .getElementById("overlay")
-        .classList.add("show");
+        .classList.toggle("open");
+
 }
 
-function closeSidebar(){
+function closeMenu(){
 
     document
         .getElementById("sidebar")
@@ -1243,50 +1058,161 @@ function closeSidebar(){
 
     document
         .getElementById("overlay")
-        .classList.remove("show");
+        .classList.remove("open");
+
 }
 
-function goHome(){
 
-    closeSidebar();
-    closeSettings();
+/* =========================
+   HOME
+========================= */
+
+function showHome(){
+
+    document
+        .getElementById("settings")
+        .classList.remove("open");
+
+    closeMenu();
+
 }
+
+
+/* =========================
+   CHAT
+========================= */
 
 function focusChat(){
 
-    closeSidebar();
-    input.focus();
+    closeMenu();
+
+    setTimeout(() => {
+
+        document
+            .getElementById("messageInput")
+            .focus();
+
+    },300);
+
 }
 
 
-/* =====================================================
+/* =========================
    SETTINGS
-===================================================== */
+========================= */
 
 function openSettings(){
 
-    closeSidebar();
+    closeMenu();
 
     document
         .getElementById("settings")
         .classList.add("open");
-}
 
-function closeSettings(){
-
-    document
-        .getElementById("settings")
-        .classList.remove("open");
 }
 
 
-/* =====================================================
+/* =========================
+   ADDRESS
+========================= */
+
+function changeAddress(){
+
+    const select =
+        document.getElementById("addressSelect");
+
+    if(select.value === "custom"){
+
+        const custom =
+            prompt(
+                "JARVIS'in sana nasıl hitap etmesini istiyorsun?"
+            );
+
+        if(custom && custom.trim()){
+
+            address = custom.trim();
+
+            localStorage.setItem(
+                "jarvis_address",
+                address
+            );
+
+        }else{
+
+            document.getElementById(
+                "addressSelect"
+            ).value = "Efendim";
+
+            address = "Efendim";
+
+            localStorage.setItem(
+                "jarvis_address",
+                address
+            );
+        }
+
+    }else{
+
+        address = select.value;
+
+        localStorage.setItem(
+            "jarvis_address",
+            address
+        );
+
+    }
+
+}
+
+
+/* =========================
+   FUN MODE
+========================= */
+
+function toggleFunMode(){
+
+    funMode =
+        document.getElementById("funMode").checked;
+
+    localStorage.setItem(
+        "jarvis_fun_mode",
+        funMode
+    );
+
+    applyFunMode();
+
+}
+
+
+function applyFunMode(){
+
+    if(funMode){
+
+        document.body.classList.add("fun-mode");
+
+        document.getElementById("statusText")
+            .textContent = "FUN MODE ONLINE";
+
+    }else{
+
+        document.body.classList.remove("fun-mode");
+
+        document.getElementById("statusText")
+            .textContent = "SYSTEM ONLINE";
+
+    }
+
+}
+
+
+/* =========================
    THEME
-===================================================== */
+========================= */
 
-function setTheme(value){
+function changeTheme(){
 
-    theme=value;
+    theme =
+        document.getElementById("themeSelect").value;
 
     localStorage.setItem(
         "jarvis_theme",
@@ -1294,146 +1220,190 @@ function setTheme(value){
     );
 
     applyTheme();
+
 }
+
 
 function applyTheme(){
 
-    document.body.classList.toggle(
-        "light",
-        theme==="light"
-    );
+    if(theme === "light"){
 
-    document
-        .getElementById("darkOption")
-        .classList.toggle(
-            "active",
-            theme==="dark"
+        document.documentElement.style.setProperty(
+            "--bg",
+            "#eaf5f8"
         );
 
-    document
-        .getElementById("lightOption")
-        .classList.toggle(
-            "active",
-            theme==="light"
+        document.documentElement.style.setProperty(
+            "--text",
+            "#07151a"
         );
-}
-
-
-/* =====================================================
-   ADDRESS
-===================================================== */
-
-function setAddress(value){
-
-    address=value;
-
-    localStorage.setItem(
-        "jarvis_address",
-        address
-    );
-
-    updateAddressButtons();
-}
-
-function saveAddress(){
-
-    const value =
-        document
-            .getElementById("customAddress")
-            .value
-            .trim();
-
-    if(!value) return;
-
-    setAddress(value);
-
-    document
-        .getElementById("customAddress")
-        .value="";
-}
-
-function updateAddressButtons(){
-
-    document
-        .getElementById("efendim")
-        .classList.toggle(
-            "active",
-            address==="Efendim"
-        );
-
-    document
-        .getElementById("komutan")
-        .classList.toggle(
-            "active",
-            address==="Komutanım"
-        );
-
-    document
-        .getElementById("patron")
-        .classList.toggle(
-            "active",
-            address==="Patron"
-        );
-}
-
-
-/* =====================================================
-   ADD MESSAGE
-===================================================== */
-
-function addMessage(text,type){
-
-    const div =
-        document.createElement("div");
-
-    div.className =
-        "message " + type;
-
-    if(type==="ai"){
-
-        div.innerHTML=`
-            <div class="message-header">
-                J.A.R.V.I.S.
-            </div>
-            <div class="message-content"></div>
-        `;
 
     }else{
 
-        div.innerHTML=`
-            <div class="message-content"></div>
-        `;
+        document.documentElement.style.setProperty(
+            "--bg",
+            "#02070d"
+        );
+
+        document.documentElement.style.setProperty(
+            "--text",
+            "#e9fbff"
+        );
+
     }
 
-    div.querySelector(
-        ".message-content"
-    ).textContent=text;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-        messages.scrollHeight;
 }
 
 
-/* =====================================================
-   TYPING
-===================================================== */
+/* =========================
+   CHAT SEND
+========================= */
 
-function showTyping(){
+async function sendMessage(){
 
-    const div =
+    const input =
+        document.getElementById("messageInput");
+
+    const text =
+        input.value.trim();
+
+    if(!text) return;
+
+    addMessage(text,"user");
+
+    input.value = "";
+
+    const typing =
+        addTyping();
+
+    try{
+
+        const response =
+            await fetch("/chat",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    message:text,
+
+                    address:address,
+
+                    fun_mode:funMode
+
+                })
+
+            });
+
+        if(!response.ok){
+
+            throw new Error(
+                "Sunucu hatası: " +
+                response.status
+            );
+
+        }
+
+        const data =
+            await response.json();
+
+        typing.remove();
+
+        addMessage(
+            data.response ||
+            "Efendim, şu anda cevap oluşturamadım.",
+            "jarvis"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        typing.remove();
+
+        addMessage(
+            "Efendim, merkezi sistemle bağlantı kuramadım.",
+            "jarvis"
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ENTER
+========================= */
+
+document
+    .getElementById("messageInput")
+    .addEventListener(
+        "keydown",
+        function(event){
+
+            if(event.key === "Enter"){
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   ADD MESSAGE
+========================= */
+
+function addMessage(text,type){
+
+    const panel =
+        document.getElementById("chatPanel");
+
+    const message =
         document.createElement("div");
 
-    div.id="typing";
+    message.className =
+        "message " +
+        (
+            type === "user"
+            ? "user-message"
+            : "jarvis-message"
+        );
 
-    div.className="message ai";
+    message.textContent = text;
 
-    div.innerHTML=`
-        <div class="message-header">
-            J.A.R.V.I.S.
-        </div>
+    panel.appendChild(message);
 
+    panel.scrollTop =
+        panel.scrollHeight;
+
+}
+
+
+/* =========================
+   TYPING
+========================= */
+
+function addTyping(){
+
+    const panel =
+        document.getElementById("chatPanel");
+
+    const message =
+        document.createElement("div");
+
+    message.className =
+        "message jarvis-message";
+
+    message.innerHTML = `
         <div class="typing">
             <span></span>
             <span></span>
@@ -1441,131 +1411,21 @@ function showTyping(){
         </div>
     `;
 
-    messages.appendChild(div);
+    panel.appendChild(message);
 
-    messages.scrollTop =
-        messages.scrollHeight;
+    panel.scrollTop =
+        panel.scrollHeight;
+
+    return message;
+
 }
 
 
-/* =====================================================
-   CHAT
-===================================================== */
-
-async function sendMessage(){
-
-    const text =
-        input.value.trim();
-
-    if(!text) return;
-
-    addMessage(
-        text,
-        "user"
-    );
-
-    input.value="";
-
-    sendButton.disabled=true;
-
-    showTyping();
-
-    try{
-
-        const response =
-            await fetch(
-                "/chat",
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        message:text,
-
-                        address:address
-
-                    })
-                }
-            );
-
-        if(!response.ok){
-
-            throw new Error(
-                "Sunucu bağlantısı başarısız."
-            );
-        }
-
-        const data =
-            await response.json();
-
-        const typing =
-            document.getElementById(
-                "typing"
-            );
-
-        if(typing)
-            typing.remove();
-
-        addMessage(
-            data.response ||
-            "Üzgünüm Efendim, yanıt oluşturamadım.",
-            "ai"
-        );
-
-    }catch(error){
-
-        console.error(error);
-
-        const typing =
-            document.getElementById(
-                "typing"
-            );
-
-        if(typing)
-            typing.remove();
-
-        addMessage(
-            "JARVIS sunucusuyla bağlantı kurulamadı.",
-            "ai"
-        );
-
-    }finally{
-
-        sendButton.disabled=false;
-
-        input.focus();
-    }
-}
-
-
-/* =====================================================
-   ENTER
-===================================================== */
-
-input.addEventListener(
-    "keydown",
-    function(event){
-
-        if(event.key==="Enter"){
-
-            event.preventDefault();
-
-            sendMessage();
-        }
-    }
-);
-
-
-/* =====================================================
+/* =========================
    VOICE
-===================================================== */
+========================= */
 
-function voiceCommand(){
+function startVoice(){
 
     const SpeechRecognition =
         window.SpeechRecognition ||
@@ -1574,8 +1434,8 @@ function voiceCommand(){
     if(!SpeechRecognition){
 
         addMessage(
-            "Bu tarayıcı sesli komut özelliğini desteklemiyor.",
-            "ai"
+            "Efendim, bu tarayıcı sesli komut sistemini desteklemiyor.",
+            "jarvis"
         );
 
         return;
@@ -1584,41 +1444,57 @@ function voiceCommand(){
     const recognition =
         new SpeechRecognition();
 
-    recognition.lang="tr-TR";
+    recognition.lang = "tr-TR";
 
-    recognition.continuous=false;
+    recognition.continuous = false;
 
-    recognition.interimResults=false;
+    recognition.interimResults = false;
 
-    recognition.onstart=function(){
+    recognition.onstart = function(){
 
-        input.placeholder=
-            "Dinliyorum Efendim...";
+        document.getElementById("statusText")
+            .textContent =
+            funMode
+            ? "FUN MODE • DİNLİYOR"
+            : "DİNLİYOR";
+
     };
 
-    recognition.onresult=function(event){
+    recognition.onresult = function(event){
 
-        const transcript =
+        const text =
             event.results[0][0].transcript;
 
-        input.value=transcript;
+        document.getElementById(
+            "messageInput"
+        ).value = text;
 
         sendMessage();
+
     };
 
-    recognition.onerror=function(){
+    recognition.onerror = function(){
 
-        input.placeholder=
-            "JARVIS'e bir komut verin...";
+        document.getElementById("statusText")
+            .textContent =
+            funMode
+            ? "FUN MODE ONLINE"
+            : "SYSTEM ONLINE";
+
     };
 
-    recognition.onend=function(){
+    recognition.onend = function(){
 
-        input.placeholder=
-            "JARVIS'e bir komut verin...";
+        document.getElementById("statusText")
+            .textContent =
+            funMode
+            ? "FUN MODE ONLINE"
+            : "SYSTEM ONLINE";
+
     };
 
     recognition.start();
+
 }
 
 </script>
