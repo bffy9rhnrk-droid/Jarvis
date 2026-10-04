@@ -15,7 +15,8 @@ app.add_middleware(
 )
 
 client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
+    api_key=os.environ.get("GROQ_API_KEY"),
+    base_url="https://api.groq.com/openai/v1"
 )
 
 class Message(BaseModel):
@@ -29,7 +30,7 @@ def home():
 def chat(data: Message):
 
     response = client.responses.create(
-        model="gpt-4o-mini",
+        model="openai/gpt-oss-20b",
         instructions="""
         Sen JARVIS'sin.
         Kullanıcının kişisel yapay zeka asistanısın.
