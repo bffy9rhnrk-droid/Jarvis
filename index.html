@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JARVIS</title>
+
+<style>
+
+body {
+    margin:0;
+    background:#05080d;
+    color:#00d9ff;
+    font-family:Arial;
+}
+
+header {
+    text-align:center;
+    padding:25px;
+    border-bottom:1px solid #123b48;
+}
+
+#chat {
+    height:70vh;
+    overflow:auto;
+    padding:15px;
+}
+
+.message {
+    padding:12px;
+    margin:10px 0;
+    border-radius:12px;
+    white-space:pre-wrap;
+}
+
+.user {
+    background:#07516a;
+    color:white;
+    text-align:right;
+}
+
+.jarvis {
+    background:#08151b;
+    border:1px solid #0b5364;
+}
+
+#bar {
+    display:flex;
+    gap:8px;
+    padding:10px;
+}
+
+input {
+    flex:1;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #164452;
+    background:#101820;
+    color:white;
+}
+
+button {
+    border:0;
+    border-radius:10px;
+    padding:0 18px;
+    background:#00a8cc;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>J.A.R.V.I.S.</h1>
+<p>ONLINE</p>
+</header>
+
+<div id="chat"></div>
+
+<div id="bar">
+
+<input
+id="input"
+placeholder="JARVIS'e yaz..."
+>
+
+<button onclick="sendMessage()">
+GÖNDER
+</button>
+
+</div>
+
+<script>
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById("input");
+
+    const chat =
+        document.getElementById("chat");
+
+    const message =
+        input.value.trim();
+
+    if (!message) return;
+
+    chat.innerHTML +=
+        `<div class="message user">
+        ${message}
+        </div>`;
+
+    input.value = "";
+
+    try {
+
+        const response =
+            await fetch("/chat", {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+                    message:message
+                })
+
+            });
+
+        const data =
+            await response.json();
+
+        chat.innerHTML +=
+            `<div class="message jarvis">
+            ${data.response}
+            </div>`;
+
+    }
+
+    catch(error) {
+
+        chat.innerHTML +=
+            `<div class="message jarvis">
+            Sunucuya bağlanılamadı.
+            </div>`;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
