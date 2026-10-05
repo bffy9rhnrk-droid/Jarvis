@@ -2,28 +2,28 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no,
-               viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
 :root{
     --accent:#36e5ff;
-    --accent-soft:rgba(54,229,255,.18);
-    --accent-bright:#8ff5ff;
-    --bg:#05080d;
-    --text:#f2f7fa;
-    --muted:#8b9aa7;
-    --border:rgba(255,255,255,.08);
-}
+    --accent-bright:#9af8ff;
+    --accent-soft:rgba(54,229,255,.16);
 
-/* =====================================================
-   RESET
-===================================================== */
+    --bg:#03070c;
+    --panel:rgba(8,15,23,.88);
+    --panel2:rgba(12,22,32,.92);
+
+    --text:#f2f8fa;
+    --muted:#82919e;
+    --border:rgba(255,255,255,.09);
+
+    --danger:#ff3f56;
+
+    --ui-scale:1;
+}
 
 *{
     box-sizing:border-box;
@@ -35,36 +35,14 @@ body{
     width:100%;
     height:100%;
     margin:0;
-    padding:0;
     overflow:hidden;
+    background:#03070c;
 }
 
 body{
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "Segoe UI",
-        sans-serif;
-
-    background:
-        radial-gradient(
-            circle at 50% 25%,
-            rgba(0,190,255,.09),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at 20% 80%,
-            rgba(0,120,255,.05),
-            transparent 35%
-        ),
-        var(--bg);
-
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
     color:var(--text);
-
-    transition:
-        background .35s ease,
-        color .35s ease;
+    overscroll-behavior:none;
 }
 
 button,
@@ -73,542 +51,382 @@ select{
     font-family:inherit;
 }
 
-/* =====================================================
-   APP
-===================================================== */
+button{
+    border:0;
+    outline:0;
+}
 
 .app{
     position:relative;
     width:100%;
-    height:100%;
+    height:100dvh;
     min-height:100dvh;
     overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 42%,rgba(0,170,210,.075),transparent 30%),
+        radial-gradient(circle at 50% 100%,rgba(0,100,150,.04),transparent 40%),
+        var(--bg);
 }
 
-/* =====================================================
-   TOP BAR
-===================================================== */
+/* GRID */
+
+.app::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:.12;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:38px 38px;
+    mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
+}
+
+/* TOP BAR */
 
 .topbar{
     position:absolute;
+    z-index:20;
     top:0;
     left:0;
     right:0;
 
-    height:
-        calc(
-            64px +
-            env(safe-area-inset-top)
-        );
+    height:72px;
+    padding:14px 18px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding:
-        env(safe-area-inset-top)
-        18px
-        0
-        18px;
-
-    z-index:50;
-
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(5,8,13,.96),
-            rgba(5,8,13,.55),
-            transparent
-        );
+    pointer-events:none;
 }
 
-/* MENU */
-
 .menu-btn{
-    width:44px;
-    height:44px;
+    width:46px;
+    height:46px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.09);
-
-    border-radius:14px;
-
-    background:
-        rgba(255,255,255,.035);
+    border-radius:15px;
 
     display:flex;
-    align-items:center;
+    flex-direction:column;
     justify-content:center;
+    align-items:center;
+    gap:5px;
+
+    background:rgba(8,18,27,.72);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
 
     cursor:pointer;
+    pointer-events:auto;
 
-    transition:.25s ease;
-
-    backdrop-filter:blur(14px);
+    transition:.2s ease;
 }
 
 .menu-btn:active{
-    transform:scale(.93);
+    transform:scale(.92);
 }
 
-.menu-icon{
-    width:19px;
-    height:14px;
-    position:relative;
-}
-
-.menu-icon span{
-    position:absolute;
-    left:0;
-    width:100%;
+.menu-line{
+    width:18px;
     height:1.5px;
-
-    background:#dce8ee;
-
-    border-radius:2px;
-
-    transition:.25s ease;
+    border-radius:5px;
+    background:var(--accent);
+    box-shadow:0 0 7px var(--accent);
 }
-
-.menu-icon span:nth-child(1){
-    top:0;
-}
-
-.menu-icon span:nth-child(2){
-    top:6px;
-}
-
-.menu-icon span:nth-child(3){
-    top:12px;
-}
-
-/* BRAND */
 
 .brand{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    justify-content:center;
-
-    user-select:none;
+    text-align:right;
+    pointer-events:none;
 }
 
 .brand-title{
-    font-size:17px;
-    font-weight:600;
+    font-size:19px;
+    font-weight:700;
     letter-spacing:4px;
     color:#edfaff;
+    text-shadow:0 0 18px rgba(54,229,255,.22);
 }
 
 .brand-sub{
     margin-top:3px;
     font-size:8px;
-    letter-spacing:2.6px;
-    color:#71818d;
+    letter-spacing:2.7px;
+    color:var(--accent);
+    opacity:.8;
 }
 
 /* SYSTEM */
 
 .system{
     position:absolute;
-
-    top:
-        calc(
-            72px +
-            env(safe-area-inset-top)
-        );
-
+    z-index:10;
+    top:82px;
     right:20px;
 
     display:flex;
     align-items:center;
-
     gap:7px;
 
     font-size:8px;
-    letter-spacing:1.8px;
-    color:#75848e;
+    letter-spacing:2px;
+    color:#8b9aa7;
 }
 
 .system-dot{
-    width:5px;
-    height:5px;
-
+    width:6px;
+    height:6px;
     border-radius:50%;
-
-    background:#4affc3;
-
-    box-shadow:
-        0 0 9px #4affc3;
+    background:#55ffad;
+    box-shadow:0 0 10px #55ffad;
+    animation:systemPulse 1.8s infinite;
 }
 
-/* =====================================================
-   CORE
-===================================================== */
+@keyframes systemPulse{
+    0%,100%{opacity:.45}
+    50%{opacity:1}
+}
+
+/* CORE */
 
 .core-area{
     position:absolute;
+    z-index:2;
 
-    top:50%;
     left:50%;
+    top:42%;
 
-    width:270px;
-    height:270px;
+    width:290px;
+    height:290px;
 
-    transform:
-        translate(-50%,-58%);
+    transform:translate(-50%,-50%) scale(var(--ui-scale));
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    transition:
+        top .35s ease,
+        transform .35s ease;
+}
+
+.core-glow{
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:rgba(54,229,255,.08);
+    filter:blur(25px);
+
+    animation:glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse{
+    0%,100%{
+        transform:scale(.9);
+        opacity:.45;
+    }
+    50%{
+        transform:scale(1.12);
+        opacity:.8;
+    }
+}
+
+.core{
+    position:absolute;
+
+    width:124px;
+    height:124px;
+
+    border-radius:50%;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    pointer-events:none;
-}
-
-/* GLOW */
-
-.core-glow{
-    position:absolute;
-
-    width:170px;
-    height:170px;
-
-    border-radius:50%;
-
     background:
-        radial-gradient(
-            circle,
-            rgba(54,229,255,.22),
-            rgba(54,229,255,.06) 42%,
-            transparent 72%
-        );
+        radial-gradient(circle at 35% 28%,#8cffff 0%,#36e5ff 16%,#0d6378 48%,#04151c 76%,#02080c 100%);
 
-    filter:blur(8px);
+    border:1px solid rgba(156,249,255,.8);
 
-    animation:
-        corePulse 4s
-        ease-in-out
-        infinite;
+    box-shadow:
+        0 0 15px rgba(54,229,255,.7),
+        0 0 45px rgba(54,229,255,.38),
+        inset 0 0 30px rgba(0,0,0,.75);
+
+    z-index:4;
+
+    animation:coreFloat 4s ease-in-out infinite;
 }
 
-@keyframes corePulse{
-    0%,100%{
-        transform:scale(.95);
-        opacity:.7;
-    }
+@keyframes coreFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-4px)}
+}
 
-    50%{
-        transform:scale(1.12);
-        opacity:1;
-    }
+.core::before{
+    content:"";
+    position:absolute;
+    inset:9px;
+    border-radius:50%;
+    border:1px solid rgba(166,250,255,.4);
+}
+
+.core::after{
+    content:"";
+    position:absolute;
+    inset:19px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.core-k{
+    position:relative;
+    z-index:5;
+
+    font-size:58px;
+    font-weight:800;
+    letter-spacing:-5px;
+
+    color:#eaffff;
+
+    text-shadow:
+        0 0 8px #fff,
+        0 0 22px var(--accent),
+        0 0 45px rgba(54,229,255,.8);
+}
+
+.core-label{
+    position:absolute;
+    bottom:-43px;
+
+    width:max-content;
+
+    font-size:8px;
+    letter-spacing:3px;
+    color:#7f939e;
+
+    white-space:nowrap;
 }
 
 /* RINGS */
 
 .ring{
     position:absolute;
-
-    border:
-        1px solid
-        rgba(100,232,255,.22);
-
     border-radius:50%;
-
-    box-shadow:
-        0 0 20px
-        rgba(54,229,255,.025);
+    border:1px solid rgba(54,229,255,.25);
+    pointer-events:none;
 }
 
 .ring1{
-    width:205px;
-    height:205px;
-
-    animation:
-        rotate 18s
-        linear
-        infinite;
+    width:215px;
+    height:215px;
+    border-top-color:rgba(54,229,255,.8);
+    border-right-color:rgba(54,229,255,.4);
+    animation:spin 8s linear infinite;
 }
 
 .ring2{
-    width:225px;
-    height:225px;
-
-    transform:rotate(58deg);
-
-    border-color:
-        rgba(100,232,255,.13);
-
-    animation:
-        rotateReverse 24s
-        linear
-        infinite;
+    width:238px;
+    height:238px;
+    border-bottom-color:rgba(54,229,255,.7);
+    border-left-color:rgba(54,229,255,.3);
+    animation:spinReverse 12s linear infinite;
 }
 
 .ring3{
-    width:245px;
-    height:245px;
-
-    transform:rotate(112deg);
-
-    border-color:
-        rgba(100,232,255,.09);
-
-    animation:
-        rotate 32s
-        linear
-        infinite;
+    width:260px;
+    height:260px;
+    border-top-color:rgba(54,229,255,.35);
+    border-left-color:rgba(54,229,255,.55);
+    animation:spin 17s linear infinite;
 }
 
 .ring4{
-    width:265px;
-    height:265px;
-
-    border-color:
-        rgba(100,232,255,.05);
-
-    animation:
-        rotateReverse 42s
-        linear
-        infinite;
+    width:280px;
+    height:280px;
+    border-right-color:rgba(54,229,255,.5);
+    border-bottom-color:rgba(54,229,255,.25);
+    animation:spinReverse 22s linear infinite;
 }
 
-@keyframes rotate{
-    from{
-        transform:rotate(0deg);
-    }
-
-    to{
-        transform:rotate(360deg);
-    }
+@keyframes spin{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
 }
 
-@keyframes rotateReverse{
-    from{
-        transform:rotate(360deg);
-    }
-
-    to{
-        transform:rotate(0deg);
-    }
+@keyframes spinReverse{
+    from{transform:rotate(360deg)}
+    to{transform:rotate(0)}
 }
-
-/* ORBIT DOTS */
 
 .orbit-dot{
     position:absolute;
-
-    width:5px;
-    height:5px;
-
+    width:6px;
+    height:6px;
     border-radius:50%;
-
     background:var(--accent);
-
-    box-shadow:
-        0 0 7px var(--accent),
-        0 0 16px var(--accent);
-
-    animation:
-        dotRotate
-        9s
-        linear
-        infinite;
+    box-shadow:0 0 12px var(--accent);
 }
 
 .dot1{
-    top:22px;
-    left:132px;
+    top:36px;
+    left:50%;
+    animation:dotSpin1 8s linear infinite;
 }
 
 .dot2{
-    right:18px;
-    top:131px;
-
-    animation-duration:13s;
+    bottom:39px;
+    right:50px;
+    animation:dotSpin2 12s linear infinite;
 }
 
-.dot3{
-    bottom:21px;
-    left:128px;
-
-    animation-duration:17s;
+@keyframes dotSpin1{
+    from{transform:rotate(0deg) translateX(108px)}
+    to{transform:rotate(360deg) translateX(108px)}
 }
 
-.dot4{
-    left:19px;
-    top:131px;
-
-    animation-duration:21s;
+@keyframes dotSpin2{
+    from{transform:rotate(360deg) translateX(119px)}
+    to{transform:rotate(0deg) translateX(119px)}
 }
 
-@keyframes dotRotate{
-    from{
-        transform:
-            rotate(0deg)
-            translateX(112px)
-            rotate(0deg);
-    }
-
-    to{
-        transform:
-            rotate(360deg)
-            translateX(112px)
-            rotate(-360deg);
-    }
-}
-
-/* =====================================================
-   K CORE
-===================================================== */
-
-.core{
-    position:relative;
-
-    width:116px;
-    height:116px;
-
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-        radial-gradient(
-            circle at 35% 28%,
-            #dfffff 0%,
-            #8cf6ff 8%,
-            #25d9ee 28%,
-            #0a7f98 58%,
-            #063b4a 100%
-        );
-
-    border:
-        1px solid
-        rgba(210,250,255,.8);
-
-    box-shadow:
-        0 0 18px
-        rgba(54,229,255,.55),
-        0 0 50px
-        rgba(54,229,255,.25),
-        inset 0 0 22px
-        rgba(255,255,255,.22);
-
-    animation:
-        coreFloat
-        5s
-        ease-in-out
-        infinite;
-}
-
-@keyframes coreFloat{
-    0%,100%{
-        transform:translateY(0);
-    }
-
-    50%{
-        transform:translateY(-5px);
-    }
-}
-
-.core::before{
-    content:"";
-
-    position:absolute;
-
-    inset:9px;
-
-    border-radius:50%;
-
-    border:
-        1px solid
-        rgba(255,255,255,.26);
-
-    box-shadow:
-        inset 0 0 18px
-        rgba(255,255,255,.1);
-}
-
-.core::after{
-    content:"";
-
-    position:absolute;
-
-    top:12px;
-    left:23px;
-
-    width:38px;
-    height:15px;
-
-    border-radius:50%;
-
-    background:
-        rgba(255,255,255,.28);
-
-    filter:blur(7px);
-
-    transform:rotate(-25deg);
-}
-
-.core-k{
-    position:relative;
-
-    z-index:3;
-
-    font-size:52px;
-    font-weight:800;
-    letter-spacing:-5px;
-
-    color:white;
-
-    text-shadow:
-        0 2px 10px
-        rgba(0,0,0,.25),
-        0 0 18px
-        rgba(255,255,255,.35);
-}
-
-.core-label{
-    position:absolute;
-
-    bottom:-37px;
-
-    font-size:8px;
-    letter-spacing:3px;
-
-    color:#7d8c96;
-
-    white-space:nowrap;
-}
-
-/* =====================================================
-   CHAT
-===================================================== */
+/* CHAT */
 
 .chat{
     position:absolute;
+    z-index:8;
 
-    left:18px;
-    right:18px;
+    left:15px;
+    right:15px;
+    bottom:107px;
 
-    bottom:
-        calc(
-            108px +
-            env(safe-area-inset-bottom)
-        );
-
+    max-width:620px;
     max-height:23vh;
 
-    overflow-y:auto;
+    margin:auto;
 
     display:flex;
     flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
 
-    gap:9px;
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:5px;
 
     scrollbar-width:none;
+
+    transform:scale(var(--ui-scale));
+    transform-origin:bottom center;
+
+    pointer-events:none;
 }
 
 .chat::-webkit-scrollbar{
@@ -616,25 +434,42 @@ select{
 }
 
 .message{
-    width:max-content;
+    max-width:90%;
 
-    max-width:88%;
+    padding:11px 14px;
 
-    padding:
-        10px
-        13px;
+    border-radius:16px;
 
-    border-radius:15px;
+    font-size:14px;
+    line-height:1.48;
 
-    font-size:13px;
-    line-height:1.45;
+    color:#dfecef;
 
-    animation:
-        messageIn
-        .25s
-        ease;
+    background:rgba(9,20,29,.76);
+
+    border:1px solid rgba(255,255,255,.07);
+
+    box-shadow:0 8px 25px rgba(0,0,0,.22);
 
     backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+
+    pointer-events:auto;
+
+    animation:messageIn .25s ease;
+}
+
+.message.user{
+    align-self:flex-end;
+
+    color:#dffcff;
+
+    background:rgba(0,91,111,.3);
+    border-color:rgba(54,229,255,.22);
+}
+
+.message.ai{
+    border-left:2px solid var(--accent);
 }
 
 @keyframes messageIn{
@@ -642,95 +477,76 @@ select{
         opacity:0;
         transform:translateY(7px);
     }
-
     to{
         opacity:1;
         transform:translateY(0);
     }
 }
 
-.message.ai{
-    align-self:flex-start;
+/* TYPING */
 
-    color:#c8d7de;
-
-    background:
-        rgba(12,19,27,.78);
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
-
-    box-shadow:
-        0 7px 25px
-        rgba(0,0,0,.14);
+.typing{
+    display:flex;
+    align-items:center;
+    gap:5px;
 }
 
-.message.user{
-    align-self:flex-end;
-
-    color:#ecfdff;
-
-    background:
-        rgba(25,117,132,.25);
-
-    border:
-        1px solid
-        rgba(54,229,255,.14);
+.typing span{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+    animation:typing 1.2s infinite;
 }
 
-/* =====================================================
-   INPUT
-===================================================== */
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+
+@keyframes typing{
+    0%,60%,100%{opacity:.25;transform:translateY(0)}
+    30%{opacity:1;transform:translateY(-3px)}
+}
+
+/* INPUT */
 
 .input-area{
     position:absolute;
+    z-index:30;
 
-    left:16px;
-    right:16px;
+    left:12px;
+    right:12px;
+    bottom:10px;
 
-    bottom:
-        calc(
-            16px +
-            env(safe-area-inset-bottom)
-        );
-
-    height:58px;
+    height:60px;
 
     display:flex;
     align-items:center;
-
-    gap:9px;
+    gap:6px;
 
     padding:6px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.09);
-
     border-radius:19px;
 
-    background:
-        rgba(11,17,24,.82);
-
-    backdrop-filter:blur(22px);
+    background:rgba(7,15,23,.91);
+    border:1px solid rgba(255,255,255,.1);
 
     box-shadow:
-        0 15px 45px
-        rgba(0,0,0,.28),
-        inset 0 1px 0
-        rgba(255,255,255,.035);
+        0 15px 45px rgba(0,0,0,.45),
+        0 0 25px rgba(0,170,220,.05);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    transform:scale(var(--ui-scale));
+    transform-origin:bottom center;
 }
 
 .input{
     flex:1;
-
     min-width:0;
 
     height:100%;
-
-    padding:
-        0 12px;
 
     border:0;
     outline:0;
@@ -739,38 +555,33 @@ select{
 
     color:white;
 
-    font-family:inherit;
-
     font-size:16px;
+    padding:0 9px;
 
     -webkit-appearance:none;
-    appearance:none;
 }
 
 .input::placeholder{
-    color:#65747e;
+    color:#71818d;
+    font-size:14px;
 }
 
 .action{
-    width:44px;
-    height:44px;
+    flex:none;
 
-    flex-shrink:0;
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
+    width:45px;
+    height:45px;
 
     border-radius:14px;
-
-    background:
-        rgba(255,255,255,.045);
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    color:#c9d8de;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);
+
+    color:#8fa3ae;
 
     cursor:pointer;
 
@@ -778,139 +589,110 @@ select{
 }
 
 .action:active{
-    transform:scale(.91);
+    transform:scale(.9);
+}
+
+.action.active{
+    color:var(--accent);
+    border-color:rgba(54,229,255,.35);
+    box-shadow:0 0 15px rgba(54,229,255,.14);
 }
 
 .send{
-    background:
-        rgba(54,229,255,.12);
-
-    border-color:
-        rgba(54,229,255,.25);
-
-    color:#9cf6ff;
+    background:rgba(54,229,255,.11);
+    color:var(--accent);
+    border-color:rgba(54,229,255,.24);
 }
 
-.action svg{
-    width:19px;
-    height:19px;
+.icon{
+    font-size:19px;
+    line-height:1;
 }
 
-/* =====================================================
-   SIDEBAR
-===================================================== */
+/* SIDEBAR */
 
 .overlay{
     position:fixed;
+    z-index:80;
     inset:0;
 
-    background:
-        rgba(0,0,0,.42);
-
-    backdrop-filter:blur(4px);
+    background:rgba(0,0,0,.55);
 
     opacity:0;
     pointer-events:none;
 
-    transition:.3s ease;
+    transition:.25s ease;
 
-    z-index:80;
+    backdrop-filter:blur(2px);
 }
 
-.overlay.active{
+.overlay.open{
     opacity:1;
     pointer-events:auto;
 }
 
 .sidebar{
     position:fixed;
+    z-index:100;
 
     top:0;
+    bottom:0;
     left:0;
 
-    width:285px;
-    max-width:82vw;
-
-    height:100%;
+    width:305px;
+    max-width:84vw;
 
     padding:
-        calc(
-            env(safe-area-inset-top)
-            + 22px
-        )
+        calc(24px + env(safe-area-inset-top))
         18px
-        25px;
+        calc(25px + env(safe-area-inset-bottom));
 
     background:
-        rgba(8,13,20,.96);
+        linear-gradient(145deg,rgba(10,21,31,.98),rgba(3,8,13,.98));
 
-    border-right:
-        1px solid
-        rgba(255,255,255,.08);
+    border-right:1px solid rgba(255,255,255,.09);
 
-    backdrop-filter:blur(25px);
+    box-shadow:20px 0 60px rgba(0,0,0,.45);
 
-    transform:
-        translateX(-105%);
+    transform:translateX(-105%);
 
-    transition:
-        .35s
-        cubic-bezier(.22,.8,.25,1);
-
-    z-index:90;
-
-    box-shadow:
-        15px 0 50px
-        rgba(0,0,0,.35);
+    transition:transform .3s cubic-bezier(.22,.8,.25,1);
 }
 
-.sidebar.active{
+.sidebar.open{
     transform:translateX(0);
 }
 
-.sidebar-header{
+.sidebar-head{
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding-bottom:20px;
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,.07);
+    margin-bottom:35px;
 }
 
 .sidebar-title{
-    font-size:14px;
-    font-weight:600;
-    letter-spacing:2px;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:2.5px;
 }
 
-.close{
-    width:36px;
-    height:36px;
+.close-btn{
+    width:38px;
+    height:38px;
 
     border-radius:12px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.07);
+    background:rgba(255,255,255,.045);
+    color:#9aaab4;
 
-    background:
-        rgba(255,255,255,.035);
-
-    color:#aebbc1;
-
-    font-size:19px;
+    font-size:20px;
 }
 
 .nav{
-    margin-top:20px;
-
     display:flex;
     flex-direction:column;
-
-    gap:7px;
+    gap:8px;
 }
 
 .nav-btn{
@@ -918,174 +700,163 @@ select{
 
     display:flex;
     align-items:center;
-
     gap:13px;
 
-    padding:13px;
+    padding:15px 13px;
 
-    border:
-        1px solid
-        transparent;
-
-    border-radius:13px;
+    border-radius:14px;
 
     background:transparent;
-
-    color:#a9b8c0;
-
-    font-family:inherit;
-    font-size:13px;
+    color:#9eacb5;
 
     text-align:left;
+    font-size:14px;
 
     cursor:pointer;
 }
 
-.nav-btn.active,
-.nav-btn:active{
-    color:#eaffff;
-
-    background:
-        rgba(54,229,255,.08);
-
-    border-color:
-        rgba(54,229,255,.12);
+.nav-btn.active{
+    color:var(--accent);
+    background:rgba(54,229,255,.08);
+    border:1px solid rgba(54,229,255,.12);
 }
 
 .nav-icon{
-    width:19px;
+    width:21px;
     text-align:center;
-    opacity:.85;
+    font-size:17px;
 }
 
-.sidebar-footer{
-    position:absolute;
+/* HOME */
 
-    bottom:28px;
-    left:20px;
-    right:20px;
-
-    color:#586872;
-
-    font-size:9px;
-
-    letter-spacing:1.5px;
-
-    line-height:1.7;
-}
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-.settings{
-    display:none;
-
+.home{
     position:absolute;
     inset:0;
 
-    padding:
-        100px
-        18px
-        100px;
-
-    overflow-y:auto;
+    transition:opacity .2s ease;
 }
 
-.settings.active{
-    display:block;
+.home.hidden{
+    opacity:0;
+    pointer-events:none;
+}
+
+/* SETTINGS */
+
+.settings{
+    position:absolute;
+    z-index:50;
+
+    inset:0;
+
+    overflow-y:auto;
+
+    padding:
+        calc(95px + env(safe-area-inset-top))
+        18px
+        calc(100px + env(safe-area-inset-bottom));
+
+    background:
+        radial-gradient(circle at 50% 15%,rgba(0,160,200,.07),transparent 30%),
+        var(--bg);
+
+    opacity:0;
+    pointer-events:none;
+
+    transform:translateX(20px);
+
+    transition:.25s ease;
+
+    scrollbar-width:none;
+}
+
+.settings::-webkit-scrollbar{
+    display:none;
+}
+
+.settings.open{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateX(0);
 }
 
 .settings-title{
-    font-size:21px;
-    font-weight:600;
+    margin:0;
 
-    margin-bottom:5px;
+    font-size:27px;
+    letter-spacing:1px;
 }
 
 .settings-sub{
-    color:#72818b;
+    margin:7px 0 25px;
 
-    font-size:12px;
-
-    margin-bottom:25px;
+    color:var(--muted);
+    font-size:13px;
 }
 
 .setting-card{
-    padding:17px;
-
     margin-bottom:12px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.07);
+    padding:17px;
 
-    border-radius:17px;
+    border-radius:18px;
 
-    background:
-        rgba(11,17,24,.72);
+    background:rgba(10,19,28,.72);
+    border:1px solid var(--border);
 
-    backdrop-filter:blur(18px);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
 }
 
 .setting-row{
     display:flex;
     align-items:center;
     justify-content:space-between;
-
-    gap:15px;
+    gap:14px;
 }
 
 .setting-name{
-    font-size:13px;
-    color:#e2ebee;
+    font-size:14px;
+    font-weight:600;
 }
 
 .setting-desc{
-    margin-top:4px;
+    margin-top:5px;
 
-    font-size:10px;
-
-    color:#687781;
+    color:#748590;
+    font-size:11px;
+    line-height:1.45;
 }
 
 .select{
-    border:
-        1px solid
-        rgba(255,255,255,.09);
+    width:120px;
+
+    padding:10px;
 
     border-radius:11px;
 
-    padding:9px 10px;
-
-    background:#101821;
-
-    color:#dce8ec;
+    color:white;
+    background:#0b1720;
+    border:1px solid rgba(255,255,255,.1);
 
     outline:0;
-
-    font-family:inherit;
 }
 
 .toggle{
     position:relative;
 
-    width:46px;
-    height:26px;
+    width:48px;
+    height:27px;
 
-    flex-shrink:0;
+    flex:none;
 
     border-radius:20px;
 
-    background:#202b34;
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
+    background:#16222b;
 
     cursor:pointer;
 
-    transition:.25s ease;
+    transition:.2s;
 }
 
 .toggle::after{
@@ -1093,279 +864,143 @@ select{
 
     position:absolute;
 
-    top:3px;
-    left:3px;
+    width:21px;
+    height:21px;
 
-    width:18px;
-    height:18px;
+    left:3px;
+    top:3px;
 
     border-radius:50%;
 
-    background:#b9c6cb;
+    background:#73818a;
 
-    transition:.25s ease;
+    transition:.2s;
 }
 
-.toggle.active{
-    background:
-        rgba(54,229,255,.22);
-
-    border-color:
-        rgba(54,229,255,.35);
+.toggle.on{
+    background:rgba(54,229,255,.22);
+    border:1px solid rgba(54,229,255,.35);
 }
 
-.toggle.active::after{
-    transform:
-        translateX(20px);
-
+.toggle.on::after{
+    left:22px;
     background:var(--accent);
-
-    box-shadow:
-        0 0 10px
-        var(--accent);
+    box-shadow:0 0 12px var(--accent);
 }
 
-/* =====================================================
-   LIGHT MODE
-===================================================== */
+.range-wrap{
+    width:145px;
+    flex:none;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.range{
+    width:105px;
+    accent-color:var(--accent);
+}
+
+.range-value{
+    width:37px;
+
+    text-align:right;
+
+    color:var(--accent);
+    font-size:11px;
+}
+
+/* LIGHT */
 
 body.light{
-    --bg:#edf3f6;
-    --text:#142027;
-    --muted:#65747d;
+    --bg:#edf5f8;
+    --text:#102029;
+    --muted:#61717a;
+    --panel:rgba(255,255,255,.88);
+    --border:rgba(0,40,55,.12);
+}
 
-    --border:
-        rgba(20,32,39,.10);
-
+body.light .app{
     background:
-        radial-gradient(
-            circle at 50% 25%,
-            rgba(54,229,255,.18),
-            transparent 35%
-        ),
-        #edf3f6;
+        radial-gradient(circle at 50% 40%,rgba(0,180,220,.13),transparent 35%),
+        #edf5f8;
 }
 
-body.light .topbar{
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(237,243,246,.95),
-            rgba(237,243,246,.55),
-            transparent
-        );
-}
-
-body.light .brand-title{
-    color:#17252c;
-}
-
-body.light .brand-sub,
-body.light .system{
-    color:#667780;
-}
-
-body.light .menu-btn,
-body.light .action,
 body.light .input-area,
-body.light .setting-card{
-    background:
-        rgba(255,255,255,.75);
-
-    border-color:
-        rgba(20,32,39,.09);
+body.light .sidebar,
+body.light .setting-card,
+body.light .message{
+    background:rgba(255,255,255,.8);
 }
 
 body.light .input{
-    color:#17252c;
+    color:#102029;
 }
 
-body.light .message.ai{
-    background:
-        rgba(255,255,255,.78);
-
-    color:#304149;
-
-    border-color:
-        rgba(20,32,39,.08);
-}
-
-body.light .message.user{
-    background:
-        rgba(54,229,255,.15);
-
-    color:#17343b;
-}
-
-body.light .sidebar{
-    background:
-        rgba(245,249,250,.97);
-
-    border-color:
-        rgba(20,32,39,.09);
-}
-
-body.light .sidebar-title,
-body.light .setting-name{
-    color:#17252c;
-}
-
-/* =====================================================
-   FUN MODE
-===================================================== */
+/* FUN */
 
 body.fun{
-    --accent:#ff4058;
-
-    --accent-soft:
-        rgba(255,64,88,.18);
-
-    --accent-bright:#ff8a98;
-}
-
-body.fun{
-    background:
-        radial-gradient(
-            circle at 50% 25%,
-            rgba(255,64,88,.10),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at 20% 80%,
-            rgba(255,40,70,.05),
-            transparent 35%
-        ),
-        var(--bg);
+    --accent:#ff4057;
+    --accent-bright:#ff8392;
+    --accent-soft:rgba(255,64,87,.16);
 }
 
 body.fun .core{
+    border-color:rgba(255,100,115,.85);
+
     background:
-        radial-gradient(
-            circle at 35% 28%,
-            #fff0f2 0%,
-            #ff9aa7 8%,
-            #ff4058 28%,
-            #9e1529 58%,
-            #430711 100%
-        );
+        radial-gradient(circle at 35% 28%,#ff9da8 0%,#ff4057 17%,#7e1726 50%,#18060a 77%,#050203 100%);
 
     box-shadow:
-        0 0 18px
-        rgba(255,64,88,.65),
-
-        0 0 50px
-        rgba(255,64,88,.28),
-
-        inset 0 0 22px
-        rgba(255,255,255,.22);
+        0 0 15px rgba(255,64,87,.7),
+        0 0 45px rgba(255,64,87,.35),
+        inset 0 0 30px rgba(0,0,0,.75);
 }
 
 body.fun .core-glow{
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,64,88,.25),
-            rgba(255,64,88,.06) 42%,
-            transparent 72%
-        );
+    background:rgba(255,64,87,.08);
 }
 
 body.fun .ring{
-    border-color:
-        rgba(255,64,88,.18);
+    border-color:rgba(255,64,87,.25);
 }
 
-body.fun .orbit-dot{
-    background:#ff4058;
-
-    box-shadow:
-        0 0 7px #ff4058,
-        0 0 16px #ff4058;
+body.fun .system-dot{
+    background:#ff5266;
+    box-shadow:0 0 10px #ff5266;
 }
 
-body.fun .send{
-    background:
-        rgba(255,64,88,.13);
+/* RESPONSIVE */
 
-    border-color:
-        rgba(255,64,88,.28);
+/* iPhone / small screens */
 
-    color:#ff9aa7;
-}
+@media(max-width:699px){
 
-/* =====================================================
-   TYPING
-===================================================== */
-
-.typing{
-    display:flex;
-    gap:4px;
-    padding:4px 2px;
-}
-
-.typing span{
-    width:4px;
-    height:4px;
-
-    border-radius:50%;
-
-    background:
-        var(--accent);
-
-    animation:
-        typing
-        1.2s
-        infinite;
-}
-
-.typing span:nth-child(2){
-    animation-delay:.15s;
-}
-
-.typing span:nth-child(3){
-    animation-delay:.3s;
-}
-
-@keyframes typing{
-    0%,60%,100%{
-        transform:
-            translateY(0);
-
-        opacity:.35;
+    .app{
+        width:100%;
+        height:100dvh;
+        min-height:100dvh;
     }
-
-    30%{
-        transform:
-            translateY(-3px);
-
-        opacity:1;
-    }
-}
-
-/* =====================================================
-   iPHONE OPTIMIZATION
-   SADECE EKRAN YERLEŞİMİ
-===================================================== */
-
-@media(max-width:600px){
-
-    /* TOP */
 
     .topbar{
-        height:
-            calc(
-                62px +
-                env(safe-area-inset-top)
-            );
-
-        padding-left:15px;
-        padding-right:15px;
+        height:calc(64px + env(safe-area-inset-top));
+        padding:
+            env(safe-area-inset-top)
+            14px
+            0
+            14px;
     }
 
     .menu-btn{
         width:44px;
         height:44px;
         border-radius:14px;
+    }
+
+    .brand{
+        transform:scale(var(--ui-scale));
+        transform-origin:right center;
     }
 
     .brand-title{
@@ -1376,143 +1011,113 @@ body.fun .send{
     .brand-sub{
         font-size:7.5px;
         letter-spacing:2px;
-        margin-top:3px;
     }
 
     .system{
-        top:
-            calc(
-                70px +
-                env(safe-area-inset-top)
-            );
+        top:calc(72px + env(safe-area-inset-top));
+        right:15px;
 
-        right:16px;
-
-        font-size:7.5px;
-        letter-spacing:1.5px;
+        transform:scale(var(--ui-scale));
+        transform-origin:right center;
     }
 
-    /* =================================================
-       CORE
-    ================================================= */
-
     .core-area{
-        width:250px;
-        height:250px;
-
-        /*
-        iPhone'da çekirdeği
-        ekranın tam ortasından
-        biraz yukarı alıyoruz.
-        */
+        width:270px;
+        height:270px;
 
         top:41%;
 
         transform:
-            translate(-50%,-50%);
+            translate(-50%,-50%)
+            scale(var(--ui-scale));
     }
 
     .core{
-        width:108px;
-        height:108px;
+        width:112px;
+        height:112px;
     }
 
     .core-k{
-        font-size:48px;
+        font-size:50px;
     }
 
     .core-label{
-        bottom:-34px;
-
+        bottom:-36px;
         font-size:7px;
         letter-spacing:2.5px;
     }
 
     .core-glow{
-        width:150px;
-        height:150px;
+        width:155px;
+        height:155px;
     }
 
     .ring1{
-        width:190px;
-        height:190px;
+        width:195px;
+        height:195px;
     }
 
     .ring2{
-        width:208px;
-        height:208px;
+        width:215px;
+        height:215px;
     }
 
     .ring3{
-        width:228px;
-        height:228px;
+        width:235px;
+        height:235px;
     }
 
     .ring4{
-        width:246px;
-        height:246px;
+        width:255px;
+        height:255px;
     }
 
-    /* =================================================
-       CHAT
-    ================================================= */
-
     .chat{
-        left:13px;
-        right:13px;
+        left:12px;
+        right:12px;
 
         bottom:
-            calc(
-                94px +
-                env(safe-area-inset-bottom)
-            );
+            calc(87px + env(safe-area-inset-bottom));
 
         max-height:20vh;
 
         gap:7px;
+
+        transform:scale(var(--ui-scale));
+        transform-origin:bottom center;
     }
 
     .message{
         max-width:92%;
 
-        padding:
-            9px
-            12px;
+        padding:9px 12px;
 
         font-size:13px;
-        line-height:1.4;
+        line-height:1.42;
 
         border-radius:14px;
     }
-
-    /* =================================================
-       INPUT
-    ================================================= */
 
     .input-area{
         left:10px;
         right:10px;
 
         bottom:
-            calc(
-                8px +
-                env(safe-area-inset-bottom)
-            );
+            calc(7px + env(safe-area-inset-bottom));
 
         height:56px;
 
         padding:5px;
 
-        gap:6px;
-
         border-radius:17px;
+
+        transform:scale(var(--ui-scale));
+        transform-origin:bottom center;
     }
 
     .input{
         font-size:16px;
-
-        padding:
-            0 8px;
+        padding:0 8px;
     }
 
     .input::placeholder{
@@ -1522,22 +1127,16 @@ body.fun .send{
     .action{
         width:43px;
         height:43px;
-
         border-radius:13px;
     }
 
-    .action svg{
-        width:18px;
-        height:18px;
-    }
-
-    /* =================================================
-       SIDEBAR
-    ================================================= */
-
     .sidebar{
-        width:285px;
-        max-width:84vw;
+        width:min(285px,84vw);
+
+        padding:
+            calc(20px + env(safe-area-inset-top))
+            16px
+            calc(25px + env(safe-area-inset-bottom));
     }
 
     .sidebar-title{
@@ -1545,27 +1144,15 @@ body.fun .send{
     }
 
     .nav-btn{
-        padding:
-            14px
-            12px;
-
+        padding:14px 12px;
         font-size:14px;
-
-        border-radius:13px;
     }
-
-    /* =================================================
-       SETTINGS
-    ================================================= */
 
     .settings{
         padding:
-            calc(
-                88px +
-                env(safe-area-inset-top)
-            )
+            calc(87px + env(safe-area-inset-top))
             14px
-            90px;
+            calc(90px + env(safe-area-inset-bottom));
     }
 
     .settings-title{
@@ -1574,18 +1161,12 @@ body.fun .send{
 
     .settings-sub{
         font-size:12px;
-
         margin-bottom:20px;
     }
 
     .setting-card{
         padding:15px;
-
         border-radius:15px;
-    }
-
-    .setting-row{
-        gap:10px;
     }
 
     .setting-name{
@@ -1594,48 +1175,54 @@ body.fun .send{
 
     .setting-desc{
         font-size:10px;
-        line-height:1.35;
     }
 
     .select{
+        width:110px;
         font-size:12px;
         padding:8px;
     }
+
+    .range-wrap{
+        width:130px;
+    }
+
+    .range{
+        width:90px;
+    }
 }
 
-/* =====================================================
-   iPHONE 15 / 16 / 17 BOYUTLARI
-===================================================== */
+/* Çok kısa ekranlar */
 
-@media(
-    min-width:391px
-) and (
-    max-width:430px
-){
+@media(max-width:699px) and (max-height:750px){
 
     .core-area{
-        top:40.5%;
+        top:37%;
     }
 
     .chat{
-        bottom:
-            calc(
-                96px +
-                env(safe-area-inset-bottom)
-            );
+        max-height:18vh;
     }
 }
 
-/* =====================================================
-   KÜÇÜK iPHONE
-===================================================== */
+@media(max-width:699px) and (max-height:680px){
+
+    .core-area{
+        top:34%;
+    }
+
+    .chat{
+        max-height:16vh;
+    }
+
+    .input-area{
+        bottom:calc(5px + env(safe-area-inset-bottom));
+    }
+}
+
+/* Küçük iPhone */
 
 @media(max-width:390px){
-
-    .topbar{
-        padding-left:13px;
-        padding-right:13px;
-    }
 
     .brand-title{
         font-size:15px;
@@ -1644,162 +1231,82 @@ body.fun .send{
 
     .brand-sub{
         font-size:7px;
-        letter-spacing:1.7px;
-    }
-
-    .system{
-        right:14px;
-        font-size:7px;
     }
 
     .core-area{
-        width:225px;
-        height:225px;
-
-        top:40%;
+        width:250px;
+        height:250px;
     }
 
     .core{
-        width:98px;
-        height:98px;
+        width:100px;
+        height:100px;
     }
 
     .core-k{
-        font-size:43px;
-    }
-
-    .core-label{
-        bottom:-31px;
-
-        font-size:6.5px;
-        letter-spacing:2.2px;
-    }
-
-    .core-glow{
-        width:135px;
-        height:135px;
+        font-size:44px;
     }
 
     .ring1{
-        width:172px;
-        height:172px;
+        width:175px;
+        height:175px;
     }
 
     .ring2{
-        width:188px;
-        height:188px;
+        width:193px;
+        height:193px;
     }
 
     .ring3{
-        width:205px;
-        height:205px;
+        width:211px;
+        height:211px;
     }
 
     .ring4{
-        width:220px;
-        height:220px;
-    }
-
-    .chat{
-        left:11px;
-        right:11px;
-
-        bottom:
-            calc(
-                92px +
-                env(safe-area-inset-bottom)
-            );
-
-        max-height:19vh;
+        width:229px;
+        height:229px;
     }
 
     .message{
         font-size:12.5px;
-
-        padding:
-            8px
-            11px;
     }
 
-    .input-area{
-        left:9px;
-        right:9px;
-
-        height:54px;
-
-        border-radius:16px;
+    .range-wrap{
+        width:115px;
     }
 
-    .action{
-        width:41px;
-        height:41px;
-        border-radius:12px;
+    .range{
+        width:78px;
     }
 }
 
-/* =====================================================
-   ÇOK KISA EKRAN
-===================================================== */
-
-@media(
-    max-height:700px
-) and (
-    max-width:600px
-){
-
-    .core-area{
-        top:36%;
-    }
-
-    .chat{
-        max-height:18vh;
-
-        bottom:
-            calc(
-                88px +
-                env(safe-area-inset-bottom)
-            );
-    }
-
-    .input-area{
-        bottom:
-            calc(
-                6px +
-                env(safe-area-inset-bottom)
-            );
-    }
-}
-
-/* =====================================================
-   TABLET / DESKTOP
-===================================================== */
+/* Tablet / PC */
 
 @media(min-width:700px){
 
     .chat{
-        max-width:620px;
-
         left:50%;
         right:auto;
-
+        width:calc(100% - 40px);
         transform:
-            translateX(-50%);
+            translateX(-50%)
+            scale(var(--ui-scale));
 
-        width:
-            calc(100% - 40px);
+        transform-origin:bottom center;
     }
 
     .input-area{
-        max-width:650px;
-
         left:50%;
         right:auto;
 
-        width:
-            calc(100% - 40px);
+        width:calc(100% - 40px);
+        max-width:650px;
 
         transform:
-            translateX(-50%);
+            translateX(-50%)
+            scale(var(--ui-scale));
+
+        transform-origin:bottom center;
     }
 }
 </style>
@@ -1809,741 +1316,562 @@ body.fun .send{
 
 <div class="app">
 
-<header class="topbar">
+    <!-- HOME -->
+    <div class="home" id="home">
 
-    <button
-        class="menu-btn"
-        id="menuBtn"
-        aria-label="Menü">
+        <div class="topbar">
 
-        <div class="menu-icon">
-            <span></span>
-            <span></span>
-            <span></span>
+            <button class="menu-btn" id="menuBtn">
+                <span class="menu-line"></span>
+                <span class="menu-line"></span>
+                <span class="menu-line"></span>
+            </button>
+
+            <div class="brand">
+                <div class="brand-title">J.A.R.V.I.S.</div>
+                <div class="brand-sub">KARAHAN INC.</div>
+            </div>
+
         </div>
 
-    </button>
-
-    <div class="brand">
-
-        <div class="brand-title">
-            J.A.R.V.I.S.
+        <div class="system">
+            <span class="system-dot"></span>
+            SYSTEM ONLINE
         </div>
 
-        <div class="brand-sub">
-            KARAHAN INC.
-        </div>
+        <!-- CORE -->
+        <div class="core-area">
 
-    </div>
+            <div class="core-glow"></div>
 
-</header>
+            <div class="ring ring1"></div>
+            <div class="ring ring2"></div>
+            <div class="ring ring3"></div>
+            <div class="ring ring4"></div>
 
-<div class="system">
+            <div class="orbit-dot dot1"></div>
+            <div class="orbit-dot dot2"></div>
 
-    <span class="system-dot"></span>
-
-    SYSTEM ONLINE
-
-</div>
-
-<main id="home">
-
-    <div class="core-area">
-
-        <div class="core-glow"></div>
-
-        <div class="ring ring1"></div>
-        <div class="ring ring2"></div>
-        <div class="ring ring3"></div>
-        <div class="ring ring4"></div>
-
-        <div class="orbit-dot dot1"></div>
-        <div class="orbit-dot dot2"></div>
-        <div class="orbit-dot dot3"></div>
-        <div class="orbit-dot dot4"></div>
-
-        <div class="core">
-
-            <div class="core-k">
-                K
+            <div class="core">
+                <div class="core-k">K</div>
             </div>
 
             <div class="core-label">
-                PERSONAL AI SYSTEM
+                ARTIFICIAL INTELLIGENCE
             </div>
+
+        </div>
+
+        <!-- CHAT -->
+        <div class="chat" id="chat">
+
+            <div class="message ai">
+                Merhaba Efendim, nasıl yardımcı olabilirim?
+            </div>
+
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-area">
+
+            <input
+                id="input"
+                class="input"
+                type="text"
+                autocomplete="off"
+                autocorrect="on"
+                spellcheck="true"
+                placeholder="J.A.R.V.I.S.'e bir şey söyle..."
+            >
+
+            <button class="action" id="micBtn" title="Sesli giriş">
+                <span class="icon">◉</span>
+            </button>
+
+            <button class="action send" id="sendBtn" title="Gönder">
+                <span class="icon">➤</span>
+            </button>
 
         </div>
 
     </div>
 
-</main>
 
-<div
-    class="chat"
-    id="chat">
+    <!-- SETTINGS -->
+    <section class="settings" id="settings">
 
-    <div class="message ai">
-        Merhaba Efendim, nasıl yardımcı olabilirim?
-    </div>
+        <h1 class="settings-title">Ayarlar</h1>
+
+        <p class="settings-sub">
+            J.A.R.V.I.S. deneyimini kendinize göre yapılandırın.
+        </p>
+
+
+        <!-- HITAP -->
+        <div class="setting-card">
+
+            <div class="setting-row">
+
+                <div style="flex:1;">
+                    <div class="setting-name">
+                        Hitap Şekli
+                    </div>
+
+                    <div class="setting-desc">
+                        J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
+                    </div>
+                </div>
+
+                <select class="select" id="addressSelect">
+                    <option value="Efendim">Efendim</option>
+                    <option value="Komutanım">Komutanım</option>
+                    <option value="Patron">Patron</option>
+                    <option value="Dostum">Dostum</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- UI SCALE -->
+        <div class="setting-card">
+
+            <div class="setting-row">
+
+                <div style="flex:1;">
+
+                    <div class="setting-name">
+                        Arayüz Boyutu
+                    </div>
+
+                    <div class="setting-desc">
+                        J.A.R.V.I.S. arayüzündeki yazı ve görsel öğelerin boyutunu ayarlayın.
+                    </div>
+
+                </div>
+
+                <div class="range-wrap">
+
+                    <input
+                        id="uiScale"
+                        class="range"
+                        type="range"
+                        min="80"
+                        max="120"
+                        value="100"
+                        step="5"
+                    >
+
+                    <span
+                        id="uiScaleValue"
+                        class="range-value"
+                    >
+                        100%
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- THEME -->
+        <div class="setting-card">
+
+            <div class="setting-row">
+
+                <div style="flex:1;">
+
+                    <div class="setting-name">
+                        Gece / Gündüz
+                    </div>
+
+                    <div class="setting-desc">
+                        Arayüz görünümünü değiştirin.
+                    </div>
+
+                </div>
+
+                <div
+                    class="toggle"
+                    id="themeToggle"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FUN -->
+        <div class="setting-card">
+
+            <div class="setting-row">
+
+                <div style="flex:1;">
+
+                    <div class="setting-name">
+                        Eğlence Modu
+                    </div>
+
+                    <div class="setting-desc">
+                        J.A.R.V.I.S. daha esprili ve hafif muzip cevaplar versin.
+                    </div>
+
+                </div>
+
+                <div
+                    class="toggle"
+                    id="funToggle"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SIDEBAR -->
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-head">
+
+            <div class="sidebar-title">
+                J.A.R.V.I.S.
+            </div>
+
+            <button class="close-btn" id="closeBtn">
+                ×
+            </button>
+
+        </div>
+
+        <nav class="nav">
+
+            <button class="nav-btn active" id="homeBtn">
+                <span class="nav-icon">⌂</span>
+                Ana Ekran
+            </button>
+
+            <button class="nav-btn" id="chatBtn">
+                <span class="nav-icon">◌</span>
+                JARVIS Chat
+            </button>
+
+            <button class="nav-btn" id="settingsBtn">
+                <span class="nav-icon">⚙</span>
+                Ayarlar
+            </button>
+
+        </nav>
+
+    </aside>
 
 </div>
 
-<section
-    class="settings"
-    id="settings">
-
-    <div class="settings-title">
-        Ayarlar
-    </div>
-
-    <div class="settings-sub">
-        J.A.R.V.I.S. sistem tercihleri
-    </div>
-
-    <div class="setting-card">
-
-        <div class="setting-row">
-
-            <div>
-
-                <div class="setting-name">
-                    Hitap şekli
-                </div>
-
-                <div class="setting-desc">
-                    JARVIS'in size nasıl hitap edeceğini seçin.
-                </div>
-
-            </div>
-
-            <select
-                class="select"
-                id="addressSelect">
-
-                <option value="Efendim">
-                    Efendim
-                </option>
-
-                <option value="Komutanım">
-                    Komutanım
-                </option>
-
-                <option value="Patron">
-                    Patron
-                </option>
-
-                <option value="custom">
-                    Özel
-                </option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-    <div class="setting-card">
-
-        <div class="setting-row">
-
-            <div>
-
-                <div class="setting-name">
-                    Gece / Gündüz
-                </div>
-
-                <div class="setting-desc">
-                    Arayüz temasını değiştirin.
-                </div>
-
-            </div>
-
-            <div
-                class="toggle"
-                id="themeToggle">
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="setting-card">
-
-        <div class="setting-row">
-
-            <div>
-
-                <div class="setting-name">
-                    Eğlence Modu
-                </div>
-
-                <div class="setting-desc">
-                    JARVIS daha esprili ve hafif alaycı konuşur.
-                </div>
-
-            </div>
-
-            <div
-                class="toggle"
-                id="funToggle">
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<div class="input-area">
-
-    <button
-        class="action"
-        id="micBtn"
-        aria-label="Sesli giriş">
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.7"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-
-            <rect
-                x="9"
-                y="3"
-                width="6"
-                height="12"
-                rx="3">
-            </rect>
-
-            <path
-                d="M5 11a7 7 0 0 0 14 0">
-            </path>
-
-            <path
-                d="M12 18v3">
-            </path>
-
-            <path
-                d="M9 21h6">
-            </path>
-
-        </svg>
-
-    </button>
-
-    <input
-        id="input"
-        class="input"
-        type="text"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="sentences"
-        spellcheck="false"
-        placeholder="JARVIS'e bir şey sor...">
-
-    <button
-        class="action send"
-        id="sendBtn"
-        aria-label="Gönder">
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-
-            <path
-                d="M22 2L11 13">
-            </path>
-
-            <path
-                d="M22 2l-7 20-4-9-9-4z">
-            </path>
-
-        </svg>
-
-    </button>
-
-</div>
-
-<div
-    class="overlay"
-    id="overlay">
-</div>
-
-<aside
-    class="sidebar"
-    id="sidebar">
-
-    <div class="sidebar-header">
-
-        <div class="sidebar-title">
-            J.A.R.V.I.S.
-        </div>
-
-        <button
-            class="close"
-            id="closeBtn">
-            ×
-        </button>
-
-    </div>
-
-    <nav class="nav">
-
-        <button
-            class="nav-btn active"
-            id="homeBtn">
-
-            <span class="nav-icon">
-                ⌂
-            </span>
-
-            Ana Ekran
-
-        </button>
-
-        <button
-            class="nav-btn"
-            id="chatBtn">
-
-            <span class="nav-icon">
-                ◉
-            </span>
-
-            JARVIS Chat
-
-        </button>
-
-        <button
-            class="nav-btn"
-            id="settingsBtn">
-
-            <span class="nav-icon">
-                ⚙
-            </span>
-
-            Ayarlar
-
-        </button>
-
-    </nav>
-
-    <div class="sidebar-footer">
-
-        KARAHAN INC.<br>
-        PERSONAL AI SYSTEM<br>
-        VERSION 1.0
-
-    </div>
-
-</aside>
-
-</div>
 
 <script>
 
+/* ==============================
+   J.A.R.V.I.S.
+   KARAHAN INC.
+================================ */
+
 const API = "/chat";
 
-const chat =
-    document.getElementById("chat");
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
 
-const input =
-    document.getElementById("input");
+const menuBtn = document.getElementById("menuBtn");
+const closeBtn = document.getElementById("closeBtn");
 
-const sendBtn =
-    document.getElementById("sendBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
-const menuBtn =
-    document.getElementById("menuBtn");
+const settings = document.getElementById("settings");
+const home = document.getElementById("home");
 
-const closeBtn =
-    document.getElementById("closeBtn");
+const homeBtn = document.getElementById("homeBtn");
+const chatBtn = document.getElementById("chatBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
-const sidebar =
-    document.getElementById("sidebar");
+const addressSelect = document.getElementById("addressSelect");
+const themeToggle = document.getElementById("themeToggle");
+const funToggle = document.getElementById("funToggle");
 
-const overlay =
-    document.getElementById("overlay");
+const micBtn = document.getElementById("micBtn");
 
-const settings =
-    document.getElementById("settings");
+const uiScale = document.getElementById("uiScale");
+const uiScaleValue = document.getElementById("uiScaleValue");
 
-const home =
-    document.getElementById("home");
 
-const homeBtn =
-    document.getElementById("homeBtn");
-
-const chatBtn =
-    document.getElementById("chatBtn");
-
-const settingsBtn =
-    document.getElementById("settingsBtn");
-
-const addressSelect =
-    document.getElementById("addressSelect");
-
-const themeToggle =
-    document.getElementById("themeToggle");
-
-const funToggle =
-    document.getElementById("funToggle");
-
-const micBtn =
-    document.getElementById("micBtn");
-
+/* ==============================
+   LOCAL STORAGE
+================================ */
 
 let address =
-    localStorage.getItem("jarvis_address")
-    || "Efendim";
+    localStorage.getItem("jarvis_address") ||
+    "Efendim";
 
 let funMode =
-    localStorage.getItem("jarvis_fun_mode")
-    === "true";
+    localStorage.getItem("jarvis_fun_mode") === "true";
 
 let theme =
-    localStorage.getItem("jarvis_theme")
-    || "dark";
+    localStorage.getItem("jarvis_theme") ||
+    "dark";
+
+let savedScale =
+    localStorage.getItem("jarvis_ui_scale") ||
+    "100";
 
 
-if(
-    ["Efendim","Komutanım","Patron"]
-    .includes(address)
-){
+/* ==============================
+   APPLY SETTINGS
+================================ */
 
-    addressSelect.value =
-        address;
-
-}else{
-
-    addressSelect.value =
-        "custom";
-
-}
-
+addressSelect.value = address;
 
 if(theme === "light"){
-
-    document.body
-        .classList
-        .add("light");
-
-    themeToggle
-        .classList
-        .add("active");
-
+    document.body.classList.add("light");
+    themeToggle.classList.add("on");
 }
-
 
 if(funMode){
-
-    document.body
-        .classList
-        .add("fun");
-
-    funToggle
-        .classList
-        .add("active");
-
+    document.body.classList.add("fun");
+    funToggle.classList.add("on");
 }
 
+let scaleNumber = Number(savedScale);
+
+if(
+    !Number.isFinite(scaleNumber) ||
+    scaleNumber < 80 ||
+    scaleNumber > 120
+){
+    scaleNumber = 100;
+}
+
+document.documentElement.style.setProperty(
+    "--ui-scale",
+    scaleNumber / 100
+);
+
+uiScale.value = scaleNumber;
+uiScaleValue.textContent = scaleNumber + "%";
+
+
+/* ==============================
+   SIDEBAR
+================================ */
 
 function openMenu(){
 
-    sidebar
-        .classList
-        .add("active");
-
-    overlay
-        .classList
-        .add("active");
+    sidebar.classList.add("open");
+    overlay.classList.add("open");
 
 }
-
 
 function closeMenu(){
 
-    sidebar
-        .classList
-        .remove("active");
-
-    overlay
-        .classList
-        .remove("active");
+    sidebar.classList.remove("open");
+    overlay.classList.remove("open");
 
 }
 
-
-menuBtn.onclick =
-    openMenu;
-
-closeBtn.onclick =
-    closeMenu;
-
-overlay.onclick =
-    closeMenu;
+menuBtn.addEventListener("click",openMenu);
+closeBtn.addEventListener("click",closeMenu);
+overlay.addEventListener("click",closeMenu);
 
 
-function showHome(){
+/* ==============================
+   NAVIGATION
+================================ */
 
-    settings
-        .classList
-        .remove("active");
-
-    home.style.display =
-        "block";
-
-    chat.style.display =
-        "flex";
+function setActive(button){
 
     document
-        .querySelector(".input-area")
-        .style.display =
-        "flex";
+        .querySelectorAll(".nav-btn")
+        .forEach(btn => btn.classList.remove("active"));
 
-    homeBtn
-        .classList
-        .add("active");
-
-    chatBtn
-        .classList
-        .remove("active");
-
-    settingsBtn
-        .classList
-        .remove("active");
-
-    closeMenu();
-
+    button.classList.add("active");
 }
 
 
-function showChat(){
-
-    settings
-        .classList
-        .remove("active");
-
-    home.style.display =
-        "block";
-
-    chat.style.display =
-        "flex";
-
-    document
-        .querySelector(".input-area")
-        .style.display =
-        "flex";
-
-    homeBtn
-        .classList
-        .remove("active");
-
-    chatBtn
-        .classList
-        .add("active");
-
-    settingsBtn
-        .classList
-        .remove("active");
+homeBtn.addEventListener("click",()=>{
 
     closeMenu();
 
-    setTimeout(
-        () => input.focus(),
-        100
+    home.classList.remove("hidden");
+    settings.classList.remove("open");
+
+    setActive(homeBtn);
+
+});
+
+
+chatBtn.addEventListener("click",()=>{
+
+    closeMenu();
+
+    home.classList.remove("hidden");
+    settings.classList.remove("open");
+
+    setActive(chatBtn);
+
+    setTimeout(()=>{
+        input.focus();
+    },250);
+
+});
+
+
+settingsBtn.addEventListener("click",()=>{
+
+    closeMenu();
+
+    settings.classList.add("open");
+
+    setActive(settingsBtn);
+
+});
+
+
+/* ==============================
+   ADDRESS
+================================ */
+
+addressSelect.addEventListener("change",()=>{
+
+    address = addressSelect.value;
+
+    localStorage.setItem(
+        "jarvis_address",
+        address
     );
 
-}
+});
 
 
-function showSettings(){
+/* ==============================
+   THEME
+================================ */
 
-    home.style.display =
-        "none";
+themeToggle.addEventListener("click",()=>{
 
-    chat.style.display =
-        "none";
+    const isLight =
+        document.body.classList.toggle("light");
 
-    document
-        .querySelector(".input-area")
-        .style.display =
-        "none";
+    themeToggle.classList.toggle(
+        "on",
+        isLight
+    );
 
-    settings
-        .classList
-        .add("active");
+    theme =
+        isLight ? "light" : "dark";
 
-    homeBtn
-        .classList
-        .remove("active");
+    localStorage.setItem(
+        "jarvis_theme",
+        theme
+    );
 
-    chatBtn
-        .classList
-        .remove("active");
-
-    settingsBtn
-        .classList
-        .add("active");
-
-    closeMenu();
-
-}
+});
 
 
-homeBtn.onclick =
-    showHome;
+/* ==============================
+   FUN MODE
+================================ */
 
-chatBtn.onclick =
-    showChat;
+funToggle.addEventListener("click",()=>{
 
-settingsBtn.onclick =
-    showSettings;
+    funMode =
+        document.body.classList.toggle("fun");
 
+    funToggle.classList.toggle(
+        "on",
+        funMode
+    );
 
-addressSelect.onchange =
-    () => {
+    localStorage.setItem(
+        "jarvis_fun_mode",
+        funMode
+    );
 
-        if(
-            addressSelect.value
-            === "custom"
-        ){
-
-            const custom =
-                prompt(
-                    "JARVIS size nasıl hitap etsin?"
-                );
-
-            if(
-                custom &&
-                custom.trim()
-            ){
-
-                address =
-                    custom.trim();
-
-                localStorage.setItem(
-                    "jarvis_address",
-                    address
-                );
-
-            }
-
-        }else{
-
-            address =
-                addressSelect.value;
-
-            localStorage.setItem(
-                "jarvis_address",
-                address
-            );
-
-        }
-
-    };
+});
 
 
-themeToggle.onclick =
-    () => {
+/* ==============================
+   UI SCALE
+================================ */
 
-        document.body
-            .classList
-            .toggle("light");
+uiScale.addEventListener("input",()=>{
 
-        const enabled =
-            document.body
-                .classList
-                .contains("light");
+    const value =
+        Number(uiScale.value);
 
-        themeToggle
-            .classList
-            .toggle(
-                "active",
-                enabled
-            );
+    const scale =
+        value / 100;
 
-        localStorage.setItem(
-            "jarvis_theme",
-            enabled
-                ? "light"
-                : "dark"
-        );
+    document.documentElement.style.setProperty(
+        "--ui-scale",
+        scale
+    );
 
-    };
+    uiScaleValue.textContent =
+        value + "%";
 
+    localStorage.setItem(
+        "jarvis_ui_scale",
+        value
+    );
 
-funToggle.onclick =
-    () => {
-
-        funMode =
-            !funMode;
-
-        funToggle
-            .classList
-            .toggle(
-                "active",
-                funMode
-            );
-
-        document.body
-            .classList
-            .toggle(
-                "fun",
-                funMode
-            );
-
-        localStorage.setItem(
-            "jarvis_fun_mode",
-            funMode
-        );
-
-    };
+});
 
 
-function addMessage(
-    text,
-    type
-){
+/* ==============================
+   ADD MESSAGE
+================================ */
 
-    const div =
-        document
-            .createElement("div");
+function addMessage(text,type="ai"){
 
-    div.className =
-        "message "
-        + type;
+    const message =
+        document.createElement("div");
 
-    div.textContent =
+    message.className =
+        "message " + type;
+
+    message.textContent =
         text;
 
-    chat.appendChild(
-        div
-    );
+    chat.appendChild(message);
 
     chat.scrollTop =
         chat.scrollHeight;
 
-    return div;
-
+    return message;
 }
 
 
+/* ==============================
+   TYPING
+================================ */
+
 function addTyping(){
 
-    const div =
-        document
-            .createElement("div");
+    const message =
+        document.createElement("div");
 
-    div.className =
+    message.className =
         "message ai";
 
-    div.innerHTML = `
+    message.id =
+        "typingMessage";
+
+    message.innerHTML = `
         <div class="typing">
             <span></span>
             <span></span>
@@ -2551,17 +1879,17 @@ function addTyping(){
         </div>
     `;
 
-    chat.appendChild(
-        div
-    );
+    chat.appendChild(message);
 
     chat.scrollTop =
         chat.scrollHeight;
 
-    return div;
-
 }
 
+
+/* ==============================
+   SEND MESSAGE
+================================ */
 
 async function sendMessage(){
 
@@ -2577,14 +1905,12 @@ async function sendMessage(){
         "user"
     );
 
-    input.value =
-        "";
+    input.value = "";
 
-    const typing =
-        addTyping();
+    addTyping();
 
-    sendBtn.disabled =
-        true;
+    sendBtn.disabled = true;
+
 
     try{
 
@@ -2599,53 +1925,86 @@ async function sendMessage(){
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
-                            message:text,
-                            address:address,
-                            fun_mode:funMode
-                        })
+                    body:JSON.stringify({
+
+                        message:text,
+
+                        address:address,
+
+                        fun_mode:funMode
+
+                    })
                 }
             );
 
-        if(!response.ok){
-
-            throw new Error(
-                "Sunucu hatası"
-            );
-
-        }
 
         const data =
             await response.json();
 
-        typing.remove();
 
-        addMessage(
+        const typing =
+            document.getElementById(
+                "typingMessage"
+            );
+
+        if(typing){
+            typing.remove();
+        }
+
+
+        if(
+            data &&
             data.response
-            ||
-            "Üzgünüm Efendim, cevap oluşturamadım.",
-            "ai"
-        );
+        ){
 
-    }catch(error){
+            addMessage(
+                data.response,
+                "ai"
+            );
 
-        typing.remove();
+        }else{
 
-        addMessage(
+            addMessage(
+                "Efendim, sistemden geçerli bir cevap alamadım.",
+                "ai"
+            );
 
-            funMode
-                ? "Efendim... sistem şu an benimle aynı fikirde değil. 😏 Sunucu bağlantısını kontrol etmemiz gerekiyor."
-                : "Efendim, sunucuya ulaşamıyorum. Sistem bağlantısını kontrol etmem gerekiyor.",
+        }
 
-            "ai"
+    }
+    catch(error){
 
-        );
+        const typing =
+            document.getElementById(
+                "typingMessage"
+            );
 
-    }finally{
+        if(typing){
+            typing.remove();
+        }
 
-        sendBtn.disabled =
-            false;
+        if(funMode){
+
+            addMessage(
+                "Efendim... sistem şu an benimle aynı fikirde değil. 😏 Sunucu bağlantısını kontrol etmemiz gerekiyor.",
+                "ai"
+            );
+
+        }else{
+
+            addMessage(
+                "Efendim, sunucuya ulaşamıyorum. Sistem bağlantısını kontrol etmem gerekiyor.",
+                "ai"
+            );
+
+        }
+
+        console.error(error);
+
+    }
+    finally{
+
+        sendBtn.disabled = false;
 
         input.focus();
 
@@ -2654,17 +2013,27 @@ async function sendMessage(){
 }
 
 
-sendBtn.onclick =
-    sendMessage;
+/* ==============================
+   SEND BUTTON
+================================ */
 
+sendBtn.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+/* ==============================
+   ENTER
+================================ */
 
 input.addEventListener(
     "keydown",
     event => {
 
         if(
-            event.key
-            === "Enter"
+            event.key === "Enter" &&
+            !event.shiftKey
         ){
 
             event.preventDefault();
@@ -2677,22 +2046,18 @@ input.addEventListener(
 );
 
 
-let recognition =
-    null;
+/* ==============================
+   VOICE
+================================ */
+
+let recognition = null;
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
 
-if(
-    "webkitSpeechRecognition"
-    in window
-    ||
-    "SpeechRecognition"
-    in window
-){
-
-    const SpeechRecognition =
-        window.SpeechRecognition
-        ||
-        window.webkitSpeechRecognition;
+if(SpeechRecognition){
 
     recognition =
         new SpeechRecognition();
@@ -2706,83 +2071,109 @@ if(
     recognition.interimResults =
         false;
 
-    recognition.onresult =
-        event => {
 
-            const text =
-                event
-                    .results[0][0]
-                    .transcript;
+    recognition.onstart = ()=>{
 
-            input.value =
-                text;
+        micBtn.classList.add(
+            "active"
+        );
 
-            input.focus();
+    };
 
-        };
 
-    recognition.onerror =
-        () => {
+    recognition.onend = ()=>{
 
-            micBtn.style.color =
-                "";
+        micBtn.classList.remove(
+            "active"
+        );
 
-        };
+    };
 
-    recognition.onend =
-        () => {
 
-            micBtn.style.color =
-                "";
+    recognition.onresult = event =>{
 
-        };
+        const transcript =
+            event.results[0][0].transcript;
 
-    micBtn.onclick =
-        () => {
+        input.value =
+            transcript;
 
-            micBtn.style.color =
-                "var(--accent)";
+        input.focus();
+
+    };
+
+
+    recognition.onerror = ()=>{
+
+        micBtn.classList.remove(
+            "active"
+        );
+
+    };
+
+
+    micBtn.addEventListener(
+        "click",
+        ()=>{
 
             try{
 
                 recognition.start();
 
-            }catch(error){
+            }catch(e){
+
+                console.log(e);
 
             }
 
-        };
+        }
+    );
 
 }else{
 
-    micBtn.style.opacity =
-        ".4";
-
-    micBtn.onclick =
-        () => {
+    micBtn.addEventListener(
+        "click",
+        ()=>{
 
             addMessage(
-                "Bu cihaz veya tarayıcı sesli girişi desteklemiyor.",
+                "Efendim, bu tarayıcı sesli girişi desteklemiyor.",
                 "ai"
             );
 
-        };
+        }
+    );
 
 }
 
 
+/* ==============================
+   STARTUP
+================================ */
+
 window.addEventListener(
     "load",
-    () => {
+    ()=>{
 
-        setTimeout(
-            () => {
+        setTimeout(()=>{
 
-                input.focus();
+            input.focus();
 
-            },
-            500
-        );
+        },500);
+
+    }
+);
+
+
+/* ==============================
+   KEYBOARD / MOBILE
+================================ */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        chat.scrollTop =
+            chat.scrollHeight;
 
     }
 );
