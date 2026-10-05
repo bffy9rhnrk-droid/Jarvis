@@ -2,21 +2,16 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
 :root{
     --cyan:#39e8ff;
-    --cyan2:#087dff;
     --green:#4dffb1;
-    --red:#ff4264;
     --bg:#02060b;
-    --panel:rgba(7,15,24,.82);
-    --panel2:rgba(12,24,35,.72);
     --text:#effcff;
     --muted:#718492;
-    --line:rgba(130,220,255,.13);
 }
 
 *{
@@ -33,7 +28,7 @@ html,body{
 }
 
 body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     color:var(--text);
 }
 
@@ -49,48 +44,27 @@ button{
 .app{
     position:relative;
     width:100%;
-    height:100dvh;
+    height:100vh;
     overflow:hidden;
     background:
-        radial-gradient(circle at 50% 38%,rgba(0,190,255,.13),transparent 24%),
-        radial-gradient(circle at 10% 80%,rgba(0,80,255,.06),transparent 25%),
-        radial-gradient(circle at 90% 20%,rgba(0,255,220,.04),transparent 25%),
+        radial-gradient(circle at 50% 38%,rgba(0,190,255,.14),transparent 25%),
         #02060b;
 }
 
-/* =========================
-   BACKGROUND
-========================= */
+/* GRID */
 
 .app:before{
     content:"";
     position:absolute;
     inset:0;
-    opacity:.18;
+    opacity:.16;
     background-image:
-        linear-gradient(rgba(90,200,255,.04) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(90,200,255,.04) 1px,transparent 1px);
+        linear-gradient(rgba(90,200,255,.045) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(90,200,255,.045) 1px,transparent 1px);
     background-size:38px 38px;
-    mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
 }
 
-.app:after{
-    content:"";
-    position:absolute;
-    width:500px;
-    height:500px;
-    left:50%;
-    top:37%;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:rgba(0,210,255,.035);
-    filter:blur(70px);
-    pointer-events:none;
-}
-
-/* =========================
-   TOP BAR
-========================= */
+/* TOP */
 
 .top{
     position:absolute;
@@ -98,10 +72,8 @@ button{
     top:0;
     left:0;
     right:0;
-    height:82px;
-    padding:
-        calc(12px + env(safe-area-inset-top))
-        15px 8px;
+    height:78px;
+    padding:14px 15px;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -110,25 +82,19 @@ button{
 .menu{
     width:45px;
     height:45px;
-    border-radius:15px;
+    border-radius:14px;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     gap:5px;
-    color:white;
-    background:rgba(7,18,28,.75);
-    border:1px solid rgba(100,220,255,.15);
-    box-shadow:
-        inset 0 0 20px rgba(0,200,255,.03),
-        0 8px 30px #0008;
-    backdrop-filter:blur(16px);
+    background:rgba(7,18,28,.85);
+    border:1px solid rgba(100,220,255,.16);
 }
 
 .menu i{
     width:18px;
-    height:1.5px;
-    border-radius:10px;
+    height:2px;
     background:var(--cyan);
     box-shadow:0 0 8px var(--cyan);
 }
@@ -140,9 +106,7 @@ button{
 .brand b{
     display:block;
     font-size:17px;
-    font-weight:700;
     letter-spacing:3px;
-    text-shadow:0 0 18px rgba(54,229,255,.25);
 }
 
 .brand small{
@@ -153,14 +117,12 @@ button{
     letter-spacing:3px;
 }
 
-/* =========================
-   STATUS
-========================= */
+/* STATUS */
 
 .status{
     position:absolute;
     z-index:10;
-    top:93px;
+    top:90px;
     right:17px;
     display:flex;
     align-items:center;
@@ -176,197 +138,183 @@ button{
     border-radius:50%;
     background:var(--green);
     box-shadow:0 0 12px var(--green);
-    animation:statusPulse 1.8s infinite;
+    animation:pulse 1.5s infinite;
 }
 
-@keyframes statusPulse{
-    0%,100%{opacity:.5;transform:scale(.8)}
-    50%{opacity:1;transform:scale(1.2)}
+@keyframes pulse{
+    0%,100%{opacity:.4}
+    50%{opacity:1}
 }
 
-/* =========================
-   HUD
-========================= */
+/* HUD */
 
 .hud{
     position:absolute;
-    z-index:3;
+    z-index:4;
+    top:115px;
     left:14px;
     right:14px;
-    top:116px;
     display:flex;
     justify-content:space-between;
-    pointer-events:none;
 }
 
 .hud-side{
     display:flex;
     flex-direction:column;
-    gap:7px;
+    gap:8px;
 }
 
 .hud-item{
     display:flex;
     align-items:center;
-    gap:7px;
-    color:#526774;
+    gap:6px;
+    color:#70858f;
     font-size:6px;
-    letter-spacing:1.5px;
-}
-
-.hud-item b{
-    color:#87a1ad;
-    font-weight:500;
+    letter-spacing:1px;
 }
 
 .hud-bar{
-    width:28px;
+    width:27px;
     height:2px;
-    border-radius:5px;
     background:rgba(57,232,255,.1);
-    overflow:hidden;
 }
 
 .hud-bar span{
     display:block;
-    width:78%;
+    width:80%;
     height:100%;
     background:var(--cyan);
-    box-shadow:0 0 8px var(--cyan);
+    box-shadow:0 0 7px var(--cyan);
 }
 
-/* =========================
-   CORE AREA
-========================= */
+/* CORE */
 
 .core-area{
     position:absolute;
     z-index:5;
     left:50%;
     top:38%;
-    width:285px;
-    height:285px;
+    width:280px;
+    height:280px;
     transform:translate(-50%,-50%);
 }
 
-/* central glow */
-
-.core-glow{
+.glow{
     position:absolute;
     left:50%;
     top:50%;
-    width:180px;
-    height:180px;
+    width:170px;
+    height:170px;
     transform:translate(-50%,-50%);
     border-radius:50%;
-    background:rgba(57,232,255,.12);
-    filter:blur(32px);
-    animation:coreGlow 3s ease-in-out infinite;
+    background:rgba(57,232,255,.14);
+    filter:blur(35px);
+    animation:glow 3s infinite;
 }
 
-@keyframes coreGlow{
-    0%,100%{transform:translate(-50%,-50%) scale(.88);opacity:.65}
-    50%{transform:translate(-50%,-50%) scale(1.18);opacity:1}
+@keyframes glow{
+    0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(.9)}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
 }
 
-/* rings */
+/* RINGS */
 
 .ring{
     position:absolute;
     left:50%;
     top:50%;
     border-radius:50%;
+    border:1px solid rgba(57,232,255,.18);
     transform:translate(-50%,-50%);
-    border:1px solid rgba(57,232,255,.16);
 }
 
 .r1{
-    width:164px;
-    height:164px;
+    width:160px;
+    height:160px;
     border-top-color:var(--cyan);
-    border-right-color:rgba(57,232,255,.03);
     animation:spin 7s linear infinite;
 }
 
 .r2{
-    width:192px;
-    height:192px;
+    width:190px;
+    height:190px;
     border-bottom-color:var(--cyan);
-    border-left-color:rgba(57,232,255,.03);
     animation:spinReverse 10s linear infinite;
 }
 
 .r3{
-    width:225px;
-    height:225px;
-    border-left-color:rgba(57,232,255,.8);
-    border-top-color:rgba(57,232,255,.08);
+    width:220px;
+    height:220px;
+    border-left-color:var(--cyan);
     animation:spin 15s linear infinite;
 }
 
 .r4{
-    width:260px;
-    height:260px;
-    border-right-color:rgba(57,232,255,.35);
-    border-bottom-color:rgba(57,232,255,.06);
+    width:255px;
+    height:255px;
+    border-right-color:rgba(57,232,255,.45);
     animation:spinReverse 22s linear infinite;
 }
 
 @keyframes spin{
+    from{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
     to{
         transform:translate(-50%,-50%) rotate(360deg);
     }
 }
 
 @keyframes spinReverse{
+    from{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
     to{
         transform:translate(-50%,-50%) rotate(-360deg);
     }
 }
 
-/* orbit markers */
+/* ORBIT */
 
 .orbit{
     position:absolute;
     left:50%;
     top:50%;
-    width:248px;
-    height:248px;
+    width:245px;
+    height:245px;
     transform:translate(-50%,-50%);
     animation:spin 12s linear infinite;
 }
 
-.orbit-dot{
+.dot{
     position:absolute;
     width:6px;
     height:6px;
     border-radius:50%;
     background:var(--cyan);
-    box-shadow:
-        0 0 6px var(--cyan),
-        0 0 18px var(--cyan);
+    box-shadow:0 0 8px var(--cyan),0 0 18px var(--cyan);
 }
 
-.orbit-dot.one{
-    top:9px;
+.dot1{
+    top:7px;
     left:50%;
 }
 
-.orbit-dot.two{
-    right:15px;
-    bottom:44px;
+.dot2{
+    right:14px;
+    bottom:42px;
     width:4px;
     height:4px;
 }
 
-.orbit-dot.three{
-    left:20px;
+.dot3{
+    left:18px;
     bottom:38px;
     width:3px;
     height:3px;
 }
 
-/* core */
+/* CORE */
 
 .core{
     position:absolute;
@@ -382,29 +330,31 @@ button{
 
     background:
         radial-gradient(
-            circle at 32% 25%,
-            #dfffff 0%,
-            #6df2ff 12%,
-            #1596b0 34%,
-            #064253 56%,
-            #020b10 78%,
-            #010305
+            circle at 30% 25%,
+            #e8ffff,
+            #65efff 14%,
+            #168da5 35%,
+            #053744 58%,
+            #010609 82%
         );
 
-    border:1px solid rgba(184,251,255,.9);
+    border:1px solid #b8fbff;
 
     box-shadow:
         0 0 18px rgba(57,232,255,.9),
-        0 0 42px rgba(57,232,255,.45),
-        0 0 85px rgba(57,232,255,.18),
-        inset 0 0 28px #000;
+        0 0 45px rgba(57,232,255,.4),
+        inset 0 0 25px #000;
 
-    animation:coreFloat 3.5s ease-in-out infinite;
+    animation:float 3.5s ease-in-out infinite;
 }
 
-@keyframes coreFloat{
-    0%,100%{transform:translate(-50%,-50%) scale(1)}
-    50%{transform:translate(-50%,-50%) scale(1.035)}
+@keyframes float{
+    0%,100%{
+        transform:translate(-50%,-50%) scale(1);
+    }
+    50%{
+        transform:translate(-50%,-50%) scale(1.04);
+    }
 }
 
 .core:before{
@@ -412,29 +362,19 @@ button{
     position:absolute;
     inset:8px;
     border-radius:50%;
-    border:1px solid rgba(255,255,255,.32);
-}
-
-.core:after{
-    content:"";
-    position:absolute;
-    inset:17px;
-    border-radius:50%;
-    border:1px dashed rgba(255,255,255,.16);
-    animation:spin 8s linear infinite;
+    border:1px solid rgba(255,255,255,.3);
 }
 
 .k{
     position:relative;
-    z-index:3;
+    z-index:2;
     font-size:50px;
-    line-height:1;
     font-weight:800;
-    color:#eaffff;
+    color:#efffff;
     text-shadow:
         0 0 5px white,
-        0 0 16px white,
-        0 0 32px var(--cyan);
+        0 0 18px white,
+        0 0 30px var(--cyan);
 }
 
 .core-label{
@@ -449,7 +389,7 @@ button{
 
 .core-status{
     position:absolute;
-    top:calc(50% + 92px);
+    top:calc(50% + 91px);
     width:100%;
     text-align:center;
     color:var(--green);
@@ -457,81 +397,58 @@ button{
     letter-spacing:2px;
 }
 
-/* =========================
-   SIDE DATA
-========================= */
+/* SIDE DATA */
 
-.data-left,
-.data-right{
+.data{
     position:absolute;
     z-index:3;
     top:38%;
-    width:72px;
-    color:#455b67;
+    width:70px;
+    color:#536b76;
     font-size:6px;
-    letter-spacing:1.5px;
+    letter-spacing:1px;
 }
 
-.data-left{
+.data.left{
     left:14px;
 }
 
-.data-right{
+.data.right{
     right:14px;
     text-align:right;
-}
-
-.data-title{
-    color:#78909c;
-    margin-bottom:5px;
 }
 
 .data-value{
     color:var(--cyan);
     font-size:9px;
-    margin-bottom:12px;
+    margin:5px 0 10px;
 }
 
-.mini-lines{
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-}
-
-.mini-lines span{
+.line{
     height:2px;
-    width:100%;
+    margin:4px 0;
     background:rgba(57,232,255,.08);
-    overflow:hidden;
 }
 
-.mini-lines span:after{
-    content:"";
+.line span{
     display:block;
     height:100%;
-    width:var(--w,60%);
     background:var(--cyan);
-    box-shadow:0 0 5px var(--cyan);
 }
 
-/* =========================
-   CHAT
-========================= */
+/* CHAT */
 
 .chat{
     position:absolute;
     z-index:8;
     left:12px;
     right:12px;
-    bottom:99px;
+    bottom:100px;
     max-height:20vh;
     overflow-y:auto;
     display:flex;
     flex-direction:column;
     gap:7px;
-    scrollbar-width:none;
-    mask-image:linear-gradient(to bottom,transparent,#000 10%);
-    padding-top:10px;
 }
 
 .chat::-webkit-scrollbar{
@@ -539,21 +456,18 @@ button{
 }
 
 .msg{
-    position:relative;
     max-width:88%;
     padding:10px 13px;
-    border-radius:15px;
+    border-radius:14px;
     color:#cce5ec;
-    background:rgba(7,17,27,.72);
-    border:1px solid rgba(120,220,255,.09);
-    backdrop-filter:blur(12px);
-    box-shadow:0 5px 25px rgba(0,0,0,.15);
+    background:rgba(7,17,27,.8);
+    border:1px solid rgba(120,220,255,.1);
     font-size:12px;
     line-height:1.45;
-    animation:messageIn .25s ease;
+    animation:message .25s ease;
 }
 
-@keyframes messageIn{
+@keyframes message{
     from{
         opacity:0;
         transform:translateY(7px);
@@ -571,18 +485,12 @@ button{
 .msg.user{
     align-self:flex-end;
     color:#eaffff;
-    background:linear-gradient(
-        135deg,
-        rgba(0,100,125,.32),
-        rgba(0,65,100,.18)
-    );
-    border-color:rgba(57,232,255,.18);
+    background:rgba(0,100,125,.25);
 }
 
 .typing{
     display:flex;
     gap:4px;
-    align-items:center;
 }
 
 .typing span{
@@ -590,47 +498,39 @@ button{
     height:4px;
     border-radius:50%;
     background:var(--cyan);
-    box-shadow:0 0 7px var(--cyan);
-    animation:typeDot 1s infinite;
+    animation:typing 1s infinite;
 }
 
-.typing span:nth-child(2){animation-delay:.15s}
-.typing span:nth-child(3){animation-delay:.3s}
-
-@keyframes typeDot{
-    0%,100%{opacity:.25;transform:translateY(0)}
-    50%{opacity:1;transform:translateY(-3px)}
+.typing span:nth-child(2){
+    animation-delay:.15s;
 }
 
-/* =========================
-   INPUT
-========================= */
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
+
+@keyframes typing{
+    0%,100%{opacity:.2}
+    50%{opacity:1}
+}
+
+/* INPUT */
 
 .input-area{
     position:absolute;
     z-index:25;
     left:10px;
     right:10px;
-    bottom:calc(7px + env(safe-area-inset-bottom));
+    bottom:7px;
     height:58px;
     display:flex;
-    gap:6px;
     align-items:center;
+    gap:6px;
     padding:6px;
-    border-radius:19px;
-    background:rgba(5,13,21,.88);
-    border:1px solid rgba(115,215,255,.12);
-    box-shadow:
-        0 15px 45px #000b,
-        inset 0 0 20px rgba(57,232,255,.025);
-    backdrop-filter:blur(22px);
-}
-
-.input-area:focus-within{
-    border-color:rgba(57,232,255,.3);
-    box-shadow:
-        0 15px 45px #000b,
-        0 0 25px rgba(57,232,255,.07);
+    border-radius:18px;
+    background:rgba(5,13,21,.92);
+    border:1px solid rgba(115,215,255,.14);
+    box-shadow:0 15px 45px #000b;
 }
 
 .input{
@@ -641,7 +541,7 @@ button{
     outline:0;
     background:transparent;
     color:white;
-    padding:0 9px;
+    padding:0 8px;
     font-size:15px;
 }
 
@@ -654,12 +554,12 @@ button{
     width:44px;
     height:44px;
     flex:none;
-    border-radius:14px;
+    border-radius:13px;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:rgba(255,255,255,.035);
-    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
     color:#78909c;
 }
 
@@ -671,31 +571,27 @@ button{
     font-size:17px;
 }
 
+.mic.active{
+    color:#ff4264;
+    border-color:#ff4264;
+    box-shadow:0 0 18px rgba(255,66,100,.4);
+}
+
 .send{
     color:var(--cyan);
-    background:rgba(57,232,255,.07);
-    border-color:rgba(57,232,255,.2);
     font-size:18px;
-    box-shadow:0 0 15px rgba(57,232,255,.05);
 }
 
-.send:disabled{
-    opacity:.4;
-}
-
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 
 .overlay{
     position:fixed;
     z-index:50;
     inset:0;
     background:rgba(0,0,0,.65);
-    backdrop-filter:blur(4px);
     opacity:0;
     pointer-events:none;
-    transition:.28s;
+    transition:.25s;
 }
 
 .overlay.open{
@@ -709,18 +605,14 @@ button{
     left:0;
     top:0;
     bottom:0;
-    width:290px;
-    max-width:84vw;
-    padding:
-        calc(20px + env(safe-area-inset-top))
-        17px
-        calc(20px + env(safe-area-inset-bottom));
-    background:
-        linear-gradient(150deg,rgba(12,25,37,.98),rgba(2,8,13,.98));
-    border-right:1px solid rgba(100,220,255,.14);
+    width:285px;
+    max-width:85vw;
+    padding:25px 17px;
+    background:linear-gradient(150deg,#0c1925,#02080d);
+    border-right:1px solid rgba(100,220,255,.15);
     box-shadow:20px 0 60px #0008;
     transform:translateX(-105%);
-    transition:.32s cubic-bezier(.2,.8,.2,1);
+    transition:.3s;
 }
 
 .sidebar.open{
@@ -731,7 +623,7 @@ button{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:34px;
+    margin-bottom:35px;
 }
 
 .side-brand{
@@ -741,8 +633,8 @@ button{
 }
 
 .side-logo{
-    width:38px;
-    height:38px;
+    width:40px;
+    height:40px;
     border-radius:12px;
     display:flex;
     align-items:center;
@@ -750,7 +642,6 @@ button{
     color:var(--cyan);
     border:1px solid rgba(57,232,255,.2);
     background:rgba(57,232,255,.05);
-    box-shadow:0 0 20px rgba(57,232,255,.07);
     font-weight:800;
 }
 
@@ -773,7 +664,6 @@ button{
     border-radius:13px;
     color:#91a5ae;
     background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.07);
     font-size:22px;
 }
 
@@ -784,38 +674,32 @@ button{
 }
 
 .nav button{
-    position:relative;
     padding:14px;
     border-radius:14px;
     text-align:left;
     color:#7f939d;
     background:transparent;
-    border:1px solid transparent;
-    transition:.2s;
 }
 
 .nav button.active{
     color:var(--cyan);
     background:rgba(57,232,255,.06);
-    border-color:rgba(57,232,255,.12);
     box-shadow:inset 3px 0 0 var(--cyan);
 }
 
 .nav-icon{
     display:inline-block;
-    width:22px;
-    color:inherit;
+    width:24px;
 }
 
 .side-footer{
     position:absolute;
     left:17px;
     right:17px;
-    bottom:calc(22px + env(safe-area-inset-bottom));
+    bottom:22px;
     padding:13px;
     border-radius:14px;
     background:rgba(255,255,255,.025);
-    border:1px solid rgba(255,255,255,.05);
     color:#536b76;
     font-size:7px;
     letter-spacing:1.5px;
@@ -825,25 +709,18 @@ button{
     color:var(--green);
 }
 
-/* =========================
-   SETTINGS
-========================= */
+/* SETTINGS */
 
 .settings{
     position:absolute;
     z-index:40;
     inset:0;
     overflow-y:auto;
-    padding:
-        calc(92px + env(safe-area-inset-top))
-        15px
-        calc(90px + env(safe-area-inset-bottom));
-    background:
-        radial-gradient(circle at 50% 10%,rgba(57,232,255,.08),transparent 28%),
-        #02060b;
+    padding:90px 15px;
+    background:#02060b;
     opacity:0;
     pointer-events:none;
-    transform:translateX(25px);
+    transform:translateX(20px);
     transition:.25s;
 }
 
@@ -853,18 +730,12 @@ button{
     transform:none;
 }
 
-.settings-header{
-    margin-bottom:22px;
-}
-
 .settings h1{
     margin:0;
     font-size:25px;
-    letter-spacing:-.5px;
 }
 
 .settings p{
-    margin:7px 0 0;
     color:#637883;
     font-size:11px;
     line-height:1.5;
@@ -874,9 +745,8 @@ button{
     margin-bottom:10px;
     padding:16px;
     border-radius:17px;
-    background:rgba(8,18,28,.78);
+    background:rgba(8,18,28,.8);
     border:1px solid rgba(120,220,255,.09);
-    box-shadow:0 8px 30px #0003;
 }
 
 .row{
@@ -895,14 +765,12 @@ button{
     margin-top:5px;
     color:#647984;
     font-size:9px;
-    line-height:1.4;
 }
 
 select{
     width:105px;
-    padding:9px 8px;
-    border-radius:11px;
-    outline:0;
+    padding:9px;
+    border-radius:10px;
     background:#0a1721;
     color:white;
     border:1px solid rgba(120,220,255,.1);
@@ -912,11 +780,8 @@ select{
     position:relative;
     width:48px;
     height:27px;
-    flex:none;
     border-radius:20px;
     background:#15232c;
-    border:1px solid rgba(255,255,255,.06);
-    transition:.2s;
 }
 
 .toggle:after{
@@ -928,12 +793,11 @@ select{
     height:19px;
     border-radius:50%;
     background:#687a83;
-    transition:.22s;
+    transition:.2s;
 }
 
 .toggle.on{
     background:rgba(57,232,255,.15);
-    border-color:rgba(57,232,255,.25);
 }
 
 .toggle.on:after{
@@ -943,24 +807,19 @@ select{
 }
 
 .range{
-    width:100px;
-    accent-color:var(--cyan);
+    width:95px;
 }
 
 .range-value{
     width:35px;
     color:var(--cyan);
     font-size:10px;
-    text-align:right;
 }
 
-/* =========================
-   FUN MODE
-========================= */
+/* FUN */
 
 body.fun{
     --cyan:#ff4264;
-    --cyan2:#ff1944;
 }
 
 body.fun .app{
@@ -969,42 +828,20 @@ body.fun .app{
         #080204;
 }
 
-body.fun .core-glow{
-    background:rgba(255,55,85,.13);
-}
-
 body.fun .core{
     background:
         radial-gradient(
-            circle at 32% 25%,
+            circle at 30% 25%,
             #ffe4e8,
-            #ff7189 12%,
-            #b32645 35%,
-            #42101d 58%,
-            #080103 80%
+            #ff7189 15%,
+            #b32645 38%,
+            #42101d 60%,
+            #080103 82%
         );
     border-color:#ffb5c0;
 }
 
-body.fun .status-dot{
-    background:#ff536f;
-    box-shadow:0 0 12px #ff536f;
-}
-
-body.fun .send{
-    color:#ff6680;
-    border-color:rgba(255,66,100,.25);
-}
-
-body.fun .hud-bar span,
-body.fun .mini-lines span{
-    background:#ff4264;
-    box-shadow:0 0 8px #ff4264;
-}
-
-/* =========================
-   LIGHT MODE
-========================= */
+/* LIGHT */
 
 body.light{
     --bg:#edf6f9;
@@ -1012,9 +849,7 @@ body.light{
 }
 
 body.light .app{
-    background:
-        radial-gradient(circle at 50% 35%,rgba(0,170,210,.13),transparent 27%),
-        #edf6f9;
+    background:#edf6f9;
 }
 
 body.light .settings{
@@ -1023,49 +858,28 @@ body.light .settings{
 
 body.light .input-area,
 body.light .msg,
-body.light .sidebar,
 body.light .card{
-    background:rgba(255,255,255,.82);
+    background:rgba(255,255,255,.85);
 }
 
 body.light .input{
     color:#102029;
 }
 
-body.light .brand b{
-    color:#102029;
-}
-
-body.light .sidebar{
-    background:linear-gradient(150deg,#f8fdff,#e7f1f5);
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
+/* MOBILE */
 
 @media(max-width:390px){
 
     .brand b{
         font-size:15px;
-        letter-spacing:2px;
+    }
+
+    .data{
+        display:none;
     }
 
     .core-area{
         transform:translate(-50%,-50%) scale(.9);
-    }
-
-    .data-left,
-    .data-right{
-        display:none;
-    }
-
-    .hud{
-        top:111px;
-    }
-
-    .chat{
-        max-height:18vh;
     }
 }
 
@@ -1076,12 +890,12 @@ body.light .sidebar{
         transform:translate(-50%,-50%) scale(.82);
     }
 
-    .chat{
-        max-height:16vh;
-    }
-
     .hud{
         display:none;
+    }
+
+    .chat{
+        max-height:16vh;
     }
 }
 </style>
@@ -1090,8 +904,6 @@ body.light .sidebar{
 <body>
 
 <div class="app">
-
-    <!-- TOP -->
 
     <div class="top">
 
@@ -1108,82 +920,114 @@ body.light .sidebar{
 
     </div>
 
-    <!-- STATUS -->
 
     <div class="status">
         <span class="status-dot"></span>
         SYSTEM ONLINE
     </div>
 
-    <!-- HUD -->
 
     <div class="hud">
 
         <div class="hud-side">
 
             <div class="hud-item">
-                <div class="hud-bar"><span></span></div>
-                <b>CORE ACTIVE</b>
+                <div class="hud-bar">
+                    <span></span>
+                </div>
+                CORE ACTIVE
             </div>
 
             <div class="hud-item">
-                <div class="hud-bar"><span style="--w:91%"></span></div>
-                <b>NETWORK SECURE</b>
+                <div class="hud-bar">
+                    <span style="width:91%"></span>
+                </div>
+                NETWORK SECURE
             </div>
 
         </div>
+
 
         <div class="hud-side">
 
             <div class="hud-item">
-                <b>AI ENGINE ONLINE</b>
-                <div class="hud-bar"><span style="--w:86%"></span></div>
+                AI ENGINE ONLINE
+                <div class="hud-bar">
+                    <span style="width:86%"></span>
+                </div>
             </div>
 
             <div class="hud-item">
-                <b>MK-I / K-CORE</b>
-                <div class="hud-bar"><span style="--w:73%"></span></div>
+                MK-I / K-CORE
+                <div class="hud-bar">
+                    <span style="width:73%"></span>
+                </div>
             </div>
 
         </div>
 
     </div>
 
-    <!-- SIDE DATA -->
 
-    <div class="data-left">
+    <div class="data left">
 
-        <div class="data-title">SYSTEM LOAD</div>
-        <div class="data-value" id="loadValue">24%</div>
+        SYSTEM LOAD
 
-        <div class="mini-lines">
-            <span style="--w:32%"></span>
-            <span style="--w:57%"></span>
-            <span style="--w:41%"></span>
-            <span style="--w:68%"></span>
+        <div class="data-value" id="loadValue">
+            24%
+        </div>
+
+        <div class="line">
+            <span style="width:32%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:57%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:41%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:68%"></span>
         </div>
 
     </div>
 
-    <div class="data-right">
 
-        <div class="data-title">SIGNAL</div>
-        <div class="data-value">98.7%</div>
+    <div class="data right">
 
-        <div class="mini-lines">
-            <span style="--w:82%"></span>
-            <span style="--w:91%"></span>
-            <span style="--w:73%"></span>
-            <span style="--w:95%"></span>
+        SIGNAL
+
+        <div class="data-value">
+            98.7%
+        </div>
+
+        <div class="line">
+            <span style="width:82%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:91%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:73%"></span>
+        </div>
+
+        <div class="line">
+            <span style="width:95%"></span>
         </div>
 
     </div>
+
 
     <!-- CORE -->
 
     <div class="core-area" id="coreArea">
 
-        <div class="core-glow"></div>
+        <div class="glow"></div>
 
         <div class="ring r1"></div>
         <div class="ring r2"></div>
@@ -1191,9 +1035,9 @@ body.light .sidebar{
         <div class="ring r4"></div>
 
         <div class="orbit">
-            <div class="orbit-dot one"></div>
-            <div class="orbit-dot two"></div>
-            <div class="orbit-dot three"></div>
+            <div class="dot dot1"></div>
+            <div class="dot dot2"></div>
+            <div class="dot dot3"></div>
         </div>
 
         <div class="core">
@@ -1210,6 +1054,7 @@ body.light .sidebar{
 
     </div>
 
+
     <!-- CHAT -->
 
     <div class="chat" id="chat">
@@ -1219,6 +1064,7 @@ body.light .sidebar{
         </div>
 
     </div>
+
 
     <!-- INPUT -->
 
@@ -1231,26 +1077,31 @@ body.light .sidebar{
             autocomplete="off"
         >
 
-        <button class="action mic" id="micBtn">◉</button>
+        <button
+            class="action mic"
+            id="micBtn"
+        >◉</button>
 
-        <button class="action send" id="sendBtn">➤</button>
+        <button
+            class="action send"
+            id="sendBtn"
+        >➤</button>
 
     </div>
 
 
     <!-- SETTINGS -->
 
-    <section class="settings" id="settings">
+    <section
+        class="settings"
+        id="settings"
+    >
 
-        <div class="settings-header">
+        <h1>Ayarlar</h1>
 
-            <h1>Ayarlar</h1>
-
-            <p>
-                J.A.R.V.I.S. sistemini ve arayüz deneyimini kişiselleştirin.
-            </p>
-
-        </div>
+        <p>
+            J.A.R.V.I.S. sistemini ve arayüz deneyimini kişiselleştirin.
+        </p>
 
 
         <div class="card">
@@ -1258,18 +1109,24 @@ body.light .sidebar{
             <div class="row">
 
                 <div>
-                    <div class="name">Hitap Şekli</div>
+
+                    <div class="name">
+                        Hitap Şekli
+                    </div>
 
                     <div class="desc">
                         J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
                     </div>
+
                 </div>
 
                 <select id="addressSelect">
+
                     <option>Efendim</option>
                     <option>Komutanım</option>
                     <option>Patron</option>
                     <option>Dostum</option>
+
                 </select>
 
             </div>
@@ -1282,11 +1139,15 @@ body.light .sidebar{
             <div class="row">
 
                 <div>
-                    <div class="name">Arayüz Boyutu</div>
+
+                    <div class="name">
+                        Arayüz Boyutu
+                    </div>
 
                     <div class="desc">
                         K-Core boyutunu ayarlayın.
                     </div>
+
                 </div>
 
                 <div class="row">
@@ -1318,14 +1179,21 @@ body.light .sidebar{
             <div class="row">
 
                 <div>
-                    <div class="name">Gece / Gündüz</div>
+
+                    <div class="name">
+                        Gece / Gündüz
+                    </div>
 
                     <div class="desc">
                         Arayüz temasını değiştirin.
                     </div>
+
                 </div>
 
-                <div class="toggle" id="themeToggle"></div>
+                <div
+                    class="toggle"
+                    id="themeToggle"
+                ></div>
 
             </div>
 
@@ -1337,14 +1205,21 @@ body.light .sidebar{
             <div class="row">
 
                 <div>
-                    <div class="name">Eğlence Modu</div>
+
+                    <div class="name">
+                        Eğlence Modu
+                    </div>
 
                     <div class="desc">
-                        Daha esprili ve enerjik J.A.R.V.I.S. cevaplarını etkinleştirin.
+                        Daha esprili J.A.R.V.I.S. cevaplarını etkinleştirin.
                     </div>
+
                 </div>
 
-                <div class="toggle" id="funToggle"></div>
+                <div
+                    class="toggle"
+                    id="funToggle"
+                ></div>
 
             </div>
 
@@ -1355,20 +1230,29 @@ body.light .sidebar{
 
     <!-- OVERLAY -->
 
-    <div class="overlay" id="overlay"></div>
+    <div
+        class="overlay"
+        id="overlay"
+    ></div>
 
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar" id="sidebar">
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
 
         <div class="side-head">
 
             <div class="side-brand">
 
-                <div class="side-logo">K</div>
+                <div class="side-logo">
+                    K
+                </div>
 
                 <div>
+
                     <div class="side-title">
                         J.A.R.V.I.S.
                     </div>
@@ -1376,11 +1260,16 @@ body.light .sidebar{
                     <div class="side-sub">
                         KARAHAN INC.
                     </div>
+
                 </div>
 
             </div>
 
-            <button class="close" id="closeBtn">
+
+            <button
+                class="close"
+                id="closeBtn"
+            >
                 ×
             </button>
 
@@ -1389,30 +1278,42 @@ body.light .sidebar{
 
         <div class="nav">
 
-            <button class="active" id="homeBtn">
+            <button
+                class="active"
+                id="homeBtn"
+            >
                 <span class="nav-icon">⌂</span>
                 Ana Ekran
             </button>
 
+
             <button id="chatBtn">
+
                 <span class="nav-icon">◌</span>
                 JARVIS Chat
+
             </button>
 
+
             <button id="settingsBtn">
+
                 <span class="nav-icon">⚙</span>
                 Ayarlar
+
             </button>
 
         </div>
 
 
         <div class="side-footer">
+
             <span>●</span>
-            &nbsp; SYSTEM ONLINE
-            <br>
-            <br>
+            SYSTEM ONLINE
+
+            <br><br>
+
             KARAHAN INC. // K-CORE 01
+
         </div>
 
     </aside>
@@ -1422,18 +1323,11 @@ body.light .sidebar{
 
 <script>
 
-/* =========================
-   CONFIG
-========================= */
-
 const API="/chat";
 
-
-/* =========================
-   ELEMENTS
-========================= */
-
-const $=id=>document.getElementById(id);
+function $(id){
+    return document.getElementById(id);
+}
 
 const chat=$("chat");
 const input=$("input");
@@ -1461,9 +1355,7 @@ const coreArea=$("coreArea");
 const loadValue=$("loadValue");
 
 
-/* =========================
-   SETTINGS
-========================= */
+/* SETTINGS */
 
 let address=
     localStorage.getItem("jarvis_address") ||
@@ -1476,7 +1368,7 @@ let light=
     localStorage.getItem("jarvis_theme")==="light";
 
 let scale=
-    Number(localStorage.getItem("jarvis_scale")||100);
+    Number(localStorage.getItem("jarvis_scale") || 100);
 
 
 addressSelect.value=address;
@@ -1487,84 +1379,68 @@ uiScaleValue.textContent=scale+"%";
 
 
 if(light){
-
     document.body.classList.add("light");
-
     themeToggle.classList.add("on");
-
 }
-
 
 if(funMode){
-
     document.body.classList.add("fun");
-
     funToggle.classList.add("on");
-
 }
 
 
-/* =========================
-   CORE SCALE
-========================= */
+/* CORE SCALE */
 
 function applyScale(){
 
-    const s=scale/100;
+    const value=scale/100;
 
     coreArea.style.transform=
-        "translate(-50%,-50%) scale("+s+")";
+        "translate(-50%,-50%) scale("+value+")";
 
 }
 
 applyScale();
 
 
-/* =========================
-   MENU
-========================= */
+/* MENU */
 
 function openMenu(){
 
     sidebar.classList.add("open");
-
     overlay.classList.add("open");
 
 }
 
-
 function closeMenu(){
 
     sidebar.classList.remove("open");
-
     overlay.classList.remove("open");
 
 }
 
-
 menuBtn.onclick=openMenu;
-
 closeBtn.onclick=closeMenu;
-
 overlay.onclick=closeMenu;
 
 
-/* =========================
-   NAV
-========================= */
+/* NAV */
 
-function active(btn){
+function active(button){
 
-    document
-        .querySelectorAll(".nav button")
-        .forEach(x=>x.classList.remove("active"));
+    const buttons=
+        document.querySelectorAll(".nav button");
 
-    btn.classList.add("active");
+    buttons.forEach(function(item){
+        item.classList.remove("active");
+    });
+
+    button.classList.add("active");
 
 }
 
 
-homeBtn.onclick=()=>{
+homeBtn.onclick=function(){
 
     closeMenu();
 
@@ -1575,7 +1451,7 @@ homeBtn.onclick=()=>{
 };
 
 
-chatBtn.onclick=()=>{
+chatBtn.onclick=function(){
 
     closeMenu();
 
@@ -1583,12 +1459,14 @@ chatBtn.onclick=()=>{
 
     active(chatBtn);
 
-    setTimeout(()=>input.focus(),200);
+    setTimeout(function(){
+        input.focus();
+    },200);
 
 };
 
 
-settingsBtn.onclick=()=>{
+settingsBtn.onclick=function(){
 
     closeMenu();
 
@@ -1599,11 +1477,9 @@ settingsBtn.onclick=()=>{
 };
 
 
-/* =========================
-   ADDRESS
-========================= */
+/* ADDRESS */
 
-addressSelect.onchange=()=>{
+addressSelect.onchange=function(){
 
     address=addressSelect.value;
 
@@ -1615,11 +1491,9 @@ addressSelect.onchange=()=>{
 };
 
 
-/* =========================
-   THEME
-========================= */
+/* THEME */
 
-themeToggle.onclick=()=>{
+themeToggle.onclick=function(){
 
     light=
         document.body.classList.toggle("light");
@@ -1637,11 +1511,9 @@ themeToggle.onclick=()=>{
 };
 
 
-/* =========================
-   FUN MODE
-========================= */
+/* FUN MODE */
 
-funToggle.onclick=()=>{
+funToggle.onclick=function(){
 
     funMode=
         document.body.classList.toggle("fun");
@@ -1656,22 +1528,19 @@ funToggle.onclick=()=>{
         funMode
     );
 
-
     addMessage(
         funMode
-            ? "Eğlence modu aktif. Efendim, artık biraz daha yaratıcı olabilirim. 😏"
-            : "Eğlence modu devre dışı. Sistem tekrar ciddi çalışma modunda.",
+            ? "Eğlence modu aktif. Efendim, sistem biraz daha renkli çalışacak. 😏"
+            : "Eğlence modu kapatıldı. Sistem normal çalışma moduna döndü.",
         "ai"
     );
 
 };
 
 
-/* =========================
-   SCALE
-========================= */
+/* SCALE */
 
-uiScale.oninput=()=>{
+uiScale.oninput=function(){
 
     scale=Number(uiScale.value);
 
@@ -1688,52 +1557,45 @@ uiScale.oninput=()=>{
 };
 
 
-/* =========================
-   CHAT MESSAGE
-========================= */
+/* CHAT */
 
 function addMessage(text,type){
 
-    const el=
+    const element=
         document.createElement("div");
 
-    el.className=
+    element.className=
         "msg "+type;
 
-    el.textContent=text;
+    element.textContent=text;
 
-    chat.appendChild(el);
+    chat.appendChild(element);
 
     chat.scrollTop=
         chat.scrollHeight;
 
-    return el;
-
 }
 
 
-/* =========================
-   TYPING
-========================= */
+/* TYPING */
 
-function typing(){
+function showTyping(){
 
-    const el=
+    const element=
         document.createElement("div");
 
-    el.id="typing";
+    element.id="typing";
 
-    el.className="msg ai";
+    element.className="msg ai";
 
-    el.innerHTML=`
-        <div class="typing">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    `;
+    element.innerHTML=
+        '<div class="typing">' +
+        '<span></span>' +
+        '<span></span>' +
+        '<span></span>' +
+        '</div>';
 
-    chat.appendChild(el);
+    chat.appendChild(element);
 
     chat.scrollTop=
         chat.scrollHeight;
@@ -1741,16 +1603,16 @@ function typing(){
 }
 
 
-/* =========================
-   SEND
-========================= */
+/* SEND MESSAGE */
 
 async function sendMessage(){
 
     const text=
         input.value.trim();
 
-    if(!text)return;
+    if(!text){
+        return;
+    }
 
 
     addMessage(
@@ -1761,14 +1623,14 @@ async function sendMessage(){
 
     input.value="";
 
-    typing();
+    showTyping();
 
     sendBtn.disabled=true;
 
 
     try{
 
-        const res=
+        const response=
             await fetch(
                 API,
                 {
@@ -1793,88 +1655,77 @@ async function sendMessage(){
             );
 
 
-        if(!res.ok){
+        if(!response.ok){
 
             throw new Error(
-                "HTTP "+res.status
+                "HTTP "+response.status
             );
 
         }
 
 
         const data=
-            await res.json();
+            await response.json();
 
 
-        const t=
+        const typing=
             $("typing");
 
-        if(t)t.remove();
+        if(typing){
+            typing.remove();
+        }
 
 
         addMessage(
-
             data.response ||
-            "Efendim, geçerli bir cevap alınamadı.",
-
+            "Efendim, cevap alınamadı.",
             "ai"
-
         );
 
 
     }catch(error){
 
-        const t=
+        const typing=
             $("typing");
 
-        if(t)t.remove();
+        if(typing){
+            typing.remove();
+        }
 
 
         addMessage(
-
             funMode
-
-                ? "Efendim... sunucu şu an biraz naz yapıyor. 😏 Bağlantıyı kontrol etmemiz gerekiyor."
-
+                ? "Efendim, sunucu şu an biraz naz yapıyor. 😏"
                 : "Efendim, sunucu bağlantısında bir sorun oluştu.",
-
             "ai"
-
         );
 
-
-        console.error(error);
-
-    }finally{
-
-        sendBtn.disabled=false;
-
-        input.focus();
+        console.log(error);
 
     }
+
+
+    sendBtn.disabled=false;
+
+    input.focus();
 
 }
 
 
-/* =========================
-   SEND
-========================= */
+/* SEND BUTTON */
 
-sendBtn.onclick=
-    sendMessage;
+sendBtn.onclick=sendMessage;
 
 
-/* =========================
-   ENTER
-========================= */
+/* ENTER */
 
 input.addEventListener(
     "keydown",
-    e=>{
+    function(event){
 
-        if(e.key==="Enter"){
+        if(event.key==="Enter"){
 
-            e.preventDefault();
+            event.preventDefault();
 
             sendMessage();
 
@@ -1884,9 +1735,7 @@ input.addEventListener(
 );
 
 
-/* =========================
-   VOICE
-========================= */
+/* VOICE */
 
 const SpeechRecognition=
     window.SpeechRecognition ||
@@ -1898,64 +1747,58 @@ if(SpeechRecognition){
     const recognition=
         new SpeechRecognition();
 
+    recognition.lang="tr-TR";
 
-    recognition.lang=
-        "tr-TR";
+    recognition.continuous=false;
 
-    recognition.continuous=
-        false;
-
-    recognition.interimResults=
-        false;
+    recognition.interimResults=false;
 
 
-    recognition.onstart=()=>{
+    recognition.onstart=function(){
 
-        micBtn.classList.add(
-            "active"
-        );
+        micBtn.classList.add("active");
 
         micBtn.textContent="●";
 
     };
 
 
-    recognition.onend=()=>{
+    recognition.onend=function(){
 
-        micBtn.classList.remove(
-            "active"
-        );
+        micBtn.classList.remove("active");
 
         micBtn.textContent="◉";
 
     };
 
 
-    recognition.onresult=e=>{
+    recognition.onresult=function(event){
 
         input.value=
-            e.results[0][0]
-                .transcript;
+            event.results[0][0].transcript;
 
         input.focus();
 
     };
 
 
-    micBtn.onclick=()=>{
+    micBtn.onclick=function(){
 
         try{
 
             recognition.start();
 
-        }catch(e){}
+        }catch(error){
+
+            console.log(error);
+
+        }
 
     };
 
-
 }else{
 
-    micBtn.onclick=()=>{
+    micBtn.onclick=function(){
 
         addMessage(
             "Bu tarayıcı sesli girişi desteklemiyor.",
@@ -1967,16 +1810,13 @@ if(SpeechRecognition){
 }
 
 
-/* =========================
-   SYSTEM LOAD ANIMATION
-========================= */
+/* SYSTEM LOAD */
 
-setInterval(()=>{
+setInterval(function(){
 
     const value=
         Math.floor(
-            20+
-            Math.random()*45
+            20 + Math.random()*45
         );
 
     loadValue.textContent=
@@ -1985,11 +1825,9 @@ setInterval(()=>{
 },1800);
 
 
-/* =========================
-   START
-========================= */
+/* START */
 
-setTimeout(()=>{
+setTimeout(function(){
 
     input.focus();
 
