@@ -2,6 +2,12 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no,
+               viewport-fit=cover">
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 <style>
 :root{
@@ -9,13 +15,13 @@
     --accent-soft:rgba(54,229,255,.18);
     --accent-bright:#8ff5ff;
     --bg:#05080d;
-    --panel:rgba(11,16,24,.82);
-    --panel-strong:rgba(15,21,31,.94);
     --text:#f2f7fa;
     --muted:#8b9aa7;
     --border:rgba(255,255,255,.08);
-    --danger:#ff4058;
 }
+/* =====================================================
+   RESET
+===================================================== */
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
@@ -28,17 +34,37 @@ body{
     overflow:hidden;
 }
 body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
-                 "Segoe UI",sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
     background:
-        radial-gradient(circle at 50% 25%,rgba(0,190,255,.09),transparent 35%),
-        radial-gradient(circle at 20% 80%,rgba(0,120,255,.05),transparent 35%),
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(0,190,255,.09),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 20% 80%,
+            rgba(0,120,255,.05),
+            transparent 35%
+        ),
         var(--bg);
     color:var(--text);
+    transition:
+        background .35s ease,
+        color .35s ease;
 }
-/* =========================
+button,
+input,
+select{
+    font-family:inherit;
+}
+/* =====================================================
    APP
-========================= */
+===================================================== */
 .app{
     position:relative;
     width:100%;
@@ -46,9 +72,9 @@ body{
     min-height:100dvh;
     overflow:hidden;
 }
-/* =========================
+/* =====================================================
    TOP BAR
-========================= */
+===================================================== */
 .topbar{
     position:absolute;
     top:0;
@@ -64,20 +90,24 @@ body{
         0
         18px;
     z-index:50;
-    background:linear-gradient(
-        to bottom,
-        rgba(5,8,13,.94),
-        rgba(5,8,13,.55),
-        transparent
-    );
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(5,8,13,.96),
+            rgba(5,8,13,.55),
+            transparent
+        );
 }
-/* SOL MENÜ */
+/* MENU */
 .menu-btn{
     width:44px;
     height:44px;
-    border:1px solid rgba(255,255,255,.09);
+    border:
+        1px solid
+        rgba(255,255,255,.09);
     border-radius:14px;
-    background:rgba(255,255,255,.035);
+    background:
+        rgba(255,255,255,.035);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -102,10 +132,16 @@ body{
     border-radius:2px;
     transition:.25s ease;
 }
-.menu-icon span:nth-child(1){top:0}
-.menu-icon span:nth-child(2){top:6px}
-.menu-icon span:nth-child(3){top:12px}
-/* SAĞ JARVIS */
+.menu-icon span:nth-child(1){
+    top:0;
+}
+.menu-icon span:nth-child(2){
+    top:6px;
+}
+.menu-icon span:nth-child(3){
+    top:12px;
+}
+/* BRAND */
 .brand{
     display:flex;
     flex-direction:column;
@@ -125,6 +161,7 @@ body{
     letter-spacing:2.6px;
     color:#71818d;
 }
+/* SYSTEM */
 .system{
     position:absolute;
     top:84px;
@@ -141,36 +178,43 @@ body{
     height:5px;
     border-radius:50%;
     background:#4affc3;
-    box-shadow:0 0 9px #4affc3;
+    box-shadow:
+        0 0 9px #4affc3;
 }
-/* =========================
-   CORE AREA
-========================= */
+/* =====================================================
+   CORE
+===================================================== */
 .core-area{
     position:absolute;
     top:50%;
     left:50%;
     width:270px;
     height:270px;
-    transform:translate(-50%,-58%);
+    transform:
+        translate(-50%,-58%);
     display:flex;
     align-items:center;
     justify-content:center;
     pointer-events:none;
 }
+/* GLOW */
 .core-glow{
     position:absolute;
     width:170px;
     height:170px;
     border-radius:50%;
-    background:radial-gradient(
-        circle,
-        rgba(54,229,255,.22),
-        rgba(54,229,255,.06) 42%,
-        transparent 72%
-    );
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,229,255,.22),
+            rgba(54,229,255,.06) 42%,
+            transparent 72%
+        );
     filter:blur(8px);
-    animation:corePulse 4s ease-in-out infinite;
+    animation:
+        corePulse 4s
+        ease-in-out
+        infinite;
 }
 @keyframes corePulse{
     0%,100%{
@@ -182,47 +226,72 @@ body{
         opacity:1;
     }
 }
-/* ORBIT RINGS */
+/* RINGS */
 .ring{
     position:absolute;
-    border:1px solid rgba(100,232,255,.22);
+    border:
+        1px solid
+        rgba(100,232,255,.22);
     border-radius:50%;
     box-shadow:
-        0 0 20px rgba(54,229,255,.025),
-        inset 0 0 15px rgba(54,229,255,.02);
+        0 0 20px
+        rgba(54,229,255,.025);
 }
 .ring1{
     width:205px;
     height:205px;
-    animation:rotate 18s linear infinite;
+    animation:
+        rotate 18s
+        linear
+        infinite;
 }
 .ring2{
     width:225px;
     height:225px;
     transform:rotate(58deg);
-    border-color:rgba(100,232,255,.13);
-    animation:rotateReverse 24s linear infinite;
+    border-color:
+        rgba(100,232,255,.13);
+    animation:
+        rotateReverse 24s
+        linear
+        infinite;
 }
 .ring3{
     width:245px;
     height:245px;
     transform:rotate(112deg);
-    border-color:rgba(100,232,255,.09);
-    animation:rotate 32s linear infinite;
+    border-color:
+        rgba(100,232,255,.09);
+    animation:
+        rotate 32s
+        linear
+        infinite;
 }
 .ring4{
     width:265px;
     height:265px;
-    border-color:rgba(100,232,255,.05);
-    animation:rotateReverse 42s linear infinite;
+    border-color:
+        rgba(100,232,255,.05);
+    animation:
+        rotateReverse 42s
+        linear
+        infinite;
 }
 @keyframes rotate{
-    from{transform:rotate(0deg)}
-    to{transform:rotate(360deg)}
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
 }
 @keyframes rotateReverse{
-    from{transform:rotate(360deg)}
-    to{transform:rotate(0deg)}
+    from{
+        transform:rotate(360deg);
+    }
+    to{
+        transform:rotate(0deg);
+    }
 }
 /* ORBIT DOTS */
 .orbit-dot{
@@ -234,7 +303,11 @@ body{
     box-shadow:
         0 0 7px var(--accent),
         0 0 16px var(--accent);
-    animation:dotRotate 9s linear infinite;
+    animation:
+        dotRotate
+        9s
+        linear
+        infinite;
 }
 .dot1{
     top:22px;
@@ -257,15 +330,21 @@ body{
 }
 @keyframes dotRotate{
     from{
-        transform:rotate(0deg) translateX(112px) rotate(0deg);
+        transform:
+            rotate(0deg)
+            translateX(112px)
+            rotate(0deg);
     }
     to{
-        transform:rotate(360deg) translateX(112px) rotate(-360deg);
+        transform:
+            rotate(360deg)
+            translateX(112px)
+            rotate(-360deg);
     }
 }
-/* =========================
+/* =====================================================
    K CORE
-========================= */
+===================================================== */
 .core{
     position:relative;
     width:116px;
@@ -283,12 +362,21 @@ body{
             #0a7f98 58%,
             #063b4a 100%
         );
-    border:1px solid rgba(210,250,255,.8);
+    border:
+        1px solid
+        rgba(210,250,255,.8);
     box-shadow:
-        0 0 18px rgba(54,229,255,.55),
-        0 0 50px rgba(54,229,255,.25),
-        inset 0 0 22px rgba(255,255,255,.22);
-    animation:coreFloat 5s ease-in-out infinite;
+        0 0 18px
+        rgba(54,229,255,.55),
+        0 0 50px
+        rgba(54,229,255,.25),
+        inset 0 0 22px
+        rgba(255,255,255,.22);
+    animation:
+        coreFloat
+        5s
+        ease-in-out
+        infinite;
 }
 @keyframes coreFloat{
     0%,100%{
@@ -303,9 +391,12 @@ body{
     position:absolute;
     inset:9px;
     border-radius:50%;
-    border:1px solid rgba(255,255,255,.26);
+    border:
+        1px solid
+        rgba(255,255,255,.26);
     box-shadow:
-        inset 0 0 18px rgba(255,255,255,.1);
+        inset 0 0 18px
+        rgba(255,255,255,.1);
 }
 .core::after{
     content:"";
@@ -315,7 +406,8 @@ body{
     width:38px;
     height:15px;
     border-radius:50%;
-    background:rgba(255,255,255,.28);
+    background:
+        rgba(255,255,255,.28);
     filter:blur(7px);
     transform:rotate(-25deg);
 }
@@ -327,8 +419,10 @@ body{
     letter-spacing:-5px;
     color:white;
     text-shadow:
-        0 2px 10px rgba(0,0,0,.25),
-        0 0 18px rgba(255,255,255,.35);
+        0 2px 10px
+        rgba(0,0,0,.25),
+        0 0 18px
+        rgba(255,255,255,.35);
 }
 .core-label{
     position:absolute;
@@ -338,9 +432,9 @@ body{
     color:#7d8c96;
     white-space:nowrap;
 }
-/* =========================
+/* =====================================================
    CHAT
-========================= */
+===================================================== */
 .chat{
     position:absolute;
     left:18px;
@@ -359,11 +453,16 @@ body{
 .message{
     width:max-content;
     max-width:88%;
-    padding:10px 13px;
+    padding:
+        10px
+        13px;
     border-radius:15px;
     font-size:13px;
     line-height:1.45;
-    animation:messageIn .25s ease;
+    animation:
+        messageIn
+        .25s
+        ease;
     backdrop-filter:blur(15px);
 }
 @keyframes messageIn{
@@ -379,19 +478,27 @@ body{
 .message.ai{
     align-self:flex-start;
     color:#c8d7de;
-    background:rgba(12,19,27,.78);
-    border:1px solid rgba(255,255,255,.07);
-    box-shadow:0 7px 25px rgba(0,0,0,.14);
+    background:
+        rgba(12,19,27,.78);
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+    box-shadow:
+        0 7px 25px
+        rgba(0,0,0,.14);
 }
 .message.user{
     align-self:flex-end;
     color:#ecfdff;
-    background:rgba(25,117,132,.25);
-    border:1px solid rgba(54,229,255,.14);
+    background:
+        rgba(25,117,132,.25);
+    border:
+        1px solid
+        rgba(54,229,255,.14);
 }
-/* =========================
+/* =====================================================
    INPUT
-========================= */
+===================================================== */
 .input-area{
     position:absolute;
     left:16px;
@@ -402,24 +509,34 @@ body{
     align-items:center;
     gap:9px;
     padding:6px;
-    border:1px solid rgba(255,255,255,.09);
+    border:
+        1px solid
+        rgba(255,255,255,.09);
     border-radius:19px;
-    background:rgba(11,17,24,.82);
+    background:
+        rgba(11,17,24,.82);
     backdrop-filter:blur(22px);
     box-shadow:
-        0 15px 45px rgba(0,0,0,.28),
-        inset 0 1px 0 rgba(255,255,255,.035);
+        0 15px 45px
+        rgba(0,0,0,.28),
+        inset 0 1px 0
+        rgba(255,255,255,.035);
 }
 .input{
     flex:1;
     min-width:0;
     height:100%;
-    padding:0 12px;
+    padding:
+        0 12px;
     border:0;
     outline:0;
     background:transparent;
     color:white;
     font-family:inherit;
+    /*
+    16px sayesinde iPhone
+    input zoom yapmaz.
+    */
     font-size:16px;
     -webkit-appearance:none;
     appearance:none;
@@ -431,9 +548,12 @@ body{
     width:44px;
     height:44px;
     flex-shrink:0;
-    border:1px solid rgba(255,255,255,.07);
+    border:
+        1px solid
+        rgba(255,255,255,.07);
     border-radius:14px;
-    background:rgba(255,255,255,.045);
+    background:
+        rgba(255,255,255,.045);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -445,21 +565,24 @@ body{
     transform:scale(.91);
 }
 .send{
-    background:rgba(54,229,255,.12);
-    border-color:rgba(54,229,255,.25);
+    background:
+        rgba(54,229,255,.12);
+    border-color:
+        rgba(54,229,255,.25);
     color:#9cf6ff;
 }
 .action svg{
     width:19px;
     height:19px;
 }
-/* =========================
-   SIDE MENU
-========================= */
+/* =====================================================
+   SIDEBAR
+===================================================== */
 .overlay{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.42);
+    background:
+        rgba(0,0,0,.42);
     backdrop-filter:blur(4px);
     opacity:0;
     pointer-events:none;
@@ -478,16 +601,27 @@ body{
     max-width:82vw;
     height:100%;
     padding:
-        calc(env(safe-area-inset-top) + 22px)
+        calc(
+            env(safe-area-inset-top)
+            + 22px
+        )
         18px
         25px;
-    background:rgba(8,13,20,.96);
-    border-right:1px solid rgba(255,255,255,.08);
+    background:
+        rgba(8,13,20,.96);
+    border-right:
+        1px solid
+        rgba(255,255,255,.08);
     backdrop-filter:blur(25px);
-    transform:translateX(-105%);
-    transition:.35s cubic-bezier(.22,.8,.25,1);
+    transform:
+        translateX(-105%);
+    transition:
+        .35s
+        cubic-bezier(.22,.8,.25,1);
     z-index:90;
-    box-shadow:15px 0 50px rgba(0,0,0,.35);
+    box-shadow:
+        15px 0 50px
+        rgba(0,0,0,.35);
 }
 .sidebar.active{
     transform:translateX(0);
@@ -497,7 +631,9 @@ body{
     align-items:center;
     justify-content:space-between;
     padding-bottom:20px;
-    border-bottom:1px solid rgba(255,255,255,.07);
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.07);
 }
 .sidebar-title{
     font-size:14px;
@@ -508,8 +644,11 @@ body{
     width:36px;
     height:36px;
     border-radius:12px;
-    border:1px solid rgba(255,255,255,.07);
-    background:rgba(255,255,255,.035);
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+    background:
+        rgba(255,255,255,.035);
     color:#aebbc1;
     font-size:19px;
 }
@@ -525,7 +664,9 @@ body{
     align-items:center;
     gap:13px;
     padding:13px;
-    border:1px solid transparent;
+    border:
+        1px solid
+        transparent;
     border-radius:13px;
     background:transparent;
     color:#a9b8c0;
@@ -537,8 +678,10 @@ body{
 .nav-btn.active,
 .nav-btn:active{
     color:#eaffff;
-    background:rgba(54,229,255,.08);
-    border-color:rgba(54,229,255,.12);
+    background:
+        rgba(54,229,255,.08);
+    border-color:
+        rgba(54,229,255,.12);
 }
 .nav-icon{
     width:19px;
@@ -555,9 +698,9 @@ body{
     letter-spacing:1.5px;
     line-height:1.7;
 }
-/* =========================
+/* =====================================================
    SETTINGS
-========================= */
+===================================================== */
 .settings{
     display:none;
     position:absolute;
@@ -584,9 +727,12 @@ body{
 .setting-card{
     padding:17px;
     margin-bottom:12px;
-    border:1px solid rgba(255,255,255,.07);
+    border:
+        1px solid
+        rgba(255,255,255,.07);
     border-radius:17px;
-    background:rgba(11,17,24,.72);
+    background:
+        rgba(11,17,24,.72);
     backdrop-filter:blur(18px);
 }
 .setting-row{
@@ -605,7 +751,9 @@ body{
     color:#687781;
 }
 .select{
-    border:1px solid rgba(255,255,255,.09);
+    border:
+        1px solid
+        rgba(255,255,255,.09);
     border-radius:11px;
     padding:9px 10px;
     background:#101821;
@@ -619,7 +767,9 @@ body{
     height:26px;
     border-radius:20px;
     background:#202b34;
-    border:1px solid rgba(255,255,255,.08);
+    border:
+        1px solid
+        rgba(255,255,255,.08);
     cursor:pointer;
     transition:.25s ease;
 }
@@ -635,34 +785,44 @@ body{
     transition:.25s ease;
 }
 .toggle.active{
-    background:rgba(54,229,255,.22);
-    border-color:rgba(54,229,255,.35);
+    background:
+        rgba(54,229,255,.22);
+    border-color:
+        rgba(54,229,255,.35);
 }
 .toggle.active::after{
-    transform:translateX(20px);
+    transform:
+        translateX(20px);
     background:var(--accent);
-    box-shadow:0 0 10px var(--accent);
+    box-shadow:
+        0 0 10px
+        var(--accent);
 }
-/* =========================
+/* =====================================================
    LIGHT MODE
-========================= */
+===================================================== */
 body.light{
     --bg:#edf3f6;
-    --panel:rgba(255,255,255,.86);
     --text:#142027;
     --muted:#65747d;
-    --border:rgba(20,32,39,.10);
+    --border:
+        rgba(20,32,39,.10);
     background:
-        radial-gradient(circle at 50% 25%,rgba(54,229,255,.18),transparent 35%),
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(54,229,255,.18),
+            transparent 35%
+        ),
         #edf3f6;
 }
 body.light .topbar{
-    background:linear-gradient(
-        to bottom,
-        rgba(237,243,246,.95),
-        rgba(237,243,246,.55),
-        transparent
-    );
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(237,243,246,.95),
+            rgba(237,243,246,.55),
+            transparent
+        );
 }
 body.light .brand-title{
     color:#17252c;
@@ -675,41 +835,57 @@ body.light .menu-btn,
 body.light .action,
 body.light .input-area,
 body.light .setting-card{
-    background:rgba(255,255,255,.75);
-    border-color:rgba(20,32,39,.09);
+    background:
+        rgba(255,255,255,.75);
+    border-color:
+        rgba(20,32,39,.09);
 }
 body.light .input{
     color:#17252c;
 }
 body.light .message.ai{
-    background:rgba(255,255,255,.78);
+    background:
+        rgba(255,255,255,.78);
     color:#304149;
-    border-color:rgba(20,32,39,.08);
+    border-color:
+        rgba(20,32,39,.08);
 }
 body.light .message.user{
-    background:rgba(54,229,255,.15);
+    background:
+        rgba(54,229,255,.15);
     color:#17343b;
 }
 body.light .sidebar{
-    background:rgba(245,249,250,.97);
-    border-color:rgba(20,32,39,.09);
+    background:
+        rgba(245,249,250,.97);
+    border-color:
+        rgba(20,32,39,.09);
 }
 body.light .sidebar-title,
 body.light .setting-name{
     color:#17252c;
 }
-/* =========================
+/* =====================================================
    FUN MODE
-========================= */
+===================================================== */
 body.fun{
     --accent:#ff4058;
-    --accent-soft:rgba(255,64,88,.18);
+    --accent-soft:
+        rgba(255,64,88,.18);
     --accent-bright:#ff8a98;
 }
 body.fun{
     background:
-        radial-gradient(circle at 50% 25%,rgba(255,64,88,.10),transparent 35%),
-        radial-gradient(circle at 20% 80%,rgba(255,40,70,.05),transparent 35%),
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(255,64,88,.10),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 20% 80%,
+            rgba(255,40,70,.05),
+            transparent 35%
+        ),
         var(--bg);
 }
 body.fun .core{
@@ -723,20 +899,25 @@ body.fun .core{
             #430711 100%
         );
     box-shadow:
-        0 0 18px rgba(255,64,88,.65),
-        0 0 50px rgba(255,64,88,.28),
-        inset 0 0 22px rgba(255,255,255,.22);
+        0 0 18px
+        rgba(255,64,88,.65),
+        0 0 50px
+        rgba(255,64,88,.28),
+        inset 0 0 22px
+        rgba(255,255,255,.22);
 }
 body.fun .core-glow{
-    background:radial-gradient(
-        circle,
-        rgba(255,64,88,.25),
-        rgba(255,64,88,.06) 42%,
-        transparent 72%
-    );
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,64,88,.25),
+            rgba(255,64,88,.06) 42%,
+            transparent 72%
+        );
 }
 body.fun .ring{
-    border-color:rgba(255,64,88,.18);
+    border-color:
+        rgba(255,64,88,.18);
 }
 body.fun .orbit-dot{
     background:#ff4058;
@@ -745,13 +926,15 @@ body.fun .orbit-dot{
         0 0 16px #ff4058;
 }
 body.fun .send{
-    background:rgba(255,64,88,.13);
-    border-color:rgba(255,64,88,.28);
+    background:
+        rgba(255,64,88,.13);
+    border-color:
+        rgba(255,64,88,.28);
     color:#ff9aa7;
 }
-/* =========================
+/* =====================================================
    TYPING
-========================= */
+===================================================== */
 .typing{
     display:flex;
     gap:4px;
@@ -761,8 +944,12 @@ body.fun .send{
     width:4px;
     height:4px;
     border-radius:50%;
-    background:var(--accent);
-    animation:typing 1.2s infinite;
+    background:
+        var(--accent);
+    animation:
+        typing
+        1.2s
+        infinite;
 }
 .typing span:nth-child(2){
     animation-delay:.15s;
@@ -772,52 +959,272 @@ body.fun .send{
 }
 @keyframes typing{
     0%,60%,100%{
-        transform:translateY(0);
+        transform:
+            translateY(0);
         opacity:.35;
     }
     30%{
-        transform:translateY(-3px);
+        transform:
+            translateY(-3px);
         opacity:1;
     }
 }
-/* =========================
-   RESPONSIVE
-========================= */
-@media(max-height:700px){
+/* =====================================================
+   iPHONE / MOBILE
+===================================================== */
+@media(max-width:600px){
+    .topbar{
+        height:72px;
+        padding-left:16px;
+        padding-right:16px;
+    }
+    .menu-btn{
+        width:46px;
+        height:46px;
+        border-radius:15px;
+    }
+    .brand-title{
+        font-size:19px;
+        letter-spacing:3.5px;
+    }
+    .brand-sub{
+        font-size:8.5px;
+        letter-spacing:2.3px;
+        margin-top:4px;
+    }
+    .system{
+        top:82px;
+        right:18px;
+        font-size:8.5px;
+    }
+    /* CORE */
     .core-area{
-        transform:translate(-50%,-62%) scale(.88);
+        width:285px;
+        height:285px;
+        top:43%;
+        transform:
+            translate(-50%,-50%);
     }
+    .core{
+        width:124px;
+        height:124px;
+    }
+    .core-k{
+        font-size:56px;
+    }
+    .core-label{
+        bottom:-40px;
+        font-size:8.5px;
+        letter-spacing:3.2px;
+    }
+    .ring1{
+        width:215px;
+        height:215px;
+    }
+    .ring2{
+        width:235px;
+        height:235px;
+    }
+    .ring3{
+        width:255px;
+        height:255px;
+    }
+    .ring4{
+        width:275px;
+        height:275px;
+    }
+    /* CHAT */
     .chat{
-        bottom:112px;
-        max-height:22vh;
+        left:15px;
+        right:15px;
+        bottom:106px;
+        max-height:23vh;
+        gap:8px;
     }
+    .message{
+        max-width:90%;
+        padding:
+            11px
+            14px;
+        font-size:14px;
+        line-height:1.5;
+        border-radius:16px;
+    }
+    /* INPUT */
     .input-area{
-        bottom:15px;
+        left:12px;
+        right:12px;
+        bottom:
+            calc(
+                10px +
+                env(safe-area-inset-bottom)
+            );
+        height:60px;
+        padding:6px;
+        border-radius:19px;
+    }
+    .input{
+        font-size:16px;
+        padding-left:11px;
+        padding-right:7px;
+    }
+    .input::placeholder{
+        font-size:14px;
+    }
+    .action{
+        width:45px;
+        height:45px;
+        border-radius:14px;
+    }
+    /* SIDEBAR */
+    .sidebar{
+        width:300px;
+        max-width:84vw;
+    }
+    .sidebar-title{
+        font-size:15px;
+        letter-spacing:2.3px;
+    }
+    .nav-btn{
+        padding:
+            15px
+            13px;
+        font-size:14px;
+        border-radius:14px;
+    }
+    .nav-icon{
+        width:20px;
+        font-size:16px;
+    }
+    /* SETTINGS */
+    .settings{
+        padding:
+            105px
+            16px
+            90px;
+    }
+    .settings-title{
+        font-size:24px;
+    }
+    .settings-sub{
+        font-size:13px;
+        margin-bottom:23px;
+    }
+    .setting-card{
+        padding:17px;
+        border-radius:17px;
+    }
+    .setting-name{
+        font-size:14px;
+    }
+    .setting-desc{
+        font-size:11px;
+        line-height:1.4;
+    }
+    .select{
+        font-size:13px;
+        padding:10px;
     }
 }
+/* =====================================================
+   SMALL iPHONE
+===================================================== */
+@media(max-width:390px){
+    .brand-title{
+        font-size:17px;
+        letter-spacing:3px;
+    }
+    .brand-sub{
+        font-size:8px;
+    }
+    .core-area{
+        width:265px;
+        height:265px;
+        top:42%;
+    }
+    .core{
+        width:116px;
+        height:116px;
+    }
+    .core-k{
+        font-size:51px;
+    }
+    .ring1{
+        width:200px;
+        height:200px;
+    }
+    .ring2{
+        width:218px;
+        height:218px;
+    }
+    .ring3{
+        width:238px;
+        height:238px;
+    }
+    .ring4{
+        width:256px;
+        height:256px;
+    }
+    .chat{
+        bottom:103px;
+    }
+    .message{
+        font-size:13.5px;
+    }
+}
+/* =====================================================
+   SHORT SCREENS
+===================================================== */
+@media(max-height:700px){
+    .core-area{
+        top:39%;
+        transform:
+            translate(-50%,-50%)
+            scale(.88);
+    }
+    .chat{
+        max-height:21vh;
+        bottom:101px;
+    }
+    .input-area{
+        bottom:8px;
+    }
+}
+/* =====================================================
+   TABLET / DESKTOP
+===================================================== */
 @media(min-width:700px){
     .chat{
         max-width:620px;
         left:50%;
         right:auto;
-        transform:translateX(-50%);
-        width:calc(100% - 40px);
+        transform:
+            translateX(-50%);
+        width:
+            calc(100% - 40px);
     }
     .input-area{
         max-width:650px;
         left:50%;
         right:auto;
-        width:calc(100% - 40px);
-        transform:translateX(-50%);
+        width:
+            calc(100% - 40px);
+        transform:
+            translateX(-50%);
     }
 }
 </style>
 </head>
 <body>
 <div class="app">
-<!-- TOP BAR -->
+<!-- ===================================================
+     TOP BAR
+=================================================== -->
 <header class="topbar">
-    <button class="menu-btn" id="menuBtn">
+    <button
+        class="menu-btn"
+        id="menuBtn"
+        aria-label="Menü">
         <div class="menu-icon">
             <span></span>
             <span></span>
@@ -825,15 +1232,21 @@ body.fun .send{
         </div>
     </button>
     <div class="brand">
-        <div class="brand-title">J.A.R.V.I.S.</div>
-        <div class="brand-sub">KARAHAN INC.</div>
+        <div class="brand-title">
+            J.A.R.V.I.S.
+        </div>
+        <div class="brand-sub">
+            KARAHAN INC.
+        </div>
     </div>
 </header>
 <div class="system">
     <span class="system-dot"></span>
     SYSTEM ONLINE
 </div>
-<!-- CORE -->
+<!-- ===================================================
+     HOME / CORE
+=================================================== -->
 <main id="home">
     <div class="core-area">
         <div class="core-glow"></div>
@@ -846,27 +1259,38 @@ body.fun .send{
         <div class="orbit-dot dot3"></div>
         <div class="orbit-dot dot4"></div>
         <div class="core">
-            <div class="core-k">K</div>
+            <div class="core-k">
+                K
+            </div>
             <div class="core-label">
                 PERSONAL AI SYSTEM
             </div>
         </div>
     </div>
 </main>
-<!-- CHAT -->
-<div class="chat" id="chat">
+<!-- ===================================================
+     CHAT
+=================================================== -->
+<div
+    class="chat"
+    id="chat">
     <div class="message ai">
         Merhaba Efendim, nasıl yardımcı olabilirim?
     </div>
 </div>
-<!-- SETTINGS -->
-<section class="settings" id="settings">
+<!-- ===================================================
+     SETTINGS
+=================================================== -->
+<section
+    class="settings"
+    id="settings">
     <div class="settings-title">
         Ayarlar
     </div>
     <div class="settings-sub">
         J.A.R.V.I.S. sistem tercihleri
     </div>
+    <!-- ADDRESS -->
     <div class="setting-card">
         <div class="setting-row">
             <div>
@@ -877,14 +1301,25 @@ body.fun .send{
                     JARVIS'in size nasıl hitap edeceğini seçin.
                 </div>
             </div>
-            <select class="select" id="addressSelect">
-                <option value="Efendim">Efendim</option>
-                <option value="Komutanım">Komutanım</option>
-                <option value="Patron">Patron</option>
-                <option value="custom">Özel</option>
+            <select
+                class="select"
+                id="addressSelect">
+                <option value="Efendim">
+                    Efendim
+                </option>
+                <option value="Komutanım">
+                    Komutanım
+                </option>
+                <option value="Patron">
+                    Patron
+                </option>
+                <option value="custom">
+                    Özel
+                </option>
             </select>
         </div>
     </div>
+    <!-- THEME -->
     <div class="setting-card">
         <div class="setting-row">
             <div>
@@ -895,9 +1330,13 @@ body.fun .send{
                     Arayüz temasını değiştirin.
                 </div>
             </div>
-            <div class="toggle" id="themeToggle"></div>
+            <div
+                class="toggle"
+                id="themeToggle">
+            </div>
         </div>
     </div>
+    <!-- FUN -->
     <div class="setting-card">
         <div class="setting-row">
             <div>
@@ -908,22 +1347,44 @@ body.fun .send{
                     JARVIS daha esprili ve hafif alaycı konuşur.
                 </div>
             </div>
-            <div class="toggle" id="funToggle"></div>
+            <div
+                class="toggle"
+                id="funToggle">
+            </div>
         </div>
     </div>
 </section>
-<!-- INPUT -->
+<!-- ===================================================
+     INPUT
+=================================================== -->
 <div class="input-area">
-    <button class="action" id="micBtn" aria-label="Sesli giriş">
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor"
-             stroke-width="1.7"
-             stroke-linecap="round"
-             stroke-linejoin="round">
-            <rect x="9" y="3" width="6" height="12" rx="3"></rect>
-            <path d="M5 11a7 7 0 0 0 14 0"></path>
-            <path d="M12 18v3"></path>
-            <path d="M9 21h6"></path>
+    <button
+        class="action"
+        id="micBtn"
+        aria-label="Sesli giriş">
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect
+                x="9"
+                y="3"
+                width="6"
+                height="12"
+                rx="3">
+            </rect>
+            <path
+                d="M5 11a7 7 0 0 0 14 0">
+            </path>
+            <path
+                d="M12 18v3">
+            </path>
+            <path
+                d="M9 21h6">
+            </path>
         </svg>
     </button>
     <input
@@ -934,42 +1395,73 @@ body.fun .send{
         autocorrect="off"
         autocapitalize="sentences"
         spellcheck="false"
-        placeholder="JARVIS'e bir şey sor..."
-    >
-    <button class="action send" id="sendBtn" aria-label="Gönder">
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor"
-             stroke-width="1.8"
-             stroke-linecap="round"
-             stroke-linejoin="round">
-            <path d="M22 2L11 13"></path>
-            <path d="M22 2l-7 20-4-9-9-4z"></path>
+        placeholder="JARVIS'e bir şey sor...">
+    <button
+        class="action send"
+        id="sendBtn"
+        aria-label="Gönder">
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path
+                d="M22 2L11 13">
+            </path>
+            <path
+                d="M22 2l-7 20-4-9-9-4z">
+            </path>
         </svg>
     </button>
 </div>
-<!-- OVERLAY -->
-<div class="overlay" id="overlay"></div>
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
+<!-- ===================================================
+     OVERLAY
+=================================================== -->
+<div
+    class="overlay"
+    id="overlay">
+</div>
+<!-- ===================================================
+     SIDEBAR
+=================================================== -->
+<aside
+    class="sidebar"
+    id="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-title">
             J.A.R.V.I.S.
         </div>
-        <button class="close" id="closeBtn">
+        <button
+            class="close"
+            id="closeBtn">
             ×
         </button>
     </div>
     <nav class="nav">
-        <button class="nav-btn active" id="homeBtn">
-            <span class="nav-icon">⌂</span>
+        <button
+            class="nav-btn active"
+            id="homeBtn">
+            <span class="nav-icon">
+                ⌂
+            </span>
             Ana Ekran
         </button>
-        <button class="nav-btn" id="chatBtn">
-            <span class="nav-icon">◉</span>
+        <button
+            class="nav-btn"
+            id="chatBtn">
+            <span class="nav-icon">
+                ◉
+            </span>
             JARVIS Chat
         </button>
-        <button class="nav-btn" id="settingsBtn">
-            <span class="nav-icon">⚙</span>
+        <button
+            class="nav-btn"
+            id="settingsBtn">
+            <span class="nav-icon">
+                ⚙
+            </span>
             Ayarlar
         </button>
     </nav>
@@ -981,166 +1473,303 @@ body.fun .send{
 </aside>
 </div>
 <script>
+/* =====================================================
+   ELEMENTS
+===================================================== */
 const API = "/chat";
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
-const menuBtn = document.getElementById("menuBtn");
-const closeBtn = document.getElementById("closeBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const settings = document.getElementById("settings");
-const home = document.getElementById("home");
-const homeBtn = document.getElementById("homeBtn");
-const chatBtn = document.getElementById("chatBtn");
-const settingsBtn = document.getElementById("settingsBtn");
-const addressSelect = document.getElementById("addressSelect");
-const themeToggle = document.getElementById("themeToggle");
-const funToggle = document.getElementById("funToggle");
-const micBtn = document.getElementById("micBtn");
-/* =========================
+const chat =
+    document.getElementById("chat");
+const input =
+    document.getElementById("input");
+const sendBtn =
+    document.getElementById("sendBtn");
+const menuBtn =
+    document.getElementById("menuBtn");
+const closeBtn =
+    document.getElementById("closeBtn");
+const sidebar =
+    document.getElementById("sidebar");
+const overlay =
+    document.getElementById("overlay");
+const settings =
+    document.getElementById("settings");
+const home =
+    document.getElementById("home");
+const homeBtn =
+    document.getElementById("homeBtn");
+const chatBtn =
+    document.getElementById("chatBtn");
+const settingsBtn =
+    document.getElementById("settingsBtn");
+const addressSelect =
+    document.getElementById("addressSelect");
+const themeToggle =
+    document.getElementById("themeToggle");
+const funToggle =
+    document.getElementById("funToggle");
+const micBtn =
+    document.getElementById("micBtn");
+/* =====================================================
    STORAGE
-========================= */
-let address = localStorage.getItem("jarvis_address") || "Efendim";
-let funMode = localStorage.getItem("jarvis_fun_mode") === "true";
-let theme = localStorage.getItem("jarvis_theme") || "dark";
-addressSelect.value =
-    ["Efendim","Komutanım","Patron"].includes(address)
-    ? address
-    : "custom";
-if(addressSelect.value === "custom"){
-    setTimeout(() => {
-        const custom = prompt(
-            "JARVIS size nasıl hitap etsin?"
-        );
-        if(custom && custom.trim()){
-            address = custom.trim();
-            localStorage.setItem("jarvis_address",address);
-        }
-    },300);
+===================================================== */
+let address =
+    localStorage.getItem("jarvis_address")
+    || "Efendim";
+let funMode =
+    localStorage.getItem("jarvis_fun_mode")
+    === "true";
+let theme =
+    localStorage.getItem("jarvis_theme")
+    || "dark";
+/* =====================================================
+   LOAD SETTINGS
+===================================================== */
+if(
+    ["Efendim","Komutanım","Patron"]
+    .includes(address)
+){
+    addressSelect.value =
+        address;
+}else{
+    addressSelect.value =
+        "custom";
 }
 if(theme === "light"){
-    document.body.classList.add("light");
-    themeToggle.classList.add("active");
+    document.body
+        .classList
+        .add("light");
+    themeToggle
+        .classList
+        .add("active");
 }
 if(funMode){
-    document.body.classList.add("fun");
-    funToggle.classList.add("active");
+    document.body
+        .classList
+        .add("fun");
+    funToggle
+        .classList
+        .add("active");
 }
-/* =========================
+/* =====================================================
    MENU
-========================= */
+===================================================== */
 function openMenu(){
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
+    sidebar
+        .classList
+        .add("active");
+    overlay
+        .classList
+        .add("active");
 }
 function closeMenu(){
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
+    sidebar
+        .classList
+        .remove("active");
+    overlay
+        .classList
+        .remove("active");
 }
-menuBtn.onclick = openMenu;
-closeBtn.onclick = closeMenu;
-overlay.onclick = closeMenu;
-/* =========================
+menuBtn.onclick =
+    openMenu;
+closeBtn.onclick =
+    closeMenu;
+overlay.onclick =
+    closeMenu;
+/* =====================================================
    NAVIGATION
-========================= */
+===================================================== */
 function showHome(){
-    settings.classList.remove("active");
-    home.style.display = "block";
-    chat.style.display = "flex";
-    document.querySelector(".input-area").style.display = "flex";
-    homeBtn.classList.add("active");
-    chatBtn.classList.remove("active");
-    settingsBtn.classList.remove("active");
+    settings
+        .classList
+        .remove("active");
+    home.style.display =
+        "block";
+    chat.style.display =
+        "flex";
+    document
+        .querySelector(".input-area")
+        .style.display =
+        "flex";
+    homeBtn
+        .classList
+        .add("active");
+    chatBtn
+        .classList
+        .remove("active");
+    settingsBtn
+        .classList
+        .remove("active");
     closeMenu();
 }
 function showChat(){
-    settings.classList.remove("active");
-    home.style.display = "block";
-    chat.style.display = "flex";
-    document.querySelector(".input-area").style.display = "flex";
-    homeBtn.classList.remove("active");
-    chatBtn.classList.add("active");
-    settingsBtn.classList.remove("active");
+    settings
+        .classList
+        .remove("active");
+    home.style.display =
+        "block";
+    chat.style.display =
+        "flex";
+    document
+        .querySelector(".input-area")
+        .style.display =
+        "flex";
+    homeBtn
+        .classList
+        .remove("active");
+    chatBtn
+        .classList
+        .add("active");
+    settingsBtn
+        .classList
+        .remove("active");
     closeMenu();
-    input.focus();
+    setTimeout(
+        () => input.focus(),
+        100
+    );
 }
 function showSettings(){
-    home.style.display = "none";
-    chat.style.display = "none";
-    document.querySelector(".input-area").style.display = "none";
-    settings.classList.add("active");
-    homeBtn.classList.remove("active");
-    chatBtn.classList.remove("active");
-    settingsBtn.classList.add("active");
+    home.style.display =
+        "none";
+    chat.style.display =
+        "none";
+    document
+        .querySelector(".input-area")
+        .style.display =
+        "none";
+    settings
+        .classList
+        .add("active");
+    homeBtn
+        .classList
+        .remove("active");
+    chatBtn
+        .classList
+        .remove("active");
+    settingsBtn
+        .classList
+        .add("active");
     closeMenu();
 }
-homeBtn.onclick = showHome;
-chatBtn.onclick = showChat;
-settingsBtn.onclick = showSettings;
-/* =========================
-   SETTINGS
-========================= */
-addressSelect.onchange = () => {
-    if(addressSelect.value === "custom"){
-        const custom = prompt(
-            "JARVIS size nasıl hitap etsin?"
-        );
-        if(custom && custom.trim()){
-            address = custom.trim();
+homeBtn.onclick =
+    showHome;
+chatBtn.onclick =
+    showChat;
+settingsBtn.onclick =
+    showSettings;
+/* =====================================================
+   ADDRESS
+===================================================== */
+addressSelect.onchange =
+    () => {
+        if(
+            addressSelect.value
+            === "custom"
+        ){
+            const custom =
+                prompt(
+                    "JARVIS size nasıl hitap etsin?"
+                );
+            if(
+                custom &&
+                custom.trim()
+            ){
+                address =
+                    custom.trim();
+                localStorage.setItem(
+                    "jarvis_address",
+                    address
+                );
+            }
+        }else{
+            address =
+                addressSelect.value;
             localStorage.setItem(
                 "jarvis_address",
                 address
             );
         }
-    }else{
-        address = addressSelect.value;
+    };
+/* =====================================================
+   THEME
+===================================================== */
+themeToggle.onclick =
+    () => {
+        document.body
+            .classList
+            .toggle("light");
+        const enabled =
+            document.body
+                .classList
+                .contains("light");
+        themeToggle
+            .classList
+            .toggle(
+                "active",
+                enabled
+            );
         localStorage.setItem(
-            "jarvis_address",
-            address
+            "jarvis_theme",
+            enabled
+                ? "light"
+                : "dark"
         );
-    }
-};
-themeToggle.onclick = () => {
-    document.body.classList.toggle("light");
-    const enabled =
-        document.body.classList.contains("light");
-    themeToggle.classList.toggle("active",enabled);
-    localStorage.setItem(
-        "jarvis_theme",
-        enabled ? "light" : "dark"
-    );
-};
-funToggle.onclick = () => {
-    funMode = !funMode;
-    funToggle.classList.toggle(
-        "active",
-        funMode
-    );
-    document.body.classList.toggle(
-        "fun",
-        funMode
-    );
-    localStorage.setItem(
-        "jarvis_fun_mode",
-        funMode
-    );
-};
-/* =========================
-   CHAT
-========================= */
-function addMessage(text,type){
-    const div = document.createElement("div");
+    };
+/* =====================================================
+   FUN MODE
+===================================================== */
+funToggle.onclick =
+    () => {
+        funMode =
+            !funMode;
+        funToggle
+            .classList
+            .toggle(
+                "active",
+                funMode
+            );
+        document.body
+            .classList
+            .toggle(
+                "fun",
+                funMode
+            );
+        localStorage.setItem(
+            "jarvis_fun_mode",
+            funMode
+        );
+    };
+/* =====================================================
+   MESSAGE
+===================================================== */
+function addMessage(
+    text,
+    type
+){
+    const div =
+        document
+            .createElement("div");
     div.className =
-        "message " + type;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+        "message "
+        + type;
+    div.textContent =
+        text;
+    chat.appendChild(
+        div
+    );
+    chat.scrollTop =
+        chat.scrollHeight;
     return div;
 }
+/* =====================================================
+   TYPING
+===================================================== */
 function addTyping(){
-    const div = document.createElement("div");
-    div.className = "message ai";
+    const div =
+        document
+            .createElement("div");
+    div.className =
+        "message ai";
     div.innerHTML = `
         <div class="typing">
             <span></span>
@@ -1148,112 +1777,176 @@ function addTyping(){
             <span></span>
         </div>
     `;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+    chat.appendChild(
+        div
+    );
+    chat.scrollTop =
+        chat.scrollHeight;
     return div;
 }
-/* =========================
+/* =====================================================
    SEND
-========================= */
+===================================================== */
 async function sendMessage(){
-    const text = input.value.trim();
-    if(!text) return;
-    addMessage(text,"user");
-    input.value = "";
-    const typing = addTyping();
-    sendBtn.disabled = true;
+    const text =
+        input.value.trim();
+    if(!text){
+        return;
+    }
+    addMessage(
+        text,
+        "user"
+    );
+    input.value =
+        "";
+    const typing =
+        addTyping();
+    sendBtn.disabled =
+        true;
     try{
-        const response = await fetch(API,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                message:text,
-                address:address,
-                fun_mode:funMode
-            })
-        });
+        const response =
+            await fetch(
+                API,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:
+                        JSON.stringify({
+                            message:text,
+                            address:address,
+                            fun_mode:funMode
+                        })
+                }
+            );
         if(!response.ok){
-            throw new Error("Sunucu hatası");
+            throw new Error(
+                "Sunucu hatası"
+            );
         }
-        const data = await response.json();
+        const data =
+            await response.json();
         typing.remove();
         addMessage(
-            data.response || "Üzgünüm Efendim, cevap oluşturamadım.",
+            data.response
+            ||
+            "Üzgünüm Efendim, cevap oluşturamadım.",
             "ai"
         );
     }catch(error){
         typing.remove();
         addMessage(
-            "Efendim, sunucuya ulaşamıyorum. Sistem bağlantısını kontrol etmem gerekiyor.",
+            funMode
+                ? "Efendim... sistem şu an benimle aynı fikirde değil. 😏 Sunucu bağlantısını kontrol etmemiz gerekiyor."
+                : "Efendim, sunucuya ulaşamıyorum. Sistem bağlantısını kontrol etmem gerekiyor.",
             "ai"
         );
     }finally{
-        sendBtn.disabled = false;
+        sendBtn.disabled =
+            false;
         input.focus();
     }
 }
-sendBtn.onclick = sendMessage;
+/* =====================================================
+   SEND BUTTON
+===================================================== */
+sendBtn.onclick =
+    sendMessage;
+/* =====================================================
+   ENTER
+===================================================== */
 input.addEventListener(
     "keydown",
-    e => {
-        if(e.key === "Enter"){
-            e.preventDefault();
+    event => {
+        if(
+            event.key
+            === "Enter"
+        ){
+            event.preventDefault();
             sendMessage();
         }
     }
 );
-/* =========================
+/* =====================================================
    VOICE
-========================= */
-let recognition = null;
+===================================================== */
+let recognition =
+    null;
 if(
-    "webkitSpeechRecognition" in window ||
-    "SpeechRecognition" in window
+    "webkitSpeechRecognition"
+    in window
+    ||
+    "SpeechRecognition"
+    in window
 ){
     const SpeechRecognition =
-        window.SpeechRecognition ||
+        window.SpeechRecognition
+        ||
         window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = "tr-TR";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.onresult = event => {
-        const text =
-            event.results[0][0].transcript;
-        input.value = text;
-        input.focus();
-    };
-    recognition.onerror = () => {
-        micBtn.style.color = "";
-    };
-    recognition.onend = () => {
-        micBtn.style.color = "";
-    };
-    micBtn.onclick = () => {
-        micBtn.style.color = "var(--accent)";
-        recognition.start();
-    };
-}else{
-    micBtn.style.opacity = ".4";
-    micBtn.onclick = () => {
-        addMessage(
-            "Bu cihaz/tarayıcı sesli girişi desteklemiyor.",
-            "ai"
-        );
-    };
-}
-/* =========================
-   INITIAL
-========================= */
-window.addEventListener("load",() => {
-    setTimeout(() => {
-        if(!input.value){
+    recognition =
+        new SpeechRecognition();
+    recognition.lang =
+        "tr-TR";
+    recognition.continuous =
+        false;
+    recognition.interimResults =
+        false;
+    recognition.onresult =
+        event => {
+            const text =
+                event
+                    .results[0][0]
+                    .transcript;
+            input.value =
+                text;
             input.focus();
-        }
-    },500);
-});
+        };
+    recognition.onerror =
+        () => {
+            micBtn.style.color =
+                "";
+        };
+    recognition.onend =
+        () => {
+            micBtn.style.color =
+                "";
+        };
+    micBtn.onclick =
+        () => {
+            micBtn.style.color =
+                "var(--accent)";
+            try{
+                recognition.start();
+            }catch(error){
+            }
+        };
+}else{
+    micBtn.style.opacity =
+        ".4";
+    micBtn.onclick =
+        () => {
+            addMessage(
+                "Bu cihaz veya tarayıcı sesli girişi desteklemiyor.",
+                "ai"
+            );
+        };
+}
+/* =====================================================
+   START
+===================================================== */
+window.addEventListener(
+    "load",
+    () => {
+        setTimeout(
+            () => {
+                input.focus();
+            },
+            500
+        );
+    }
+);
 </script>
 </body>
 </html>
