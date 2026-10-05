@@ -2,26 +2,12 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#08090a">
-<title>J.A.R.V.I.S. — KARAHAN INC.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05080d">
+
+<title>J.A.R.V.I.S. - KARAHAN INC.</title>
 
 <style>
-:root{
-    --bg:#07090a;
-    --panel:rgba(17,20,22,.78);
-    --panel2:rgba(255,255,255,.045);
-    --text:#f4f8f9;
-    --muted:#727b80;
-    --soft:#a5b0b5;
-    --accent:#a9efff;
-    --accent2:#63dfff;
-    --line:rgba(255,255,255,.075);
-    --green:#83f5c1;
-    --orange:#ffd18a;
-    --danger:#ff9292;
-}
-
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
@@ -30,39 +16,55 @@
 html,body{
     margin:0;
     width:100%;
-    min-height:100%;
-    background:var(--bg);
-    color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+    height:100%;
+    overflow:hidden;
+    background:#05080d;
+    color:#f1f7fa;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 
-body{
-    overflow-x:hidden;
+:root{
+    --accent:#39d9ff;
+    --accent-soft:rgba(57,217,255,.13);
+    --accent-glow:rgba(57,217,255,.35);
+    --bg:#05080d;
+    --surface:rgba(13,18,26,.82);
+    --surface2:rgba(18,25,35,.88);
+    --text:#f1f7fa;
+    --muted:#8796a5;
+    --border:rgba(255,255,255,.09);
+    --danger:#ff4058;
 }
 
 /* BACKGROUND */
 
-body::before{
+body{
+    position:relative;
+    background:
+        radial-gradient(circle at 50% 43%,rgba(0,190,255,.075),transparent 28%),
+        radial-gradient(circle at 20% 80%,rgba(0,100,160,.07),transparent 30%),
+        radial-gradient(circle at 85% 15%,rgba(0,220,255,.045),transparent 25%),
+        #05080d;
+}
+
+body:before{
     content:"";
-    position:fixed;
+    position:absolute;
     inset:0;
     pointer-events:none;
     background:
-        radial-gradient(circle at 50% 31%,rgba(100,225,255,.075),transparent 27%),
-        radial-gradient(circle at 50% 75%,rgba(255,255,255,.025),transparent 35%);
+        linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+    background-size:40px 40px;
+    mask-image:linear-gradient(to bottom,transparent,#000 25%,#000 75%,transparent);
 }
 
-body::after{
+body:after{
     content:"";
-    position:fixed;
+    position:absolute;
     inset:0;
     pointer-events:none;
-    opacity:.16;
-    background-image:
-        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
-    background-size:42px 42px;
-    mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 80%,transparent);
+    background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.55) 100%);
 }
 
 /* APP */
@@ -70,627 +72,932 @@ body::after{
 .app{
     position:relative;
     width:100%;
-    min-height:100vh;
-    padding:
-        max(20px,env(safe-area-inset-top))
-        18px
-        max(18px,env(safe-area-inset-bottom));
+    height:100%;
+    z-index:2;
 }
 
-/* HEADER */
+/* TOP BAR */
 
-.header{
-    position:relative;
-    z-index:5;
+.topbar{
+    position:absolute;
+    top:0;
+    left:0;
     width:100%;
-    max-width:1100px;
-    margin:0 auto;
-    height:72px;
+    height:78px;
+    padding:16px 18px;
     display:flex;
     align-items:center;
     justify-content:space-between;
+    z-index:50;
 }
+
+/* MENU LEFT */
+
+.menu-btn{
+    width:46px;
+    height:46px;
+    border-radius:15px;
+    border:1px solid var(--border);
+    background:rgba(8,13,20,.75);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
+    transition:.25s ease;
+}
+
+.menu-btn span{
+    width:19px;
+    height:2px;
+    border-radius:10px;
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent-glow);
+}
+
+.menu-btn:active{
+    transform:scale(.92);
+}
+
+/* BRAND RIGHT */
 
 .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
+    text-align:right;
+    user-select:none;
 }
 
-.brand-mark{
-    width:34px;
-    height:34px;
-    border:1px solid rgba(169,239,255,.5);
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:var(--accent);
-    font-size:16px;
+.brand-main{
+    font-size:17px;
     font-weight:700;
-    box-shadow:0 0 22px rgba(99,223,255,.08);
-}
-
-.brand-title{
-    font-size:14px;
     letter-spacing:3px;
-    font-weight:600;
+    color:#f4fbff;
+    text-shadow:0 0 16px rgba(57,217,255,.22);
 }
 
 .brand-sub{
     margin-top:3px;
     font-size:8px;
-    letter-spacing:3px;
-    color:var(--muted);
+    letter-spacing:4px;
+    color:var(--accent);
+    opacity:.75;
 }
 
-.status{
+/* SYSTEM STATUS */
+
+.system-status{
+    position:absolute;
+    top:86px;
+    left:50%;
+    transform:translateX(-50%);
     display:flex;
     align-items:center;
     gap:7px;
+    padding:6px 11px;
+    border:1px solid rgba(57,217,255,.13);
+    border-radius:30px;
+    background:rgba(5,12,18,.55);
+    backdrop-filter:blur(10px);
     font-size:8px;
     letter-spacing:2px;
-    color:#91a0a5;
+    color:#7893a2;
+    white-space:nowrap;
 }
 
 .status-dot{
-    width:6px;
-    height:6px;
+    width:5px;
+    height:5px;
     border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 12px rgba(131,245,193,.8);
-    animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-    0%,100%{opacity:.55}
-    50%{opacity:1}
+    background:var(--accent);
+    box-shadow:0 0 10px var(--accent);
+    animation:pulse 1.8s infinite;
 }
 
 /* MAIN */
 
 .main{
-    position:relative;
-    z-index:2;
-    width:100%;
-    max-width:1100px;
-    margin:0 auto;
+    position:absolute;
+    inset:0;
 }
 
 /* CORE AREA */
 
-.core-section{
-    position:relative;
-    min-height:430px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-/* DATA CARDS */
-
-.data{
+.core-area{
     position:absolute;
-    width:145px;
-    padding:12px 13px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:rgba(13,16,18,.58);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-    box-shadow:0 12px 35px rgba(0,0,0,.18);
+    width:min(82vw,360px);
+    height:min(82vw,360px);
+    left:50%;
+    top:42%;
+    transform:translate(-50%,-50%);
 }
 
-.data::before{
+/* HUD */
+
+.hud{
+    position:absolute;
+    z-index:10;
+    width:112px;
+    padding:9px 10px;
+    border:1px solid rgba(57,217,255,.13);
+    border-radius:11px;
+    background:rgba(5,12,18,.58);
+    backdrop-filter:blur(13px);
+    -webkit-backdrop-filter:blur(13px);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.18),
+        inset 0 0 20px rgba(57,217,255,.018);
+}
+
+.hud:before{
     content:"";
     position:absolute;
     width:4px;
     height:4px;
     border-radius:50%;
     background:var(--accent);
-    box-shadow:0 0 9px var(--accent);
+    box-shadow:0 0 8px var(--accent);
 }
 
-.data-top{
-    top:70px;
-    left:2%;
-}
-
-.data-top::before{
-    right:12px;
-    top:13px;
-}
-
-.data-right{
-    top:70px;
-    right:2%;
-}
-
-.data-right::before{
-    left:12px;
-    top:13px;
-}
-
-.data-bottom-left{
-    bottom:43px;
-    left:5%;
-}
-
-.data-bottom-left::before{
-    right:12px;
-    top:13px;
-}
-
-.data-bottom-right{
-    bottom:43px;
-    right:5%;
-}
-
-.data-bottom-right::before{
-    left:12px;
-    top:13px;
-}
-
-.data-label{
+.hud-title{
     font-size:7px;
-    letter-spacing:2px;
-    color:#657176;
-    text-transform:uppercase;
-    margin-bottom:7px;
+    letter-spacing:1.8px;
+    color:#657783;
+    margin-bottom:4px;
 }
 
-.data-value{
-    font-size:16px;
-    font-weight:500;
-    letter-spacing:.3px;
-}
-
-.data-small{
-    margin-top:4px;
-    color:#6e7b80;
-    font-size:8px;
+.hud-value{
+    font-size:13px;
+    font-weight:600;
     letter-spacing:1px;
+    color:#dff9ff;
 }
 
-/* CORE */
-
-.core-wrap{
-    position:relative;
-    width:240px;
-    height:240px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.hud-sub{
+    margin-top:3px;
+    font-size:6px;
+    letter-spacing:1px;
+    color:#51616d;
 }
+
+.hud-left-top{
+    left:-28px;
+    top:26px;
+}
+
+.hud-left-top:before{
+    right:-3px;
+    top:50%;
+}
+
+.hud-right-top{
+    right:-28px;
+    top:26px;
+}
+
+.hud-right-top:before{
+    left:-3px;
+    top:50%;
+}
+
+.hud-left-bottom{
+    left:-28px;
+    bottom:26px;
+}
+
+.hud-left-bottom:before{
+    right:-3px;
+    top:50%;
+}
+
+.hud-right-bottom{
+    right:-28px;
+    bottom:26px;
+}
+
+.hud-right-bottom:before{
+    left:-3px;
+    top:50%;
+}
+
+/* HUD CONNECTORS */
+
+.connector{
+    position:absolute;
+    height:1px;
+    width:32px;
+    background:linear-gradient(90deg,transparent,var(--accent));
+    opacity:.25;
+    z-index:2;
+}
+
+.connector-1{
+    left:75px;
+    top:69px;
+}
+
+.connector-2{
+    right:75px;
+    top:69px;
+    transform:rotate(180deg);
+}
+
+.connector-3{
+    left:75px;
+    bottom:69px;
+}
+
+.connector-4{
+    right:75px;
+    bottom:69px;
+    transform:rotate(180deg);
+}
+
+/* CORE GLOW */
 
 .core-glow{
     position:absolute;
-    width:150px;
-    height:150px;
+    width:68%;
+    height:68%;
+    left:16%;
+    top:16%;
     border-radius:50%;
-    background:rgba(80,220,255,.07);
+    background:rgba(0,210,255,.09);
     filter:blur(28px);
     animation:coreGlow 4s ease-in-out infinite;
 }
 
-@keyframes coreGlow{
-    0%,100%{
-        transform:scale(.88);
-        opacity:.55;
-    }
-    50%{
-        transform:scale(1.12);
-        opacity:1;
-    }
+/* ORBITS */
+
+.orbit{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    border:1px solid rgba(57,217,255,.13);
+    border-radius:50%;
+    pointer-events:none;
 }
+
+.orbit-outer{
+    width:100%;
+    height:100%;
+    animation:rotate 24s linear infinite;
+}
+
+.orbit-second{
+    width:88%;
+    height:88%;
+    border-color:rgba(57,217,255,.19);
+    border-style:dashed;
+    animation:rotateReverse 19s linear infinite;
+}
+
+.orbit-third{
+    width:75%;
+    height:75%;
+    border-color:rgba(57,217,255,.11);
+    animation:rotate 14s linear infinite;
+}
+
+.orbit-inner{
+    width:63%;
+    height:63%;
+    border-color:rgba(57,217,255,.24);
+    border-style:dashed;
+    animation:rotateReverse 10s linear infinite;
+}
+
+/* ORBIT DOTS */
+
+.orbit-dot{
+    position:absolute;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:
+        0 0 8px var(--accent),
+        0 0 18px var(--accent);
+}
+
+.dot-1{
+    top:-3px;
+    left:50%;
+}
+
+.dot-2{
+    right:-3px;
+    top:50%;
+}
+
+.dot-3{
+    bottom:-3px;
+    left:50%;
+}
+
+.dot-4{
+    left:-3px;
+    top:50%;
+}
+
+/* CORE */
 
 .core{
-    position:relative;
-    width:154px;
-    height:154px;
+    position:absolute;
+    width:45%;
+    height:45%;
+    left:27.5%;
+    top:27.5%;
     border-radius:50%;
     display:flex;
-    align-items:center;
     justify-content:center;
-}
-
-.ring{
-    position:absolute;
-    border-radius:50%;
-    border:1px solid rgba(169,239,255,.22);
-}
-
-.ring.one{
-    inset:0;
-    border-top-color:rgba(169,239,255,.9);
-    border-right-color:rgba(169,239,255,.35);
-    animation:rotate 8s linear infinite;
-}
-
-.ring.two{
-    inset:13px;
-    border-bottom-color:rgba(169,239,255,.75);
-    border-left-color:rgba(169,239,255,.25);
-    animation:rotateReverse 5s linear infinite;
-}
-
-.ring.three{
-    inset:27px;
-    border-top-color:rgba(169,239,255,.45);
-    border-bottom-color:rgba(169,239,255,.12);
-    animation:rotate 12s linear infinite;
-}
-
-@keyframes rotate{
-    to{transform:rotate(360deg)}
-}
-
-@keyframes rotateReverse{
-    to{transform:rotate(-360deg)}
-}
-
-.core-center{
-    position:absolute;
-    width:86px;
-    height:86px;
-    border-radius:50%;
-    display:flex;
     align-items:center;
-    justify-content:center;
-    border:1px solid rgba(169,239,255,.28);
     background:
-        radial-gradient(circle at 50% 45%,
-        rgba(180,244,255,.11),
-        rgba(7,9,10,.96) 68%);
+        radial-gradient(circle at 35% 30%,rgba(255,255,255,.18),transparent 17%),
+        radial-gradient(circle,rgba(0,210,255,.22),rgba(2,23,34,.96) 67%);
+    border:1px solid rgba(91,226,255,.65);
     box-shadow:
-        inset 0 0 35px rgba(99,223,255,.07),
-        0 0 35px rgba(99,223,255,.06);
+        inset 0 0 30px rgba(57,217,255,.14),
+        0 0 20px rgba(57,217,255,.16),
+        0 0 65px rgba(57,217,255,.08);
+    overflow:hidden;
+    animation:corePulse 3.5s ease-in-out infinite;
 }
 
-.k{
-    font-size:38px;
-    font-weight:300;
-    letter-spacing:-4px;
-    color:#d9faff;
-    text-shadow:
-        0 0 14px rgba(169,239,255,.55),
-        0 0 35px rgba(99,223,255,.2);
-}
-
-.core-line{
+.core:before{
+    content:"";
     position:absolute;
-    width:270px;
+    inset:9%;
+    border:1px solid rgba(57,217,255,.22);
+    border-radius:50%;
+    animation:rotate 7s linear infinite;
+}
+
+.core:after{
+    content:"";
+    position:absolute;
+    width:120%;
     height:1px;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(169,239,255,.08),
-        transparent
-    );
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    opacity:.35;
+    animation:scan 3s ease-in-out infinite;
 }
 
-.core-label{
-    position:absolute;
-    bottom:-32px;
-    text-align:center;
-    width:300px;
-}
-
-.core-title{
-    font-size:9px;
+.core-letter{
+    position:relative;
+    z-index:4;
+    font-size:clamp(43px,12vw,62px);
+    font-weight:300;
     letter-spacing:4px;
-    color:#9ba9ae;
+    color:#dffaff;
+    text-shadow:
+        0 0 8px rgba(57,217,255,.8),
+        0 0 28px rgba(57,217,255,.5);
 }
 
-.core-state{
+/* CORE INFO */
+
+.core-info{
+    position:absolute;
+    top:105%;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    white-space:nowrap;
+}
+
+.core-name{
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:4px;
+    color:#dcecf1;
+}
+
+.core-desc{
     margin-top:6px;
     font-size:7px;
     letter-spacing:3px;
-    color:var(--accent);
-}
-
-/* MINI TECH LINES */
-
-.tech-line{
-    position:absolute;
-    height:1px;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(169,239,255,.3),
-        transparent
-    );
-    opacity:.55;
-}
-
-.tech-line.left{
-    width:90px;
-    left:calc(50% - 205px);
-    top:50%;
-}
-
-.tech-line.right{
-    width:90px;
-    right:calc(50% - 205px);
-    top:50%;
+    color:#62747e;
 }
 
 /* CHAT */
 
-.chat{
-    width:100%;
-    max-width:780px;
-    margin:0 auto;
-}
-
-.chat-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 5px 12px;
-    border-bottom:1px solid var(--line);
-}
-
-.chat-title{
-    font-size:8px;
-    letter-spacing:3px;
-    color:#7c888d;
-}
-
-.chat-mode{
-    font-size:7px;
-    letter-spacing:2px;
-    color:#59656a;
-}
-
-.messages{
-    height:170px;
+.chat-area{
+    position:absolute;
+    left:50%;
+    bottom:108px;
+    transform:translateX(-50%);
+    width:min(88%,560px);
+    max-height:150px;
     overflow-y:auto;
-    padding:17px 5px 8px;
-    scroll-behavior:smooth;
+    padding:8px 3px;
+    scrollbar-width:none;
 }
 
-.messages::-webkit-scrollbar{
-    width:2px;
-}
-
-.messages::-webkit-scrollbar-thumb{
-    background:rgba(255,255,255,.12);
+.chat-area::-webkit-scrollbar{
+    display:none;
 }
 
 .message{
-    max-width:85%;
-    margin-bottom:12px;
-    padding:12px 14px;
+    width:100%;
+    margin:7px 0;
+    padding:11px 14px;
+    border:1px solid rgba(255,255,255,.055);
     border-radius:14px;
-    font-size:13px;
-    line-height:1.55;
-    animation:messageIn .25s ease;
-}
-
-@keyframes messageIn{
-    from{
-        opacity:0;
-        transform:translateY(6px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.message.ai{
-    background:rgba(255,255,255,.035);
-    border:1px solid var(--line);
-    color:#dce3e5;
+    background:rgba(8,14,21,.48);
+    backdrop-filter:blur(10px);
+    color:#b8c7ce;
+    font-size:12px;
+    line-height:1.5;
 }
 
 .message.user{
-    margin-left:auto;
-    background:#eafcff;
-    color:#101719;
+    text-align:right;
+    color:#dffaff;
+    border-color:rgba(57,217,255,.09);
 }
 
-/* INPUT */
+.message.ai{
+    text-align:left;
+}
 
-.input-area{
-    margin-top:10px;
-    padding:8px;
+/* COMMAND */
+
+.command-wrap{
+    position:absolute;
+    left:50%;
+    bottom:28px;
+    transform:translateX(-50%);
+    width:min(92%,600px);
+}
+
+.command-bar{
+    height:55px;
     display:flex;
     align-items:center;
     gap:8px;
-    border:1px solid var(--line);
-    border-radius:17px;
-    background:rgba(14,17,19,.78);
+    padding:6px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:18px;
+    background:rgba(9,14,21,.78);
     backdrop-filter:blur(20px);
     -webkit-backdrop-filter:blur(20px);
-    box-shadow:0 20px 50px rgba(0,0,0,.25);
-}
-
-.input-area:focus-within{
-    border-color:rgba(169,239,255,.22);
     box-shadow:
-        0 20px 50px rgba(0,0,0,.25),
-        0 0 30px rgba(99,223,255,.035);
+        0 15px 45px rgba(0,0,0,.32),
+        inset 0 1px 0 rgba(255,255,255,.025);
 }
 
-.icon-btn{
-    flex:0 0 40px;
-    width:40px;
-    height:40px;
-    border:none;
-    border-radius:12px;
-    background:rgba(255,255,255,.035);
-    color:#849196;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-}
-
-.icon-btn:active{
-    transform:scale(.94);
-}
-
-.icon-btn.active{
-    color:var(--accent);
-    background:rgba(99,223,255,.09);
-    box-shadow:0 0 18px rgba(99,223,255,.1);
-}
-
-.input{
+#messageInput{
     flex:1;
     min-width:0;
-    border:none;
-    outline:none;
+    height:43px;
+    border:0;
+    outline:0;
     background:transparent;
-    color:#eef5f6;
-    font-size:14px;
+    color:#edfaff;
+    padding:0 12px;
+    font-size:16px;
 }
 
-.input::placeholder{
-    color:#5f696d;
+#messageInput::placeholder{
+    color:#52616c;
 }
 
-.send{
+.voice-btn,
+.send-btn{
     width:42px;
-    height:40px;
-    border:none;
-    border-radius:12px;
-    background:#dffaff;
-    color:#0c1518;
-    font-size:15px;
+    height:42px;
+    flex-shrink:0;
+    border-radius:13px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.035);
+    color:var(--accent);
+    font-size:17px;
     cursor:pointer;
-    transition:.2s;
+    transition:.2s ease;
 }
 
-.send:active{
-    transform:scale(.94);
+.voice-btn:active,
+.send-btn:active{
+    transform:scale(.9);
 }
 
-.footer{
+.send-btn{
+    background:rgba(57,217,255,.08);
+    border-color:rgba(57,217,255,.16);
+}
+
+/* TYPING */
+
+.typing{
+    display:flex;
+    gap:4px;
+    align-items:center;
+}
+
+.typing span{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--accent);
+    animation:typing 1s infinite;
+}
+
+.typing span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
+
+/* SIDEBAR */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(3px);
+    z-index:80;
+    opacity:0;
+    visibility:hidden;
+    transition:.3s ease;
+}
+
+.overlay.active{
+    opacity:1;
+    visibility:visible;
+}
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:min(82vw,310px);
+    height:100%;
+    z-index:90;
+    padding:25px 18px;
+    background:rgba(7,12,18,.96);
+    border-right:1px solid rgba(255,255,255,.07);
+    box-shadow:20px 0 60px rgba(0,0,0,.35);
+    transform:translateX(-105%);
+    transition:.35s cubic-bezier(.22,.61,.36,1);
+    backdrop-filter:blur(25px);
+}
+
+.sidebar.active{
+    transform:translateX(0);
+}
+
+.sidebar-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.sidebar-title{
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:2px;
+}
+
+.close-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.035);
+    color:#91a2ac;
+    font-size:18px;
+}
+
+.nav-item{
+    width:100%;
+    padding:14px 13px;
+    margin-bottom:7px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:1px solid transparent;
+    border-radius:13px;
+    background:transparent;
+    color:#8c9ca5;
+    font-size:12px;
+    text-align:left;
+}
+
+.nav-item.active,
+.nav-item:active{
+    background:rgba(57,217,255,.07);
+    border-color:rgba(57,217,255,.1);
+    color:#dffaff;
+}
+
+.nav-icon{
+    width:20px;
     text-align:center;
-    padding:15px 0 4px;
-    color:#4f595d;
-    font-size:7px;
-    letter-spacing:3px;
+    color:var(--accent);
 }
 
-/* THINKING */
-
-.processing .ring.one{
-    animation-duration:2.5s;
+.sidebar-line{
+    height:1px;
+    background:rgba(255,255,255,.06);
+    margin:22px 0;
 }
 
-.processing .ring.two{
-    animation-duration:1.7s;
+.settings-title{
+    margin-bottom:14px;
+    color:#60717c;
+    font-size:8px;
+    letter-spacing:2px;
 }
 
-.processing .ring.three{
-    animation-duration:4s;
+.setting{
+    margin-bottom:18px;
 }
 
-.processing .core-glow{
-    animation-duration:1.3s;
+.setting-label{
+    display:block;
+    margin-bottom:8px;
+    font-size:10px;
+    color:#9aabb4;
+}
+
+.setting select{
+    width:100%;
+    height:40px;
+    padding:0 10px;
+    border-radius:11px;
+    border:1px solid rgba(255,255,255,.07);
+    outline:0;
+    background:#0b1118;
+    color:#d9e9ee;
+}
+
+.switch-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.switch{
+    position:relative;
+    width:43px;
+    height:24px;
+}
+
+.switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+
+.slider{
+    position:absolute;
+    inset:0;
+    border-radius:30px;
+    background:#17212a;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.slider:before{
+    content:"";
+    position:absolute;
+    width:17px;
+    height:17px;
+    left:3px;
+    top:2px;
+    border-radius:50%;
+    background:#7a8992;
+    transition:.25s ease;
+}
+
+.switch input:checked + .slider{
+    background:rgba(57,217,255,.15);
+    border-color:rgba(57,217,255,.3);
+}
+
+.switch input:checked + .slider:before{
+    transform:translateX(18px);
+    background:var(--accent);
+    box-shadow:0 0 10px var(--accent);
+}
+
+/* FUN MODE */
+
+body.fun-mode{
+    --accent:#ff4058;
+    --accent-soft:rgba(255,64,88,.13);
+    --accent-glow:rgba(255,64,88,.35);
+}
+
+body.fun-mode .core{
+    background:
+        radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),transparent 17%),
+        radial-gradient(circle,rgba(255,64,88,.22),rgba(34,5,10,.96) 67%);
+}
+
+/* LIGHT */
+
+body.light{
+    --bg:#edf3f5;
+    --text:#142027;
+    --muted:#65757d;
+    --border:rgba(0,0,0,.09);
+    background:
+        radial-gradient(circle at 50% 40%,rgba(0,180,220,.1),transparent 30%),
+        #edf3f5;
+    color:#142027;
+}
+
+body.light:before{
+    opacity:.5;
+}
+
+body.light .message,
+body.light .command-bar,
+body.light .menu-btn,
+body.light .system-status{
+    background:rgba(255,255,255,.72);
+}
+
+body.light .brand-main{
+    color:#142027;
+}
+
+body.light .sidebar{
+    background:rgba(244,248,249,.96);
+}
+
+/* ANIMATIONS */
+
+@keyframes rotate{
+    from{transform:translate(-50%,-50%) rotate(0deg)}
+    to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
+@keyframes rotateReverse{
+    from{transform:translate(-50%,-50%) rotate(360deg)}
+    to{transform:translate(-50%,-50%) rotate(0deg)}
+}
+
+@keyframes corePulse{
+    0%,100%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.025);
+    }
+}
+
+@keyframes coreGlow{
+    0%,100%{
+        opacity:.55;
+        transform:scale(.95);
+    }
+    50%{
+        opacity:.9;
+        transform:scale(1.05);
+    }
+}
+
+@keyframes pulse{
+    0%,100%{opacity:.4}
+    50%{opacity:1}
+}
+
+@keyframes scan{
+    0%,100%{transform:translateY(-50px);opacity:0}
+    45%{opacity:.4}
+    50%{transform:translateY(50px);opacity:0}
+}
+
+@keyframes typing{
+    0%,60%,100%{
+        transform:translateY(0);
+        opacity:.4;
+    }
+    30%{
+        transform:translateY(-4px);
+        opacity:1;
+    }
 }
 
 /* MOBILE */
 
-@media(max-width:700px){
+@media(max-width:480px){
 
-    .app{
-        padding-left:12px;
-        padding-right:12px;
+    .topbar{
+        height:70px;
+        padding:13px 15px;
     }
 
-    .header{
-        height:62px;
+    .menu-btn{
+        width:43px;
+        height:43px;
     }
 
-    .brand-title{
-        font-size:12px;
+    .brand-main{
+        font-size:15px;
         letter-spacing:2.5px;
     }
 
     .brand-sub{
         font-size:7px;
+        letter-spacing:3px;
     }
 
-    .core-section{
-        min-height:405px;
+    .system-status{
+        top:75px;
     }
 
-    .core-wrap{
-        transform:scale(.88);
+    .core-area{
+        width:82vw;
+        height:82vw;
+        top:40%;
     }
 
-    .data{
-        width:124px;
-        padding:10px 11px;
+    .hud{
+        width:94px;
+        padding:8px;
     }
 
-    .data-top{
-        top:38px;
-        left:0;
+    .hud-left-top,
+    .hud-left-bottom{
+        left:-12px;
     }
 
-    .data-right{
-        top:38px;
-        right:0;
+    .hud-right-top,
+    .hud-right-bottom{
+        right:-12px;
     }
 
-    .data-bottom-left{
-        bottom:32px;
-        left:0;
+    .hud-value{
+        font-size:11px;
     }
 
-    .data-bottom-right{
-        bottom:32px;
-        right:0;
+    .hud-title{
+        font-size:6px;
     }
 
-    .data-value{
-        font-size:13px;
+    .hud-sub{
+        font-size:5px;
     }
 
-    .data-small{
-        font-size:7px;
-    }
-
-    .tech-line{
+    .connector{
         display:none;
     }
 
-    .messages{
-        height:155px;
+    .chat-area{
+        bottom:101px;
+        max-height:105px;
+        width:90%;
     }
 
     .message{
-        font-size:12px;
+        font-size:11px;
+        padding:9px 11px;
+    }
+
+    .command-wrap{
+        bottom:18px;
+        width:94%;
+    }
+
+    .command-bar{
+        height:53px;
+        border-radius:17px;
+    }
+
+    .voice-btn,
+    .send-btn{
+        width:40px;
+        height:40px;
     }
 }
 
-@media(max-width:390px){
+@media(max-width:360px){
 
-    .data{
-        width:108px;
+    .hud{
+        width:84px;
     }
 
-    .data-label{
-        font-size:6px;
-        letter-spacing:1.5px;
+    .hud-left-top,
+    .hud-left-bottom{
+        left:-7px;
     }
 
-    .data-value{
-        font-size:12px;
+    .hud-right-top,
+    .hud-right-bottom{
+        right:-7px;
     }
 
-    .core-wrap{
-        transform:scale(.78);
-    }
-
-    .core-section{
-        min-height:375px;
+    .hud-sub{
+        display:none;
     }
 }
 </style>
@@ -700,282 +1007,423 @@ body::after{
 
 <div class="app">
 
-    <!-- HEADER -->
-    <header class="header">
+    <!-- TOP -->
 
+    <header class="topbar">
+
+        <!-- MENU LEFT -->
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- BRAND RIGHT -->
         <div class="brand">
-
-            <div class="brand-mark">K</div>
-
-            <div>
-                <div class="brand-title">J.A.R.V.I.S.</div>
-                <div class="brand-sub">KARAHAN INC.</div>
-            </div>
-
-        </div>
-
-        <div class="status">
-            <span class="status-dot"></span>
-            SYSTEM ONLINE
+            <div class="brand-main">J.A.R.V.I.S.</div>
+            <div class="brand-sub">KARAHAN INC.</div>
         </div>
 
     </header>
 
+    <div class="system-status">
+        <span class="status-dot"></span>
+        <span id="systemStatus">SYSTEM ONLINE</span>
+    </div>
+
+    <!-- MAIN -->
 
     <main class="main">
 
-        <!-- CORE -->
-        <section class="core-section">
+        <section class="core-area">
 
-            <!-- TOP LEFT -->
-            <div class="data data-top">
+            <!-- HUD DATA -->
 
-                <div class="data-label">Atmosphere</div>
-
-                <div class="data-value" id="weatherTemp">
-                    --°C
-                </div>
-
-                <div class="data-small" id="weatherText">
-                    WEATHER / DENİZLİ
-                </div>
-
+            <div class="hud hud-left-top">
+                <div class="hud-title">ATMOSPHERE</div>
+                <div class="hud-value" id="weatherValue">-- C</div>
+                <div class="hud-sub" id="weatherSub">DENIZLI</div>
             </div>
 
-
-            <!-- TOP RIGHT -->
-            <div class="data data-right">
-
-                <div class="data-label">Network</div>
-
-                <div class="data-value" id="signal">
-                    100%
-                </div>
-
-                <div class="data-small">
-                    CONNECTION STABLE
-                </div>
-
+            <div class="hud hud-right-top">
+                <div class="hud-title">NETWORK</div>
+                <div class="hud-value" id="networkValue">100%</div>
+                <div class="hud-sub" id="networkSub">ONLINE</div>
             </div>
 
-
-            <!-- BOTTOM LEFT -->
-            <div class="data data-bottom-left">
-
-                <div class="data-label">K-Core</div>
-
-                <div class="data-value" id="coreLoad">
-                    18%
-                </div>
-
-                <div class="data-small">
-                    NEURAL PROCESSING
-                </div>
-
+            <div class="hud hud-left-bottom">
+                <div class="hud-title">K-CORE</div>
+                <div class="hud-value" id="coreLoad">18%</div>
+                <div class="hud-sub">NEURAL LOAD</div>
             </div>
 
-
-            <!-- BOTTOM RIGHT -->
-            <div class="data data-bottom-right">
-
-                <div class="data-label">Local Time</div>
-
-                <div class="data-value" id="clock">
-                    --:--
-                </div>
-
-                <div class="data-small">
-                    <span id="dateText">SYSTEM CLOCK</span>
-                </div>
-
+            <div class="hud hud-right-bottom">
+                <div class="hud-title">LOCAL TIME</div>
+                <div class="hud-value" id="clockValue">--:--</div>
+                <div class="hud-sub" id="dateValue">--</div>
             </div>
 
+            <!-- CONNECTORS -->
 
-            <div class="tech-line left"></div>
-            <div class="tech-line right"></div>
+            <div class="connector connector-1"></div>
+            <div class="connector connector-2"></div>
+            <div class="connector connector-3"></div>
+            <div class="connector connector-4"></div>
 
+            <!-- GLOW -->
 
-            <!-- CENTRAL CORE -->
+            <div class="core-glow"></div>
 
-            <div class="core-wrap" id="core">
+            <!-- ORBITS -->
 
-                <div class="core-glow"></div>
+            <div class="orbit orbit-outer">
+                <div class="orbit-dot dot-1"></div>
+                <div class="orbit-dot dot-3"></div>
+            </div>
 
-                <div class="core">
+            <div class="orbit orbit-second">
+                <div class="orbit-dot dot-2"></div>
+            </div>
 
-                    <div class="ring one"></div>
-                    <div class="ring two"></div>
-                    <div class="ring three"></div>
+            <div class="orbit orbit-third"></div>
 
-                    <div class="core-center">
-                        <div class="k">K</div>
-                    </div>
+            <div class="orbit orbit-inner">
+                <div class="orbit-dot dot-4"></div>
+            </div>
 
-                </div>
+            <!-- CORE -->
 
-                <div class="core-label">
+            <div class="core">
+                <div class="core-letter">K</div>
+            </div>
 
-                    <div class="core-title">
-                        KARAHAN INTELLIGENCE
-                    </div>
+            <!-- CORE INFO -->
 
-                    <div class="core-state" id="coreState">
-                        READY
-                    </div>
-
-                </div>
-
+            <div class="core-info">
+                <div class="core-name">J.A.R.V.I.S.</div>
+                <div class="core-desc">PERSONAL AI SYSTEM</div>
             </div>
 
         </section>
-
 
         <!-- CHAT -->
 
-        <section class="chat">
+        <section class="chat-area" id="chatArea">
 
-            <div class="chat-header">
-
-                <div class="chat-title">
-                    J.A.R.V.I.S. · PERSONAL AI
-                </div>
-
-                <div class="chat-mode">
-                    K-CORE ACTIVE
-                </div>
-
-            </div>
-
-
-            <div class="messages" id="messages">
-
-                <div class="message ai">
-                    Merhaba Efendim. Size nasıl yardımcı olabilirim?
-                </div>
-
-            </div>
-
-
-            <div class="input-area">
-
-                <button class="icon-btn" id="mic" aria-label="Sesli giriş">
-
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.7"
-                         stroke-linecap="round" stroke-linejoin="round">
-
-                        <rect x="9" y="3" width="6" height="11" rx="3"></rect>
-                        <path d="M5 11a7 7 0 0 0 14 0"></path>
-                        <path d="M12 18v3"></path>
-                        <path d="M8 21h8"></path>
-
-                    </svg>
-
-                </button>
-
-
-                <input
-                    id="input"
-                    class="input"
-                    autocomplete="off"
-                    placeholder="JARVIS'e bir şey söyle..."
-                >
-
-
-                <button class="send" id="send" aria-label="Gönder">
-                    ↑
-                </button>
-
-            </div>
-
-
-            <div class="footer">
-                KARAHAN INC. · K-CORE · J.A.R.V.I.S.
+            <div class="message ai">
+                Merhaba Efendim, nasil yardimci olabilirim?
             </div>
 
         </section>
+
+        <!-- COMMAND -->
+
+        <div class="command-wrap">
+
+            <div class="command-bar">
+
+                <input
+                    id="messageInput"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="JARVIS'e bir sey sorun..."
+                >
+
+                <button class="voice-btn" id="voiceBtn" aria-label="Sesli komut">
+                    MIC
+                </button>
+
+                <button class="send-btn" id="sendBtn" aria-label="Gonder">
+                    >
+                </button>
+
+            </div>
+
+        </div>
 
     </main>
 
 </div>
 
 
+<!-- SIDEBAR -->
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-head">
+
+        <div class="sidebar-title">
+            J.A.R.V.I.S.
+        </div>
+
+        <button class="close-btn" id="closeBtn">
+            X
+        </button>
+
+    </div>
+
+    <button class="nav-item active" id="homeBtn">
+        <span class="nav-icon">H</span>
+        Ana Ekran
+    </button>
+
+    <button class="nav-item" id="chatNavBtn">
+        <span class="nav-icon">C</span>
+        JARVIS Chat
+    </button>
+
+    <button class="nav-item" id="settingsNavBtn">
+        <span class="nav-icon">S</span>
+        Ayarlar
+    </button>
+
+    <div class="sidebar-line"></div>
+
+    <div class="settings-title">
+        SISTEM AYARLARI
+    </div>
+
+    <!-- ADDRESS -->
+
+    <div class="setting">
+
+        <label class="setting-label">
+            Hitap Sekli
+        </label>
+
+        <select id="addressSelect">
+            <option value="Efendim">Efendim</option>
+            <option value="Komutanım">Komutanım</option>
+            <option value="Patron">Patron</option>
+            <option value="Özel">Özel</option>
+        </select>
+
+    </div>
+
+    <!-- FUN -->
+
+    <div class="setting">
+
+        <div class="switch-row">
+
+            <span class="setting-label" style="margin:0">
+                Eglence Modu
+            </span>
+
+            <label class="switch">
+                <input type="checkbox" id="funMode">
+                <span class="slider"></span>
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- THEME -->
+
+    <div class="setting">
+
+        <label class="setting-label">
+            Tema
+        </label>
+
+        <select id="themeSelect">
+            <option value="dark">Gece</option>
+            <option value="light">Gunduz</option>
+        </select>
+
+    </div>
+
+</aside>
+
+
 <script>
 
-const API = "/chat";
+/* ==============================
+   ELEMENTS
+============================== */
 
-const input = document.getElementById("input");
-const send = document.getElementById("send");
-const mic = document.getElementById("mic");
-const messages = document.getElementById("messages");
-const core = document.getElementById("core");
-const coreState = document.getElementById("coreState");
+const menuBtn = document.getElementById("menuBtn");
+const closeBtn = document.getElementById("closeBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const voiceBtn = document.getElementById("voiceBtn");
+
+const chatArea = document.getElementById("chatArea");
+
+const addressSelect = document.getElementById("addressSelect");
+const funMode = document.getElementById("funMode");
+const themeSelect = document.getElementById("themeSelect");
+
+const weatherValue = document.getElementById("weatherValue");
+const weatherSub = document.getElementById("weatherSub");
+
+const networkValue = document.getElementById("networkValue");
+const networkSub = document.getElementById("networkSub");
+
+const coreLoad = document.getElementById("coreLoad");
+
+const clockValue = document.getElementById("clockValue");
+const dateValue = document.getElementById("dateValue");
+
+const systemStatus = document.getElementById("systemStatus");
 
 
-// --------------------------------------------------
-// MESSAGE
-// --------------------------------------------------
+/* ==============================
+   SIDEBAR
+============================== */
+
+function openSidebar(){
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+}
+
+function closeSidebar(){
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+}
+
+menuBtn.addEventListener("click",openSidebar);
+closeBtn.addEventListener("click",closeSidebar);
+overlay.addEventListener("click",closeSidebar);
+
+
+/* ==============================
+   LOCAL STORAGE
+============================== */
+
+const savedAddress = localStorage.getItem("jarvis_address");
+const savedFun = localStorage.getItem("jarvis_fun");
+const savedTheme = localStorage.getItem("jarvis_theme");
+
+if(savedAddress){
+    addressSelect.value = savedAddress;
+}
+
+if(savedFun === "true"){
+    funMode.checked = true;
+    document.body.classList.add("fun-mode");
+}
+
+if(savedTheme === "light"){
+    themeSelect.value = "light";
+    document.body.classList.add("light");
+}
+
+
+/* ==============================
+   SETTINGS
+============================== */
+
+addressSelect.addEventListener("change",function(){
+
+    localStorage.setItem(
+        "jarvis_address",
+        addressSelect.value
+    );
+
+});
+
+funMode.addEventListener("change",function(){
+
+    document.body.classList.toggle(
+        "fun-mode",
+        funMode.checked
+    );
+
+    localStorage.setItem(
+        "jarvis_fun",
+        funMode.checked
+    );
+
+});
+
+themeSelect.addEventListener("change",function(){
+
+    document.body.classList.toggle(
+        "light",
+        themeSelect.value === "light"
+    );
+
+    localStorage.setItem(
+        "jarvis_theme",
+        themeSelect.value
+    );
+
+});
+
+
+/* ==============================
+   CHAT
+============================== */
 
 function addMessage(text,type){
 
-    const el = document.createElement("div");
+    const message = document.createElement("div");
 
-    el.className = "message " + type;
+    message.className = "message " + type;
 
-    el.textContent = text;
+    message.textContent = text;
 
-    messages.appendChild(el);
+    chatArea.appendChild(message);
 
-    messages.scrollTop = messages.scrollHeight;
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    return message;
 }
 
 
-// --------------------------------------------------
-// TYPING EFFECT
-// --------------------------------------------------
+function addTyping(){
 
-async function typeMessage(text){
+    const message = document.createElement("div");
 
-    const el = document.createElement("div");
+    message.className = "message ai";
 
-    el.className = "message ai";
+    message.innerHTML =
+        '<div class="typing">' +
+        '<span></span>' +
+        '<span></span>' +
+        '<span></span>' +
+        '</div>';
 
-    messages.appendChild(el);
+    chatArea.appendChild(message);
 
-    for(let i=0;i<text.length;i++){
+    chatArea.scrollTop = chatArea.scrollHeight;
 
-        el.textContent += text[i];
-
-        messages.scrollTop = messages.scrollHeight;
-
-        await new Promise(resolve =>
-            setTimeout(resolve,8)
-        );
-    }
+    return message;
 }
 
 
-// --------------------------------------------------
-// SEND
-// --------------------------------------------------
+/* ==============================
+   SEND MESSAGE
+============================== */
 
 async function sendMessage(){
 
-    const text = input.value.trim();
+    const text = messageInput.value.trim();
 
-    if(!text) return;
+    if(!text){
+        return;
+    }
 
     addMessage(text,"user");
 
-    input.value = "";
+    messageInput.value = "";
 
-    core.classList.add("processing");
+    const typing = addTyping();
 
-    coreState.textContent = "THINKING";
+    systemStatus.textContent = "PROCESSING";
+
+    coreLoad.textContent = "86%";
 
     try{
 
-        const response = await fetch(API,{
+        const response = await fetch("/chat",{
 
             method:"POST",
 
@@ -986,340 +1434,333 @@ async function sendMessage(){
             body:JSON.stringify({
 
                 message:text,
-                address:"Efendim",
-                fun_mode:false
+
+                address:addressSelect.value,
+
+                fun_mode:funMode.checked
 
             })
 
         });
 
-
         if(!response.ok){
-
-            throw new Error("API_ERROR");
-
+            throw new Error("Server error");
         }
-
 
         const data = await response.json();
 
+        typing.remove();
 
-        const reply =
-            data.response ??
-            data.message ??
-            data.reply ??
-            "Üzgünüm Efendim, şu anda yanıt oluşturamadım.";
+        addMessage(
+            data.response || "Efendim, su anda yanit olusturamiyorum.",
+            "ai"
+        );
 
-
-        await typeMessage(reply);
-
+        systemStatus.textContent = "SYSTEM ONLINE";
 
     }catch(error){
 
-        await typeMessage(
-            "Bağlantıda bir sorun oluştu Efendim. K-Core sunucusunu kontrol edin."
+        typing.remove();
+
+        addMessage(
+            "Efendim, sunucuya baglanirken bir sorun olustu.",
+            "ai"
         );
 
-    }finally{
-
-        core.classList.remove("processing");
-
-        coreState.textContent = "READY";
+        systemStatus.textContent = "CONNECTION ERROR";
 
     }
 
+    coreLoad.textContent =
+        Math.floor(12 + Math.random() * 18) + "%";
 }
 
 
-// --------------------------------------------------
-// BUTTON
-// --------------------------------------------------
-
-send.addEventListener("click",sendMessage);
+sendBtn.addEventListener("click",sendMessage);
 
 
-input.addEventListener("keydown",(event)=>{
+messageInput.addEventListener("keydown",function(event){
 
     if(event.key === "Enter"){
-
         event.preventDefault();
-
         sendMessage();
-
     }
 
 });
 
 
-// --------------------------------------------------
-// VOICE
-// --------------------------------------------------
-
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-
-if(SpeechRecognition){
-
-    const recognition = new SpeechRecognition();
-
-    recognition.lang = "tr-TR";
-
-    recognition.interimResults = false;
-
-    recognition.continuous = false;
-
-
-    mic.addEventListener("click",()=>{
-
-        try{
-
-            recognition.start();
-
-            mic.classList.add("active");
-
-            coreState.textContent = "LISTENING";
-
-        }catch(e){}
-
-    });
-
-
-    recognition.onresult = (event)=>{
-
-        const transcript =
-            event.results[0][0].transcript;
-
-        input.value = transcript;
-
-        input.focus();
-
-    };
-
-
-    recognition.onend = ()=>{
-
-        mic.classList.remove("active");
-
-        if(!core.classList.contains("processing")){
-
-            coreState.textContent = "READY";
-
-        }
-
-    };
-
-
-    recognition.onerror = ()=>{
-
-        mic.classList.remove("active");
-
-        coreState.textContent = "READY";
-
-    };
-
-}else{
-
-    mic.style.display = "none";
-
-}
-
-
-// --------------------------------------------------
-// CLOCK
-// --------------------------------------------------
+/* ==============================
+   CLOCK
+============================== */
 
 function updateClock(){
 
     const now = new Date();
 
-    document.getElementById("clock").textContent =
-        now.toLocaleTimeString("tr-TR",{
-            hour:"2-digit",
-            minute:"2-digit"
-        });
+    const hours =
+        String(now.getHours()).padStart(2,"0");
 
+    const minutes =
+        String(now.getMinutes()).padStart(2,"0");
 
-    document.getElementById("dateText").textContent =
-        now.toLocaleDateString("tr-TR",{
-            day:"2-digit",
-            month:"short"
-        }).toUpperCase();
+    clockValue.textContent =
+        hours + ":" + minutes;
 
+    const day =
+        String(now.getDate()).padStart(2,"0");
+
+    const month =
+        String(now.getMonth() + 1).padStart(2,"0");
+
+    dateValue.textContent =
+        day + "." + month + "." + now.getFullYear();
 }
-
 
 updateClock();
 
 setInterval(updateClock,1000);
 
 
-// --------------------------------------------------
-// NETWORK SIGNAL
-// --------------------------------------------------
+/* ==============================
+   NETWORK
+============================== */
 
-function updateSignal(){
+function updateNetwork(){
 
-    const signal =
-        document.getElementById("signal");
+    if(!navigator.onLine){
 
-    if(navigator.onLine){
+        networkValue.textContent = "0%";
+        networkSub.textContent = "OFFLINE";
 
-        let value = 100;
-
-        if(navigator.connection){
-
-            const type =
-                navigator.connection.effectiveType;
-
-            if(type === "slow-2g") value = 25;
-            else if(type === "2g") value = 45;
-            else if(type === "3g") value = 70;
-            else value = 100;
-
-        }
-
-        signal.textContent = value + "%";
-
-    }else{
-
-        signal.textContent = "OFFLINE";
-
+        return;
     }
 
+    let percentage = 100;
+
+    if(navigator.connection){
+
+        const type =
+            navigator.connection.effectiveType;
+
+        if(type === "slow-2g"){
+            percentage = 25;
+        }else if(type === "2g"){
+            percentage = 45;
+        }else if(type === "3g"){
+            percentage = 70;
+        }else{
+            percentage = 100;
+        }
+    }
+
+    networkValue.textContent =
+        percentage + "%";
+
+    networkSub.textContent =
+        navigator.onLine ? "ONLINE" : "OFFLINE";
+}
+
+updateNetwork();
+
+window.addEventListener(
+    "online",
+    updateNetwork
+);
+
+window.addEventListener(
+    "offline",
+    updateNetwork
+);
+
+if(navigator.connection){
+
+    navigator.connection.addEventListener(
+        "change",
+        updateNetwork
+    );
+
 }
 
 
-updateSignal();
+/* ==============================
+   WEATHER
+============================== */
 
-window.addEventListener("online",updateSignal);
-window.addEventListener("offline",updateSignal);
-
-
-// --------------------------------------------------
-// K-CORE LOAD
-// --------------------------------------------------
-
-function updateCoreLoad(){
-
-    const load =
-        document.getElementById("coreLoad");
-
-    let value =
-        Math.floor(
-            12 +
-            Math.random() * 20
-        );
-
-    load.textContent = value + "%";
-
-}
-
-
-updateCoreLoad();
-
-setInterval(updateCoreLoad,2500);
-
-
-// --------------------------------------------------
-// WEATHER
-// --------------------------------------------------
-// Denizli için Open-Meteo.
-// API anahtarı gerektirmez.
-
-async function updateWeather(){
-
-    const temp =
-        document.getElementById("weatherTemp");
-
-    const text =
-        document.getElementById("weatherText");
+async function loadWeather(){
 
     try{
 
-        const response = await fetch(
-            "https://api.open-meteo.com/v1/forecast?latitude=37.7765&longitude=29.0864&current=temperature_2m,weather_code&timezone=Europe%2FIstanbul"
-        );
+        const url =
+            "https://api.open-meteo.com/v1/forecast" +
+            "?latitude=37.7765" +
+            "&longitude=29.0864" +
+            "&current=temperature_2m,weather_code" +
+            "&timezone=Europe%2FIstanbul";
 
+        const response =
+            await fetch(url);
 
-        const data = await response.json();
+        if(!response.ok){
+            throw new Error("Weather error");
+        }
+
+        const data =
+            await response.json();
 
         const temperature =
             Math.round(data.current.temperature_2m);
 
-        const code =
-            data.current.weather_code;
+        weatherValue.textContent =
+            temperature + " C";
 
-
-        const weatherMap = {
-
-            0:"CLEAR",
-            1:"MOSTLY CLEAR",
-            2:"PARTLY CLOUDY",
-            3:"CLOUDY",
-            45:"FOG",
-            48:"FOG",
-            51:"DRIZZLE",
-            53:"DRIZZLE",
-            55:"DRIZZLE",
-            61:"RAIN",
-            63:"RAIN",
-            65:"HEAVY RAIN",
-            71:"SNOW",
-            73:"SNOW",
-            75:"HEAVY SNOW",
-            80:"SHOWERS",
-            81:"SHOWERS",
-            82:"HEAVY SHOWERS",
-            95:"STORM",
-            96:"STORM",
-            99:"STORM"
-
-        };
-
-
-        temp.textContent =
-            temperature + "°C";
-
-
-        text.textContent =
-            (weatherMap[code] || "WEATHER")
-            + " / DENİZLİ";
-
+        weatherSub.textContent =
+            "DENIZLI";
 
     }catch(error){
 
-        temp.textContent = "--°C";
+        weatherValue.textContent =
+            "-- C";
 
-        text.textContent =
-            "WEATHER / OFFLINE";
+        weatherSub.textContent =
+            "WEATHER N/A";
 
     }
+}
+
+loadWeather();
+
+
+/* ==============================
+   CORE LOAD
+============================== */
+
+function idleCore(){
+
+    const value =
+        Math.floor(12 + Math.random() * 17);
+
+    coreLoad.textContent =
+        value + "%";
+}
+
+setInterval(idleCore,5000);
+
+
+/* ==============================
+   VOICE RECOGNITION
+============================== */
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+if(SpeechRecognition){
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "tr-TR";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    voiceBtn.addEventListener("click",function(){
+
+        try{
+
+            recognition.start();
+
+            voiceBtn.textContent = "...";
+
+            systemStatus.textContent =
+                "LISTENING";
+
+        }catch(error){}
+
+    });
+
+    recognition.onresult = function(event){
+
+        const result =
+            event.results[0][0].transcript;
+
+        messageInput.value = result;
+
+        voiceBtn.textContent = "MIC";
+
+        systemStatus.textContent =
+            "SYSTEM ONLINE";
+
+        sendMessage();
+
+    };
+
+    recognition.onerror = function(){
+
+        voiceBtn.textContent = "MIC";
+
+        systemStatus.textContent =
+            "SYSTEM ONLINE";
+
+    };
+
+    recognition.onend = function(){
+
+        voiceBtn.textContent = "MIC";
+
+    };
+
+}else{
+
+    voiceBtn.style.opacity = ".4";
 
 }
 
 
-updateWeather();
+/* ==============================
+   NAVIGATION
+============================== */
 
-setInterval(updateWeather,600000);
+document.getElementById("homeBtn")
+.addEventListener("click",function(){
+
+    closeSidebar();
+
+});
+
+document.getElementById("chatNavBtn")
+.addEventListener("click",function(){
+
+    closeSidebar();
+
+    setTimeout(function(){
+        messageInput.focus();
+    },350);
+
+});
+
+document.getElementById("settingsNavBtn")
+.addEventListener("click",function(){
+
+    document.querySelector(".sidebar-line")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+});
 
 
-// --------------------------------------------------
-// STARTUP
-// --------------------------------------------------
+/* ==============================
+   STARTUP
+============================== */
 
-setTimeout(()=>{
+setTimeout(function(){
 
-    coreState.textContent = "SYSTEM READY";
+    systemStatus.textContent =
+        "SYSTEM ONLINE";
 
-    setTimeout(()=>{
-
-        coreState.textContent = "READY";
-
-    },1500);
-
-},500);
+},800);
 
 </script>
 
