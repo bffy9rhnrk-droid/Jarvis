@@ -2,592 +2,524 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
-
-:root{
-    --cyan:#39e8ff;
-    --cyan2:#08a9c7;
-    --green:#4dffb1;
-    --blue:#4aa8ff;
-    --red:#ff4264;
-    --bg:#01050a;
-    --panel:rgba(5,15,24,.78);
-    --text:#effcff;
-    --muted:#6e8490;
-}
-
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
 
 html,body{
+    margin:0;
     width:100%;
     height:100%;
-    margin:0;
     overflow:hidden;
-    background:#01050a;
-}
-
-body{
+    background:#02060b;
+    color:#fff;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    color:var(--text);
 }
 
-button,
-input{
+button,input{
     font:inherit;
 }
 
 button{
-    border:0;
-    outline:0;
+    -webkit-appearance:none;
 }
+
+/* =========================
+   APP
+========================= */
 
 .app{
     position:relative;
     width:100%;
-    height:100dvh;
+    height:100vh;
     overflow:hidden;
+
     background:
         radial-gradient(
-            circle at 50% 40%,
-            rgba(0,210,255,.13),
-            transparent 27%
-        ),
-        radial-gradient(
-            circle at 50% 100%,
-            rgba(0,100,150,.08),
-            transparent 40%
-        ),
-        #01050a;
-}
-
-/* =====================================
-   BACKGROUND
-===================================== */
-
-.app:before{
-    content:"";
-    position:absolute;
-    inset:0;
-    opacity:.19;
-    background-image:
-        linear-gradient(
-            rgba(90,200,255,.045) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(90,200,255,.045) 1px,
-            transparent 1px
+            circle at 50% 42%,
+            rgba(22,82,115,.38) 0%,
+            rgba(7,25,40,.22) 25%,
+            rgba(2,8,14,.95) 65%,
+            #010307 100%
         );
-    background-size:38px 38px;
-    mask-image:linear-gradient(
-        to bottom,
-        black,
-        transparent 88%
-    );
 }
 
-.app:after{
+/* GRID */
+
+.app::before{
     content:"";
     position:absolute;
     inset:0;
     pointer-events:none;
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255,255,255,.018) 0px,
-            rgba(255,255,255,.018) 1px,
-            transparent 2px,
-            transparent 5px
-        );
-    opacity:.23;
+    opacity:.12;
+
+    background-image:
+        linear-gradient(rgba(77,184,255,.15) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(77,184,255,.15) 1px,transparent 1px);
+
+    background-size:45px 45px;
+
+    mask-image:linear-gradient(
+        to bottom,
+        transparent,
+        black 25%,
+        black 75%,
+        transparent
+    );
 }
 
-/* =====================================
-   TOP BAR
-===================================== */
+/* =========================
+   TOP
+========================= */
 
 .top{
     position:absolute;
-    z-index:30;
     top:0;
     left:0;
     right:0;
-    height:76px;
-    padding:13px 15px;
+    height:68px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
+    padding:0 16px;
+
+    background:rgba(2,7,12,.72);
+    backdrop-filter:blur(18px);
+
+    border-bottom:1px solid rgba(77,184,255,.12);
+
+    z-index:100;
 }
 
 .menu{
-    width:46px;
-    height:46px;
-    border-radius:14px;
+    width:43px;
+    height:43px;
 
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:5px;
 
-    background:rgba(5,17,27,.88);
-    border:1px solid rgba(100,220,255,.18);
+    border-radius:12px;
 
-    box-shadow:
-        inset 0 0 18px rgba(57,232,255,.035),
-        0 5px 25px rgba(0,0,0,.3);
+    border:1px solid rgba(77,184,255,.18);
+    background:rgba(77,184,255,.06);
+
+    color:#fff;
+    font-size:22px;
 }
 
-.menu i{
-    width:19px;
-    height:1.5px;
-    background:var(--cyan);
-    box-shadow:0 0 8px var(--cyan);
+.menu:active{
+    transform:scale(.94);
 }
 
 .brand{
-    text-align:right;
+    text-align:center;
 }
 
-.brand b{
-    display:block;
-    font-size:17px;
-    letter-spacing:4px;
-    text-shadow:0 0 12px rgba(57,232,255,.25);
+.brand-main{
+    font-size:19px;
+    letter-spacing:5px;
+    font-weight:600;
+
+    text-shadow:
+        0 0 12px rgba(77,184,255,.7);
 }
 
-.brand small{
-    display:block;
-    margin-top:4px;
-    color:var(--cyan);
-    font-size:7px;
-    letter-spacing:4px;
-}
+.brand-sub{
+    margin-top:2px;
 
-/* =====================================
-   ONLINE STATUS
-===================================== */
+    font-size:8px;
+    letter-spacing:3px;
+
+    opacity:.48;
+}
 
 .status{
-    position:absolute;
-    z-index:20;
-    top:88px;
-    right:17px;
-
-    display:flex;
-    align-items:center;
-    gap:7px;
-
-    color:#6f8792;
-    font-size:7px;
-    letter-spacing:2px;
-}
-
-.status-dot{
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:var(--green);
-
-    box-shadow:
-        0 0 7px var(--green),
-        0 0 17px rgba(77,255,177,.7);
-
-    animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-    0%,100%{
-        opacity:.35;
-        transform:scale(.8);
-    }
-    50%{
-        opacity:1;
-        transform:scale(1);
-    }
-}
-
-/* =====================================
-   TOP TELEMETRY
-===================================== */
-
-.hud{
-    position:absolute;
-    z-index:10;
-    top:113px;
-    left:14px;
-    right:14px;
-
-    display:flex;
-    justify-content:space-between;
-}
-
-.hud-side{
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-}
-
-.hud-item{
     display:flex;
     align-items:center;
     gap:6px;
 
-    color:#637983;
-    font-size:6px;
-    letter-spacing:1.4px;
+    font-size:9px;
+    letter-spacing:1px;
+    opacity:.8;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:#00ff9d;
+
+    box-shadow:
+        0 0 8px #00ff9d,
+        0 0 18px rgba(0,255,157,.7);
+
+    animation:statusPulse 1.8s infinite;
+}
+
+@keyframes statusPulse{
+    0%,100%{opacity:.5}
+    50%{opacity:1}
+}
+
+/* =========================
+   HUD
+========================= */
+
+.hud{
+    position:absolute;
+
+    top:85px;
+    left:15px;
+    right:15px;
+
+    display:flex;
+    justify-content:space-between;
+
+    z-index:5;
+
+    pointer-events:none;
+}
+
+.hud-side{
+    width:120px;
+}
+
+.hud-item{
+    margin-bottom:12px;
+}
+
+.hud-title{
+    font-size:7px;
+    letter-spacing:2px;
+    opacity:.45;
+    margin-bottom:5px;
+}
+
+.hud-value{
+    font-size:9px;
+    letter-spacing:1px;
 }
 
 .hud-bar{
-    width:32px;
+    margin-top:5px;
     height:2px;
+
+    width:100%;
+
+    background:rgba(255,255,255,.06);
     overflow:hidden;
-    background:rgba(57,232,255,.08);
 }
 
 .hud-bar span{
     display:block;
+    width:70%;
     height:100%;
-    background:var(--cyan);
+
+    background:#4db8ff;
 
     box-shadow:
-        0 0 7px var(--cyan);
+        0 0 8px #4db8ff;
 
-    animation:barPulse 2.2s ease-in-out infinite;
+    transition:width .8s ease;
 }
 
-@keyframes barPulse{
-    0%,100%{
-        opacity:.55;
-    }
-    50%{
-        opacity:1;
-    }
-}
-
-/* =====================================
-   SIDE TELEMETRY
-===================================== */
+/* =========================
+   DATA
+========================= */
 
 .data{
     position:absolute;
-    z-index:8;
-    top:37%;
-    width:75px;
+    top:165px;
 
-    color:#526b76;
-    font-size:6px;
-    letter-spacing:1.5px;
+    width:120px;
+
+    z-index:4;
 }
 
 .data.left{
-    left:13px;
+    left:15px;
 }
 
 .data.right{
-    right:13px;
+    right:15px;
     text-align:right;
 }
 
 .data-title{
-    color:#8299a3;
-    font-size:6px;
+    font-size:7px;
     letter-spacing:2px;
+    opacity:.4;
 }
 
 .data-value{
-    color:var(--cyan);
-    font-size:11px;
-    margin:5px 0 10px;
+    margin-top:3px;
 
-    text-shadow:0 0 10px rgba(57,232,255,.45);
-}
+    font-size:18px;
+    letter-spacing:1px;
 
-.signal-number{
-    transition:.3s;
+    color:#8fd7ff;
+
+    text-shadow:
+        0 0 10px rgba(77,184,255,.5);
 }
 
 .line{
-    position:relative;
     width:100%;
-    height:2px;
-    margin:5px 0;
+    height:1px;
 
-    overflow:hidden;
+    margin-top:8px;
 
-    background:rgba(57,232,255,.07);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(77,184,255,.5),
+            transparent
+        );
 }
 
-.line span{
-    display:block;
-    height:100%;
-    width:50%;
-
-    background:var(--cyan);
-
-    box-shadow:
-        0 0 7px var(--cyan);
-
-    transition:width .5s ease;
-}
-
-/* =====================================
+/* =========================
    SIGNAL WAVE
-===================================== */
+========================= */
 
 .signal-wave{
     position:absolute;
-    top:47%;
+
+    top:190px;
     left:50%;
 
     width:120px;
-    height:22px;
+    height:45px;
 
-    transform:translate(-50%,-50%);
+    transform:translateX(-50%);
 
-    opacity:.24;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:3px;
+
+    opacity:.35;
+
+    z-index:3;
 }
 
 .wave-bar{
-    position:absolute;
-    bottom:0;
-
     width:2px;
+    height:10px;
 
-    background:var(--cyan);
-    box-shadow:0 0 6px var(--cyan);
+    background:#4db8ff;
+
+    box-shadow:
+        0 0 8px rgba(77,184,255,.8);
 
     animation:wave 1.1s ease-in-out infinite;
 }
 
-.wave-bar:nth-child(1){left:5%;height:7px}
-.wave-bar:nth-child(2){left:13%;height:12px;animation-delay:.08s}
-.wave-bar:nth-child(3){left:21%;height:18px;animation-delay:.16s}
-.wave-bar:nth-child(4){left:29%;height:9px;animation-delay:.24s}
-.wave-bar:nth-child(5){left:37%;height:15px;animation-delay:.32s}
-.wave-bar:nth-child(6){left:45%;height:21px;animation-delay:.40s}
-.wave-bar:nth-child(7){left:53%;height:13px;animation-delay:.48s}
-.wave-bar:nth-child(8){left:61%;height:19px;animation-delay:.56s}
-.wave-bar:nth-child(9){left:69%;height:8px;animation-delay:.64s}
-.wave-bar:nth-child(10){left:77%;height:16px;animation-delay:.72s}
-.wave-bar:nth-child(11){left:85%;height:10px;animation-delay:.80s}
-.wave-bar:nth-child(12){left:93%;height:14px;animation-delay:.88s}
+.wave-bar:nth-child(2){animation-delay:.1s}
+.wave-bar:nth-child(3){animation-delay:.2s}
+.wave-bar:nth-child(4){animation-delay:.3s}
+.wave-bar:nth-child(5){animation-delay:.4s}
+.wave-bar:nth-child(6){animation-delay:.5s}
+.wave-bar:nth-child(7){animation-delay:.6s}
+.wave-bar:nth-child(8){animation-delay:.7s}
+.wave-bar:nth-child(9){animation-delay:.8s}
+.wave-bar:nth-child(10){animation-delay:.9s}
+.wave-bar:nth-child(11){animation-delay:.7s}
+.wave-bar:nth-child(12){animation-delay:.5s}
 
 @keyframes wave{
-    0%,100%{
-        transform:scaleY(.35);
-        opacity:.35;
-    }
-    50%{
-        transform:scaleY(1);
-        opacity:1;
-    }
+    0%,100%{height:7px}
+    50%{height:34px}
 }
 
-/* =====================================
+/* =========================
    CORE AREA
-===================================== */
+========================= */
 
 .core-area{
     position:absolute;
-    z-index:6;
 
+    top:50%;
     left:50%;
-    top:39%;
 
-    width:290px;
-    height:290px;
+    width:260px;
+    height:260px;
 
-    transform:translate(-50%,-50%);
+    transform:translate(-50%,-52%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.4s ease;
 }
-
-/* CORE GLOW */
 
 .glow{
     position:absolute;
 
-    left:50%;
-    top:50%;
-
-    width:170px;
-    height:170px;
-
-    transform:translate(-50%,-50%);
+    width:190px;
+    height:190px;
 
     border-radius:50%;
 
-    background:rgba(57,232,255,.16);
+    background:
+        radial-gradient(
+            circle,
+            rgba(77,184,255,.28),
+            rgba(77,184,255,.08) 40%,
+            transparent 70%
+        );
 
-    filter:blur(38px);
+    filter:blur(7px);
 
-    animation:glow 3s infinite;
+    animation:glowPulse 3s ease-in-out infinite;
 }
 
-@keyframes glow{
+@keyframes glowPulse{
     0%,100%{
-        opacity:.45;
-        transform:translate(-50%,-50%) scale(.88);
+        transform:scale(.92);
+        opacity:.7;
     }
 
     50%{
+        transform:scale(1.08);
         opacity:1;
-        transform:translate(-50%,-50%) scale(1.15);
     }
 }
 
-/* =====================================
-   RINGS
-===================================== */
+/* RINGS */
 
 .ring{
     position:absolute;
 
-    left:50%;
-    top:50%;
-
     border-radius:50%;
 
-    transform:translate(-50%,-50%);
+    border:1px solid rgba(77,184,255,.4);
 
-    border:1px solid rgba(57,232,255,.14);
+    box-shadow:
+        0 0 15px rgba(77,184,255,.12);
+
+    transition:.4s;
 }
 
 .r1{
-    width:158px;
-    height:158px;
-
-    border-top-color:var(--cyan);
-    border-right-color:rgba(57,232,255,.5);
-
-    animation:spin 6s linear infinite;
-}
-
-.r2{
-    width:188px;
-    height:188px;
-
-    border-bottom-color:var(--cyan);
-    border-left-color:rgba(57,232,255,.4);
-
-    animation:spinReverse 9s linear infinite;
-}
-
-.r3{
     width:220px;
     height:220px;
 
-    border-left-color:var(--cyan);
-    border-top-color:rgba(57,232,255,.28);
+    border-top-color:#4db8ff;
+    border-bottom-color:rgba(77,184,255,.1);
 
-    animation:spin 14s linear infinite;
+    animation:spin 9s linear infinite;
+}
+
+.r2{
+    width:195px;
+    height:195px;
+
+    border-left-color:#00ff9d;
+    border-right-color:rgba(0,255,157,.1);
+
+    animation:spinReverse 7s linear infinite;
+}
+
+.r3{
+    width:165px;
+    height:165px;
+
+    border-top-color:rgba(255,255,255,.65);
+    border-bottom-color:rgba(255,255,255,.05);
+
+    animation:spin 12s linear infinite;
 }
 
 .r4{
-    width:257px;
-    height:257px;
+    width:235px;
+    height:235px;
 
-    border-right-color:rgba(57,232,255,.5);
-    border-bottom-color:rgba(57,232,255,.16);
+    border-left-color:rgba(77,184,255,.25);
+    border-right-color:rgba(77,184,255,.25);
 
-    animation:spinReverse 20s linear infinite;
+    animation:spinReverse 16s linear infinite;
 }
 
 @keyframes spin{
-    from{
-        transform:translate(-50%,-50%) rotate(0deg);
-    }
-
-    to{
-        transform:translate(-50%,-50%) rotate(360deg);
-    }
+    from{transform:rotate(0deg)}
+    to{transform:rotate(360deg)}
 }
 
 @keyframes spinReverse{
-    from{
-        transform:translate(-50%,-50%) rotate(0deg);
-    }
-
-    to{
-        transform:translate(-50%,-50%) rotate(-360deg);
-    }
+    from{transform:rotate(360deg)}
+    to{transform:rotate(0deg)}
 }
 
-/* =====================================
-   ORBIT
-===================================== */
+/* ORBIT */
 
 .orbit{
     position:absolute;
 
-    left:50%;
-    top:50%;
+    width:205px;
+    height:205px;
 
-    width:247px;
-    height:247px;
+    border-radius:50%;
 
-    transform:translate(-50%,-50%);
-
-    animation:spin 11s linear infinite;
+    animation:spin 6s linear infinite;
 }
 
 .dot{
     position:absolute;
 
-    width:5px;
-    height:5px;
+    width:6px;
+    height:6px;
 
     border-radius:50%;
 
-    background:var(--cyan);
+    background:#4db8ff;
 
     box-shadow:
-        0 0 8px var(--cyan),
-        0 0 20px var(--cyan);
+        0 0 8px #4db8ff,
+        0 0 15px #4db8ff;
 }
 
-.dot1{
-    top:5px;
+.dot:nth-child(1){
+    top:0;
     left:50%;
 }
 
-.dot2{
-    right:11px;
-    bottom:43px;
-
-    width:4px;
-    height:4px;
+.dot:nth-child(2){
+    bottom:25px;
+    left:10px;
 }
 
-.dot3{
-    left:18px;
-    bottom:35px;
+.dot:nth-child(3){
+    right:5px;
+    bottom:40px;
 
-    width:3px;
-    height:3px;
+    background:#00ff9d;
+
+    box-shadow:
+        0 0 8px #00ff9d,
+        0 0 15px #00ff9d;
 }
 
-/* =====================================
-   CORE
-===================================== */
+/* CORE */
 
 .core{
     position:absolute;
 
-    left:50%;
-    top:50%;
-
-    width:108px;
-    height:108px;
-
-    transform:translate(-50%,-50%);
+    width:130px;
+    height:130px;
 
     border-radius:50%;
 
@@ -597,248 +529,301 @@ button{
 
     background:
         radial-gradient(
-            circle at 30% 24%,
-            #ffffff,
-            #72f1ff 12%,
-            #22a4bd 31%,
-            #064653 54%,
-            #010609 81%
+            circle at 35% 30%,
+            #173f5f,
+            #07121c 60%,
+            #03080d
         );
 
-    border:1px solid #c6fcff;
+    border:1px solid rgba(255,255,255,.16);
 
     box-shadow:
-        0 0 15px rgba(57,232,255,.95),
-        0 0 35px rgba(57,232,255,.55),
-        0 0 80px rgba(57,232,255,.18),
-        inset 0 0 28px #000;
+        inset 0 0 35px rgba(77,184,255,.22),
+        0 0 30px rgba(77,184,255,.2);
 
-    animation:coreFloat 3.4s ease-in-out infinite;
-}
+    animation:corePulse 2.8s ease-in-out infinite;
 
-@keyframes coreFloat{
-    0%,100%{
-        transform:translate(-50%,-50%) scale(1);
-    }
-
-    50%{
-        transform:translate(-50%,-50%) scale(1.045);
-    }
-}
-
-.core:before{
-    content:"";
-
-    position:absolute;
-    inset:7px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(255,255,255,.35);
-
-    box-shadow:
-        inset 0 0 15px rgba(57,232,255,.35);
-}
-
-.core:after{
-    content:"";
-
-    position:absolute;
-    inset:17px;
-
-    border-radius:50%;
-
-    border:1px dashed rgba(255,255,255,.13);
-
-    animation:spin 5s linear infinite;
+    z-index:3;
 }
 
 .k{
-    position:relative;
-    z-index:3;
+    font-size:65px;
+    font-weight:700;
 
-    font-size:51px;
-    font-weight:800;
-
-    color:#f4ffff;
+    color:#fff;
 
     text-shadow:
-        0 0 5px #fff,
-        0 0 15px #fff,
-        0 0 30px var(--cyan),
-        0 0 50px var(--cyan);
+        0 0 12px #4db8ff,
+        0 0 35px #4db8ff,
+        0 0 60px rgba(77,184,255,.7);
+}
+
+@keyframes corePulse{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.04);
+    }
 }
 
 .core-label{
     position:absolute;
 
-    top:calc(50% + 73px);
+    bottom:-35px;
 
-    width:100%;
+    width:220px;
 
     text-align:center;
 
-    color:#627b86;
-
-    font-size:7px;
+    font-size:8px;
     letter-spacing:3px;
+
+    opacity:.45;
 }
 
 .core-status{
     position:absolute;
 
-    top:calc(50% + 91px);
+    bottom:-54px;
+
+    width:220px;
+
+    text-align:center;
+
+    font-size:8px;
+    letter-spacing:2px;
+
+    color:#00ff9d;
+
+    text-shadow:0 0 8px rgba(0,255,157,.7);
+}
+
+/* =========================
+   PROCESSING
+========================= */
+
+.processing .glow{
+    animation-duration:1s;
+}
+
+.processing .r1{
+    animation-duration:2.5s;
+}
+
+.processing .r2{
+    animation-duration:2s;
+}
+
+.processing .r3{
+    animation-duration:3s;
+}
+
+.processing .r4{
+    animation-duration:4s;
+}
+
+.processing .core{
+    box-shadow:
+        inset 0 0 40px rgba(77,184,255,.4),
+        0 0 45px rgba(77,184,255,.45);
+}
+
+/* =========================
+   HOME
+========================= */
+
+.home{
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    padding-top:60px;
+}
+
+/* =========================
+   JARVIS NAME
+========================= */
+
+.jarvis-name{
+    position:absolute;
+
+    top:calc(50% + 145px);
 
     width:100%;
 
     text-align:center;
-
-    color:var(--green);
-
-    font-size:6px;
-    letter-spacing:2px;
-
-    text-shadow:0 0 8px rgba(77,255,177,.6);
 }
 
-/* =====================================
-   CORE ACTIVE STATE
-===================================== */
+.jarvis-name h2{
+    margin:0;
 
-.app.processing .core{
-    animation:
-        coreFloat 1s ease-in-out infinite,
-        coreProcessing .65s linear infinite;
+    font-size:29px;
+
+    letter-spacing:8px;
+
+    text-shadow:
+        0 0 15px rgba(77,184,255,.7);
 }
 
-.app.processing .glow{
-    animation:
-        glow .8s infinite;
+.jarvis-name p{
+    margin:7px 0 0;
+
+    font-size:8px;
+    letter-spacing:4px;
+
+    opacity:.42;
 }
 
-.app.processing .r1{
-    animation-duration:1.8s;
+/* =========================
+   MIC
+========================= */
+
+.mic{
+    position:absolute;
+
+    bottom:38px;
+
+    width:66px;
+    height:66px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(77,184,255,.45);
+
+    background:
+        radial-gradient(
+            circle,
+            #143a57,
+            #07121c
+        );
+
+    color:white;
+
+    font-size:25px;
+
+    box-shadow:
+        0 0 25px rgba(77,184,255,.2);
+
+    z-index:10;
 }
 
-.app.processing .r2{
-    animation-duration:2.5s;
+.mic:active{
+    transform:scale(.9);
 }
 
-.app.processing .core-status{
-    color:var(--cyan);
+.mic.listening{
+    border-color:#00ff9d;
+
+    box-shadow:
+        0 0 25px rgba(0,255,157,.4),
+        0 0 50px rgba(0,255,157,.15);
+
+    animation:listenPulse 1s infinite;
 }
 
-@keyframes coreProcessing{
-    0%,100%{
-        filter:brightness(1);
-    }
-
-    50%{
-        filter:brightness(1.35);
-    }
+@keyframes listenPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.08)}
 }
 
-/* =====================================
+/* =========================
    CHAT
-===================================== */
+========================= */
 
 .chat{
     position:absolute;
 
-    z-index:15;
+    top:68px;
+    left:0;
+    right:0;
+    bottom:0;
 
-    left:12px;
-    right:12px;
-    bottom:100px;
+    display:none;
+    flex-direction:column;
 
-    max-height:19vh;
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #0b2236,
+            #03080e 55%
+        );
+
+    z-index:30;
+}
+
+.chat.active{
+    display:flex;
+}
+
+.messages{
+    flex:1;
 
     overflow-y:auto;
 
-    display:flex;
-    flex-direction:column;
+    padding:22px 15px 105px;
 
-    gap:7px;
-
-    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
 }
 
-.chat::-webkit-scrollbar{
-    display:none;
+.message{
+    max-width:85%;
+
+    padding:12px 15px;
+
+    margin-bottom:12px;
+
+    border-radius:15px;
+
+    line-height:1.5;
+
+    font-size:14px;
+
+    word-wrap:break-word;
 }
 
-.msg{
-    max-width:88%;
+.message.ai{
+    margin-right:auto;
 
-    padding:10px 13px;
+    background:rgba(255,255,255,.055);
 
-    border-radius:14px;
-
-    color:#cce5ec;
-
-    background:
-        linear-gradient(
-            120deg,
-            rgba(7,18,28,.92),
-            rgba(3,12,19,.78)
-        );
-
-    border:1px solid rgba(120,220,255,.1);
-
-    font-size:12px;
-    line-height:1.45;
+    border:1px solid rgba(255,255,255,.08);
 
     box-shadow:
-        0 8px 25px rgba(0,0,0,.18);
-
-    animation:message .25s ease;
+        0 0 15px rgba(77,184,255,.03);
 }
 
-@keyframes message{
-    from{
-        opacity:0;
-        transform:translateY(7px);
-    }
+.message.user{
+    margin-left:auto;
 
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
+    background:rgba(77,184,255,.13);
 
-.msg.ai{
-    border-left:2px solid var(--cyan);
-}
-
-.msg.user{
-    align-self:flex-end;
-
-    color:#eaffff;
-
-    background:
-        linear-gradient(
-            120deg,
-            rgba(0,90,120,.38),
-            rgba(0,50,70,.24)
-        );
-
-    border-right:1px solid rgba(57,232,255,.18);
+    border:1px solid rgba(77,184,255,.2);
 }
 
 .typing{
     display:flex;
-    gap:4px;
+
+    gap:5px;
+
+    align-items:center;
 }
 
 .typing span{
-    width:4px;
-    height:4px;
+    width:5px;
+    height:5px;
 
     border-radius:50%;
 
-    background:var(--cyan);
+    background:#4db8ff;
 
-    animation:typing 1s infinite;
+    animation:type 1s infinite;
 }
 
 .typing span:nth-child(2){
@@ -849,52 +834,44 @@ button{
     animation-delay:.3s;
 }
 
-@keyframes typing{
+@keyframes type{
     0%,100%{
         opacity:.2;
+        transform:translateY(0);
     }
 
     50%{
         opacity:1;
+        transform:translateY(-4px);
     }
 }
 
-/* =====================================
-   INPUT
-===================================== */
+/* CHAT INPUT */
 
 .input-area{
     position:absolute;
 
-    z-index:35;
-
-    left:10px;
-    right:10px;
-    bottom:7px;
-
-    height:58px;
+    left:12px;
+    right:12px;
+    bottom:13px;
 
     display:flex;
     align-items:center;
 
-    gap:6px;
+    gap:7px;
 
-    padding:6px;
+    padding:7px;
+
+    background:rgba(5,14,22,.94);
+
+    border:1px solid rgba(77,184,255,.13);
 
     border-radius:18px;
 
-    background:
-        linear-gradient(
-            120deg,
-            rgba(5,15,24,.96),
-            rgba(2,9,15,.94)
-        );
-
-    border:1px solid rgba(115,215,255,.17);
+    backdrop-filter:blur(20px);
 
     box-shadow:
-        0 15px 45px #000b,
-        inset 0 0 20px rgba(57,232,255,.025);
+        0 8px 35px rgba(0,0,0,.45);
 }
 
 .input{
@@ -902,92 +879,68 @@ button{
 
     min-width:0;
 
-    height:100%;
-
-    border:0;
-    outline:0;
+    border:none;
+    outline:none;
 
     background:transparent;
 
-    color:white;
+    color:#fff;
 
-    padding:0 8px;
+    padding:10px;
 
     font-size:15px;
 }
 
 .input::placeholder{
-    color:#586d78;
-    font-size:12px;
+    color:rgba(255,255,255,.3);
 }
 
 .action{
-    width:44px;
-    height:44px;
+    width:43px;
+    height:43px;
 
-    flex:none;
+    border:none;
 
     border-radius:13px;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    color:white;
 
-    background:rgba(255,255,255,.035);
+    background:rgba(77,184,255,.1);
 
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid rgba(77,184,255,.1);
 
-    color:#78909c;
-
-    transition:.15s;
-}
-
-.action:active{
-    transform:scale(.91);
-}
-
-.mic{
-    font-size:17px;
-}
-
-.mic.active{
-    color:var(--red);
-
-    border-color:var(--red);
-
-    box-shadow:
-        0 0 18px rgba(255,66,100,.4);
+    font-size:18px;
 }
 
 .send{
-    color:var(--cyan);
+    background:#123956;
 
-    font-size:18px;
-
-    text-shadow:0 0 8px rgba(57,232,255,.5);
+    box-shadow:
+        0 0 12px rgba(77,184,255,.12);
 }
 
-/* =====================================
+/* =========================
    SIDEBAR
-===================================== */
+========================= */
 
 .overlay{
     position:fixed;
 
-    z-index:50;
-
     inset:0;
 
-    background:rgba(0,0,0,.68);
+    background:rgba(0,0,0,.55);
+
+    backdrop-filter:blur(3px);
 
     opacity:0;
-
     pointer-events:none;
 
-    transition:.25s;
+    transition:.3s;
+
+    z-index:80;
 }
 
-.overlay.open{
+.overlay.active{
     opacity:1;
     pointer-events:auto;
 }
@@ -995,36 +948,32 @@ button{
 .sidebar{
     position:fixed;
 
-    z-index:60;
-
-    left:0;
+    left:-300px;
     top:0;
-    bottom:0;
 
     width:285px;
-    max-width:85vw;
+    height:100vh;
 
-    padding:25px 17px;
+    padding:25px 18px;
 
     background:
         linear-gradient(
-            150deg,
-            #0c1925,
-            #02080d
+            180deg,
+            rgba(4,14,23,.98),
+            rgba(2,7,12,.98)
         );
 
-    border-right:1px solid rgba(100,220,255,.15);
+    border-right:1px solid rgba(77,184,255,.15);
 
-    box-shadow:
-        20px 0 60px #0008;
+    backdrop-filter:blur(25px);
 
-    transform:translateX(-105%);
+    transition:.35s cubic-bezier(.4,0,.2,1);
 
-    transition:.3s;
+    z-index:90;
 }
 
-.sidebar.open{
-    transform:translateX(0);
+.sidebar.active{
+    left:0;
 }
 
 .side-head{
@@ -1032,7 +981,7 @@ button{
     align-items:center;
     justify-content:space-between;
 
-    margin-bottom:35px;
+    margin-bottom:30px;
 }
 
 .side-brand{
@@ -1042,209 +991,189 @@ button{
 }
 
 .side-logo{
-    width:40px;
-    height:40px;
-
-    border-radius:12px;
+    width:43px;
+    height:43px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    color:var(--cyan);
+    border-radius:50%;
 
-    border:1px solid rgba(57,232,255,.2);
+    border:1px solid #4db8ff;
 
-    background:rgba(57,232,255,.05);
+    color:#fff;
 
-    font-weight:800;
+    font-size:22px;
+    font-weight:700;
 
-    box-shadow:0 0 18px rgba(57,232,255,.08);
+    box-shadow:
+        0 0 18px rgba(77,184,255,.25);
 }
 
 .side-title{
-    font-size:13px;
-    font-weight:700;
-    letter-spacing:2px;
+    font-size:15px;
+    letter-spacing:3px;
 }
 
 .side-sub{
-    margin-top:3px;
-
-    color:#536b76;
+    margin-top:2px;
 
     font-size:7px;
     letter-spacing:2px;
+
+    opacity:.4;
 }
 
 .close{
-    width:39px;
-    height:39px;
+    width:38px;
+    height:38px;
 
-    border-radius:13px;
+    border:none;
+    border-radius:10px;
 
-    color:#91a5ae;
+    color:white;
 
-    background:rgba(255,255,255,.04);
+    background:rgba(255,255,255,.06);
 
     font-size:22px;
 }
 
-.nav{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-}
-
 .nav button{
+    width:100%;
+
+    display:flex;
+    align-items:center;
+
+    gap:13px;
+
+    margin-bottom:8px;
+
     padding:14px;
 
-    border-radius:14px;
+    border-radius:13px;
 
-    text-align:left;
-
-    color:#7f939d;
+    border:1px solid transparent;
 
     background:transparent;
 
-    transition:.2s;
+    color:#fff;
+
+    text-align:left;
+
+    font-size:14px;
 }
 
-.nav button.active{
-    color:var(--cyan);
+.nav button.active,
+.nav button:active{
+    background:rgba(77,184,255,.09);
 
-    background:rgba(57,232,255,.06);
-
-    box-shadow:
-        inset 3px 0 0 var(--cyan),
-        0 0 20px rgba(57,232,255,.035);
+    border-color:rgba(77,184,255,.16);
 }
 
 .nav-icon{
-    display:inline-block;
-    width:24px;
+    width:25px;
+
+    text-align:center;
+
+    font-size:18px;
 }
 
 .side-footer{
     position:absolute;
 
-    left:17px;
-    right:17px;
-    bottom:22px;
+    left:18px;
+    right:18px;
+    bottom:25px;
 
-    padding:13px;
+    padding-top:15px;
 
-    border-radius:14px;
-
-    background:rgba(255,255,255,.025);
-
-    color:#536b76;
+    border-top:1px solid rgba(255,255,255,.07);
 
     font-size:7px;
-    letter-spacing:1.5px;
+
+    letter-spacing:2px;
+
+    opacity:.35;
+
+    line-height:1.8;
 }
 
-.side-footer span{
-    color:var(--green);
-}
-
-/* =====================================
+/* =========================
    SETTINGS
-===================================== */
+========================= */
 
 .settings{
     position:absolute;
 
-    z-index:40;
+    top:68px;
+    left:0;
+    right:0;
+    bottom:0;
 
-    inset:0;
+    display:none;
 
     overflow-y:auto;
 
-    padding:90px 15px;
+    padding:22px 15px 40px;
 
-    background:#02060b;
+    background:
+        radial-gradient(
+            circle at top,
+            #0a1c2d,
+            #03080d 55%
+        );
 
-    opacity:0;
-
-    pointer-events:none;
-
-    transform:translateX(20px);
-
-    transition:.25s;
+    z-index:25;
 }
 
-.settings.open{
-    opacity:1;
-
-    pointer-events:auto;
-
-    transform:none;
+.settings.active{
+    display:block;
 }
 
-.settings h1{
-    margin:0;
+.settings h2{
+    margin:0 0 18px;
 
-    font-size:25px;
-}
+    font-size:21px;
 
-.settings p{
-    color:#637883;
-
-    font-size:11px;
-
-    line-height:1.5;
+    letter-spacing:3px;
 }
 
 .card{
-    margin-bottom:10px;
+    margin-bottom:12px;
 
-    padding:16px;
+    padding:17px;
 
-    border-radius:17px;
+    border-radius:15px;
 
-    background:rgba(8,18,28,.8);
+    background:rgba(255,255,255,.045);
 
-    border:1px solid rgba(120,220,255,.09);
+    border:1px solid rgba(255,255,255,.08);
 }
 
 .row{
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
 
-    gap:12px;
+    gap:15px;
 }
 
 .name{
-    font-size:13px;
-
-    font-weight:600;
+    font-size:14px;
 }
 
 .desc{
-    margin-top:5px;
+    margin-top:4px;
 
-    color:#647984;
+    font-size:10px;
 
-    font-size:9px;
+    line-height:1.5;
+
+    opacity:.4;
 }
 
-select{
-    width:105px;
-
-    padding:9px;
-
-    border-radius:10px;
-
-    background:#0a1721;
-
-    color:white;
-
-    border:1px solid rgba(120,220,255,.1);
-}
+/* TOGGLE */
 
 .toggle{
     position:relative;
@@ -1252,153 +1181,128 @@ select{
     width:48px;
     height:27px;
 
+    border:none;
     border-radius:20px;
 
-    background:#15232c;
+    background:#172532;
 }
 
-.toggle:after{
+.toggle::after{
     content:"";
 
     position:absolute;
 
-    left:3px;
-    top:3px;
+    width:21px;
+    height:21px;
 
-    width:19px;
-    height:19px;
+    top:3px;
+    left:3px;
 
     border-radius:50%;
 
-    background:#687a83;
+    background:#777;
 
-    transition:.2s;
+    transition:.25s;
 }
 
 .toggle.on{
-    background:rgba(57,232,255,.15);
+    background:#0d4a50;
 }
 
-.toggle.on:after{
+.toggle.on::after{
     left:24px;
 
-    background:var(--cyan);
+    background:#00ff9d;
 
-    box-shadow:0 0 12px var(--cyan);
+    box-shadow:
+        0 0 10px rgba(0,255,157,.6);
 }
 
 .range{
-    width:95px;
+    width:100%;
+    margin-top:15px;
 }
 
-.range-value{
-    width:35px;
+/* =========================
+   RESPONSIVE
+========================= */
 
-    color:var(--cyan);
+@media(max-width:600px){
 
-    font-size:10px;
-}
-
-/* =====================================
-   FUN MODE
-===================================== */
-
-body.fun{
-    --cyan:#ff4264;
-}
-
-body.fun .app{
-    background:
-        radial-gradient(
-            circle at 50% 38%,
-            rgba(255,45,80,.14),
-            transparent 25%
-        ),
-        #080204;
-}
-
-body.fun .core{
-    background:
-        radial-gradient(
-            circle at 30% 25%,
-            #ffe4e8,
-            #ff7189 15%,
-            #b32645 38%,
-            #42101d 60%,
-            #080103 82%
-        );
-
-    border-color:#ffb5c0;
-}
-
-/* =====================================
-   LIGHT
-===================================== */
-
-body.light{
-    --bg:#edf6f9;
-    --text:#102029;
-}
-
-body.light .app{
-    background:#edf6f9;
-}
-
-body.light .settings{
-    background:#edf6f9;
-}
-
-body.light .input-area,
-body.light .msg,
-body.light .card{
-    background:rgba(255,255,255,.85);
-}
-
-body.light .input{
-    color:#102029;
-}
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media(max-width:390px){
-
-    .brand b{
-        font-size:15px;
+    .hud-side{
+        width:95px;
     }
 
     .data{
-        display:none;
+        width:85px;
+    }
+
+    .data-value{
+        font-size:15px;
     }
 
     .core-area{
-        transform:
-            translate(-50%,-50%)
-            scale(.9);
+        transform:translate(-50%,-55%) scale(.88);
+    }
+
+    .jarvis-name{
+        top:calc(50% + 135px);
+    }
+
+    .jarvis-name h2{
+        font-size:25px;
+        letter-spacing:6px;
     }
 }
 
-@media(max-height:700px){
+/* =========================
+   LIGHT MODE
+========================= */
 
-    .core-area{
-        top:35%;
-
-        transform:
-            translate(-50%,-50%)
-            scale(.82);
-    }
-
-    .hud{
-        display:none;
-    }
-
-    .chat{
-        max-height:16vh;
-    }
-
+.light{
+    filter:none;
 }
 
+.light .app{
+    background:
+        radial-gradient(
+            circle at center,
+            #dcefff,
+            #8cb4d1 55%,
+            #6d91a9 100%
+        );
+
+    color:#03101b;
+}
+
+.light .top{
+    background:rgba(230,245,255,.75);
+}
+
+.light .chat{
+    background:#dcefff;
+}
+
+.light .settings{
+    background:#dcefff;
+}
+
+.light .sidebar{
+    background:rgba(230,245,255,.97);
+    color:#03101b;
+}
+
+.light .nav button{
+    color:#03101b;
+}
+
+.light .input-area{
+    background:rgba(220,240,250,.92);
+}
+
+.light .input{
+    color:#03101b;
+}
 </style>
 </head>
 
@@ -1406,188 +1310,149 @@ body.light .input{
 
 <div class="app" id="app">
 
-    <!-- TOP -->
+<!-- =========================
+     TOP BAR
+========================= -->
 
-    <div class="top">
+<header class="top">
 
-        <button class="menu" id="menuBtn">
-            <i></i>
-            <i></i>
-            <i></i>
-        </button>
+    <button class="menu" id="menuBtn">
+        ☰
+    </button>
 
-        <div class="brand">
-
-            <b>J.A.R.V.I.S.</b>
-
-            <small>KARAHAN INC.</small>
-
+    <div class="brand">
+        <div class="brand-main">
+            J.A.R.V.I.S.
         </div>
 
+        <div class="brand-sub">
+            KARAHAN INC.
+        </div>
     </div>
-
-
-    <!-- STATUS -->
 
     <div class="status">
-
         <span class="status-dot"></span>
-
-        SYSTEM ONLINE
-
+        <span>SYSTEM ONLINE</span>
     </div>
 
+</header>
 
-    <!-- TELEMETRY -->
 
-    <div class="hud">
+<!-- =========================
+     HUD
+========================= -->
 
-        <div class="hud-side">
+<div class="hud">
 
-            <div class="hud-item">
+    <div class="hud-side">
 
-                <div class="hud-bar">
-                    <span id="coreBar" style="width:96%"></span>
-                </div>
+        <div class="hud-item">
+            <div class="hud-title">CORE</div>
+            <div class="hud-value">ACTIVE</div>
 
-                CORE ACTIVE
-
+            <div class="hud-bar">
+                <span id="coreBar"></span>
             </div>
+        </div>
 
-            <div class="hud-item">
+        <div class="hud-item">
+            <div class="hud-title">NETWORK</div>
+            <div class="hud-value">SECURE</div>
 
-                <div class="hud-bar">
-                    <span id="networkBar" style="width:91%"></span>
-                </div>
-
-                NETWORK SECURE
-
+            <div class="hud-bar">
+                <span id="networkBar"></span>
             </div>
-
         </div>
 
+    </div>
 
-        <div class="hud-side">
 
-            <div class="hud-item">
+    <div class="hud-side">
 
-                AI ENGINE ONLINE
+        <div class="hud-item">
+            <div class="hud-title">AI ENGINE</div>
+            <div class="hud-value">ONLINE</div>
 
-                <div class="hud-bar">
-
-                    <span id="aiBar" style="width:86%"></span>
-
-                </div>
-
+            <div class="hud-bar">
+                <span id="aiBar"></span>
             </div>
+        </div>
 
+        <div class="hud-item">
+            <div class="hud-title">K-CORE</div>
+            <div class="hud-value">MK-I</div>
 
-            <div class="hud-item">
-
-                MK-I / K-CORE
-
-                <div class="hud-bar">
-
-                    <span id="mkBar" style="width:73%"></span>
-
-                </div>
-
+            <div class="hud-bar">
+                <span id="mkBar"></span>
             </div>
-
         </div>
 
     </div>
 
+</div>
 
-    <!-- LEFT TELEMETRY -->
 
-    <div class="data left">
+<!-- =========================
+     DATA
+========================= -->
 
-        <div class="data-title">
-            SYSTEM LOAD
-        </div>
+<div class="data left">
 
-        <div
-            class="data-value"
-            id="loadValue"
-        >
-            24%
-        </div>
-
-        <div class="line">
-            <span id="load1" style="width:32%"></span>
-        </div>
-
-        <div class="line">
-            <span id="load2" style="width:57%"></span>
-        </div>
-
-        <div class="line">
-            <span id="load3" style="width:41%"></span>
-        </div>
-
-        <div class="line">
-            <span id="load4" style="width:68%"></span>
-        </div>
-
+    <div class="data-title">
+        SYSTEM LOAD
     </div>
 
-
-    <!-- RIGHT SIGNAL -->
-
-    <div class="data right">
-
-        <div class="data-title">
-            SIGNAL STRENGTH
-        </div>
-
-        <div
-            class="data-value signal-number"
-            id="signalValue"
-        >
-            98.7%
-        </div>
-
-        <div class="line">
-            <span id="signal1" style="width:82%"></span>
-        </div>
-
-        <div class="line">
-            <span id="signal2" style="width:91%"></span>
-        </div>
-
-        <div class="line">
-            <span id="signal3" style="width:73%"></span>
-        </div>
-
-        <div class="line">
-            <span id="signal4" style="width:95%"></span>
-        </div>
-
+    <div class="data-value">
+        <span id="loadValue">42</span>%
     </div>
 
+    <div class="line"></div>
 
-    <!-- SIGNAL WAVE -->
+</div>
 
-    <div class="signal-wave">
 
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
+<div class="data right">
 
+    <div class="data-title">
+        SIGNAL STRENGTH
     </div>
 
+    <div class="data-value">
+        <span id="signalValue">97</span>%
+    </div>
 
-    <!-- CORE -->
+    <div class="line"></div>
+
+</div>
+
+
+<!-- =========================
+     SIGNAL WAVE
+========================= -->
+
+<div class="signal-wave">
+
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+
+</div>
+
+
+<!-- =========================
+     HOME
+========================= -->
+
+<main class="home" id="home">
 
     <div
         class="core-area"
@@ -1601,15 +1466,13 @@ body.light .input{
         <div class="ring r3"></div>
         <div class="ring r4"></div>
 
-
         <div class="orbit">
 
-            <div class="dot dot1"></div>
-            <div class="dot dot2"></div>
-            <div class="dot dot3"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
 
         </div>
-
 
         <div class="core">
 
@@ -1619,11 +1482,9 @@ body.light .input{
 
         </div>
 
-
         <div class="core-label">
             ARTIFICIAL INTELLIGENCE
         </div>
-
 
         <div
             class="core-status"
@@ -1635,40 +1496,69 @@ body.light .input{
     </div>
 
 
-    <!-- CHAT -->
+    <div class="jarvis-name">
+
+        <h2>
+            JARVIS
+        </h2>
+
+        <p>
+            KARAHAN INTELLIGENCE SYSTEM
+        </p>
+
+    </div>
+
+
+    <button
+        class="mic"
+        id="micButton"
+    >
+        🎙️
+    </button>
+
+</main>
+
+
+<!-- =========================
+     CHAT
+========================= -->
+
+<section
+    class="chat"
+    id="chat"
+>
 
     <div
-        class="chat"
-        id="chat"
+        class="messages"
+        id="messages"
     >
 
-        <div class="msg ai">
-
-            Merhaba Efendim.
-            J.A.R.V.I.S. sistemleri çevrimiçi.
-
+        <div class="message ai">
+            Merhaba. Ben JARVIS.
+            <br><br>
+            Sistemlerim çevrimiçi.
+            Size nasıl yardımcı olabilirim?
         </div>
 
     </div>
 
 
-    <!-- INPUT -->
-
     <div class="input-area">
 
-        <input
-            id="input"
-            class="input"
-            placeholder="J.A.R.V.I.S.'e bir şey söyle..."
-            autocomplete="off"
-        >
-
         <button
-            class="action mic"
-            id="micBtn"
+            class="action"
+            id="chatMic"
         >
-            ◉
+            🎙
         </button>
+
+        <input
+            class="input"
+            id="messageInput"
+            type="text"
+            autocomplete="off"
+            placeholder="JARVIS'e bir şey sor..."
+        >
 
         <button
             class="action send"
@@ -1679,649 +1569,650 @@ body.light .input{
 
     </div>
 
-
-    <!-- SETTINGS -->
-
-    <section
-        class="settings"
-        id="settings"
-    >
-
-        <h1>Ayarlar</h1>
-
-        <p>
-            J.A.R.V.I.S. sistemini ve arayüz deneyimini kişiselleştirin.
-        </p>
+</section>
 
 
-        <div class="card">
+<!-- =========================
+     SETTINGS
+========================= -->
 
-            <div class="row">
+<section
+    class="settings"
+    id="settings"
+>
 
-                <div>
+    <h2>
+        AYARLAR
+    </h2>
 
-                    <div class="name">
-                        Hitap Şekli
-                    </div>
 
-                    <div class="desc">
-                        J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
-                    </div>
+    <div class="card">
 
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Hitap Şekli
                 </div>
 
-                <select id="addressSelect">
-
-                    <option>Efendim</option>
-                    <option>Komutanım</option>
-                    <option>Patron</option>
-                    <option>Dostum</option>
-
-                </select>
+                <div class="desc">
+                    JARVIS'in size nasıl hitap edeceğini seçin.
+                </div>
 
             </div>
+
+            <select
+                id="addressSelect"
+                style="
+                    background:#102638;
+                    color:white;
+                    border:1px solid rgba(77,184,255,.2);
+                    border-radius:9px;
+                    padding:8px;
+                "
+            >
+
+                <option value="Efendim">
+                    Efendim
+                </option>
+
+                <option value="Komutanım">
+                    Komutanım
+                </option>
+
+                <option value="Patron">
+                    Patron
+                </option>
+
+                <option value="Dostum">
+                    Dostum
+                </option>
+
+            </select>
 
         </div>
 
+    </div>
 
-        <div class="card">
 
-            <div class="row">
+    <div class="card">
 
-                <div>
+        <div class="row">
 
-                    <div class="name">
-                        Arayüz Boyutu
-                    </div>
+            <div>
 
-                    <div class="desc">
-                        K-Core boyutunu ayarlayın.
-                    </div>
-
+                <div class="name">
+                    Eğlence Modu
                 </div>
 
-                <div class="row">
-
-                    <input
-                        id="uiScale"
-                        class="range"
-                        type="range"
-                        min="80"
-                        max="120"
-                        step="5"
-                        value="100"
-                    >
-
-                    <span
-                        id="uiScaleValue"
-                        class="range-value"
-                    >
-                        100%
-                    </span>
-
+                <div class="desc">
+                    JARVIS'in daha esprili cevaplar vermesini sağlar.
                 </div>
 
             </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="row">
-
-                <div>
-
-                    <div class="name">
-                        Gece / Gündüz
-                    </div>
-
-                    <div class="desc">
-                        Arayüz temasını değiştirin.
-                    </div>
-
-                </div>
-
-                <div
-                    class="toggle"
-                    id="themeToggle"
-                ></div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="row">
-
-                <div>
-
-                    <div class="name">
-                        Eğlence Modu
-                    </div>
-
-                    <div class="desc">
-                        Daha esprili J.A.R.V.I.S. cevaplarını etkinleştirin.
-                    </div>
-
-                </div>
-
-                <div
-                    class="toggle"
-                    id="funToggle"
-                ></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- OVERLAY -->
-
-    <div
-        class="overlay"
-        id="overlay"
-    ></div>
-
-
-    <!-- SIDEBAR -->
-
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
-        <div class="side-head">
-
-            <div class="side-brand">
-
-                <div class="side-logo">
-                    K
-                </div>
-
-                <div>
-
-                    <div class="side-title">
-                        J.A.R.V.I.S.
-                    </div>
-
-                    <div class="side-sub">
-                        KARAHAN INC.
-                    </div>
-
-                </div>
-
-            </div>
-
 
             <button
-                class="close"
-                id="closeBtn"
-            >
-                ×
-            </button>
+                class="toggle"
+                id="funToggle"
+            ></button>
 
         </div>
 
+    </div>
 
-        <div class="nav">
+
+    <div class="card">
+
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Gece / Gündüz
+                </div>
+
+                <div class="desc">
+                    Arayüz temasını değiştirir.
+                </div>
+
+            </div>
 
             <button
-                class="active"
-                id="homeBtn"
-            >
-                <span class="nav-icon">⌂</span>
-                Ana Ekran
-            </button>
-
-
-            <button id="chatBtn">
-
-                <span class="nav-icon">◌</span>
-
-                JARVIS Chat
-
-            </button>
-
-
-            <button id="settingsBtn">
-
-                <span class="nav-icon">⚙</span>
-
-                Ayarlar
-
-            </button>
+                class="toggle"
+                id="themeToggle"
+            ></button>
 
         </div>
 
+    </div>
 
-        <div class="side-footer">
 
-            <span>●</span>
+    <div class="card">
 
-            SYSTEM ONLINE
+        <div class="name">
+            Arayüz Boyutu
+        </div>
 
-            <br><br>
+        <div class="desc">
+            JARVIS arayüzünün genel ölçeğini ayarlayın.
+        </div>
 
-            KARAHAN INC. // K-CORE 01
+        <input
+            class="range"
+            id="uiScale"
+            type="range"
+            min="80"
+            max="120"
+            value="100"
+        >
+
+        <div
+            style="
+                text-align:right;
+                margin-top:5px;
+                font-size:10px;
+                opacity:.5;
+            "
+        >
+            <span id="uiScaleValue">
+                100
+            </span>%
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SIDEBAR OVERLAY
+========================= -->
+
+<div
+    class="overlay"
+    id="overlay"
+></div>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+    <div class="side-head">
+
+        <div class="side-brand">
+
+            <div class="side-logo">
+                K
+            </div>
+
+            <div>
+
+                <div class="side-title">
+                    JARVIS
+                </div>
+
+                <div class="side-sub">
+                    KARAHAN INC.
+                </div>
+
+            </div>
 
         </div>
 
-    </aside>
+        <button
+            class="close"
+            id="closeBtn"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <nav class="nav">
+
+        <button
+            id="homeBtn"
+            class="active"
+        >
+
+            <span class="nav-icon">
+                ⌂
+            </span>
+
+            Ana Ekran
+
+        </button>
+
+
+        <button
+            id="chatBtn"
+        >
+
+            <span class="nav-icon">
+                ◉
+            </span>
+
+            JARVIS Chat
+
+        </button>
+
+
+        <button
+            id="settingsBtn"
+        >
+
+            <span class="nav-icon">
+                ⚙
+            </span>
+
+            Ayarlar
+
+        </button>
+
+    </nav>
+
+
+    <div class="side-footer">
+
+        SYSTEM ONLINE<br>
+        KARAHAN INC. // K-CORE 01
+
+    </div>
+
+</aside>
 
 </div>
 
 
 <script>
 
-/* =====================================
-   CORE CONFIG
-===================================== */
+/* =====================================================
+   JARVIS CONFIG
+===================================================== */
 
-const API="/chat";
+const API = "/chat";
 
+let recognition = null;
 
-function $(id){
-    return document.getElementById(id);
-}
-
-
-/* =====================================
-   ELEMENTS
-===================================== */
-
-const app=$("app");
-
-const chat=$("chat");
-const input=$("input");
-
-const sendBtn=$("sendBtn");
-const micBtn=$("micBtn");
-
-const sidebar=$("sidebar");
-const overlay=$("overlay");
-
-const settings=$("settings");
-
-const menuBtn=$("menuBtn");
-const closeBtn=$("closeBtn");
-
-const homeBtn=$("homeBtn");
-const chatBtn=$("chatBtn");
-const settingsBtn=$("settingsBtn");
-
-const addressSelect=$("addressSelect");
-
-const themeToggle=$("themeToggle");
-const funToggle=$("funToggle");
-
-const uiScale=$("uiScale");
-const uiScaleValue=$("uiScaleValue");
-
-const coreArea=$("coreArea");
-const coreStatus=$("coreStatus");
-
-const loadValue=$("loadValue");
-const signalValue=$("signalValue");
-
-
-/* =====================================
-   SETTINGS
-===================================== */
-
-let address=
+let address =
     localStorage.getItem("jarvis_address") ||
     "Efendim";
 
-let funMode=
-    localStorage.getItem("jarvis_fun")==="true";
+let funMode =
+    localStorage.getItem("jarvis_fun") === "true";
 
-let light=
-    localStorage.getItem("jarvis_theme")==="light";
+let theme =
+    localStorage.getItem("jarvis_theme") === "true";
 
-let scale=
-    Number(
-        localStorage.getItem("jarvis_scale") || 100
-    );
-
-
-addressSelect.value=address;
-
-uiScale.value=scale;
-
-uiScaleValue.textContent=
-    scale+"%";
+let scale =
+    localStorage.getItem("jarvis_scale") ||
+    "100";
 
 
-if(light){
+/* =====================================================
+   ELEMENTLER
+===================================================== */
 
-    document.body.classList.add("light");
+const app =
+    document.getElementById("app");
 
-    themeToggle.classList.add("on");
+const sidebar =
+    document.getElementById("sidebar");
 
-}
+const overlay =
+    document.getElementById("overlay");
 
+const home =
+    document.getElementById("home");
+
+const chat =
+    document.getElementById("chat");
+
+const settings =
+    document.getElementById("settings");
+
+const coreArea =
+    document.getElementById("coreArea");
+
+const coreStatus =
+    document.getElementById("coreStatus");
+
+const messages =
+    document.getElementById("messages");
+
+const input =
+    document.getElementById("messageInput");
+
+const micButton =
+    document.getElementById("micButton");
+
+const addressSelect =
+    document.getElementById("addressSelect");
+
+const funToggle =
+    document.getElementById("funToggle");
+
+const themeToggle =
+    document.getElementById("themeToggle");
+
+const uiScale =
+    document.getElementById("uiScale");
+
+const uiScaleValue =
+    document.getElementById("uiScaleValue");
+
+
+/* =====================================================
+   AYARLARI YÜKLE
+===================================================== */
+
+addressSelect.value = address;
+
+uiScale.value = scale;
+
+uiScaleValue.textContent = scale;
 
 if(funMode){
-
-    document.body.classList.add("fun");
-
     funToggle.classList.add("on");
+}
 
+if(theme){
+    themeToggle.classList.add("on");
+    document.body.classList.add("light");
 }
 
 
-/* =====================================
-   CORE SCALE
-===================================== */
-
-function applyScale(){
-
-    const value=scale/100;
-
-    coreArea.style.transform=
-        "translate(-50%,-50%) scale("+value+")";
-
-}
-
-applyScale();
-
-
-/* =====================================
-   MENU
-===================================== */
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
 function openMenu(){
 
-    sidebar.classList.add("open");
-
-    overlay.classList.add("open");
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
 
 }
-
 
 function closeMenu(){
 
-    sidebar.classList.remove("open");
-
-    overlay.classList.remove("open");
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
 
 }
 
+document
+    .getElementById("menuBtn")
+    .addEventListener(
+        "click",
+        openMenu
+    );
 
-menuBtn.onclick=openMenu;
+document
+    .getElementById("closeBtn")
+    .addEventListener(
+        "click",
+        closeMenu
+    );
 
-closeBtn.onclick=closeMenu;
+overlay.addEventListener(
+    "click",
+    closeMenu
+);
 
-overlay.onclick=closeMenu;
 
+/* =====================================================
+   SAYFA GEÇİŞLERİ
+===================================================== */
 
-/* =====================================
-   NAVIGATION
-===================================== */
-
-function active(button){
+function resetNavigation(){
 
     document
         .querySelectorAll(".nav button")
-        .forEach(function(item){
+        .forEach(button => {
 
-            item.classList.remove("active");
+            button.classList.remove("active");
 
         });
 
-    button.classList.add("active");
+}
+
+function showHome(){
+
+    home.style.display = "flex";
+
+    chat.classList.remove("active");
+
+    settings.classList.remove("active");
+
+    document
+        .getElementById("homeBtn")
+        .classList.add("active");
+
+    closeMenu();
+
+}
+
+function showChat(){
+
+    home.style.display = "none";
+
+    chat.classList.add("active");
+
+    settings.classList.remove("active");
+
+    document
+        .getElementById("chatBtn")
+        .classList.add("active");
+
+    closeMenu();
+
+    setTimeout(() => {
+        input.focus();
+    },300);
+
+}
+
+function showSettings(){
+
+    home.style.display = "none";
+
+    chat.classList.remove("active");
+
+    settings.classList.add("active");
+
+    document
+        .getElementById("settingsBtn")
+        .classList.add("active");
+
+    closeMenu();
+
+}
+
+document
+    .getElementById("homeBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            resetNavigation();
+            showHome();
+
+        }
+    );
+
+document
+    .getElementById("chatBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            resetNavigation();
+            showChat();
+
+        }
+    );
+
+document
+    .getElementById("settingsBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            resetNavigation();
+            showSettings();
+
+        }
+    );
+
+
+/* =====================================================
+   CORE PROCESSING
+===================================================== */
+
+function setProcessing(state){
+
+    if(state){
+
+        coreArea.classList.add("processing");
+
+        coreStatus.textContent =
+            "● PROCESSING";
+
+        coreStatus.style.color =
+            "#4db8ff";
+
+    }else{
+
+        coreArea.classList.remove("processing");
+
+        coreStatus.textContent =
+            "● CORE STABLE";
+
+        coreStatus.style.color =
+            "#00ff9d";
+
+    }
 
 }
 
 
-homeBtn.onclick=function(){
-
-    closeMenu();
-
-    settings.classList.remove("open");
-
-    active(homeBtn);
-
-};
-
-
-chatBtn.onclick=function(){
-
-    closeMenu();
-
-    settings.classList.remove("open");
-
-    active(chatBtn);
-
-    setTimeout(function(){
-
-        input.focus();
-
-    },200);
-
-};
-
-
-settingsBtn.onclick=function(){
-
-    closeMenu();
-
-    settings.classList.add("open");
-
-    active(settingsBtn);
-
-};
-
-
-/* =====================================
-   ADDRESS
-===================================== */
-
-addressSelect.onchange=function(){
-
-    address=addressSelect.value;
-
-    localStorage.setItem(
-        "jarvis_address",
-        address
-    );
-
-};
-
-
-/* =====================================
-   THEME
-===================================== */
-
-themeToggle.onclick=function(){
-
-    light=
-        document.body.classList.toggle("light");
-
-    themeToggle.classList.toggle(
-        "on",
-        light
-    );
-
-    localStorage.setItem(
-        "jarvis_theme",
-        light
-            ? "light"
-            : "dark"
-    );
-
-};
-
-
-/* =====================================
-   FUN MODE
-===================================== */
-
-funToggle.onclick=function(){
-
-    funMode=
-        document.body.classList.toggle("fun");
-
-    funToggle.classList.toggle(
-        "on",
-        funMode
-    );
-
-    localStorage.setItem(
-        "jarvis_fun",
-        funMode
-    );
-
-    addMessage(
-
-        funMode
-            ? "Eğlence modu aktif. Efendim, sistem biraz daha renkli çalışacak."
-            : "Eğlence modu kapatıldı. Sistem normal çalışma moduna döndü.",
-
-        "ai"
-
-    );
-
-};
-
-
-/* =====================================
-   SCALE
-===================================== */
-
-uiScale.oninput=function(){
-
-    scale=
-        Number(uiScale.value);
-
-    uiScaleValue.textContent=
-        scale+"%";
-
-    localStorage.setItem(
-        "jarvis_scale",
-        scale
-    );
-
-    applyScale();
-
-};
-
-
-/* =====================================
-   CHAT
-===================================== */
+/* =====================================================
+   MESAJ EKLE
+===================================================== */
 
 function addMessage(text,type){
 
-    const element=
+    const message =
         document.createElement("div");
 
-    element.className=
-        "msg "+type;
+    message.className =
+        "message " + type;
 
-    element.textContent=text;
+    message.textContent =
+        text;
 
-    chat.appendChild(element);
+    messages.appendChild(message);
 
-    chat.scrollTop=
-        chat.scrollHeight;
+    messages.scrollTop =
+        messages.scrollHeight;
+
+    return message;
 
 }
 
 
-/* =====================================
+/* =====================================================
    TYPING
-===================================== */
+===================================================== */
 
 function showTyping(){
 
-    const element=
+    const typing =
         document.createElement("div");
 
-    element.id="typing";
+    typing.className =
+        "message ai";
 
-    element.className="msg ai";
+    typing.id =
+        "typingMessage";
 
-    element.innerHTML=
-        '<div class="typing">'+
-        '<span></span>'+
-        '<span></span>'+
-        '<span></span>'+
-        '</div>';
+    typing.innerHTML = `
+        <div class="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
 
-    chat.appendChild(element);
+    messages.appendChild(typing);
 
-    chat.scrollTop=
-        chat.scrollHeight;
-
-}
-
-
-/* =====================================
-   JARVIS PROCESSING
-===================================== */
-
-function startProcessing(){
-
-    app.classList.add("processing");
-
-    coreStatus.textContent=
-        "● PROCESSING";
+    messages.scrollTop =
+        messages.scrollHeight;
 
 }
 
 
-function stopProcessing(){
+/* =====================================================
+   TYPING KALDIR
+===================================================== */
 
-    app.classList.remove("processing");
+function removeTyping(){
 
-    coreStatus.textContent=
-        "● CORE STABLE";
+    const typing =
+        document.getElementById(
+            "typingMessage"
+        );
+
+    if(typing){
+        typing.remove();
+    }
 
 }
 
 
-/* =====================================
-   SEND
-===================================== */
+/* =====================================================
+   AI MESAJI
+===================================================== */
 
-async function sendMessage(){
+async function sendMessage(customText = null){
 
-    const text=
-        input.value.trim();
+    const text =
+        customText !== null
+            ? customText.trim()
+            : input.value.trim();
 
     if(!text){
         return;
     }
 
+    if(customText === null){
+        input.value = "";
+    }
+
+    showChat();
 
     addMessage(
         text,
         "user"
     );
 
-
-    input.value="";
-
     showTyping();
 
-    sendBtn.disabled=true;
-
-    startProcessing();
-
+    setProcessing(true);
 
     try{
 
-        const response=
+        const response =
             await fetch(
-
                 API,
-
                 {
                     method:"POST",
 
@@ -2339,95 +2230,70 @@ async function sendMessage(){
                         fun_mode:funMode
 
                     })
-
                 }
-
             );
 
 
         if(!response.ok){
 
             throw new Error(
-                "HTTP "+response.status
+                "HTTP " + response.status
             );
 
         }
 
 
-        const data=
+        const data =
             await response.json();
 
 
-        const typing=
-            $("typing");
+        removeTyping();
 
-        if(typing){
-            typing.remove();
-        }
+
+        const answer =
+            data.response ||
+            data.message ||
+            "JARVIS cevap oluşturamadı.";
 
 
         addMessage(
-
-            data.response ||
-            "Efendim, cevap alınamadı.",
-
+            answer,
             "ai"
-
         );
 
 
     }catch(error){
 
-        const typing=
-            $("typing");
-
-        if(typing){
-            typing.remove();
-        }
-
-
-        addMessage(
-
-            funMode
-                ? "Efendim, sunucu şu an biraz naz yapıyor."
-                : "Efendim, sunucu bağlantısında bir sorun oluştu.",
-
-            "ai"
-
+        console.error(
+            "JARVIS API ERROR:",
+            error
         );
 
-        console.log(error);
+        removeTyping();
+
+        addMessage(
+            "JARVIS sunucusuna bağlanırken bir sorun oluştu. Sunucunun çevrimiçi olduğunu kontrol edin.",
+            "ai"
+        );
+
+    }finally{
+
+        setProcessing(false);
 
     }
-
-
-    stopProcessing();
-
-    sendBtn.disabled=false;
-
-    input.focus();
 
 }
 
 
-/* =====================================
-   SEND BUTTON
-===================================== */
-
-sendBtn.onclick=sendMessage;
-
-
-/* =====================================
+/* =====================================================
    ENTER
-===================================== */
+===================================================== */
 
 input.addEventListener(
-
     "keydown",
-
     function(event){
 
-        if(event.key==="Enter"){
+        if(event.key === "Enter"){
 
             event.preventDefault();
 
@@ -2436,160 +2302,309 @@ input.addEventListener(
         }
 
     }
-
 );
 
 
-/* =====================================
-   VOICE
-===================================== */
+/* =====================================================
+   SEND BUTTON
+===================================================== */
 
-const SpeechRecognition=
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-
-if(SpeechRecognition){
-
-    const recognition=
-        new SpeechRecognition();
-
-    recognition.lang="tr-TR";
-
-    recognition.continuous=false;
-
-    recognition.interimResults=false;
+document
+    .getElementById("sendBtn")
+    .addEventListener(
+        "click",
+        () => sendMessage()
+    );
 
 
-    recognition.onstart=function(){
+/* =====================================================
+   SESLİ KOMUT
+===================================================== */
 
-        micBtn.classList.add("active");
+function startListening(){
 
-        micBtn.textContent="●";
-
-    };
-
-
-    recognition.onend=function(){
-
-        micBtn.classList.remove("active");
-
-        micBtn.textContent="◉";
-
-    };
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
 
 
-    recognition.onresult=function(event){
+    if(!SpeechRecognition){
 
-        input.value=
-            event.results[0][0].transcript;
+        alert(
+            "Bu tarayıcı sesli komut özelliğini desteklemiyor."
+        );
 
-        input.focus();
+        return;
 
-    };
+    }
 
 
-    micBtn.onclick=function(){
+    if(recognition){
 
         try{
+            recognition.stop();
+        }catch(e){}
 
-            recognition.start();
+    }
 
-        }catch(error){
 
-            console.log(error);
+    recognition =
+        new SpeechRecognition();
+
+    recognition.lang =
+        "tr-TR";
+
+    recognition.continuous =
+        false;
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.onstart = function(){
+
+        micButton.classList.add(
+            "listening"
+        );
+
+        micButton.textContent =
+            "🔴";
+
+        setProcessing(true);
+
+    };
+
+
+    recognition.onresult = function(event){
+
+        const text =
+            event
+                .results[0][0]
+                .transcript
+                .trim();
+
+
+        if(text){
+
+            sendMessage(text);
 
         }
 
     };
 
-}else{
 
-    micBtn.onclick=function(){
+    recognition.onerror = function(event){
 
-        addMessage(
-            "Bu tarayıcı sesli girişi desteklemiyor.",
-            "ai"
+        console.error(
+            "VOICE ERROR:",
+            event.error
         );
 
+        setProcessing(false);
+
     };
+
+
+    recognition.onend = function(){
+
+        micButton.classList.remove(
+            "listening"
+        );
+
+        micButton.textContent =
+            "🎙️";
+
+        if(
+            !document.querySelector(
+                ".processing"
+            )
+        ){
+            setProcessing(false);
+        }
+
+    };
+
+
+    recognition.start();
 
 }
 
 
-/* =====================================
-   LIVE TELEMETRY
-===================================== */
+micButton.addEventListener(
+    "click",
+    startListening
+);
 
-function random(min,max){
+
+document
+    .getElementById("chatMic")
+    .addEventListener(
+        "click",
+        startListening
+    );
+
+
+/* =====================================================
+   HITAP AYARI
+===================================================== */
+
+addressSelect.addEventListener(
+    "change",
+    function(){
+
+        address =
+            this.value;
+
+        localStorage.setItem(
+            "jarvis_address",
+            address
+        );
+
+    }
+);
+
+
+/* =====================================================
+   EĞLENCE MODU
+===================================================== */
+
+funToggle.addEventListener(
+    "click",
+    function(){
+
+        funMode =
+            !funMode;
+
+        this.classList.toggle(
+            "on",
+            funMode
+        );
+
+        localStorage.setItem(
+            "jarvis_fun",
+            funMode
+        );
+
+    }
+);
+
+
+/* =====================================================
+   TEMA
+===================================================== */
+
+themeToggle.addEventListener(
+    "click",
+    function(){
+
+        theme =
+            !theme;
+
+        this.classList.toggle(
+            "on",
+            theme
+        );
+
+        document.body.classList.toggle(
+            "light",
+            theme
+        );
+
+        localStorage.setItem(
+            "jarvis_theme",
+            theme
+        );
+
+    }
+);
+
+
+/* =====================================================
+   UI SCALE
+===================================================== */
+
+uiScale.addEventListener(
+    "input",
+    function(){
+
+        scale =
+            this.value;
+
+        uiScaleValue.textContent =
+            scale;
+
+        app.style.transform =
+            `scale(${scale / 100})`;
+
+        app.style.transformOrigin =
+            "center center";
+
+        localStorage.setItem(
+            "jarvis_scale",
+            scale
+        );
+
+    }
+);
+
+
+/* =====================================================
+   TELEMETRY
+===================================================== */
+
+function randomBetween(min,max){
 
     return Math.floor(
-        Math.random()*(max-min+1)+min
-    );
+        Math.random() *
+        (max - min + 1)
+    ) + min;
 
 }
 
 
 function updateTelemetry(){
 
-    /* SYSTEM LOAD */
+    const load =
+        randomBetween(35,72);
 
-    const load=
-        random(18,64);
-
-    loadValue.textContent=
-        load+"%";
+    const signal =
+        randomBetween(91,100);
 
 
-    $("load1").style.width=
-        random(30,85)+"%";
-
-    $("load2").style.width=
-        random(35,95)+"%";
-
-    $("load3").style.width=
-        random(25,75)+"%";
-
-    $("load4").style.width=
-        random(45,92)+"%";
+    document
+        .getElementById("loadValue")
+        .textContent =
+        load;
 
 
-    /* SIGNAL */
-
-    const signal=
-        (97+Math.random()*2.8)
-            .toFixed(1);
-
-    signalValue.textContent=
-        signal+"%";
+    document
+        .getElementById("signalValue")
+        .textContent =
+        signal;
 
 
-    $("signal1").style.width=
-        random(80,99)+"%";
-
-    $("signal2").style.width=
-        random(76,96)+"%";
-
-    $("signal3").style.width=
-        random(70,94)+"%";
-
-    $("signal4").style.width=
-        random(82,99)+"%";
+    document
+        .getElementById("coreBar")
+        .style.width =
+        randomBetween(88,99) + "%";
 
 
-    /* TOP TELEMETRY */
+    document
+        .getElementById("networkBar")
+        .style.width =
+        signal + "%";
 
-    $("coreBar").style.width=
-        random(90,99)+"%";
 
-    $("networkBar").style.width=
-        random(86,99)+"%";
+    document
+        .getElementById("aiBar")
+        .style.width =
+        randomBetween(82,99) + "%";
 
-    $("aiBar").style.width=
-        random(80,98)+"%";
 
-    $("mkBar").style.width=
-        random(68,91)+"%";
+    document
+        .getElementById("mkBar")
+        .style.width =
+        randomBetween(90,100) + "%";
 
 }
 
@@ -2602,15 +2617,11 @@ setInterval(
 updateTelemetry();
 
 
-/* =====================================
+/* =====================================================
    START
-===================================== */
+===================================================== */
 
-setTimeout(function(){
-
-    input.focus();
-
-},500);
+showHome();
 
 </script>
 
