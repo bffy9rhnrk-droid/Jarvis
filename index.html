@@ -3,32 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
-
-/* =====================================================
-   J.A.R.V.I.S. — KARAHAN INC.
-   PREMIUM MOBILE INTERFACE
-===================================================== */
-
 :root{
-    --cyan:#36e5ff;
-    --cyan2:#9af8ff;
-
+    --cyan:#39e8ff;
+    --cyan2:#087dff;
+    --green:#4dffb1;
+    --red:#ff4264;
     --bg:#02060b;
-    --panel:rgba(7,16,25,.88);
-
-    --text:#edfaff;
-    --muted:#758792;
-
-    --border:rgba(255,255,255,.09);
-
-    --green:#55ffad;
-    --red:#ff4057;
-
-    --accent:var(--cyan);
+    --panel:rgba(7,15,24,.82);
+    --panel2:rgba(12,24,35,.72);
+    --text:#effcff;
+    --muted:#718492;
+    --line:rgba(130,220,255,.13);
 }
 
 *{
@@ -36,8 +24,7 @@
     -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
+html,body{
     width:100%;
     height:100%;
     margin:0;
@@ -46,150 +33,105 @@ body{
 }
 
 body{
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "Segoe UI",
-        sans-serif;
-
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
     color:var(--text);
 }
 
-/* =====================================================
-   APP
-===================================================== */
+button,input{
+    font:inherit;
+}
+
+button{
+    border:0;
+    outline:0;
+}
 
 .app{
     position:relative;
-
     width:100%;
     height:100dvh;
-
     overflow:hidden;
-
     background:
-        radial-gradient(
-            circle at 50% 42%,
-            rgba(0,190,230,.12),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 50% 100%,
-            rgba(0,110,150,.08),
-            transparent 45%
-        ),
+        radial-gradient(circle at 50% 38%,rgba(0,190,255,.13),transparent 24%),
+        radial-gradient(circle at 10% 80%,rgba(0,80,255,.06),transparent 25%),
+        radial-gradient(circle at 90% 20%,rgba(0,255,220,.04),transparent 25%),
         #02060b;
 }
 
-/* GRID */
+/* =========================
+   BACKGROUND
+========================= */
 
 .app:before{
     content:"";
-
     position:absolute;
     inset:0;
-
-    pointer-events:none;
-
-    opacity:.12;
-
+    opacity:.18;
     background-image:
-        linear-gradient(
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        );
-
-    background-size:34px 34px;
-
-    mask-image:
-        linear-gradient(
-            to bottom,
-            transparent,
-            #000 18%,
-            #000 82%,
-            transparent
-        );
+        linear-gradient(rgba(90,200,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(90,200,255,.04) 1px,transparent 1px);
+    background-size:38px 38px;
+    mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
 }
 
-/* =====================================================
+.app:after{
+    content:"";
+    position:absolute;
+    width:500px;
+    height:500px;
+    left:50%;
+    top:37%;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:rgba(0,210,255,.035);
+    filter:blur(70px);
+    pointer-events:none;
+}
+
+/* =========================
    TOP BAR
-===================================================== */
+========================= */
 
 .top{
     position:absolute;
-
     z-index:20;
-
     top:0;
     left:0;
     right:0;
-
-    height:78px;
-
+    height:82px;
     padding:
         calc(12px + env(safe-area-inset-top))
-        15px
-        8px;
-
+        15px 8px;
     display:flex;
-
-    justify-content:space-between;
     align-items:center;
+    justify-content:space-between;
 }
-
-/* MENU */
 
 .menu{
     width:45px;
     height:45px;
-
     border-radius:15px;
-
-    border:1px solid rgba(54,229,255,.16);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(13,27,39,.9),
-            rgba(5,12,19,.9)
-        );
-
     display:flex;
     flex-direction:column;
-
-    justify-content:center;
     align-items:center;
-
+    justify-content:center;
     gap:5px;
-
+    color:white;
+    background:rgba(7,18,28,.75);
+    border:1px solid rgba(100,220,255,.15);
     box-shadow:
-        inset 0 0 15px rgba(54,229,255,.03),
-        0 8px 25px rgba(0,0,0,.3);
-}
-
-.menu:active{
-    transform:scale(.92);
+        inset 0 0 20px rgba(0,200,255,.03),
+        0 8px 30px #0008;
+    backdrop-filter:blur(16px);
 }
 
 .menu i{
     width:18px;
     height:1.5px;
-
-    border-radius:5px;
-
-    background:var(--accent);
-
-    box-shadow:
-        0 0 8px var(--accent);
+    border-radius:10px;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
 }
-
-/* BRAND */
 
 .brand{
     text-align:right;
@@ -197,552 +139,399 @@ body{
 
 .brand b{
     display:block;
-
-    font-size:18px;
-
-    letter-spacing:4px;
-
-    color:#f1fbff;
-
-    text-shadow:
-        0 0 20px rgba(54,229,255,.18);
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:3px;
+    text-shadow:0 0 18px rgba(54,229,255,.25);
 }
 
 .brand small{
     display:block;
-
     margin-top:4px;
-
+    color:var(--cyan);
     font-size:7px;
-
     letter-spacing:3px;
-
-    color:var(--accent);
-
-    opacity:.8;
 }
 
-/* =====================================================
-   SYSTEM BAR
-===================================================== */
+/* =========================
+   STATUS
+========================= */
 
-.system{
+.status{
     position:absolute;
-
     z-index:10;
-
-    top:91px;
-    right:16px;
-
+    top:93px;
+    right:17px;
     display:flex;
     align-items:center;
-
-    gap:7px;
-
+    gap:6px;
+    color:#738793;
     font-size:7px;
-
     letter-spacing:2px;
-
-    color:#758792;
 }
 
-.system-dot{
+.status-dot{
     width:6px;
     height:6px;
-
     border-radius:50%;
-
     background:var(--green);
-
-    box-shadow:
-        0 0 10px var(--green);
-
-    animation:
-        systemPulse 1.8s infinite;
+    box-shadow:0 0 12px var(--green);
+    animation:statusPulse 1.8s infinite;
 }
 
-@keyframes systemPulse{
-
-    0%,100%{
-        opacity:.35;
-    }
-
-    50%{
-        opacity:1;
-    }
-
+@keyframes statusPulse{
+    0%,100%{opacity:.5;transform:scale(.8)}
+    50%{opacity:1;transform:scale(1.2)}
 }
 
-/* =====================================================
-   EXTRA HUD
-===================================================== */
+/* =========================
+   HUD
+========================= */
 
-.hud-left{
+.hud{
     position:absolute;
-
-    left:15px;
-    top:103px;
-
-    font-size:6px;
-
-    letter-spacing:1.8px;
-
-    color:#52646f;
-
-    line-height:1.9;
-
+    z-index:3;
+    left:14px;
+    right:14px;
+    top:116px;
+    display:flex;
+    justify-content:space-between;
     pointer-events:none;
 }
 
-.hud-left span{
-    color:var(--accent);
+.hud-side{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
 }
 
-.hud-right{
-    position:absolute;
-
-    right:15px;
-    top:123px;
-
+.hud-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#526774;
     font-size:6px;
-
-    letter-spacing:1.6px;
-
-    color:#52646f;
-
-    text-align:right;
-
-    line-height:1.9;
-
-    pointer-events:none;
+    letter-spacing:1.5px;
 }
 
-.hud-right span{
-    color:var(--accent);
+.hud-item b{
+    color:#87a1ad;
+    font-weight:500;
 }
 
-/* =====================================================
-   CORE
-===================================================== */
+.hud-bar{
+    width:28px;
+    height:2px;
+    border-radius:5px;
+    background:rgba(57,232,255,.1);
+    overflow:hidden;
+}
+
+.hud-bar span{
+    display:block;
+    width:78%;
+    height:100%;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+}
+
+/* =========================
+   CORE AREA
+========================= */
 
 .core-area{
-
     position:absolute;
-
-    top:40%;
-
+    z-index:5;
     left:50%;
-
+    top:38%;
     width:285px;
     height:285px;
-
-    transform:
-        translate(-50%,-50%);
-
+    transform:translate(-50%,-50%);
 }
 
-/* GLOW */
+/* central glow */
 
-.glow{
+.core-glow{
     position:absolute;
-
     left:50%;
     top:50%;
-
-    width:165px;
-    height:165px;
-
-    transform:
-        translate(-50%,-50%);
-
+    width:180px;
+    height:180px;
+    transform:translate(-50%,-50%);
     border-radius:50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(54,229,255,.22),
-            rgba(54,229,255,.04) 55%,
-            transparent 75%
-        );
-
-    filter:blur(17px);
-
-    animation:
-        coreGlow 3s ease-in-out infinite;
+    background:rgba(57,232,255,.12);
+    filter:blur(32px);
+    animation:coreGlow 3s ease-in-out infinite;
 }
 
 @keyframes coreGlow{
-
-    0%,100%{
-        transform:
-            translate(-50%,-50%)
-            scale(.88);
-
-        opacity:.55;
-    }
-
-    50%{
-        transform:
-            translate(-50%,-50%)
-            scale(1.12);
-
-        opacity:1;
-    }
-
+    0%,100%{transform:translate(-50%,-50%) scale(.88);opacity:.65}
+    50%{transform:translate(-50%,-50%) scale(1.18);opacity:1}
 }
 
-/* RINGS */
+/* rings */
 
 .ring{
     position:absolute;
-
     left:50%;
     top:50%;
-
     border-radius:50%;
-
-    transform:
-        translate(-50%,-50%);
-
-    border:1px solid rgba(54,229,255,.18);
-
-    pointer-events:none;
+    transform:translate(-50%,-50%);
+    border:1px solid rgba(57,232,255,.16);
 }
 
 .r1{
-    width:175px;
-    height:175px;
-
-    border-top-color:var(--accent);
-    border-right-color:rgba(54,229,255,.45);
-
-    animation:
-        spin1 7s linear infinite;
+    width:164px;
+    height:164px;
+    border-top-color:var(--cyan);
+    border-right-color:rgba(57,232,255,.03);
+    animation:spin 7s linear infinite;
 }
 
 .r2{
-    width:202px;
-    height:202px;
-
-    border-bottom-color:var(--accent);
-    border-left-color:rgba(54,229,255,.4);
-
-    animation:
-        spin2 11s linear infinite;
+    width:192px;
+    height:192px;
+    border-bottom-color:var(--cyan);
+    border-left-color:rgba(57,232,255,.03);
+    animation:spinReverse 10s linear infinite;
 }
 
 .r3{
-    width:230px;
-    height:230px;
-
-    border-top-color:rgba(54,229,255,.45);
-    border-left-color:rgba(54,229,255,.6);
-
-    animation:
-        spin1 16s linear infinite;
+    width:225px;
+    height:225px;
+    border-left-color:rgba(57,232,255,.8);
+    border-top-color:rgba(57,232,255,.08);
+    animation:spin 15s linear infinite;
 }
 
 .r4{
-    width:258px;
-    height:258px;
-
-    border-right-color:rgba(54,229,255,.4);
-    border-bottom-color:rgba(54,229,255,.25);
-
-    animation:
-        spin2 22s linear infinite;
+    width:260px;
+    height:260px;
+    border-right-color:rgba(57,232,255,.35);
+    border-bottom-color:rgba(57,232,255,.06);
+    animation:spinReverse 22s linear infinite;
 }
 
-@keyframes spin1{
-
-    from{
-        transform:
-            translate(-50%,-50%)
-            rotate(0);
-    }
-
+@keyframes spin{
     to{
-        transform:
-            translate(-50%,-50%)
-            rotate(360deg);
+        transform:translate(-50%,-50%) rotate(360deg);
     }
-
 }
 
-@keyframes spin2{
-
-    from{
-        transform:
-            translate(-50%,-50%)
-            rotate(360deg);
-    }
-
+@keyframes spinReverse{
     to{
-        transform:
-            translate(-50%,-50%)
-            rotate(0);
+        transform:translate(-50%,-50%) rotate(-360deg);
     }
-
 }
 
-/* ORBIT DOTS */
+/* orbit markers */
 
 .orbit{
     position:absolute;
-
     left:50%;
     top:50%;
+    width:248px;
+    height:248px;
+    transform:translate(-50%,-50%);
+    animation:spin 12s linear infinite;
+}
 
-    width:7px;
-    height:7px;
-
-    margin:-3.5px;
-
+.orbit-dot{
+    position:absolute;
+    width:6px;
+    height:6px;
     border-radius:50%;
-
-    background:var(--accent);
-
+    background:var(--cyan);
     box-shadow:
-        0 0 12px var(--accent),
-        0 0 25px rgba(54,229,255,.5);
+        0 0 6px var(--cyan),
+        0 0 18px var(--cyan);
 }
 
-.o1{
-    animation:
-        orbit1 7s linear infinite;
+.orbit-dot.one{
+    top:9px;
+    left:50%;
 }
 
-.o2{
-    animation:
-        orbit2 11s linear infinite;
+.orbit-dot.two{
+    right:15px;
+    bottom:44px;
+    width:4px;
+    height:4px;
 }
 
-@keyframes orbit1{
-
-    from{
-        transform:
-            rotate(0deg)
-            translateX(87px);
-    }
-
-    to{
-        transform:
-            rotate(360deg)
-            translateX(87px);
-    }
-
+.orbit-dot.three{
+    left:20px;
+    bottom:38px;
+    width:3px;
+    height:3px;
 }
 
-@keyframes orbit2{
-
-    from{
-        transform:
-            rotate(360deg)
-            translateX(101px);
-    }
-
-    to{
-        transform:
-            rotate(0deg)
-            translateX(101px);
-    }
-
-}
-
-/* CORE */
+/* core */
 
 .core{
     position:absolute;
-
     left:50%;
     top:50%;
-
     width:108px;
     height:108px;
-
-    transform:
-        translate(-50%,-50%);
-
+    transform:translate(-50%,-50%);
     border-radius:50%;
-
     display:flex;
-
-    justify-content:center;
     align-items:center;
+    justify-content:center;
 
     background:
         radial-gradient(
-            circle at 30% 25%,
-            #d0ffff 0%,
-            #36e5ff 17%,
-            #0b6075 46%,
-            #04151c 72%,
-            #010509 100%
+            circle at 32% 25%,
+            #dfffff 0%,
+            #6df2ff 12%,
+            #1596b0 34%,
+            #064253 56%,
+            #020b10 78%,
+            #010305
         );
 
-    border:1px solid rgba(170,250,255,.9);
+    border:1px solid rgba(184,251,255,.9);
 
     box-shadow:
-        0 0 15px rgba(54,229,255,.85),
-        0 0 40px rgba(54,229,255,.5),
-        0 0 80px rgba(54,229,255,.12),
-        inset 0 0 28px rgba(0,0,0,.85);
+        0 0 18px rgba(57,232,255,.9),
+        0 0 42px rgba(57,232,255,.45),
+        0 0 85px rgba(57,232,255,.18),
+        inset 0 0 28px #000;
 
-    animation:
-        coreFloat 4s ease-in-out infinite;
-
+    animation:coreFloat 3.5s ease-in-out infinite;
 }
 
 @keyframes coreFloat{
-
-    0%,100%{
-        transform:
-            translate(-50%,-50%);
-    }
-
-    50%{
-        transform:
-            translate(-50%,-54%);
-    }
-
+    0%,100%{transform:translate(-50%,-50%) scale(1)}
+    50%{transform:translate(-50%,-50%) scale(1.035)}
 }
 
 .core:before{
     content:"";
-
     position:absolute;
-
     inset:8px;
-
     border-radius:50%;
-
-    border:1px solid rgba(200,255,255,.35);
+    border:1px solid rgba(255,255,255,.32);
 }
 
 .core:after{
     content:"";
-
     position:absolute;
-
     inset:17px;
-
     border-radius:50%;
-
-    border:1px solid rgba(255,255,255,.1);
+    border:1px dashed rgba(255,255,255,.16);
+    animation:spin 8s linear infinite;
 }
 
 .k{
     position:relative;
-
-    z-index:2;
-
+    z-index:3;
     font-size:50px;
-
+    line-height:1;
     font-weight:800;
-
-    letter-spacing:-5px;
-
-    color:#edffff;
-
+    color:#eaffff;
     text-shadow:
-        0 0 7px white,
-        0 0 20px var(--accent),
-        0 0 45px var(--accent);
+        0 0 5px white,
+        0 0 16px white,
+        0 0 32px var(--cyan);
 }
-
-/* LABEL */
 
 .core-label{
-
     position:absolute;
-
-    top:calc(50% + 79px);
-
+    top:calc(50% + 73px);
     width:100%;
-
     text-align:center;
-
+    color:#617a86;
     font-size:7px;
-
     letter-spacing:3px;
-
-    color:#637781;
 }
-
-/* =====================================================
-   CORE STATUS
-===================================================== */
 
 .core-status{
-
     position:absolute;
-
-    top:calc(50% + 103px);
-
-    left:50%;
-
-    transform:
-        translateX(-50%);
-
-    display:flex;
-
-    align-items:center;
-
-    gap:5px;
-
+    top:calc(50% + 92px);
+    width:100%;
+    text-align:center;
+    color:var(--green);
     font-size:6px;
+    letter-spacing:2px;
+}
 
+/* =========================
+   SIDE DATA
+========================= */
+
+.data-left,
+.data-right{
+    position:absolute;
+    z-index:3;
+    top:38%;
+    width:72px;
+    color:#455b67;
+    font-size:6px;
     letter-spacing:1.5px;
-
-    color:#4d626c;
-
 }
 
-.core-status i{
-
-    width:4px;
-    height:4px;
-
-    border-radius:50%;
-
-    background:var(--green);
-
-    box-shadow:
-        0 0 7px var(--green);
-
+.data-left{
+    left:14px;
 }
 
-/* =====================================================
+.data-right{
+    right:14px;
+    text-align:right;
+}
+
+.data-title{
+    color:#78909c;
+    margin-bottom:5px;
+}
+
+.data-value{
+    color:var(--cyan);
+    font-size:9px;
+    margin-bottom:12px;
+}
+
+.mini-lines{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.mini-lines span{
+    height:2px;
+    width:100%;
+    background:rgba(57,232,255,.08);
+    overflow:hidden;
+}
+
+.mini-lines span:after{
+    content:"";
+    display:block;
+    height:100%;
+    width:var(--w,60%);
+    background:var(--cyan);
+    box-shadow:0 0 5px var(--cyan);
+}
+
+/* =========================
    CHAT
-===================================================== */
+========================= */
 
 .chat{
-
     position:absolute;
-
     z-index:8;
-
     left:12px;
     right:12px;
-
-    bottom:
-        calc(
-            91px +
-            env(safe-area-inset-bottom)
-        );
-
-    max-height:21vh;
-
+    bottom:99px;
+    max-height:20vh;
     overflow-y:auto;
-
     display:flex;
-
     flex-direction:column;
-
     gap:7px;
-
     scrollbar-width:none;
-
+    mask-image:linear-gradient(to bottom,transparent,#000 10%);
+    padding-top:10px;
 }
 
 .chat::-webkit-scrollbar{
@@ -750,336 +539,188 @@ body{
 }
 
 .msg{
-
-    max-width:91%;
-
-    padding:
-        10px 13px;
-
+    position:relative;
+    max-width:88%;
+    padding:10px 13px;
     border-radius:15px;
-
-    font-size:13px;
-
+    color:#cce5ec;
+    background:rgba(7,17,27,.72);
+    border:1px solid rgba(120,220,255,.09);
+    backdrop-filter:blur(12px);
+    box-shadow:0 5px 25px rgba(0,0,0,.15);
+    font-size:12px;
     line-height:1.45;
-
-    color:#dcecf0;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(11,25,36,.9),
-            rgba(5,14,21,.9)
-        );
-
-    border:1px solid rgba(255,255,255,.07);
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.2);
-
-    backdrop-filter:blur(14px);
-
-    animation:
-        messageIn .25s ease;
-
-}
-
-.msg.ai{
-
-    border-left:
-        2px solid var(--accent);
-
-}
-
-.msg.user{
-
-    align-self:flex-end;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,95,115,.38),
-            rgba(0,50,65,.3)
-        );
-
-    border-color:
-        rgba(54,229,255,.2);
-
+    animation:messageIn .25s ease;
 }
 
 @keyframes messageIn{
-
     from{
         opacity:0;
         transform:translateY(7px);
     }
-
     to{
         opacity:1;
-        transform:translateY(0);
+        transform:none;
     }
-
 }
 
-/* =====================================================
-   TYPING
-===================================================== */
+.msg.ai{
+    border-left:2px solid var(--cyan);
+}
+
+.msg.user{
+    align-self:flex-end;
+    color:#eaffff;
+    background:linear-gradient(
+        135deg,
+        rgba(0,100,125,.32),
+        rgba(0,65,100,.18)
+    );
+    border-color:rgba(57,232,255,.18);
+}
 
 .typing{
-
     display:flex;
-
-    gap:5px;
-
+    gap:4px;
     align-items:center;
-
 }
 
-.typing i{
-
-    width:5px;
-    height:5px;
-
+.typing span{
+    width:4px;
+    height:4px;
     border-radius:50%;
-
-    background:var(--accent);
-
-    box-shadow:
-        0 0 8px var(--accent);
-
-    animation:
-        typing 1.2s infinite;
-
+    background:var(--cyan);
+    box-shadow:0 0 7px var(--cyan);
+    animation:typeDot 1s infinite;
 }
 
-.typing i:nth-child(2){
-    animation-delay:.15s;
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+
+@keyframes typeDot{
+    0%,100%{opacity:.25;transform:translateY(0)}
+    50%{opacity:1;transform:translateY(-3px)}
 }
 
-.typing i:nth-child(3){
-    animation-delay:.3s;
-}
-
-@keyframes typing{
-
-    0%,60%,100%{
-        opacity:.25;
-        transform:translateY(0);
-    }
-
-    30%{
-        opacity:1;
-        transform:translateY(-3px);
-    }
-
-}
-
-/* =====================================================
+/* =========================
    INPUT
-===================================================== */
+========================= */
 
 .input-area{
-
     position:absolute;
-
-    z-index:30;
-
+    z-index:25;
     left:10px;
     right:10px;
-
-    bottom:
-        calc(
-            7px +
-            env(safe-area-inset-bottom)
-        );
-
-    height:57px;
-
+    bottom:calc(7px + env(safe-area-inset-bottom));
+    height:58px;
     display:flex;
-
-    gap:5px;
-
-    padding:5px;
-
-    border-radius:18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(10,20,30,.96),
-            rgba(4,11,17,.96)
-        );
-
-    border:
-        1px solid rgba(255,255,255,.1);
-
+    gap:6px;
+    align-items:center;
+    padding:6px;
+    border-radius:19px;
+    background:rgba(5,13,21,.88);
+    border:1px solid rgba(115,215,255,.12);
     box-shadow:
-        0 15px 45px rgba(0,0,0,.5),
-        0 0 25px rgba(0,170,220,.05);
+        0 15px 45px #000b,
+        inset 0 0 20px rgba(57,232,255,.025);
+    backdrop-filter:blur(22px);
+}
 
-    backdrop-filter:blur(20px);
-
+.input-area:focus-within{
+    border-color:rgba(57,232,255,.3);
+    box-shadow:
+        0 15px 45px #000b,
+        0 0 25px rgba(57,232,255,.07);
 }
 
 .input{
-
     flex:1;
-
     min-width:0;
-
+    height:100%;
     border:0;
-
     outline:0;
-
     background:transparent;
-
     color:white;
-
-    padding:0 8px;
-
-    font-size:16px;
-
+    padding:0 9px;
+    font-size:15px;
 }
 
 .input::placeholder{
-
-    color:#667983;
-
-    font-size:13px;
-
+    color:#586d78;
+    font-size:12px;
 }
 
 .action{
-
     width:44px;
     height:44px;
-
     flex:none;
-
-    border-radius:13px;
-
-    border:
-        1px solid rgba(255,255,255,.07);
-
-    background:
-        rgba(255,255,255,.045);
-
-    color:#82949e;
-
-    transition:.2s;
-
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    color:#78909c;
 }
 
 .action:active{
-    transform:scale(.9);
+    transform:scale(.93);
 }
 
-.action.active{
-
-    color:var(--accent);
-
-    border-color:
-        rgba(54,229,255,.4);
-
-    box-shadow:
-        0 0 17px rgba(54,229,255,.2);
-
-    animation:
-        micPulse .8s infinite alternate;
-
-}
-
-@keyframes micPulse{
-
-    to{
-        box-shadow:
-            0 0 25px rgba(54,229,255,.55);
-    }
-
+.mic{
+    font-size:17px;
 }
 
 .send{
-
-    color:var(--accent);
-
-    border-color:
-        rgba(54,229,255,.25);
-
-    background:
-        rgba(54,229,255,.08);
-
+    color:var(--cyan);
+    background:rgba(57,232,255,.07);
+    border-color:rgba(57,232,255,.2);
+    font-size:18px;
+    box-shadow:0 0 15px rgba(57,232,255,.05);
 }
 
-/* =====================================================
+.send:disabled{
+    opacity:.4;
+}
+
+/* =========================
    SIDEBAR
-===================================================== */
+========================= */
 
 .overlay{
-
     position:fixed;
-
-    z-index:80;
-
+    z-index:50;
     inset:0;
-
-    background:
-        rgba(0,0,0,.62);
-
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
     opacity:0;
-
     pointer-events:none;
-
-    transition:.25s;
-
-    backdrop-filter:blur(3px);
-
+    transition:.28s;
 }
 
 .overlay.open{
-
     opacity:1;
-
     pointer-events:auto;
-
 }
 
 .sidebar{
-
     position:fixed;
-
-    z-index:100;
-
+    z-index:60;
+    left:0;
     top:0;
     bottom:0;
-    left:0;
-
     width:290px;
-
     max-width:84vw;
-
     padding:
         calc(20px + env(safe-area-inset-top))
-        16px
+        17px
         calc(20px + env(safe-area-inset-bottom));
-
     background:
-        linear-gradient(
-            145deg,
-            rgba(10,22,32,.98),
-            rgba(2,7,12,.99)
-        );
-
-    border-right:
-        1px solid rgba(255,255,255,.1);
-
-    box-shadow:
-        20px 0 60px rgba(0,0,0,.5);
-
-    transform:
-        translateX(-105%);
-
-    transition:
-        transform .3s cubic-bezier(.22,.8,.25,1);
-
+        linear-gradient(150deg,rgba(12,25,37,.98),rgba(2,8,13,.98));
+    border-right:1px solid rgba(100,220,255,.14);
+    box-shadow:20px 0 60px #0008;
+    transform:translateX(-105%);
+    transition:.32s cubic-bezier(.2,.8,.2,1);
 }
 
 .sidebar.open{
@@ -1087,913 +728,762 @@ body{
 }
 
 .side-head{
-
     display:flex;
-
-    justify-content:space-between;
-
     align-items:center;
+    justify-content:space-between;
+    margin-bottom:34px;
+}
 
-    margin-bottom:30px;
+.side-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
 
+.side-logo{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--cyan);
+    border:1px solid rgba(57,232,255,.2);
+    background:rgba(57,232,255,.05);
+    box-shadow:0 0 20px rgba(57,232,255,.07);
+    font-weight:800;
 }
 
 .side-title{
-
-    font-size:15px;
-
+    font-size:13px;
     font-weight:700;
+    letter-spacing:2px;
+}
 
-    letter-spacing:2.5px;
-
+.side-sub{
+    margin-top:3px;
+    color:#536b76;
+    font-size:7px;
+    letter-spacing:2px;
 }
 
 .close{
-
-    width:38px;
-    height:38px;
-
-    border-radius:12px;
-
-    background:
-        rgba(255,255,255,.05);
-
-    color:#9aaab4;
-
-    font-size:21px;
-
+    width:39px;
+    height:39px;
+    border-radius:13px;
+    color:#91a5ae;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    font-size:22px;
 }
 
 .nav{
-
     display:flex;
-
     flex-direction:column;
-
     gap:7px;
-
 }
 
 .nav button{
-
+    position:relative;
     padding:14px;
-
-    border-radius:13px;
-
-    border:
-        1px solid transparent;
-
-    background:transparent;
-
-    color:#9eacb5;
-
+    border-radius:14px;
     text-align:left;
-
-    font-size:14px;
-
+    color:#7f939d;
+    background:transparent;
+    border:1px solid transparent;
+    transition:.2s;
 }
 
 .nav button.active{
-
-    color:var(--accent);
-
-    background:
-        rgba(54,229,255,.08);
-
-    border-color:
-        rgba(54,229,255,.15);
-
+    color:var(--cyan);
+    background:rgba(57,232,255,.06);
+    border-color:rgba(57,232,255,.12);
+    box-shadow:inset 3px 0 0 var(--cyan);
 }
 
-/* =====================================================
+.nav-icon{
+    display:inline-block;
+    width:22px;
+    color:inherit;
+}
+
+.side-footer{
+    position:absolute;
+    left:17px;
+    right:17px;
+    bottom:calc(22px + env(safe-area-inset-bottom));
+    padding:13px;
+    border-radius:14px;
+    background:rgba(255,255,255,.025);
+    border:1px solid rgba(255,255,255,.05);
+    color:#536b76;
+    font-size:7px;
+    letter-spacing:1.5px;
+}
+
+.side-footer span{
+    color:var(--green);
+}
+
+/* =========================
    SETTINGS
-===================================================== */
+========================= */
 
 .settings{
-
     position:absolute;
-
+    z-index:40;
     inset:0;
-
-    z-index:60;
-
     overflow-y:auto;
-
     padding:
-        calc(90px + env(safe-area-inset-top))
+        calc(92px + env(safe-area-inset-top))
         15px
         calc(90px + env(safe-area-inset-bottom));
-
     background:
-        radial-gradient(
-            circle at 50% 10%,
-            rgba(0,160,200,.08),
-            transparent 28%
-        ),
+        radial-gradient(circle at 50% 10%,rgba(57,232,255,.08),transparent 28%),
         #02060b;
-
     opacity:0;
-
     pointer-events:none;
-
-    transform:
-        translateX(20px);
-
+    transform:translateX(25px);
     transition:.25s;
-
 }
 
 .settings.open{
-
     opacity:1;
-
     pointer-events:auto;
-
     transform:none;
+}
 
+.settings-header{
+    margin-bottom:22px;
 }
 
 .settings h1{
-
     margin:0;
-
     font-size:25px;
-
-    letter-spacing:.5px;
-
+    letter-spacing:-.5px;
 }
 
 .settings p{
-
-    color:var(--muted);
-
-    font-size:12px;
-
-    margin:
-        7px 0 22px;
-
+    margin:7px 0 0;
+    color:#637883;
+    font-size:11px;
+    line-height:1.5;
 }
 
 .card{
-
     margin-bottom:10px;
-
-    padding:15px;
-
+    padding:16px;
     border-radius:17px;
-
-    background:
-        rgba(9,19,28,.78);
-
-    border:
-        1px solid var(--border);
-
+    background:rgba(8,18,28,.78);
+    border:1px solid rgba(120,220,255,.09);
+    box-shadow:0 8px 30px #0003;
 }
 
 .row{
-
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
-    gap:10px;
-
+    gap:12px;
 }
 
 .name{
-
     font-size:13px;
-
     font-weight:600;
-
 }
 
 .desc{
-
-    margin-top:4px;
-
-    color:#71838d;
-
-    font-size:10px;
-
+    margin-top:5px;
+    color:#647984;
+    font-size:9px;
     line-height:1.4;
-
 }
 
 select{
-
     width:105px;
-
-    padding:8px;
-
-    border-radius:10px;
-
-    background:#0b1720;
-
+    padding:9px 8px;
+    border-radius:11px;
+    outline:0;
+    background:#0a1721;
     color:white;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid rgba(120,220,255,.1);
 }
 
 .toggle{
-
-    width:47px;
-    height:26px;
-
-    border-radius:20px;
-
-    background:#16222b;
-
     position:relative;
-
+    width:48px;
+    height:27px;
     flex:none;
-
+    border-radius:20px;
+    background:#15232c;
+    border:1px solid rgba(255,255,255,.06);
+    transition:.2s;
 }
 
 .toggle:after{
-
     content:"";
-
     position:absolute;
-
     left:3px;
     top:3px;
-
-    width:20px;
-    height:20px;
-
+    width:19px;
+    height:19px;
     border-radius:50%;
-
-    background:#73818a;
-
-    transition:.2s;
-
+    background:#687a83;
+    transition:.22s;
 }
 
 .toggle.on{
-
-    background:
-        rgba(54,229,255,.2);
-
+    background:rgba(57,232,255,.15);
+    border-color:rgba(57,232,255,.25);
 }
 
 .toggle.on:after{
-
     left:24px;
-
-    background:var(--accent);
-
-    box-shadow:
-        0 0 10px var(--accent);
-
+    background:var(--cyan);
+    box-shadow:0 0 12px var(--cyan);
 }
 
 .range{
-
-    width:95px;
-
-    accent-color:var(--accent);
-
+    width:100px;
+    accent-color:var(--cyan);
 }
 
 .range-value{
-
     width:35px;
-
-    color:var(--accent);
-
-    font-size:11px;
-
+    color:var(--cyan);
+    font-size:10px;
+    text-align:right;
 }
 
-/* =====================================================
-   LIGHT MODE
-===================================================== */
-
-body.light{
-
-    --bg:#edf5f8;
-
-    --text:#102029;
-
-}
-
-body.light .app{
-
-    background:
-        radial-gradient(
-            circle at 50% 40%,
-            rgba(0,180,220,.13),
-            transparent 32%
-        ),
-        #edf5f8;
-
-}
-
-body.light .settings{
-
-    background:#edf5f8;
-
-}
-
-body.light .input-area,
-body.light .sidebar,
-body.light .card,
-body.light .msg{
-
-    background:
-        rgba(255,255,255,.86);
-
-}
-
-body.light .input{
-
-    color:#102029;
-
-}
-
-/* =====================================================
+/* =========================
    FUN MODE
-===================================================== */
+========================= */
 
 body.fun{
-
-    --accent:#ff4057;
-
+    --cyan:#ff4264;
+    --cyan2:#ff1944;
 }
 
 body.fun .app{
-
     background:
-        radial-gradient(
-            circle at 50% 42%,
-            rgba(255,45,70,.11),
-            transparent 28%
-        ),
+        radial-gradient(circle at 50% 38%,rgba(255,45,80,.14),transparent 25%),
         #080204;
+}
 
+body.fun .core-glow{
+    background:rgba(255,55,85,.13);
 }
 
 body.fun .core{
-
     background:
         radial-gradient(
-            circle at 30% 25%,
-            #ffc0c7,
-            #ff4057 17%,
-            #781a28 46%,
-            #180508 72%,
-            #020203
+            circle at 32% 25%,
+            #ffe4e8,
+            #ff7189 12%,
+            #b32645 35%,
+            #42101d 58%,
+            #080103 80%
         );
-
-    border-color:
-        rgba(255,140,150,.9);
-
-    box-shadow:
-        0 0 18px rgba(255,64,87,.85),
-        0 0 45px rgba(255,64,87,.45),
-        inset 0 0 28px #000;
-
+    border-color:#ffb5c0;
 }
 
-body.fun .glow{
+body.fun .status-dot{
+    background:#ff536f;
+    box-shadow:0 0 12px #ff536f;
+}
 
+body.fun .send{
+    color:#ff6680;
+    border-color:rgba(255,66,100,.25);
+}
+
+body.fun .hud-bar span,
+body.fun .mini-lines span{
+    background:#ff4264;
+    box-shadow:0 0 8px #ff4264;
+}
+
+/* =========================
+   LIGHT MODE
+========================= */
+
+body.light{
+    --bg:#edf6f9;
+    --text:#102029;
+}
+
+body.light .app{
     background:
-        radial-gradient(
-            circle,
-            rgba(255,64,87,.22),
-            transparent 70%
-        );
-
+        radial-gradient(circle at 50% 35%,rgba(0,170,210,.13),transparent 27%),
+        #edf6f9;
 }
 
-body.fun .ring{
-
-    border-color:
-        rgba(255,64,87,.22);
-
+body.light .settings{
+    background:#edf6f9;
 }
 
-body.fun .orbit{
-
-    background:#ff4057;
-
-    box-shadow:
-        0 0 12px #ff4057,
-        0 0 25px rgba(255,64,87,.5);
-
+body.light .input-area,
+body.light .msg,
+body.light .sidebar,
+body.light .card{
+    background:rgba(255,255,255,.82);
 }
 
-body.fun .system-dot{
-
-    background:#ff5266;
-
-    box-shadow:
-        0 0 10px #ff5266;
-
+body.light .input{
+    color:#102029;
 }
 
-/* =====================================================
-   SHORT SCREEN
-===================================================== */
-
-@media(max-height:680px){
-
-    .core-area{
-
-        top:34%;
-
-        transform:
-            translate(-50%,-50%)
-            scale(.82);
-
-    }
-
-    .chat{
-
-        max-height:16vh;
-
-    }
-
-    .hud-left,
-    .hud-right{
-
-        display:none;
-
-    }
-
+body.light .brand b{
+    color:#102029;
 }
 
-/* =====================================================
-   SMALL IPHONE
-===================================================== */
+body.light .sidebar{
+    background:linear-gradient(150deg,#f8fdff,#e7f1f5);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:390px){
 
     .brand b{
-
         font-size:15px;
-
-        letter-spacing:2.5px;
-
+        letter-spacing:2px;
     }
 
     .core-area{
+        transform:translate(-50%,-50%) scale(.9);
+    }
 
-        transform:
-            translate(-50%,-50%)
-            scale(.9);
+    .data-left,
+    .data-right{
+        display:none;
+    }
 
+    .hud{
+        top:111px;
     }
 
     .chat{
-
         max-height:18vh;
-
     }
-
 }
 
+@media(max-height:700px){
+
+    .core-area{
+        top:35%;
+        transform:translate(-50%,-50%) scale(.82);
+    }
+
+    .chat{
+        max-height:16vh;
+    }
+
+    .hud{
+        display:none;
+    }
+}
 </style>
 </head>
-
 
 <body>
 
 <div class="app">
 
+    <!-- TOP -->
 
-<!-- =================================================
-     TOP
-================================================= -->
+    <div class="top">
 
-<div class="top">
+        <button class="menu" id="menuBtn">
+            <i></i>
+            <i></i>
+            <i></i>
+        </button>
 
-    <button class="menu" id="menuBtn">
-
-        <i></i>
-        <i></i>
-        <i></i>
-
-    </button>
-
-
-    <div class="brand">
-
-        <b>J.A.R.V.I.S.</b>
-
-        <small>
-            KARAHAN INC.
-        </small>
-
-    </div>
-
-</div>
-
-
-<!-- SYSTEM -->
-
-<div class="system">
-
-    <span class="system-dot"></span>
-
-    SYSTEM ONLINE
-
-</div>
-
-
-<!-- HUD -->
-
-<div class="hud-left">
-
-    CORE <span>ACTIVE</span><br>
-    NETWORK <span>SECURE</span><br>
-    AI ENGINE <span>ONLINE</span>
-
-</div>
-
-
-<div class="hud-right">
-
-    MK-I<br>
-    K-CORE <span>01</span><br>
-    STATUS <span>READY</span>
-
-</div>
-
-
-<!-- =================================================
-     CORE
-================================================= -->
-
-<div class="core-area">
-
-    <div class="glow"></div>
-
-    <div class="ring r1"></div>
-    <div class="ring r2"></div>
-    <div class="ring r3"></div>
-    <div class="ring r4"></div>
-
-    <div class="orbit o1"></div>
-    <div class="orbit o2"></div>
-
-    <div class="core">
-
-        <div class="k">
-            K
+        <div class="brand">
+            <b>J.A.R.V.I.S.</b>
+            <small>KARAHAN INC.</small>
         </div>
 
     </div>
 
-    <div class="core-label">
+    <!-- STATUS -->
 
-        ARTIFICIAL INTELLIGENCE
-
+    <div class="status">
+        <span class="status-dot"></span>
+        SYSTEM ONLINE
     </div>
 
-    <div class="core-status">
+    <!-- HUD -->
 
-        <i></i>
+    <div class="hud">
 
-        CORE STABLE
+        <div class="hud-side">
 
-    </div>
-
-</div>
-
-
-<!-- =================================================
-     CHAT
-================================================= -->
-
-<div class="chat" id="chat">
-
-    <div class="msg ai">
-
-        Merhaba Efendim, nasıl yardımcı olabilirim?
-
-    </div>
-
-</div>
-
-
-<!-- =================================================
-     INPUT
-================================================= -->
-
-<div class="input-area">
-
-    <input
-        id="input"
-        class="input"
-        placeholder="J.A.R.V.I.S.'e bir şey söyle..."
-        autocomplete="off"
-    >
-
-    <button
-        class="action"
-        id="micBtn"
-        title="Sesli giriş"
-    >
-        ◉
-    </button>
-
-    <button
-        class="action send"
-        id="sendBtn"
-        title="Gönder"
-    >
-        ➤
-    </button>
-
-</div>
-
-
-<!-- =================================================
-     SETTINGS
-================================================= -->
-
-<section
-    class="settings"
-    id="settings"
->
-
-    <h1>
-        Ayarlar
-    </h1>
-
-    <p>
-        J.A.R.V.I.S. deneyimini kendinize göre yapılandırın.
-    </p>
-
-
-    <!-- HITAP -->
-
-    <div class="card">
-
-        <div class="row">
-
-            <div>
-
-                <div class="name">
-                    Hitap Şekli
-                </div>
-
-                <div class="desc">
-                    J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
-                </div>
-
+            <div class="hud-item">
+                <div class="hud-bar"><span></span></div>
+                <b>CORE ACTIVE</b>
             </div>
 
-            <select id="addressSelect">
+            <div class="hud-item">
+                <div class="hud-bar"><span style="--w:91%"></span></div>
+                <b>NETWORK SECURE</b>
+            </div>
 
-                <option>Efendim</option>
-                <option>Komutanım</option>
-                <option>Patron</option>
-                <option>Dostum</option>
+        </div>
 
-            </select>
+        <div class="hud-side">
+
+            <div class="hud-item">
+                <b>AI ENGINE ONLINE</b>
+                <div class="hud-bar"><span style="--w:86%"></span></div>
+            </div>
+
+            <div class="hud-item">
+                <b>MK-I / K-CORE</b>
+                <div class="hud-bar"><span style="--w:73%"></span></div>
+            </div>
 
         </div>
 
     </div>
 
+    <!-- SIDE DATA -->
 
-    <!-- SCALE -->
+    <div class="data-left">
 
-    <div class="card">
+        <div class="data-title">SYSTEM LOAD</div>
+        <div class="data-value" id="loadValue">24%</div>
 
-        <div class="row">
+        <div class="mini-lines">
+            <span style="--w:32%"></span>
+            <span style="--w:57%"></span>
+            <span style="--w:41%"></span>
+            <span style="--w:68%"></span>
+        </div>
 
-            <div>
+    </div>
 
-                <div class="name">
-                    Arayüz Boyutu
-                </div>
+    <div class="data-right">
 
-                <div class="desc">
-                    Arayüz çekirdeğinin boyutunu ayarlayın.
-                </div>
+        <div class="data-title">SIGNAL</div>
+        <div class="data-value">98.7%</div>
 
-            </div>
+        <div class="mini-lines">
+            <span style="--w:82%"></span>
+            <span style="--w:91%"></span>
+            <span style="--w:73%"></span>
+            <span style="--w:95%"></span>
+        </div>
+
+    </div>
+
+    <!-- CORE -->
+
+    <div class="core-area" id="coreArea">
+
+        <div class="core-glow"></div>
+
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="ring r4"></div>
+
+        <div class="orbit">
+            <div class="orbit-dot one"></div>
+            <div class="orbit-dot two"></div>
+            <div class="orbit-dot three"></div>
+        </div>
+
+        <div class="core">
+            <div class="k">K</div>
+        </div>
+
+        <div class="core-label">
+            ARTIFICIAL INTELLIGENCE
+        </div>
+
+        <div class="core-status">
+            ● CORE STABLE
+        </div>
+
+    </div>
+
+    <!-- CHAT -->
+
+    <div class="chat" id="chat">
+
+        <div class="msg ai">
+            Merhaba Efendim. J.A.R.V.I.S. sistemleri çevrimiçi.
+        </div>
+
+    </div>
+
+    <!-- INPUT -->
+
+    <div class="input-area">
+
+        <input
+            id="input"
+            class="input"
+            placeholder="J.A.R.V.I.S.'e bir şey söyle..."
+            autocomplete="off"
+        >
+
+        <button class="action mic" id="micBtn">◉</button>
+
+        <button class="action send" id="sendBtn">➤</button>
+
+    </div>
+
+
+    <!-- SETTINGS -->
+
+    <section class="settings" id="settings">
+
+        <div class="settings-header">
+
+            <h1>Ayarlar</h1>
+
+            <p>
+                J.A.R.V.I.S. sistemini ve arayüz deneyimini kişiselleştirin.
+            </p>
+
+        </div>
+
+
+        <div class="card">
 
             <div class="row">
 
-                <input
-                    id="uiScale"
-                    class="range"
-                    type="range"
-                    min="80"
-                    max="120"
-                    step="5"
-                    value="100"
-                >
+                <div>
+                    <div class="name">Hitap Şekli</div>
 
-                <span
-                    id="uiScaleValue"
-                    class="range-value"
-                >
-                    100%
-                </span>
+                    <div class="desc">
+                        J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
+                    </div>
+                </div>
+
+                <select id="addressSelect">
+                    <option>Efendim</option>
+                    <option>Komutanım</option>
+                    <option>Patron</option>
+                    <option>Dostum</option>
+                </select>
 
             </div>
 
         </div>
 
-    </div>
 
+        <div class="card">
 
-    <!-- THEME -->
+            <div class="row">
 
-    <div class="card">
+                <div>
+                    <div class="name">Arayüz Boyutu</div>
 
-        <div class="row">
-
-            <div>
-
-                <div class="name">
-                    Gece / Gündüz
+                    <div class="desc">
+                        K-Core boyutunu ayarlayın.
+                    </div>
                 </div>
 
-                <div class="desc">
-                    J.A.R.V.I.S. temasını değiştirin.
-                </div>
+                <div class="row">
 
-            </div>
+                    <input
+                        id="uiScale"
+                        class="range"
+                        type="range"
+                        min="80"
+                        max="120"
+                        step="5"
+                        value="100"
+                    >
 
-            <div
-                class="toggle"
-                id="themeToggle"
-            ></div>
+                    <span
+                        id="uiScaleValue"
+                        class="range-value"
+                    >100%</span>
 
-        </div>
-
-    </div>
-
-
-    <!-- FUN -->
-
-    <div class="card">
-
-        <div class="row">
-
-            <div>
-
-                <div class="name">
-                    Eğlence Modu
-                </div>
-
-                <div class="desc">
-                    Daha esprili ve muzip J.A.R.V.I.S. cevapları.
                 </div>
 
             </div>
 
-            <div
-                class="toggle"
-                id="funToggle"
-            ></div>
+        </div>
+
+
+        <div class="card">
+
+            <div class="row">
+
+                <div>
+                    <div class="name">Gece / Gündüz</div>
+
+                    <div class="desc">
+                        Arayüz temasını değiştirin.
+                    </div>
+                </div>
+
+                <div class="toggle" id="themeToggle"></div>
+
+            </div>
 
         </div>
 
-    </div>
 
-</section>
+        <div class="card">
 
+            <div class="row">
 
-<!-- =================================================
-     SIDEBAR
-================================================= -->
+                <div>
+                    <div class="name">Eğlence Modu</div>
 
-<div
-    class="overlay"
-    id="overlay"
-></div>
+                    <div class="desc">
+                        Daha esprili ve enerjik J.A.R.V.I.S. cevaplarını etkinleştirin.
+                    </div>
+                </div>
 
+                <div class="toggle" id="funToggle"></div>
 
-<aside
-    class="sidebar"
-    id="sidebar"
->
-
-    <div class="side-head">
-
-        <div class="side-title">
-
-            J.A.R.V.I.S.
+            </div>
 
         </div>
 
-        <button
-            class="close"
-            id="closeBtn"
-        >
-            ×
-        </button>
-
-    </div>
+    </section>
 
 
-    <div class="nav">
+    <!-- OVERLAY -->
 
-        <button
-            class="active"
-            id="homeBtn"
-        >
-            ⌂ &nbsp; Ana Ekran
-        </button>
+    <div class="overlay" id="overlay"></div>
 
-        <button
-            id="chatBtn"
-        >
-            ◌ &nbsp; JARVIS Chat
-        </button>
 
-        <button
-            id="settingsBtn"
-        >
-            ⚙ &nbsp; Ayarlar
-        </button>
+    <!-- SIDEBAR -->
 
-    </div>
+    <aside class="sidebar" id="sidebar">
 
-</aside>
+        <div class="side-head">
 
+            <div class="side-brand">
+
+                <div class="side-logo">K</div>
+
+                <div>
+                    <div class="side-title">
+                        J.A.R.V.I.S.
+                    </div>
+
+                    <div class="side-sub">
+                        KARAHAN INC.
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="close" id="closeBtn">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="nav">
+
+            <button class="active" id="homeBtn">
+                <span class="nav-icon">⌂</span>
+                Ana Ekran
+            </button>
+
+            <button id="chatBtn">
+                <span class="nav-icon">◌</span>
+                JARVIS Chat
+            </button>
+
+            <button id="settingsBtn">
+                <span class="nav-icon">⚙</span>
+                Ayarlar
+            </button>
+
+        </div>
+
+
+        <div class="side-footer">
+            <span>●</span>
+            &nbsp; SYSTEM ONLINE
+            <br>
+            <br>
+            KARAHAN INC. // K-CORE 01
+        </div>
+
+    </aside>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-   J.A.R.V.I.S. ENGINE
-===================================================== */
+/* =========================
+   CONFIG
+========================= */
 
 const API="/chat";
+
+
+/* =========================
+   ELEMENTS
+========================= */
 
 const $=id=>document.getElementById(id);
 
 const chat=$("chat");
 const input=$("input");
-
 const sendBtn=$("sendBtn");
 const micBtn=$("micBtn");
 
-const menuBtn=$("menuBtn");
-const closeBtn=$("closeBtn");
-
 const sidebar=$("sidebar");
 const overlay=$("overlay");
-
 const settings=$("settings");
+
+const menuBtn=$("menuBtn");
+const closeBtn=$("closeBtn");
 
 const homeBtn=$("homeBtn");
 const chatBtn=$("chatBtn");
 const settingsBtn=$("settingsBtn");
 
 const addressSelect=$("addressSelect");
-
 const themeToggle=$("themeToggle");
 const funToggle=$("funToggle");
 
 const uiScale=$("uiScale");
 const uiScaleValue=$("uiScaleValue");
+const coreArea=$("coreArea");
+const loadValue=$("loadValue");
 
 
-/* =====================================================
+/* =========================
    SETTINGS
-===================================================== */
+========================= */
 
-let address =
-    localStorage.getItem("jarvis_address")
-    || "Efendim";
+let address=
+    localStorage.getItem("jarvis_address") ||
+    "Efendim";
 
-let funMode =
-    localStorage.getItem("jarvis_fun")
-    === "true";
+let funMode=
+    localStorage.getItem("jarvis_fun")==="true";
 
-let light =
-    localStorage.getItem("jarvis_theme")
-    === "light";
+let light=
+    localStorage.getItem("jarvis_theme")==="light";
 
-let scale =
-    Number(
-        localStorage.getItem("jarvis_scale")
-        || 100
-    );
+let scale=
+    Number(localStorage.getItem("jarvis_scale")||100);
 
 
 addressSelect.value=address;
 
 uiScale.value=scale;
 
-uiScaleValue.textContent=
-    scale+"%";
+uiScaleValue.textContent=scale+"%";
 
 
 if(light){
@@ -2014,9 +1504,25 @@ if(funMode){
 }
 
 
-/* =====================================================
+/* =========================
+   CORE SCALE
+========================= */
+
+function applyScale(){
+
+    const s=scale/100;
+
+    coreArea.style.transform=
+        "translate(-50%,-50%) scale("+s+")";
+
+}
+
+applyScale();
+
+
+/* =========================
    MENU
-===================================================== */
+========================= */
 
 function openMenu(){
 
@@ -2043,17 +1549,15 @@ closeBtn.onclick=closeMenu;
 overlay.onclick=closeMenu;
 
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+/* =========================
+   NAV
+========================= */
 
 function active(btn){
 
     document
         .querySelectorAll(".nav button")
-        .forEach(
-            x=>x.classList.remove("active")
-        );
+        .forEach(x=>x.classList.remove("active"));
 
     btn.classList.add("active");
 
@@ -2079,10 +1583,7 @@ chatBtn.onclick=()=>{
 
     active(chatBtn);
 
-    setTimeout(
-        ()=>input.focus(),
-        200
-    );
+    setTimeout(()=>input.focus(),200);
 
 };
 
@@ -2098,14 +1599,13 @@ settingsBtn.onclick=()=>{
 };
 
 
-/* =====================================================
+/* =========================
    ADDRESS
-===================================================== */
+========================= */
 
 addressSelect.onchange=()=>{
 
-    address=
-        addressSelect.value;
+    address=addressSelect.value;
 
     localStorage.setItem(
         "jarvis_address",
@@ -2115,15 +1615,14 @@ addressSelect.onchange=()=>{
 };
 
 
-/* =====================================================
+/* =========================
    THEME
-===================================================== */
+========================= */
 
 themeToggle.onclick=()=>{
 
     light=
-        document.body.classList
-        .toggle("light");
+        document.body.classList.toggle("light");
 
     themeToggle.classList.toggle(
         "on",
@@ -2132,23 +1631,20 @@ themeToggle.onclick=()=>{
 
     localStorage.setItem(
         "jarvis_theme",
-        light
-        ? "light"
-        : "dark"
+        light ? "light" : "dark"
     );
 
 };
 
 
-/* =====================================================
+/* =========================
    FUN MODE
-===================================================== */
+========================= */
 
 funToggle.onclick=()=>{
 
     funMode=
-        document.body.classList
-        .toggle("fun");
+        document.body.classList.toggle("fun");
 
     funToggle.classList.toggle(
         "on",
@@ -2160,26 +1656,24 @@ funToggle.onclick=()=>{
         funMode
     );
 
-    /* Görsel bildirim */
 
     addMessage(
         funMode
-        ? "Eğlence modu aktif. Efendim, artık biraz daha yaratıcı olabilirim. 😏"
-        : "Eğlence modu devre dışı. Sistem tekrar ciddi çalışma modunda.",
+            ? "Eğlence modu aktif. Efendim, artık biraz daha yaratıcı olabilirim. 😏"
+            : "Eğlence modu devre dışı. Sistem tekrar ciddi çalışma modunda.",
         "ai"
     );
 
 };
 
 
-/* =====================================================
+/* =========================
    SCALE
-===================================================== */
+========================= */
 
 uiScale.oninput=()=>{
 
-    scale=
-        Number(uiScale.value);
+    scale=Number(uiScale.value);
 
     uiScaleValue.textContent=
         scale+"%";
@@ -2189,32 +1683,19 @@ uiScale.oninput=()=>{
         scale
     );
 
-    const core=
-        document.querySelector(
-            ".core-area"
-        );
-
-    core.style.transform=
-        "translate(-50%,-50%) scale("+
-        scale/100+
-        ")";
+    applyScale();
 
 };
 
 
-/* =====================================================
-   MESSAGE
-===================================================== */
+/* =========================
+   CHAT MESSAGE
+========================= */
 
-function addMessage(
-    text,
-    type="ai"
-){
+function addMessage(text,type){
 
     const el=
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     el.className=
         "msg "+type;
@@ -2231,27 +1712,24 @@ function addMessage(
 }
 
 
-/* =====================================================
+/* =========================
    TYPING
-===================================================== */
+========================= */
 
 function typing(){
 
     const el=
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     el.id="typing";
 
-    el.className=
-        "msg ai";
+    el.className="msg ai";
 
     el.innerHTML=`
         <div class="typing">
-            <i></i>
-            <i></i>
-            <i></i>
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     `;
 
@@ -2263,18 +1741,16 @@ function typing(){
 }
 
 
-/* =====================================================
+/* =========================
    SEND
-===================================================== */
+========================= */
 
 async function sendMessage(){
 
     const text=
         input.value.trim();
 
-    if(!text){
-        return;
-    }
+    if(!text)return;
 
 
     addMessage(
@@ -2285,9 +1761,7 @@ async function sendMessage(){
 
     input.value="";
 
-
     typing();
-
 
     sendBtn.disabled=true;
 
@@ -2335,10 +1809,7 @@ async function sendMessage(){
         const t=
             $("typing");
 
-
-        if(t){
-            t.remove();
-        }
+        if(t)t.remove();
 
 
         addMessage(
@@ -2356,18 +1827,16 @@ async function sendMessage(){
         const t=
             $("typing");
 
-        if(t){
-            t.remove();
-        }
+        if(t)t.remove();
 
 
         addMessage(
 
             funMode
 
-            ? "Efendim... sunucu şu an biraz naz yapıyor. 😏 Bağlantıyı kontrol etmemiz gerekiyor."
+                ? "Efendim... sunucu şu an biraz naz yapıyor. 😏 Bağlantıyı kontrol etmemiz gerekiyor."
 
-            : "Efendim, sunucu bağlantısında bir sorun oluştu.",
+                : "Efendim, sunucu bağlantısında bir sorun oluştu.",
 
             "ai"
 
@@ -2387,25 +1856,23 @@ async function sendMessage(){
 }
 
 
-/* =====================================================
+/* =========================
    SEND
-===================================================== */
+========================= */
 
 sendBtn.onclick=
     sendMessage;
 
 
-/* =====================================================
+/* =========================
    ENTER
-===================================================== */
+========================= */
 
 input.addEventListener(
     "keydown",
     e=>{
 
-        if(
-            e.key==="Enter"
-        ){
+        if(e.key==="Enter"){
 
             e.preventDefault();
 
@@ -2417,9 +1884,9 @@ input.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================
    VOICE
-===================================================== */
+========================= */
 
 const SpeechRecognition=
     window.SpeechRecognition ||
@@ -2435,10 +1902,8 @@ if(SpeechRecognition){
     recognition.lang=
         "tr-TR";
 
-
     recognition.continuous=
         false;
-
 
     recognition.interimResults=
         false;
@@ -2450,6 +1915,8 @@ if(SpeechRecognition){
             "active"
         );
 
+        micBtn.textContent="●";
+
     };
 
 
@@ -2459,6 +1926,8 @@ if(SpeechRecognition){
             "active"
         );
 
+        micBtn.textContent="◉";
+
     };
 
 
@@ -2466,7 +1935,7 @@ if(SpeechRecognition){
 
         input.value=
             e.results[0][0]
-            .transcript;
+                .transcript;
 
         input.focus();
 
@@ -2483,6 +1952,7 @@ if(SpeechRecognition){
 
     };
 
+
 }else{
 
     micBtn.onclick=()=>{
@@ -2497,16 +1967,33 @@ if(SpeechRecognition){
 }
 
 
-/* =====================================================
-   START
-===================================================== */
+/* =========================
+   SYSTEM LOAD ANIMATION
+========================= */
 
-setTimeout(
-    ()=>{
-        input.focus();
-    },
-    500
-);
+setInterval(()=>{
+
+    const value=
+        Math.floor(
+            20+
+            Math.random()*45
+        );
+
+    loadValue.textContent=
+        value+"%";
+
+},1800);
+
+
+/* =========================
+   START
+========================= */
+
+setTimeout(()=>{
+
+    input.focus();
+
+},500);
 
 </script>
 
