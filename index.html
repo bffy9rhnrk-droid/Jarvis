@@ -3,16 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
+
+/* =====================================================
+   J.A.R.V.I.S. — KARAHAN INC.
+   PREMIUM MOBILE INTERFACE
+===================================================== */
+
 :root{
     --cyan:#36e5ff;
-    --bg:#03070c;
-    --text:#eefaff;
-    --muted:#82919e;
-    --panel:rgba(8,17,26,.92);
-    --border:rgba(255,255,255,.1);
+    --cyan2:#9af8ff;
+
+    --bg:#02060b;
+    --panel:rgba(7,16,25,.88);
+
+    --text:#edfaff;
+    --muted:#758792;
+
+    --border:rgba(255,255,255,.09);
+
+    --green:#55ffad;
+    --red:#ff4057;
+
+    --accent:var(--cyan);
 }
 
 *{
@@ -20,7 +36,8 @@
     -webkit-tap-highlight-color:transparent;
 }
 
-html,body{
+html,
+body{
     width:100%;
     height:100%;
     margin:0;
@@ -29,75 +46,150 @@ html,body{
 }
 
 body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
+
     color:var(--text);
 }
 
-button,input{
-    font:inherit;
-}
+/* =====================================================
+   APP
+===================================================== */
 
 .app{
     position:relative;
+
     width:100%;
     height:100dvh;
+
     overflow:hidden;
+
     background:
-        radial-gradient(circle at 50% 42%,rgba(0,180,220,.1),transparent 30%),
-        #03070c;
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(0,190,230,.12),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(0,110,150,.08),
+            transparent 45%
+        ),
+        #02060b;
 }
 
 /* GRID */
 
 .app:before{
     content:"";
+
     position:absolute;
     inset:0;
-    opacity:.1;
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-    background-size:35px 35px;
+
     pointer-events:none;
+
+    opacity:.12;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:34px 34px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            transparent,
+            #000 18%,
+            #000 82%,
+            transparent
+        );
 }
 
-/* TOP */
+/* =====================================================
+   TOP BAR
+===================================================== */
 
 .top{
     position:absolute;
-    z-index:10;
+
+    z-index:20;
+
     top:0;
     left:0;
     right:0;
-    height:75px;
+
+    height:78px;
+
     padding:
         calc(12px + env(safe-area-inset-top))
-        15px 8px;
+        15px
+        8px;
+
     display:flex;
+
     justify-content:space-between;
     align-items:center;
 }
 
+/* MENU */
+
 .menu{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    background:rgba(10,20,30,.8);
-    border:1px solid var(--border);
+    width:45px;
+    height:45px;
+
+    border-radius:15px;
+
+    border:1px solid rgba(54,229,255,.16);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(13,27,39,.9),
+            rgba(5,12,19,.9)
+        );
+
     display:flex;
     flex-direction:column;
+
     justify-content:center;
     align-items:center;
+
     gap:5px;
+
+    box-shadow:
+        inset 0 0 15px rgba(54,229,255,.03),
+        0 8px 25px rgba(0,0,0,.3);
+}
+
+.menu:active{
+    transform:scale(.92);
 }
 
 .menu i{
     width:18px;
-    height:2px;
-    background:var(--cyan);
-    box-shadow:0 0 8px var(--cyan);
+    height:1.5px;
+
     border-radius:5px;
+
+    background:var(--accent);
+
+    box-shadow:
+        0 0 8px var(--accent);
 }
+
+/* BRAND */
 
 .brand{
     text-align:right;
@@ -105,166 +197,552 @@ button,input{
 
 .brand b{
     display:block;
-    font-size:17px;
-    letter-spacing:3px;
+
+    font-size:18px;
+
+    letter-spacing:4px;
+
+    color:#f1fbff;
+
+    text-shadow:
+        0 0 20px rgba(54,229,255,.18);
 }
 
 .brand small{
     display:block;
-    margin-top:3px;
+
+    margin-top:4px;
+
     font-size:7px;
-    letter-spacing:2px;
-    color:var(--cyan);
+
+    letter-spacing:3px;
+
+    color:var(--accent);
+
+    opacity:.8;
 }
 
-/* STATUS */
+/* =====================================================
+   SYSTEM BAR
+===================================================== */
 
-.status{
+.system{
     position:absolute;
-    top:88px;
-    right:15px;
-    font-size:8px;
+
+    z-index:10;
+
+    top:91px;
+    right:16px;
+
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    font-size:7px;
+
     letter-spacing:2px;
-    color:#82919e;
+
+    color:#758792;
 }
 
-.status span{
-    display:inline-block;
+.system-dot{
     width:6px;
     height:6px;
-    margin-right:5px;
+
     border-radius:50%;
-    background:#55ffad;
-    box-shadow:0 0 9px #55ffad;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 10px var(--green);
+
+    animation:
+        systemPulse 1.8s infinite;
 }
 
-/* CORE */
+@keyframes systemPulse{
+
+    0%,100%{
+        opacity:.35;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+}
+
+/* =====================================================
+   EXTRA HUD
+===================================================== */
+
+.hud-left{
+    position:absolute;
+
+    left:15px;
+    top:103px;
+
+    font-size:6px;
+
+    letter-spacing:1.8px;
+
+    color:#52646f;
+
+    line-height:1.9;
+
+    pointer-events:none;
+}
+
+.hud-left span{
+    color:var(--accent);
+}
+
+.hud-right{
+    position:absolute;
+
+    right:15px;
+    top:123px;
+
+    font-size:6px;
+
+    letter-spacing:1.6px;
+
+    color:#52646f;
+
+    text-align:right;
+
+    line-height:1.9;
+
+    pointer-events:none;
+}
+
+.hud-right span{
+    color:var(--accent);
+}
+
+/* =====================================================
+   CORE
+===================================================== */
 
 .core-area{
+
     position:absolute;
-    top:39%;
+
+    top:40%;
+
     left:50%;
-    width:250px;
-    height:250px;
-    transform:translate(-50%,-50%);
+
+    width:285px;
+    height:285px;
+
+    transform:
+        translate(-50%,-50%);
+
 }
+
+/* GLOW */
 
 .glow{
     position:absolute;
-    width:155px;
-    height:155px;
-    left:47px;
-    top:47px;
+
+    left:50%;
+    top:50%;
+
+    width:165px;
+    height:165px;
+
+    transform:
+        translate(-50%,-50%);
+
     border-radius:50%;
-    background:rgba(54,229,255,.1);
-    filter:blur(25px);
-    animation:pulse 3s infinite;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,229,255,.22),
+            rgba(54,229,255,.04) 55%,
+            transparent 75%
+        );
+
+    filter:blur(17px);
+
+    animation:
+        coreGlow 3s ease-in-out infinite;
 }
 
-@keyframes pulse{
-    50%{transform:scale(1.15);opacity:.8}
+@keyframes coreGlow{
+
+    0%,100%{
+        transform:
+            translate(-50%,-50%)
+            scale(.88);
+
+        opacity:.55;
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            scale(1.12);
+
+        opacity:1;
+    }
+
 }
+
+/* RINGS */
 
 .ring{
     position:absolute;
+
     left:50%;
     top:50%;
-    border:1px solid rgba(54,229,255,.25);
+
     border-radius:50%;
-    transform:translate(-50%,-50%);
+
+    transform:
+        translate(-50%,-50%);
+
+    border:1px solid rgba(54,229,255,.18);
+
+    pointer-events:none;
 }
 
 .r1{
-    width:180px;
-    height:180px;
-    border-top-color:var(--cyan);
-    animation:spin 7s linear infinite;
+    width:175px;
+    height:175px;
+
+    border-top-color:var(--accent);
+    border-right-color:rgba(54,229,255,.45);
+
+    animation:
+        spin1 7s linear infinite;
 }
 
 .r2{
-    width:205px;
-    height:205px;
-    border-bottom-color:var(--cyan);
-    animation:spin 11s linear reverse infinite;
+    width:202px;
+    height:202px;
+
+    border-bottom-color:var(--accent);
+    border-left-color:rgba(54,229,255,.4);
+
+    animation:
+        spin2 11s linear infinite;
 }
 
 .r3{
     width:230px;
     height:230px;
-    border-left-color:var(--cyan);
-    animation:spin 16s linear infinite;
+
+    border-top-color:rgba(54,229,255,.45);
+    border-left-color:rgba(54,229,255,.6);
+
+    animation:
+        spin1 16s linear infinite;
 }
 
-@keyframes spin{
-    to{transform:translate(-50%,-50%) rotate(360deg)}
+.r4{
+    width:258px;
+    height:258px;
+
+    border-right-color:rgba(54,229,255,.4);
+    border-bottom-color:rgba(54,229,255,.25);
+
+    animation:
+        spin2 22s linear infinite;
 }
+
+@keyframes spin1{
+
+    from{
+        transform:
+            translate(-50%,-50%)
+            rotate(0);
+    }
+
+    to{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg);
+    }
+
+}
+
+@keyframes spin2{
+
+    from{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg);
+    }
+
+    to{
+        transform:
+            translate(-50%,-50%)
+            rotate(0);
+    }
+
+}
+
+/* ORBIT DOTS */
+
+.orbit{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:7px;
+    height:7px;
+
+    margin:-3.5px;
+
+    border-radius:50%;
+
+    background:var(--accent);
+
+    box-shadow:
+        0 0 12px var(--accent),
+        0 0 25px rgba(54,229,255,.5);
+}
+
+.o1{
+    animation:
+        orbit1 7s linear infinite;
+}
+
+.o2{
+    animation:
+        orbit2 11s linear infinite;
+}
+
+@keyframes orbit1{
+
+    from{
+        transform:
+            rotate(0deg)
+            translateX(87px);
+    }
+
+    to{
+        transform:
+            rotate(360deg)
+            translateX(87px);
+    }
+
+}
+
+@keyframes orbit2{
+
+    from{
+        transform:
+            rotate(360deg)
+            translateX(101px);
+    }
+
+    to{
+        transform:
+            rotate(0deg)
+            translateX(101px);
+    }
+
+}
+
+/* CORE */
 
 .core{
     position:absolute;
+
     left:50%;
     top:50%;
-    width:105px;
-    height:105px;
-    transform:translate(-50%,-50%);
+
+    width:108px;
+    height:108px;
+
+    transform:
+        translate(-50%,-50%);
+
     border-radius:50%;
+
     display:flex;
+
     justify-content:center;
     align-items:center;
+
     background:
-        radial-gradient(circle at 30% 25%,
-        #bfffff,
-        #36e5ff 18%,
-        #0d6174 48%,
-        #04151b 75%,
-        #020609);
-    border:1px solid #9af8ff;
+        radial-gradient(
+            circle at 30% 25%,
+            #d0ffff 0%,
+            #36e5ff 17%,
+            #0b6075 46%,
+            #04151c 72%,
+            #010509 100%
+        );
+
+    border:1px solid rgba(170,250,255,.9);
+
     box-shadow:
-        0 0 18px rgba(54,229,255,.8),
-        0 0 50px rgba(54,229,255,.35),
-        inset 0 0 25px #000;
+        0 0 15px rgba(54,229,255,.85),
+        0 0 40px rgba(54,229,255,.5),
+        0 0 80px rgba(54,229,255,.12),
+        inset 0 0 28px rgba(0,0,0,.85);
+
+    animation:
+        coreFloat 4s ease-in-out infinite;
+
+}
+
+@keyframes coreFloat{
+
+    0%,100%{
+        transform:
+            translate(-50%,-50%);
+    }
+
+    50%{
+        transform:
+            translate(-50%,-54%);
+    }
+
+}
+
+.core:before{
+    content:"";
+
+    position:absolute;
+
+    inset:8px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(200,255,255,.35);
 }
 
 .core:after{
     content:"";
+
     position:absolute;
-    inset:9px;
-    border:1px solid rgba(255,255,255,.3);
+
+    inset:17px;
+
     border-radius:50%;
+
+    border:1px solid rgba(255,255,255,.1);
 }
 
 .k{
     position:relative;
+
     z-index:2;
-    font-size:48px;
+
+    font-size:50px;
+
     font-weight:800;
+
+    letter-spacing:-5px;
+
+    color:#edffff;
+
     text-shadow:
-        0 0 8px white,
-        0 0 25px var(--cyan);
+        0 0 7px white,
+        0 0 20px var(--accent),
+        0 0 45px var(--accent);
 }
+
+/* LABEL */
 
 .core-label{
+
     position:absolute;
-    top:calc(50% + 75px);
+
+    top:calc(50% + 79px);
+
     width:100%;
+
     text-align:center;
+
     font-size:7px;
-    letter-spacing:2.5px;
-    color:#82919e;
+
+    letter-spacing:3px;
+
+    color:#637781;
 }
 
-/* CHAT */
+/* =====================================================
+   CORE STATUS
+===================================================== */
+
+.core-status{
+
+    position:absolute;
+
+    top:calc(50% + 103px);
+
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:5px;
+
+    font-size:6px;
+
+    letter-spacing:1.5px;
+
+    color:#4d626c;
+
+}
+
+.core-status i{
+
+    width:4px;
+    height:4px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 7px var(--green);
+
+}
+
+/* =====================================================
+   CHAT
+===================================================== */
 
 .chat{
+
     position:absolute;
+
+    z-index:8;
+
     left:12px;
     right:12px;
-    bottom:92px;
+
+    bottom:
+        calc(
+            91px +
+            env(safe-area-inset-bottom)
+        );
+
     max-height:21vh;
+
     overflow-y:auto;
+
     display:flex;
+
     flex-direction:column;
+
     gap:7px;
+
     scrollbar-width:none;
+
 }
 
 .chat::-webkit-scrollbar{
@@ -272,108 +750,336 @@ button,input{
 }
 
 .msg{
-    max-width:90%;
-    padding:9px 12px;
-    border-radius:14px;
+
+    max-width:91%;
+
+    padding:
+        10px 13px;
+
+    border-radius:15px;
+
     font-size:13px;
+
     line-height:1.45;
-    background:rgba(9,20,29,.85);
-    border:1px solid rgba(255,255,255,.08);
+
+    color:#dcecf0;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(11,25,36,.9),
+            rgba(5,14,21,.9)
+        );
+
+    border:1px solid rgba(255,255,255,.07);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.2);
+
+    backdrop-filter:blur(14px);
+
+    animation:
+        messageIn .25s ease;
+
 }
 
 .msg.ai{
-    border-left:2px solid var(--cyan);
+
+    border-left:
+        2px solid var(--accent);
+
 }
 
 .msg.user{
+
     align-self:flex-end;
-    background:rgba(0,90,110,.35);
-    border-color:rgba(54,229,255,.25);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,95,115,.38),
+            rgba(0,50,65,.3)
+        );
+
+    border-color:
+        rgba(54,229,255,.2);
+
 }
 
-/* INPUT */
+@keyframes messageIn{
+
+    from{
+        opacity:0;
+        transform:translateY(7px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* =====================================================
+   TYPING
+===================================================== */
+
+.typing{
+
+    display:flex;
+
+    gap:5px;
+
+    align-items:center;
+
+}
+
+.typing i{
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:var(--accent);
+
+    box-shadow:
+        0 0 8px var(--accent);
+
+    animation:
+        typing 1.2s infinite;
+
+}
+
+.typing i:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing i:nth-child(3){
+    animation-delay:.3s;
+}
+
+@keyframes typing{
+
+    0%,60%,100%{
+        opacity:.25;
+        transform:translateY(0);
+    }
+
+    30%{
+        opacity:1;
+        transform:translateY(-3px);
+    }
+
+}
+
+/* =====================================================
+   INPUT
+===================================================== */
 
 .input-area{
+
     position:absolute;
-    z-index:20;
+
+    z-index:30;
+
     left:10px;
     right:10px;
-    bottom:calc(7px + env(safe-area-inset-bottom));
-    height:56px;
+
+    bottom:
+        calc(
+            7px +
+            env(safe-area-inset-bottom)
+        );
+
+    height:57px;
+
     display:flex;
+
     gap:5px;
+
     padding:5px;
-    border-radius:17px;
-    background:rgba(7,15,23,.95);
-    border:1px solid var(--border);
-    box-shadow:0 12px 40px #0008;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,20,30,.96),
+            rgba(4,11,17,.96)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.5),
+        0 0 25px rgba(0,170,220,.05);
+
+    backdrop-filter:blur(20px);
+
 }
 
 .input{
+
     flex:1;
+
     min-width:0;
+
     border:0;
+
     outline:0;
+
     background:transparent;
+
     color:white;
+
     padding:0 8px;
+
     font-size:16px;
+
 }
 
 .input::placeholder{
-    color:#71818d;
+
+    color:#667983;
+
     font-size:13px;
+
 }
 
 .action{
-    width:43px;
-    height:43px;
+
+    width:44px;
+    height:44px;
+
     flex:none;
+
     border-radius:13px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.08);
-    color:#8fa3ae;
+
+    border:
+        1px solid rgba(255,255,255,.07);
+
+    background:
+        rgba(255,255,255,.045);
+
+    color:#82949e;
+
+    transition:.2s;
+
 }
 
-.action.active,
+.action:active{
+    transform:scale(.9);
+}
+
+.action.active{
+
+    color:var(--accent);
+
+    border-color:
+        rgba(54,229,255,.4);
+
+    box-shadow:
+        0 0 17px rgba(54,229,255,.2);
+
+    animation:
+        micPulse .8s infinite alternate;
+
+}
+
+@keyframes micPulse{
+
+    to{
+        box-shadow:
+            0 0 25px rgba(54,229,255,.55);
+    }
+
+}
+
 .send{
-    color:var(--cyan);
-    border-color:rgba(54,229,255,.3);
+
+    color:var(--accent);
+
+    border-color:
+        rgba(54,229,255,.25);
+
+    background:
+        rgba(54,229,255,.08);
+
 }
 
-/* SIDEBAR */
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
 .overlay{
+
     position:fixed;
+
+    z-index:80;
+
     inset:0;
-    z-index:40;
-    background:#0009;
+
+    background:
+        rgba(0,0,0,.62);
+
     opacity:0;
+
     pointer-events:none;
+
     transition:.25s;
+
+    backdrop-filter:blur(3px);
+
 }
 
 .overlay.open{
+
     opacity:1;
+
     pointer-events:auto;
+
 }
 
 .sidebar{
+
     position:fixed;
-    z-index:50;
+
+    z-index:100;
+
     top:0;
     bottom:0;
     left:0;
-    width:285px;
+
+    width:290px;
+
     max-width:84vw;
+
     padding:
         calc(20px + env(safe-area-inset-top))
         16px
         calc(20px + env(safe-area-inset-bottom));
-    background:linear-gradient(145deg,#0a151f,#03080d);
-    border-right:1px solid var(--border);
-    transform:translateX(-105%);
-    transition:.3s;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,22,32,.98),
+            rgba(2,7,12,.99)
+        );
+
+    border-right:
+        1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        20px 0 60px rgba(0,0,0,.5);
+
+    transform:
+        translateX(-105%);
+
+    transition:
+        transform .3s cubic-bezier(.22,.8,.25,1);
+
 }
 
 .sidebar.open{
@@ -381,425 +1087,852 @@ button,input{
 }
 
 .side-head{
+
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
+
     margin-bottom:30px;
+
 }
 
 .side-title{
-    font-weight:bold;
-    letter-spacing:2px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:2.5px;
+
 }
 
 .close{
+
     width:38px;
     height:38px;
+
     border-radius:12px;
-    background:#ffffff0b;
-    color:#aaa;
-    font-size:22px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    color:#9aaab4;
+
+    font-size:21px;
+
 }
 
 .nav{
+
     display:flex;
+
     flex-direction:column;
+
     gap:7px;
+
 }
 
 .nav button{
+
     padding:14px;
+
     border-radius:13px;
-    border:1px solid transparent;
+
+    border:
+        1px solid transparent;
+
     background:transparent;
+
     color:#9eacb5;
+
     text-align:left;
+
+    font-size:14px;
+
 }
 
 .nav button.active{
-    color:var(--cyan);
-    background:rgba(54,229,255,.08);
-    border-color:rgba(54,229,255,.15);
+
+    color:var(--accent);
+
+    background:
+        rgba(54,229,255,.08);
+
+    border-color:
+        rgba(54,229,255,.15);
+
 }
 
-/* SETTINGS */
+/* =====================================================
+   SETTINGS
+===================================================== */
 
 .settings{
+
     position:absolute;
+
     inset:0;
-    z-index:30;
+
+    z-index:60;
+
     overflow-y:auto;
+
     padding:
         calc(90px + env(safe-area-inset-top))
         15px
         calc(90px + env(safe-area-inset-bottom));
-    background:#03070c;
+
+    background:
+        radial-gradient(
+            circle at 50% 10%,
+            rgba(0,160,200,.08),
+            transparent 28%
+        ),
+        #02060b;
+
     opacity:0;
+
     pointer-events:none;
-    transform:translateX(20px);
+
+    transform:
+        translateX(20px);
+
     transition:.25s;
+
 }
 
 .settings.open{
+
     opacity:1;
+
     pointer-events:auto;
+
     transform:none;
+
 }
 
 .settings h1{
+
     margin:0;
-    font-size:24px;
+
+    font-size:25px;
+
+    letter-spacing:.5px;
+
 }
 
 .settings p{
+
     color:var(--muted);
+
     font-size:12px;
-    margin:7px 0 22px;
+
+    margin:
+        7px 0 22px;
+
 }
 
 .card{
+
     margin-bottom:10px;
+
     padding:15px;
-    border-radius:16px;
-    background:rgba(10,19,28,.8);
-    border:1px solid var(--border);
+
+    border-radius:17px;
+
+    background:
+        rgba(9,19,28,.78);
+
+    border:
+        1px solid var(--border);
+
 }
 
 .row{
+
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
+
     gap:10px;
+
 }
 
 .name{
+
     font-size:13px;
+
     font-weight:600;
+
 }
 
 .desc{
+
     margin-top:4px;
-    color:#748590;
+
+    color:#71838d;
+
     font-size:10px;
+
     line-height:1.4;
+
 }
 
 select{
+
     width:105px;
+
     padding:8px;
+
     border-radius:10px;
+
     background:#0b1720;
+
     color:white;
-    border:1px solid var(--border);
+
+    border:
+        1px solid var(--border);
+
 }
 
 .toggle{
+
     width:47px;
     height:26px;
+
     border-radius:20px;
+
     background:#16222b;
+
     position:relative;
+
+    flex:none;
+
 }
 
 .toggle:after{
+
     content:"";
+
     position:absolute;
+
     left:3px;
     top:3px;
+
     width:20px;
     height:20px;
+
     border-radius:50%;
+
     background:#73818a;
+
     transition:.2s;
+
 }
 
 .toggle.on{
-    background:rgba(54,229,255,.2);
+
+    background:
+        rgba(54,229,255,.2);
+
 }
 
 .toggle.on:after{
+
     left:24px;
-    background:var(--cyan);
-    box-shadow:0 0 10px var(--cyan);
+
+    background:var(--accent);
+
+    box-shadow:
+        0 0 10px var(--accent);
+
 }
 
 .range{
-    width:100px;
-    accent-color:var(--cyan);
+
+    width:95px;
+
+    accent-color:var(--accent);
+
 }
 
 .range-value{
+
     width:35px;
-    color:var(--cyan);
+
+    color:var(--accent);
+
     font-size:11px;
+
 }
 
-/* LIGHT */
+/* =====================================================
+   LIGHT MODE
+===================================================== */
 
 body.light{
+
     --bg:#edf5f8;
+
     --text:#102029;
+
 }
 
-body.light .app,
+body.light .app{
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(0,180,220,.13),
+            transparent 32%
+        ),
+        #edf5f8;
+
+}
+
 body.light .settings{
+
     background:#edf5f8;
+
 }
 
 body.light .input-area,
 body.light .sidebar,
 body.light .card,
 body.light .msg{
-    background:rgba(255,255,255,.85);
+
+    background:
+        rgba(255,255,255,.86);
+
 }
 
 body.light .input{
+
     color:#102029;
+
 }
 
-/* FUN */
+/* =====================================================
+   FUN MODE
+===================================================== */
 
 body.fun{
-    --cyan:#ff4057;
+
+    --accent:#ff4057;
+
+}
+
+body.fun .app{
+
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(255,45,70,.11),
+            transparent 28%
+        ),
+        #080204;
+
 }
 
 body.fun .core{
+
     background:
-        radial-gradient(circle at 30% 25%,
-        #ffb0b8,
-        #ff4057 18%,
-        #751927 48%,
-        #170509 75%,
-        #020203);
+        radial-gradient(
+            circle at 30% 25%,
+            #ffc0c7,
+            #ff4057 17%,
+            #781a28 46%,
+            #180508 72%,
+            #020203
+        );
+
+    border-color:
+        rgba(255,140,150,.9);
+
+    box-shadow:
+        0 0 18px rgba(255,64,87,.85),
+        0 0 45px rgba(255,64,87,.45),
+        inset 0 0 28px #000;
+
 }
 
 body.fun .glow{
-    background:rgba(255,64,87,.1);
-}
 
-/* SMALL */
-
-@media(max-width:390px){
-
-    .brand b{
-        font-size:15px;
-        letter-spacing:2px;
-    }
-
-    .core-area{
-        transform:translate(-50%,-50%) scale(.9);
-    }
-
-    .chat{
-        max-height:18vh;
-    }
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,64,87,.22),
+            transparent 70%
+        );
 
 }
 
-/* SHORT */
+body.fun .ring{
+
+    border-color:
+        rgba(255,64,87,.22);
+
+}
+
+body.fun .orbit{
+
+    background:#ff4057;
+
+    box-shadow:
+        0 0 12px #ff4057,
+        0 0 25px rgba(255,64,87,.5);
+
+}
+
+body.fun .system-dot{
+
+    background:#ff5266;
+
+    box-shadow:
+        0 0 10px #ff5266;
+
+}
+
+/* =====================================================
+   SHORT SCREEN
+===================================================== */
 
 @media(max-height:680px){
 
     .core-area{
+
         top:34%;
-        transform:translate(-50%,-50%) scale(.82);
+
+        transform:
+            translate(-50%,-50%)
+            scale(.82);
+
     }
 
     .chat{
+
         max-height:16vh;
+
+    }
+
+    .hud-left,
+    .hud-right{
+
+        display:none;
+
     }
 
 }
+
+/* =====================================================
+   SMALL IPHONE
+===================================================== */
+
+@media(max-width:390px){
+
+    .brand b{
+
+        font-size:15px;
+
+        letter-spacing:2.5px;
+
+    }
+
+    .core-area{
+
+        transform:
+            translate(-50%,-50%)
+            scale(.9);
+
+    }
+
+    .chat{
+
+        max-height:18vh;
+
+    }
+
+}
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <div class="top">
 
-        <button class="menu" id="menuBtn">
-            <i></i>
-            <i></i>
-            <i></i>
+<!-- =================================================
+     TOP
+================================================= -->
+
+<div class="top">
+
+    <button class="menu" id="menuBtn">
+
+        <i></i>
+        <i></i>
+        <i></i>
+
+    </button>
+
+
+    <div class="brand">
+
+        <b>J.A.R.V.I.S.</b>
+
+        <small>
+            KARAHAN INC.
+        </small>
+
+    </div>
+
+</div>
+
+
+<!-- SYSTEM -->
+
+<div class="system">
+
+    <span class="system-dot"></span>
+
+    SYSTEM ONLINE
+
+</div>
+
+
+<!-- HUD -->
+
+<div class="hud-left">
+
+    CORE <span>ACTIVE</span><br>
+    NETWORK <span>SECURE</span><br>
+    AI ENGINE <span>ONLINE</span>
+
+</div>
+
+
+<div class="hud-right">
+
+    MK-I<br>
+    K-CORE <span>01</span><br>
+    STATUS <span>READY</span>
+
+</div>
+
+
+<!-- =================================================
+     CORE
+================================================= -->
+
+<div class="core-area">
+
+    <div class="glow"></div>
+
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <div class="ring r4"></div>
+
+    <div class="orbit o1"></div>
+    <div class="orbit o2"></div>
+
+    <div class="core">
+
+        <div class="k">
+            K
+        </div>
+
+    </div>
+
+    <div class="core-label">
+
+        ARTIFICIAL INTELLIGENCE
+
+    </div>
+
+    <div class="core-status">
+
+        <i></i>
+
+        CORE STABLE
+
+    </div>
+
+</div>
+
+
+<!-- =================================================
+     CHAT
+================================================= -->
+
+<div class="chat" id="chat">
+
+    <div class="msg ai">
+
+        Merhaba Efendim, nasıl yardımcı olabilirim?
+
+    </div>
+
+</div>
+
+
+<!-- =================================================
+     INPUT
+================================================= -->
+
+<div class="input-area">
+
+    <input
+        id="input"
+        class="input"
+        placeholder="J.A.R.V.I.S.'e bir şey söyle..."
+        autocomplete="off"
+    >
+
+    <button
+        class="action"
+        id="micBtn"
+        title="Sesli giriş"
+    >
+        ◉
+    </button>
+
+    <button
+        class="action send"
+        id="sendBtn"
+        title="Gönder"
+    >
+        ➤
+    </button>
+
+</div>
+
+
+<!-- =================================================
+     SETTINGS
+================================================= -->
+
+<section
+    class="settings"
+    id="settings"
+>
+
+    <h1>
+        Ayarlar
+    </h1>
+
+    <p>
+        J.A.R.V.I.S. deneyimini kendinize göre yapılandırın.
+    </p>
+
+
+    <!-- HITAP -->
+
+    <div class="card">
+
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Hitap Şekli
+                </div>
+
+                <div class="desc">
+                    J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
+                </div>
+
+            </div>
+
+            <select id="addressSelect">
+
+                <option>Efendim</option>
+                <option>Komutanım</option>
+                <option>Patron</option>
+                <option>Dostum</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- SCALE -->
+
+    <div class="card">
+
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Arayüz Boyutu
+                </div>
+
+                <div class="desc">
+                    Arayüz çekirdeğinin boyutunu ayarlayın.
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <input
+                    id="uiScale"
+                    class="range"
+                    type="range"
+                    min="80"
+                    max="120"
+                    step="5"
+                    value="100"
+                >
+
+                <span
+                    id="uiScaleValue"
+                    class="range-value"
+                >
+                    100%
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- THEME -->
+
+    <div class="card">
+
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Gece / Gündüz
+                </div>
+
+                <div class="desc">
+                    J.A.R.V.I.S. temasını değiştirin.
+                </div>
+
+            </div>
+
+            <div
+                class="toggle"
+                id="themeToggle"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FUN -->
+
+    <div class="card">
+
+        <div class="row">
+
+            <div>
+
+                <div class="name">
+                    Eğlence Modu
+                </div>
+
+                <div class="desc">
+                    Daha esprili ve muzip J.A.R.V.I.S. cevapları.
+                </div>
+
+            </div>
+
+            <div
+                class="toggle"
+                id="funToggle"
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =================================================
+     SIDEBAR
+================================================= -->
+
+<div
+    class="overlay"
+    id="overlay"
+></div>
+
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+    <div class="side-head">
+
+        <div class="side-title">
+
+            J.A.R.V.I.S.
+
+        </div>
+
+        <button
+            class="close"
+            id="closeBtn"
+        >
+            ×
         </button>
 
-        <div class="brand">
-            <b>J.A.R.V.I.S.</b>
-            <small>KARAHAN INC.</small>
-        </div>
-
     </div>
 
-    <div class="status">
-        <span></span>SYSTEM ONLINE
-    </div>
 
-    <div class="core-area">
+    <div class="nav">
 
-        <div class="glow"></div>
-
-        <div class="ring r1"></div>
-        <div class="ring r2"></div>
-        <div class="ring r3"></div>
-
-        <div class="core">
-            <div class="k">K</div>
-        </div>
-
-        <div class="core-label">
-            ARTIFICIAL INTELLIGENCE
-        </div>
-
-    </div>
-
-    <div class="chat" id="chat">
-        <div class="msg ai">
-            Merhaba Efendim, nasıl yardımcı olabilirim?
-        </div>
-    </div>
-
-    <div class="input-area">
-
-        <input
-            id="input"
-            class="input"
-            placeholder="J.A.R.V.I.S.'e bir şey söyle..."
-            autocomplete="off"
+        <button
+            class="active"
+            id="homeBtn"
         >
+            ⌂ &nbsp; Ana Ekran
+        </button>
 
-        <button class="action" id="micBtn">◉</button>
+        <button
+            id="chatBtn"
+        >
+            ◌ &nbsp; JARVIS Chat
+        </button>
 
-        <button class="action send" id="sendBtn">➤</button>
+        <button
+            id="settingsBtn"
+        >
+            ⚙ &nbsp; Ayarlar
+        </button>
 
     </div>
 
+</aside>
 
-    <!-- SETTINGS -->
-
-    <section class="settings" id="settings">
-
-        <h1>Ayarlar</h1>
-
-        <p>
-            J.A.R.V.I.S. deneyimini kendinize göre yapılandırın.
-        </p>
-
-        <div class="card">
-            <div class="row">
-                <div>
-                    <div class="name">Hitap Şekli</div>
-                    <div class="desc">
-                        J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
-                    </div>
-                </div>
-
-                <select id="addressSelect">
-                    <option>Efendim</option>
-                    <option>Komutanım</option>
-                    <option>Patron</option>
-                    <option>Dostum</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="row">
-                <div>
-                    <div class="name">Arayüz Boyutu</div>
-                    <div class="desc">
-                        Arayüz ölçeğini ayarlayın.
-                    </div>
-                </div>
-
-                <div class="row">
-                    <input
-                        id="uiScale"
-                        class="range"
-                        type="range"
-                        min="80"
-                        max="120"
-                        step="5"
-                        value="100"
-                    >
-                    <span
-                        id="uiScaleValue"
-                        class="range-value"
-                    >100%</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="row">
-                <div>
-                    <div class="name">Gece / Gündüz</div>
-                    <div class="desc">
-                        Arayüz temasını değiştirin.
-                    </div>
-                </div>
-
-                <div class="toggle" id="themeToggle"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="row">
-                <div>
-                    <div class="name">Eğlence Modu</div>
-                    <div class="desc">
-                        Daha esprili J.A.R.V.I.S. cevapları.
-                    </div>
-                </div>
-
-                <div class="toggle" id="funToggle"></div>
-            </div>
-        </div>
-
-    </section>
-
-
-    <!-- SIDEBAR -->
-
-    <div class="overlay" id="overlay"></div>
-
-    <aside class="sidebar" id="sidebar">
-
-        <div class="side-head">
-
-            <div class="side-title">
-                J.A.R.V.I.S.
-            </div>
-
-            <button class="close" id="closeBtn">
-                ×
-            </button>
-
-        </div>
-
-        <div class="nav">
-
-            <button class="active" id="homeBtn">
-                ⌂ &nbsp; Ana Ekran
-            </button>
-
-            <button id="chatBtn">
-                ◌ &nbsp; JARVIS Chat
-            </button>
-
-            <button id="settingsBtn">
-                ⚙ &nbsp; Ayarlar
-            </button>
-
-        </div>
-
-    </aside>
 
 </div>
 
 
 <script>
+
+/* =====================================================
+   J.A.R.V.I.S. ENGINE
+===================================================== */
 
 const API="/chat";
 
@@ -807,21 +1940,24 @@ const $=id=>document.getElementById(id);
 
 const chat=$("chat");
 const input=$("input");
+
 const sendBtn=$("sendBtn");
 const micBtn=$("micBtn");
 
-const sidebar=$("sidebar");
-const overlay=$("overlay");
-const settings=$("settings");
-
 const menuBtn=$("menuBtn");
 const closeBtn=$("closeBtn");
+
+const sidebar=$("sidebar");
+const overlay=$("overlay");
+
+const settings=$("settings");
 
 const homeBtn=$("homeBtn");
 const chatBtn=$("chatBtn");
 const settingsBtn=$("settingsBtn");
 
 const addressSelect=$("addressSelect");
+
 const themeToggle=$("themeToggle");
 const funToggle=$("funToggle");
 
@@ -829,287 +1965,520 @@ const uiScale=$("uiScale");
 const uiScaleValue=$("uiScaleValue");
 
 
-/* SETTINGS */
+/* =====================================================
+   SETTINGS
+===================================================== */
 
-let address=localStorage.getItem("jarvis_address")||"Efendim";
-let funMode=localStorage.getItem("jarvis_fun")==="true";
-let light=localStorage.getItem("jarvis_theme")==="light";
-let scale=Number(localStorage.getItem("jarvis_scale")||100);
+let address =
+    localStorage.getItem("jarvis_address")
+    || "Efendim";
+
+let funMode =
+    localStorage.getItem("jarvis_fun")
+    === "true";
+
+let light =
+    localStorage.getItem("jarvis_theme")
+    === "light";
+
+let scale =
+    Number(
+        localStorage.getItem("jarvis_scale")
+        || 100
+    );
+
 
 addressSelect.value=address;
+
 uiScale.value=scale;
-uiScaleValue.textContent=scale+"%";
+
+uiScaleValue.textContent=
+    scale+"%";
+
 
 if(light){
+
     document.body.classList.add("light");
+
     themeToggle.classList.add("on");
+
 }
+
 
 if(funMode){
+
     document.body.classList.add("fun");
+
     funToggle.classList.add("on");
+
 }
 
 
-/* MENU */
+/* =====================================================
+   MENU
+===================================================== */
 
 function openMenu(){
+
     sidebar.classList.add("open");
+
     overlay.classList.add("open");
+
 }
+
 
 function closeMenu(){
+
     sidebar.classList.remove("open");
+
     overlay.classList.remove("open");
+
 }
 
+
 menuBtn.onclick=openMenu;
+
 closeBtn.onclick=closeMenu;
+
 overlay.onclick=closeMenu;
 
 
-/* NAV */
+/* =====================================================
+   NAVIGATION
+===================================================== */
 
 function active(btn){
+
     document
         .querySelectorAll(".nav button")
-        .forEach(x=>x.classList.remove("active"));
+        .forEach(
+            x=>x.classList.remove("active")
+        );
 
     btn.classList.add("active");
+
 }
 
+
 homeBtn.onclick=()=>{
+
     closeMenu();
+
     settings.classList.remove("open");
+
     active(homeBtn);
+
 };
+
 
 chatBtn.onclick=()=>{
+
     closeMenu();
+
     settings.classList.remove("open");
+
     active(chatBtn);
-    setTimeout(()=>input.focus(),200);
+
+    setTimeout(
+        ()=>input.focus(),
+        200
+    );
+
 };
+
 
 settingsBtn.onclick=()=>{
+
     closeMenu();
+
     settings.classList.add("open");
+
     active(settingsBtn);
+
 };
 
 
-/* ADDRESS */
+/* =====================================================
+   ADDRESS
+===================================================== */
 
 addressSelect.onchange=()=>{
-    address=addressSelect.value;
-    localStorage.setItem("jarvis_address",address);
+
+    address=
+        addressSelect.value;
+
+    localStorage.setItem(
+        "jarvis_address",
+        address
+    );
+
 };
 
 
-/* THEME */
+/* =====================================================
+   THEME
+===================================================== */
 
 themeToggle.onclick=()=>{
 
-    light=document.body.classList.toggle("light");
+    light=
+        document.body.classList
+        .toggle("light");
 
-    themeToggle.classList.toggle("on",light);
+    themeToggle.classList.toggle(
+        "on",
+        light
+    );
 
     localStorage.setItem(
         "jarvis_theme",
-        light?"light":"dark"
+        light
+        ? "light"
+        : "dark"
     );
+
 };
 
 
-/* FUN */
+/* =====================================================
+   FUN MODE
+===================================================== */
 
 funToggle.onclick=()=>{
 
-    funMode=document.body.classList.toggle("fun");
+    funMode=
+        document.body.classList
+        .toggle("fun");
 
-    funToggle.classList.toggle("on",funMode);
+    funToggle.classList.toggle(
+        "on",
+        funMode
+    );
 
     localStorage.setItem(
         "jarvis_fun",
         funMode
     );
+
+    /* Görsel bildirim */
+
+    addMessage(
+        funMode
+        ? "Eğlence modu aktif. Efendim, artık biraz daha yaratıcı olabilirim. 😏"
+        : "Eğlence modu devre dışı. Sistem tekrar ciddi çalışma modunda.",
+        "ai"
+    );
+
 };
 
 
-/* SCALE */
+/* =====================================================
+   SCALE
+===================================================== */
 
 uiScale.oninput=()=>{
 
-    scale=Number(uiScale.value);
+    scale=
+        Number(uiScale.value);
 
-    uiScaleValue.textContent=scale+"%";
+    uiScaleValue.textContent=
+        scale+"%";
 
     localStorage.setItem(
         "jarvis_scale",
         scale
     );
 
-    const core=document.querySelector(".core-area");
+    const core=
+        document.querySelector(
+            ".core-area"
+        );
 
     core.style.transform=
         "translate(-50%,-50%) scale("+
-        (scale/100)+")";
+        scale/100+
+        ")";
+
 };
 
 
-/* MESSAGE */
+/* =====================================================
+   MESSAGE
+===================================================== */
 
-function addMessage(text,type){
+function addMessage(
+    text,
+    type="ai"
+){
 
-    const el=document.createElement("div");
+    const el=
+        document.createElement(
+            "div"
+        );
 
-    el.className="msg "+type;
+    el.className=
+        "msg "+type;
+
     el.textContent=text;
 
     chat.appendChild(el);
 
-    chat.scrollTop=chat.scrollHeight;
+    chat.scrollTop=
+        chat.scrollHeight;
 
     return el;
+
 }
 
 
-/* TYPING */
+/* =====================================================
+   TYPING
+===================================================== */
 
 function typing(){
 
-    const el=document.createElement("div");
+    const el=
+        document.createElement(
+            "div"
+        );
 
     el.id="typing";
-    el.className="msg ai";
-    el.innerHTML="● ● ●";
+
+    el.className=
+        "msg ai";
+
+    el.innerHTML=`
+        <div class="typing">
+            <i></i>
+            <i></i>
+            <i></i>
+        </div>
+    `;
 
     chat.appendChild(el);
 
-    chat.scrollTop=chat.scrollHeight;
+    chat.scrollTop=
+        chat.scrollHeight;
+
 }
 
 
-/* SEND */
+/* =====================================================
+   SEND
+===================================================== */
 
 async function sendMessage(){
 
-    const text=input.value.trim();
+    const text=
+        input.value.trim();
 
-    if(!text)return;
+    if(!text){
+        return;
+    }
 
-    addMessage(text,"user");
+
+    addMessage(
+        text,
+        "user"
+    );
+
 
     input.value="";
 
+
     typing();
+
 
     sendBtn.disabled=true;
 
+
     try{
 
-        const res=await fetch(API,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                message:text,
-                address:address,
-                fun_mode:funMode
-            })
-        });
+        const res=
+            await fetch(
+                API,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        message:text,
+
+                        address:address,
+
+                        fun_mode:funMode
+
+                    })
+
+                }
+            );
+
 
         if(!res.ok){
-            throw new Error("HTTP "+res.status);
+
+            throw new Error(
+                "HTTP "+res.status
+            );
+
         }
 
-        const data=await res.json();
 
-        const t=$("typing");
+        const data=
+            await res.json();
 
-        if(t)t.remove();
+
+        const t=
+            $("typing");
+
+
+        if(t){
+            t.remove();
+        }
+
 
         addMessage(
+
             data.response ||
             "Efendim, geçerli bir cevap alınamadı.",
+
             "ai"
+
         );
+
 
     }catch(error){
 
-        const t=$("typing");
+        const t=
+            $("typing");
 
-        if(t)t.remove();
+        if(t){
+            t.remove();
+        }
+
 
         addMessage(
-            "Efendim, sunucu bağlantısında bir sorun oluştu.",
+
+            funMode
+
+            ? "Efendim... sunucu şu an biraz naz yapıyor. 😏 Bağlantıyı kontrol etmemiz gerekiyor."
+
+            : "Efendim, sunucu bağlantısında bir sorun oluştu.",
+
             "ai"
+
         );
+
 
         console.error(error);
 
     }finally{
 
         sendBtn.disabled=false;
+
         input.focus();
 
     }
+
 }
 
 
-/* SEND BUTTON */
+/* =====================================================
+   SEND
+===================================================== */
 
-sendBtn.onclick=sendMessage;
+sendBtn.onclick=
+    sendMessage;
 
 
-/* ENTER */
+/* =====================================================
+   ENTER
+===================================================== */
 
-input.addEventListener("keydown",e=>{
+input.addEventListener(
+    "keydown",
+    e=>{
 
-    if(e.key==="Enter"){
-        e.preventDefault();
-        sendMessage();
+        if(
+            e.key==="Enter"
+        ){
+
+            e.preventDefault();
+
+            sendMessage();
+
+        }
+
     }
+);
 
-});
 
-
-/* VOICE */
+/* =====================================================
+   VOICE
+===================================================== */
 
 const SpeechRecognition=
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
+
 if(SpeechRecognition){
 
-    const recognition=new SpeechRecognition();
+    const recognition=
+        new SpeechRecognition();
 
-    recognition.lang="tr-TR";
-    recognition.continuous=false;
-    recognition.interimResults=false;
+
+    recognition.lang=
+        "tr-TR";
+
+
+    recognition.continuous=
+        false;
+
+
+    recognition.interimResults=
+        false;
+
 
     recognition.onstart=()=>{
-        micBtn.classList.add("active");
+
+        micBtn.classList.add(
+            "active"
+        );
+
     };
 
+
     recognition.onend=()=>{
-        micBtn.classList.remove("active");
+
+        micBtn.classList.remove(
+            "active"
+        );
+
     };
+
 
     recognition.onresult=e=>{
 
         input.value=
-            e.results[0][0].transcript;
+            e.results[0][0]
+            .transcript;
 
         input.focus();
 
     };
 
+
     micBtn.onclick=()=>{
 
         try{
+
             recognition.start();
+
         }catch(e){}
 
     };
@@ -1117,20 +2486,27 @@ if(SpeechRecognition){
 }else{
 
     micBtn.onclick=()=>{
+
         addMessage(
             "Bu tarayıcı sesli girişi desteklemiyor.",
             "ai"
         );
+
     };
 
 }
 
 
-/* START */
+/* =====================================================
+   START
+===================================================== */
 
-setTimeout(()=>{
-    input.focus();
-},500);
+setTimeout(
+    ()=>{
+        input.focus();
+    },
+    500
+);
 
 </script>
 
