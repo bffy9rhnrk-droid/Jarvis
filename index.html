@@ -2,11 +2,22 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no,
+               viewport-fit=cover">
 
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
 :root{
     --accent:#36e5ff;
     --accent-bright:#9af8ff;
@@ -25,6 +36,11 @@
     --ui-scale:1;
 }
 
+
+/* =========================================================
+   RESET
+========================================================= */
+
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
@@ -35,13 +51,23 @@ body{
     width:100%;
     height:100%;
     margin:0;
+    padding:0;
+
     overflow:hidden;
+
     background:#03070c;
 }
 
 body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
+
     color:var(--text);
+
     overscroll-behavior:none;
 }
 
@@ -56,46 +82,92 @@ button{
     outline:0;
 }
 
+
+/* =========================================================
+   APP
+========================================================= */
+
 .app{
     position:relative;
+
     width:100%;
     height:100dvh;
     min-height:100dvh;
+
     overflow:hidden;
+
     background:
-        radial-gradient(circle at 50% 42%,rgba(0,170,210,.075),transparent 30%),
-        radial-gradient(circle at 50% 100%,rgba(0,100,150,.04),transparent 40%),
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(0,170,210,.075),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(0,100,150,.04),
+            transparent 40%
+        ),
         var(--bg);
 }
 
-/* GRID */
+
+/* =========================================================
+   BACKGROUND GRID
+========================================================= */
 
 .app::before{
     content:"";
+
     position:absolute;
     inset:0;
+
     pointer-events:none;
+
     opacity:.12;
+
     background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
     background-size:38px 38px;
-    mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            transparent,
+            #000 20%,
+            #000 80%,
+            transparent
+        );
 }
 
-/* TOP BAR */
+
+/* =========================================================
+   TOP BAR
+========================================================= */
 
 .topbar{
     position:absolute;
+
     z-index:20;
+
     top:0;
     left:0;
     right:0;
 
     height:72px;
+
     padding:14px 18px;
 
     display:flex;
+
     align-items:center;
     justify-content:space-between;
 
@@ -109,17 +181,23 @@ button{
     border-radius:15px;
 
     display:flex;
+
     flex-direction:column;
+
     justify-content:center;
     align-items:center;
+
     gap:5px;
 
     background:rgba(8,18,27,.72);
+
     border:1px solid var(--border);
+
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
 
     cursor:pointer;
+
     pointer-events:auto;
 
     transition:.2s ease;
@@ -132,67 +210,127 @@ button{
 .menu-line{
     width:18px;
     height:1.5px;
+
     border-radius:5px;
+
     background:var(--accent);
-    box-shadow:0 0 7px var(--accent);
+
+    box-shadow:
+        0 0 7px var(--accent);
 }
 
 .brand{
     text-align:right;
+
     pointer-events:none;
 }
 
 .brand-title{
     font-size:19px;
+
     font-weight:700;
+
     letter-spacing:4px;
+
     color:#edfaff;
-    text-shadow:0 0 18px rgba(54,229,255,.22);
+
+    text-shadow:
+        0 0 18px rgba(54,229,255,.22);
 }
 
 .brand-sub{
     margin-top:3px;
+
     font-size:8px;
+
     letter-spacing:2.7px;
+
     color:var(--accent);
+
     opacity:.8;
 }
 
-/* SYSTEM */
+
+/* =========================================================
+   SYSTEM STATUS
+========================================================= */
 
 .system{
     position:absolute;
+
     z-index:10;
+
     top:82px;
     right:20px;
 
     display:flex;
+
     align-items:center;
+
     gap:7px;
 
     font-size:8px;
+
     letter-spacing:2px;
+
     color:#8b9aa7;
 }
 
 .system-dot{
     width:6px;
     height:6px;
+
     border-radius:50%;
+
     background:#55ffad;
-    box-shadow:0 0 10px #55ffad;
-    animation:systemPulse 1.8s infinite;
+
+    box-shadow:
+        0 0 10px #55ffad;
+
+    animation:
+        systemPulse 1.8s infinite;
 }
 
 @keyframes systemPulse{
-    0%,100%{opacity:.45}
-    50%{opacity:1}
+
+    0%,100%{
+        opacity:.45;
+    }
+
+    50%{
+        opacity:1;
+    }
+
 }
 
-/* CORE */
+
+/* =========================================================
+   HOME
+========================================================= */
+
+.home{
+    position:absolute;
+
+    inset:0;
+
+    transition:
+        opacity .2s ease;
+}
+
+.home.hidden{
+    opacity:0;
+
+    pointer-events:none;
+}
+
+
+/* =========================================================
+   CORE AREA
+========================================================= */
 
 .core-area{
     position:absolute;
+
     z-index:2;
 
     left:50%;
@@ -201,9 +339,12 @@ button{
     width:290px;
     height:290px;
 
-    transform:translate(-50%,-50%) scale(var(--ui-scale));
+    transform:
+        translate(-50%,-50%)
+        scale(var(--ui-scale));
 
     display:flex;
+
     justify-content:center;
     align-items:center;
 
@@ -211,6 +352,11 @@ button{
         top .35s ease,
         transform .35s ease;
 }
+
+
+/* =========================================================
+   CORE GLOW
+========================================================= */
 
 .core-glow{
     position:absolute;
@@ -220,22 +366,33 @@ button{
 
     border-radius:50%;
 
-    background:rgba(54,229,255,.08);
+    background:
+        rgba(54,229,255,.08);
+
     filter:blur(25px);
 
-    animation:glowPulse 3s ease-in-out infinite;
+    animation:
+        glowPulse 3s ease-in-out infinite;
 }
 
 @keyframes glowPulse{
+
     0%,100%{
         transform:scale(.9);
         opacity:.45;
     }
+
     50%{
         transform:scale(1.12);
         opacity:.8;
     }
+
 }
+
+
+/* =========================================================
+   CORE
+========================================================= */
 
 .core{
     position:absolute;
@@ -246,13 +403,22 @@ button{
     border-radius:50%;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
     background:
-        radial-gradient(circle at 35% 28%,#8cffff 0%,#36e5ff 16%,#0d6378 48%,#04151c 76%,#02080c 100%);
+        radial-gradient(
+            circle at 35% 28%,
+            #8cffff 0%,
+            #36e5ff 16%,
+            #0d6378 48%,
+            #04151c 76%,
+            #02080c 100%
+        );
 
-    border:1px solid rgba(156,249,255,.8);
+    border:
+        1px solid rgba(156,249,255,.8);
 
     box-shadow:
         0 0 15px rgba(54,229,255,.7),
@@ -261,36 +427,57 @@ button{
 
     z-index:4;
 
-    animation:coreFloat 4s ease-in-out infinite;
+    animation:
+        coreFloat 4s ease-in-out infinite;
 }
 
 @keyframes coreFloat{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-4px)}
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-4px);
+    }
+
 }
 
 .core::before{
     content:"";
+
     position:absolute;
+
     inset:9px;
+
     border-radius:50%;
-    border:1px solid rgba(166,250,255,.4);
+
+    border:
+        1px solid rgba(166,250,255,.4);
 }
 
 .core::after{
     content:"";
+
     position:absolute;
+
     inset:19px;
+
     border-radius:50%;
-    border:1px solid rgba(255,255,255,.12);
+
+    border:
+        1px solid rgba(255,255,255,.12);
 }
 
 .core-k{
     position:relative;
+
     z-index:5;
 
     font-size:58px;
+
     font-weight:800;
+
     letter-spacing:-5px;
 
     color:#eaffff;
@@ -303,117 +490,210 @@ button{
 
 .core-label{
     position:absolute;
+
     bottom:-43px;
 
     width:max-content;
 
     font-size:8px;
+
     letter-spacing:3px;
+
     color:#7f939e;
 
     white-space:nowrap;
 }
 
-/* RINGS */
+
+/* =========================================================
+   RINGS
+========================================================= */
 
 .ring{
     position:absolute;
+
     border-radius:50%;
-    border:1px solid rgba(54,229,255,.25);
+
+    border:
+        1px solid rgba(54,229,255,.25);
+
     pointer-events:none;
 }
 
 .ring1{
     width:215px;
     height:215px;
-    border-top-color:rgba(54,229,255,.8);
-    border-right-color:rgba(54,229,255,.4);
-    animation:spin 8s linear infinite;
+
+    border-top-color:
+        rgba(54,229,255,.8);
+
+    border-right-color:
+        rgba(54,229,255,.4);
+
+    animation:
+        spin 8s linear infinite;
 }
 
 .ring2{
     width:238px;
     height:238px;
-    border-bottom-color:rgba(54,229,255,.7);
-    border-left-color:rgba(54,229,255,.3);
-    animation:spinReverse 12s linear infinite;
+
+    border-bottom-color:
+        rgba(54,229,255,.7);
+
+    border-left-color:
+        rgba(54,229,255,.3);
+
+    animation:
+        spinReverse 12s linear infinite;
 }
 
 .ring3{
     width:260px;
     height:260px;
-    border-top-color:rgba(54,229,255,.35);
-    border-left-color:rgba(54,229,255,.55);
-    animation:spin 17s linear infinite;
+
+    border-top-color:
+        rgba(54,229,255,.35);
+
+    border-left-color:
+        rgba(54,229,255,.55);
+
+    animation:
+        spin 17s linear infinite;
 }
 
 .ring4{
     width:280px;
     height:280px;
-    border-right-color:rgba(54,229,255,.5);
-    border-bottom-color:rgba(54,229,255,.25);
-    animation:spinReverse 22s linear infinite;
+
+    border-right-color:
+        rgba(54,229,255,.5);
+
+    border-bottom-color:
+        rgba(54,229,255,.25);
+
+    animation:
+        spinReverse 22s linear infinite;
 }
 
 @keyframes spin{
-    from{transform:rotate(0)}
-    to{transform:rotate(360deg)}
+
+    from{
+        transform:rotate(0);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 
 @keyframes spinReverse{
-    from{transform:rotate(360deg)}
-    to{transform:rotate(0)}
+
+    from{
+        transform:rotate(360deg);
+    }
+
+    to{
+        transform:rotate(0);
+    }
+
 }
+
+
+/* =========================================================
+   ORBIT DOTS
+========================================================= */
 
 .orbit-dot{
     position:absolute;
+
     width:6px;
     height:6px;
+
     border-radius:50%;
+
     background:var(--accent);
-    box-shadow:0 0 12px var(--accent);
+
+    box-shadow:
+        0 0 12px var(--accent);
 }
 
 .dot1{
     top:36px;
     left:50%;
-    animation:dotSpin1 8s linear infinite;
+
+    animation:
+        dotSpin1 8s linear infinite;
 }
 
 .dot2{
     bottom:39px;
     right:50px;
-    animation:dotSpin2 12s linear infinite;
+
+    animation:
+        dotSpin2 12s linear infinite;
 }
 
 @keyframes dotSpin1{
-    from{transform:rotate(0deg) translateX(108px)}
-    to{transform:rotate(360deg) translateX(108px)}
+
+    from{
+        transform:
+            rotate(0deg)
+            translateX(108px);
+    }
+
+    to{
+        transform:
+            rotate(360deg)
+            translateX(108px);
+    }
+
 }
 
 @keyframes dotSpin2{
-    from{transform:rotate(360deg) translateX(119px)}
-    to{transform:rotate(0deg) translateX(119px)}
+
+    from{
+        transform:
+            rotate(360deg)
+            translateX(119px);
+    }
+
+    to{
+        transform:
+            rotate(0deg)
+            translateX(119px);
+    }
+
 }
 
-/* CHAT */
+
+/* =========================================================
+   CHAT
+========================================================= */
 
 .chat{
     position:absolute;
+
     z-index:8;
 
     left:15px;
     right:15px;
+
     bottom:107px;
 
     max-width:620px;
+
     max-height:23vh;
 
     margin:auto;
 
     display:flex;
+
     flex-direction:column;
+
     align-items:flex-start;
+
     gap:8px;
 
     overflow-y:auto;
@@ -422,9 +702,6 @@ button{
     padding:5px;
 
     scrollbar-width:none;
-
-    transform:scale(var(--ui-scale));
-    transform-origin:bottom center;
 
     pointer-events:none;
 }
@@ -441,22 +718,27 @@ button{
     border-radius:16px;
 
     font-size:14px;
+
     line-height:1.48;
 
     color:#dfecef;
 
-    background:rgba(9,20,29,.76);
+    background:
+        rgba(9,20,29,.76);
 
-    border:1px solid rgba(255,255,255,.07);
+    border:
+        1px solid rgba(255,255,255,.07);
 
-    box-shadow:0 8px 25px rgba(0,0,0,.22);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.22);
 
     backdrop-filter:blur(15px);
     -webkit-backdrop-filter:blur(15px);
 
     pointer-events:auto;
 
-    animation:messageIn .25s ease;
+    animation:
+        messageIn .25s ease;
 }
 
 .message.user{
@@ -464,72 +746,115 @@ button{
 
     color:#dffcff;
 
-    background:rgba(0,91,111,.3);
-    border-color:rgba(54,229,255,.22);
+    background:
+        rgba(0,91,111,.3);
+
+    border-color:
+        rgba(54,229,255,.22);
 }
 
 .message.ai{
-    border-left:2px solid var(--accent);
+    border-left:
+        2px solid var(--accent);
 }
 
 @keyframes messageIn{
+
     from{
         opacity:0;
         transform:translateY(7px);
     }
+
     to{
         opacity:1;
         transform:translateY(0);
     }
+
 }
 
-/* TYPING */
+
+/* =========================================================
+   TYPING
+========================================================= */
 
 .typing{
     display:flex;
+
     align-items:center;
+
     gap:5px;
 }
 
 .typing span{
     width:5px;
     height:5px;
+
     border-radius:50%;
+
     background:var(--accent);
-    box-shadow:0 0 8px var(--accent);
-    animation:typing 1.2s infinite;
+
+    box-shadow:
+        0 0 8px var(--accent);
+
+    animation:
+        typing 1.2s infinite;
 }
 
-.typing span:nth-child(2){animation-delay:.15s}
-.typing span:nth-child(3){animation-delay:.3s}
+.typing span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
 
 @keyframes typing{
-    0%,60%,100%{opacity:.25;transform:translateY(0)}
-    30%{opacity:1;transform:translateY(-3px)}
+
+    0%,60%,100%{
+        opacity:.25;
+        transform:translateY(0);
+    }
+
+    30%{
+        opacity:1;
+        transform:translateY(-3px);
+    }
+
 }
 
-/* INPUT */
+
+/* =========================================================
+   INPUT
+========================================================= */
 
 .input-area{
     position:absolute;
+
     z-index:30;
 
     left:12px;
     right:12px;
-    bottom:10px;
+
+    bottom:
+        calc(10px + env(safe-area-inset-bottom));
 
     height:60px;
 
     display:flex;
+
     align-items:center;
+
     gap:6px;
 
     padding:6px;
 
     border-radius:19px;
 
-    background:rgba(7,15,23,.91);
-    border:1px solid rgba(255,255,255,.1);
+    background:
+        rgba(7,15,23,.91);
+
+    border:
+        1px solid rgba(255,255,255,.1);
 
     box-shadow:
         0 15px 45px rgba(0,0,0,.45),
@@ -537,18 +862,17 @@ button{
 
     backdrop-filter:blur(22px);
     -webkit-backdrop-filter:blur(22px);
-
-    transform:scale(var(--ui-scale));
-    transform-origin:bottom center;
 }
 
 .input{
     flex:1;
+
     min-width:0;
 
     height:100%;
 
     border:0;
+
     outline:0;
 
     background:transparent;
@@ -556,13 +880,16 @@ button{
     color:white;
 
     font-size:16px;
-    padding:0 9px;
+
+    padding:
+        0 9px;
 
     -webkit-appearance:none;
 }
 
 .input::placeholder{
     color:#71818d;
+
     font-size:14px;
 }
 
@@ -575,11 +902,15 @@ button{
     border-radius:14px;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
-    background:rgba(255,255,255,.045);
-    border:1px solid rgba(255,255,255,.07);
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.07);
 
     color:#8fa3ae;
 
@@ -594,31 +925,47 @@ button{
 
 .action.active{
     color:var(--accent);
-    border-color:rgba(54,229,255,.35);
-    box-shadow:0 0 15px rgba(54,229,255,.14);
+
+    border-color:
+        rgba(54,229,255,.35);
+
+    box-shadow:
+        0 0 15px rgba(54,229,255,.14);
 }
 
 .send{
-    background:rgba(54,229,255,.11);
+    background:
+        rgba(54,229,255,.11);
+
     color:var(--accent);
-    border-color:rgba(54,229,255,.24);
+
+    border-color:
+        rgba(54,229,255,.24);
 }
 
 .icon{
     font-size:19px;
+
     line-height:1;
 }
 
-/* SIDEBAR */
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
 
 .overlay{
     position:fixed;
+
     z-index:80;
+
     inset:0;
 
-    background:rgba(0,0,0,.55);
+    background:
+        rgba(0,0,0,.55);
 
     opacity:0;
+
     pointer-events:none;
 
     transition:.25s ease;
@@ -628,11 +975,13 @@ button{
 
 .overlay.open{
     opacity:1;
+
     pointer-events:auto;
 }
 
 .sidebar{
     position:fixed;
+
     z-index:100;
 
     top:0;
@@ -640,6 +989,7 @@ button{
     left:0;
 
     width:305px;
+
     max-width:84vw;
 
     padding:
@@ -648,24 +998,35 @@ button{
         calc(25px + env(safe-area-inset-bottom));
 
     background:
-        linear-gradient(145deg,rgba(10,21,31,.98),rgba(3,8,13,.98));
+        linear-gradient(
+            145deg,
+            rgba(10,21,31,.98),
+            rgba(3,8,13,.98)
+        );
 
-    border-right:1px solid rgba(255,255,255,.09);
+    border-right:
+        1px solid rgba(255,255,255,.09);
 
-    box-shadow:20px 0 60px rgba(0,0,0,.45);
+    box-shadow:
+        20px 0 60px rgba(0,0,0,.45);
 
-    transform:translateX(-105%);
+    transform:
+        translateX(-105%);
 
-    transition:transform .3s cubic-bezier(.22,.8,.25,1);
+    transition:
+        transform .3s cubic-bezier(.22,.8,.25,1);
 }
 
 .sidebar.open{
-    transform:translateX(0);
+    transform:
+        translateX(0);
 }
 
 .sidebar-head{
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
 
     margin-bottom:35px;
@@ -673,7 +1034,9 @@ button{
 
 .sidebar-title{
     font-size:15px;
+
     font-weight:700;
+
     letter-spacing:2.5px;
 }
 
@@ -683,7 +1046,9 @@ button{
 
     border-radius:12px;
 
-    background:rgba(255,255,255,.045);
+    background:
+        rgba(255,255,255,.045);
+
     color:#9aaab4;
 
     font-size:20px;
@@ -691,7 +1056,9 @@ button{
 
 .nav{
     display:flex;
+
     flex-direction:column;
+
     gap:8px;
 }
 
@@ -699,7 +1066,9 @@ button{
     width:100%;
 
     display:flex;
+
     align-items:center;
+
     gap:13px;
 
     padding:15px 13px;
@@ -707,9 +1076,11 @@ button{
     border-radius:14px;
 
     background:transparent;
+
     color:#9eacb5;
 
     text-align:left;
+
     font-size:14px;
 
     cursor:pointer;
@@ -717,34 +1088,30 @@ button{
 
 .nav-btn.active{
     color:var(--accent);
-    background:rgba(54,229,255,.08);
-    border:1px solid rgba(54,229,255,.12);
+
+    background:
+        rgba(54,229,255,.08);
+
+    border:
+        1px solid rgba(54,229,255,.12);
 }
 
 .nav-icon{
     width:21px;
+
     text-align:center;
+
     font-size:17px;
 }
 
-/* HOME */
 
-.home{
-    position:absolute;
-    inset:0;
-
-    transition:opacity .2s ease;
-}
-
-.home.hidden{
-    opacity:0;
-    pointer-events:none;
-}
-
-/* SETTINGS */
+/* =========================================================
+   SETTINGS
+========================================================= */
 
 .settings{
     position:absolute;
+
     z-index:50;
 
     inset:0;
@@ -757,13 +1124,19 @@ button{
         calc(100px + env(safe-area-inset-bottom));
 
     background:
-        radial-gradient(circle at 50% 15%,rgba(0,160,200,.07),transparent 30%),
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(0,160,200,.07),
+            transparent 30%
+        ),
         var(--bg);
 
     opacity:0;
+
     pointer-events:none;
 
-    transform:translateX(20px);
+    transform:
+        translateX(20px);
 
     transition:.25s ease;
 
@@ -776,21 +1149,27 @@ button{
 
 .settings.open{
     opacity:1;
+
     pointer-events:auto;
-    transform:translateX(0);
+
+    transform:
+        translateX(0);
 }
 
 .settings-title{
     margin:0;
 
     font-size:27px;
+
     letter-spacing:1px;
 }
 
 .settings-sub{
-    margin:7px 0 25px;
+    margin:
+        7px 0 25px;
 
     color:var(--muted);
+
     font-size:13px;
 }
 
@@ -801,8 +1180,11 @@ button{
 
     border-radius:18px;
 
-    background:rgba(10,19,28,.72);
-    border:1px solid var(--border);
+    background:
+        rgba(10,19,28,.72);
+
+    border:
+        1px solid var(--border);
 
     backdrop-filter:blur(15px);
     -webkit-backdrop-filter:blur(15px);
@@ -810,13 +1192,17 @@ button{
 
 .setting-row{
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
+
     gap:14px;
 }
 
 .setting-name{
     font-size:14px;
+
     font-weight:600;
 }
 
@@ -824,7 +1210,9 @@ button{
     margin-top:5px;
 
     color:#748590;
+
     font-size:11px;
+
     line-height:1.45;
 }
 
@@ -836,11 +1224,19 @@ button{
     border-radius:11px;
 
     color:white;
+
     background:#0b1720;
-    border:1px solid rgba(255,255,255,.1);
+
+    border:
+        1px solid rgba(255,255,255,.1);
 
     outline:0;
 }
+
+
+/* =========================================================
+   TOGGLE
+========================================================= */
 
 .toggle{
     position:relative;
@@ -878,27 +1274,42 @@ button{
 }
 
 .toggle.on{
-    background:rgba(54,229,255,.22);
-    border:1px solid rgba(54,229,255,.35);
+    background:
+        rgba(54,229,255,.22);
+
+    border:
+        1px solid rgba(54,229,255,.35);
 }
 
 .toggle.on::after{
     left:22px;
+
     background:var(--accent);
-    box-shadow:0 0 12px var(--accent);
+
+    box-shadow:
+        0 0 12px var(--accent);
 }
+
+
+/* =========================================================
+   UI SCALE
+========================================================= */
 
 .range-wrap{
     width:145px;
+
     flex:none;
 
     display:flex;
+
     align-items:center;
+
     gap:8px;
 }
 
 .range{
     width:105px;
+
     accent-color:var(--accent);
 }
 
@@ -908,10 +1319,14 @@ button{
     text-align:right;
 
     color:var(--accent);
+
     font-size:11px;
 }
 
-/* LIGHT */
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
 
 body.light{
     --bg:#edf5f8;
@@ -923,7 +1338,11 @@ body.light{
 
 body.light .app{
     background:
-        radial-gradient(circle at 50% 40%,rgba(0,180,220,.13),transparent 35%),
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(0,180,220,.13),
+            transparent 35%
+        ),
         #edf5f8;
 }
 
@@ -931,26 +1350,41 @@ body.light .input-area,
 body.light .sidebar,
 body.light .setting-card,
 body.light .message{
-    background:rgba(255,255,255,.8);
+    background:
+        rgba(255,255,255,.8);
 }
 
 body.light .input{
     color:#102029;
 }
 
-/* FUN */
+
+/* =========================================================
+   FUN MODE
+========================================================= */
 
 body.fun{
     --accent:#ff4057;
+
     --accent-bright:#ff8392;
-    --accent-soft:rgba(255,64,87,.16);
+
+    --accent-soft:
+        rgba(255,64,87,.16);
 }
 
 body.fun .core{
-    border-color:rgba(255,100,115,.85);
+    border-color:
+        rgba(255,100,115,.85);
 
     background:
-        radial-gradient(circle at 35% 28%,#ff9da8 0%,#ff4057 17%,#7e1726 50%,#18060a 77%,#050203 100%);
+        radial-gradient(
+            circle at 35% 28%,
+            #ff9da8 0%,
+            #ff4057 17%,
+            #7e1726 50%,
+            #18060a 77%,
+            #050203 100%
+        );
 
     box-shadow:
         0 0 15px rgba(255,64,87,.7),
@@ -959,21 +1393,26 @@ body.fun .core{
 }
 
 body.fun .core-glow{
-    background:rgba(255,64,87,.08);
+    background:
+        rgba(255,64,87,.08);
 }
 
 body.fun .ring{
-    border-color:rgba(255,64,87,.25);
+    border-color:
+        rgba(255,64,87,.25);
 }
 
 body.fun .system-dot{
     background:#ff5266;
-    box-shadow:0 0 10px #ff5266;
+
+    box-shadow:
+        0 0 10px #ff5266;
 }
 
-/* RESPONSIVE */
 
-/* iPhone / small screens */
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media(max-width:699px){
 
@@ -983,8 +1422,13 @@ body.fun .system-dot{
         min-height:100dvh;
     }
 
+
+    /* TOP */
+
     .topbar{
-        height:calc(64px + env(safe-area-inset-top));
+        height:
+            calc(64px + env(safe-area-inset-top));
+
         padding:
             env(safe-area-inset-top)
             14px
@@ -995,31 +1439,48 @@ body.fun .system-dot{
     .menu-btn{
         width:44px;
         height:44px;
+
         border-radius:14px;
     }
 
     .brand{
-        transform:scale(var(--ui-scale));
-        transform-origin:right center;
+        transform:
+            scale(var(--ui-scale));
+
+        transform-origin:
+            right center;
     }
 
     .brand-title{
         font-size:17px;
+
         letter-spacing:3px;
     }
 
     .brand-sub{
         font-size:7.5px;
+
         letter-spacing:2px;
     }
 
+
+    /* STATUS */
+
     .system{
-        top:calc(72px + env(safe-area-inset-top));
+        top:
+            calc(72px + env(safe-area-inset-top));
+
         right:15px;
 
-        transform:scale(var(--ui-scale));
-        transform-origin:right center;
+        transform:
+            scale(var(--ui-scale));
+
+        transform-origin:
+            right center;
     }
+
+
+    /* CORE */
 
     .core-area{
         width:270px;
@@ -1043,7 +1504,9 @@ body.fun .system-dot{
 
     .core-label{
         bottom:-36px;
+
         font-size:7px;
+
         letter-spacing:2.5px;
     }
 
@@ -1072,38 +1535,58 @@ body.fun .system-dot{
         height:255px;
     }
 
+
+    /* CHAT */
+
     .chat{
         left:12px;
         right:12px;
 
         bottom:
-            calc(87px + env(safe-area-inset-bottom));
+            calc(
+                72px
+                + env(safe-area-inset-bottom)
+                + 58px
+            );
 
-        max-height:20vh;
+        max-height:19vh;
 
         gap:7px;
 
-        transform:scale(var(--ui-scale));
-        transform-origin:bottom center;
+        /*
+           ÖNEMLİ:
+           Chat artık scale edilmiyor.
+           Böylece iPhone'da gerçek alan hesabı
+           bozulmuyor.
+        */
+        transform:none;
     }
 
     .message{
         max-width:92%;
 
-        padding:9px 12px;
+        padding:
+            9px 12px;
 
         font-size:13px;
+
         line-height:1.42;
 
         border-radius:14px;
     }
+
+
+    /* INPUT */
 
     .input-area{
         left:10px;
         right:10px;
 
         bottom:
-            calc(7px + env(safe-area-inset-bottom));
+            calc(
+                7px
+                + env(safe-area-inset-bottom)
+            );
 
         height:56px;
 
@@ -1111,13 +1594,17 @@ body.fun .system-dot{
 
         border-radius:17px;
 
-        transform:scale(var(--ui-scale));
-        transform-origin:bottom center;
+        /*
+           Input da artık scale edilmiyor.
+        */
+        transform:none;
     }
 
     .input{
         font-size:16px;
-        padding:0 8px;
+
+        padding:
+            0 8px;
     }
 
     .input::placeholder{
@@ -1127,16 +1614,27 @@ body.fun .system-dot{
     .action{
         width:43px;
         height:43px;
+
         border-radius:13px;
     }
 
+
+    /* SIDEBAR */
+
     .sidebar{
-        width:min(285px,84vw);
+        width:
+            min(285px,84vw);
 
         padding:
-            calc(20px + env(safe-area-inset-top))
+            calc(
+                20px
+                + env(safe-area-inset-top)
+            )
             16px
-            calc(25px + env(safe-area-inset-bottom));
+            calc(
+                25px
+                + env(safe-area-inset-bottom)
+            );
     }
 
     .sidebar-title{
@@ -1145,14 +1643,24 @@ body.fun .system-dot{
 
     .nav-btn{
         padding:14px 12px;
+
         font-size:14px;
     }
 
+
+    /* SETTINGS */
+
     .settings{
         padding:
-            calc(87px + env(safe-area-inset-top))
+            calc(
+                87px
+                + env(safe-area-inset-top)
+            )
             14px
-            calc(90px + env(safe-area-inset-bottom));
+            calc(
+                90px
+                + env(safe-area-inset-bottom)
+            );
     }
 
     .settings-title{
@@ -1161,11 +1669,13 @@ body.fun .system-dot{
 
     .settings-sub{
         font-size:12px;
+
         margin-bottom:20px;
     }
 
     .setting-card{
         padding:15px;
+
         border-radius:15px;
     }
 
@@ -1175,11 +1685,15 @@ body.fun .system-dot{
 
     .setting-desc{
         font-size:10px;
+
+        line-height:1.4;
     }
 
     .select{
         width:110px;
+
         font-size:12px;
+
         padding:8px;
     }
 
@@ -1190,9 +1704,13 @@ body.fun .system-dot{
     .range{
         width:90px;
     }
+
 }
 
-/* Çok kısa ekranlar */
+
+/* =========================================================
+   SHORT MOBILE
+========================================================= */
 
 @media(max-width:699px) and (max-height:750px){
 
@@ -1201,7 +1719,7 @@ body.fun .system-dot{
     }
 
     .chat{
-        max-height:18vh;
+        max-height:17vh;
     }
 }
 
@@ -1212,20 +1730,28 @@ body.fun .system-dot{
     }
 
     .chat{
-        max-height:16vh;
+        max-height:15vh;
     }
 
     .input-area{
-        bottom:calc(5px + env(safe-area-inset-bottom));
+        bottom:
+            calc(
+                5px
+                + env(safe-area-inset-bottom)
+            );
     }
 }
 
-/* Küçük iPhone */
+
+/* =========================================================
+   SMALL IPHONE
+========================================================= */
 
 @media(max-width:390px){
 
     .brand-title{
         font-size:15px;
+
         letter-spacing:2.5px;
     }
 
@@ -1280,66 +1806,128 @@ body.fun .system-dot{
     }
 }
 
-/* Tablet / PC */
+
+/* =========================================================
+   DESKTOP
+========================================================= */
 
 @media(min-width:700px){
 
     .chat{
         left:50%;
         right:auto;
-        width:calc(100% - 40px);
-        transform:
-            translateX(-50%)
-            scale(var(--ui-scale));
 
-        transform-origin:bottom center;
+        width:
+            calc(100% - 40px);
+
+        transform:
+            translateX(-50%);
     }
 
     .input-area{
         left:50%;
         right:auto;
 
-        width:calc(100% - 40px);
+        width:
+            calc(100% - 40px);
+
         max-width:650px;
 
         transform:
-            translateX(-50%)
-            scale(var(--ui-scale));
-
-        transform-origin:bottom center;
+            translateX(-50%);
     }
+
 }
+
+
+/* =========================================================
+   VERY SMALL HEIGHT
+========================================================= */
+
+@media(max-height:600px) and (max-width:699px){
+
+    .system{
+        display:none;
+    }
+
+    .core-area{
+        top:31%;
+    }
+
+    .chat{
+        max-height:14vh;
+    }
+
+    .message{
+        padding:7px 10px;
+
+        font-size:12px;
+    }
+
+}
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <!-- HOME -->
+
+    <!-- =====================================================
+         HOME
+    ====================================================== -->
+
     <div class="home" id="home">
+
+
+        <!-- TOP BAR -->
 
         <div class="topbar">
 
-            <button class="menu-btn" id="menuBtn">
+            <button
+                class="menu-btn"
+                id="menuBtn"
+                aria-label="Menü">
+
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
+
             </button>
 
+
             <div class="brand">
-                <div class="brand-title">J.A.R.V.I.S.</div>
-                <div class="brand-sub">KARAHAN INC.</div>
+
+                <div class="brand-title">
+                    J.A.R.V.I.S.
+                </div>
+
+                <div class="brand-sub">
+                    KARAHAN INC.
+                </div>
+
             </div>
 
         </div>
 
+
+        <!-- SYSTEM -->
+
         <div class="system">
+
             <span class="system-dot"></span>
+
             SYSTEM ONLINE
+
         </div>
 
-        <!-- CORE -->
+
+        <!-- =================================================
+             CORE
+        ================================================== -->
+
         <div class="core-area">
 
             <div class="core-glow"></div>
@@ -1352,9 +1940,15 @@ body.fun .system-dot{
             <div class="orbit-dot dot1"></div>
             <div class="orbit-dot dot2"></div>
 
+
             <div class="core">
-                <div class="core-k">K</div>
+
+                <div class="core-k">
+                    K
+                </div>
+
             </div>
+
 
             <div class="core-label">
                 ARTIFICIAL INTELLIGENCE
@@ -1362,8 +1956,14 @@ body.fun .system-dot{
 
         </div>
 
-        <!-- CHAT -->
-        <div class="chat" id="chat">
+
+        <!-- =================================================
+             CHAT
+        ================================================== -->
+
+        <div
+            class="chat"
+            id="chat">
 
             <div class="message ai">
                 Merhaba Efendim, nasıl yardımcı olabilirim?
@@ -1371,7 +1971,11 @@ body.fun .system-dot{
 
         </div>
 
-        <!-- INPUT -->
+
+        <!-- =================================================
+             INPUT
+        ================================================== -->
+
         <div class="input-area">
 
             <input
@@ -1384,12 +1988,30 @@ body.fun .system-dot{
                 placeholder="J.A.R.V.I.S.'e bir şey söyle..."
             >
 
-            <button class="action" id="micBtn" title="Sesli giriş">
-                <span class="icon">◉</span>
+
+            <button
+                class="action"
+                id="micBtn"
+                title="Sesli giriş"
+                aria-label="Sesli giriş">
+
+                <span class="icon">
+                    ◉
+                </span>
+
             </button>
 
-            <button class="action send" id="sendBtn" title="Gönder">
-                <span class="icon">➤</span>
+
+            <button
+                class="action send"
+                id="sendBtn"
+                title="Gönder"
+                aria-label="Gönder">
+
+                <span class="icon">
+                    ➤
+                </span>
+
             </button>
 
         </div>
@@ -1397,10 +2019,19 @@ body.fun .system-dot{
     </div>
 
 
-    <!-- SETTINGS -->
-    <section class="settings" id="settings">
+    <!-- =====================================================
+         SETTINGS
+    ====================================================== -->
 
-        <h1 class="settings-title">Ayarlar</h1>
+    <section
+        class="settings"
+        id="settings">
+
+
+        <h1 class="settings-title">
+            Ayarlar
+        </h1>
+
 
         <p class="settings-sub">
             J.A.R.V.I.S. deneyimini kendinize göre yapılandırın.
@@ -1408,11 +2039,13 @@ body.fun .system-dot{
 
 
         <!-- HITAP -->
+
         <div class="setting-card">
 
             <div class="setting-row">
 
                 <div style="flex:1;">
+
                     <div class="setting-name">
                         Hitap Şekli
                     </div>
@@ -1420,13 +2053,30 @@ body.fun .system-dot{
                     <div class="setting-desc">
                         J.A.R.V.I.S.'in size nasıl hitap edeceğini seçin.
                     </div>
+
                 </div>
 
-                <select class="select" id="addressSelect">
-                    <option value="Efendim">Efendim</option>
-                    <option value="Komutanım">Komutanım</option>
-                    <option value="Patron">Patron</option>
-                    <option value="Dostum">Dostum</option>
+
+                <select
+                    class="select"
+                    id="addressSelect">
+
+                    <option value="Efendim">
+                        Efendim
+                    </option>
+
+                    <option value="Komutanım">
+                        Komutanım
+                    </option>
+
+                    <option value="Patron">
+                        Patron
+                    </option>
+
+                    <option value="Dostum">
+                        Dostum
+                    </option>
+
                 </select>
 
             </div>
@@ -1435,6 +2085,7 @@ body.fun .system-dot{
 
 
         <!-- UI SCALE -->
+
         <div class="setting-card">
 
             <div class="setting-row">
@@ -1446,10 +2097,11 @@ body.fun .system-dot{
                     </div>
 
                     <div class="setting-desc">
-                        J.A.R.V.I.S. arayüzündeki yazı ve görsel öğelerin boyutunu ayarlayın.
+                        J.A.R.V.I.S. arayüzünün boyutunu ayarlayın.
                     </div>
 
                 </div>
+
 
                 <div class="range-wrap">
 
@@ -1463,11 +2115,13 @@ body.fun .system-dot{
                         step="5"
                     >
 
+
                     <span
                         id="uiScaleValue"
-                        class="range-value"
-                    >
+                        class="range-value">
+
                         100%
+
                     </span>
 
                 </div>
@@ -1478,6 +2132,7 @@ body.fun .system-dot{
 
 
         <!-- THEME -->
+
         <div class="setting-card">
 
             <div class="setting-row">
@@ -1494,10 +2149,11 @@ body.fun .system-dot{
 
                 </div>
 
+
                 <div
                     class="toggle"
-                    id="themeToggle"
-                ></div>
+                    id="themeToggle">
+                </div>
 
             </div>
 
@@ -1505,6 +2161,7 @@ body.fun .system-dot{
 
 
         <!-- FUN -->
+
         <div class="setting-card">
 
             <div class="setting-row">
@@ -1521,10 +2178,11 @@ body.fun .system-dot{
 
                 </div>
 
+
                 <div
                     class="toggle"
-                    id="funToggle"
-                ></div>
+                    id="funToggle">
+                </div>
 
             </div>
 
@@ -1533,10 +2191,24 @@ body.fun .system-dot{
     </section>
 
 
-    <!-- SIDEBAR -->
-    <div class="overlay" id="overlay"></div>
+    <!-- =====================================================
+         OVERLAY
+    ====================================================== -->
 
-    <aside class="sidebar" id="sidebar">
+    <div
+        class="overlay"
+        id="overlay">
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar">
+
 
         <div class="sidebar-head">
 
@@ -1544,28 +2216,60 @@ body.fun .system-dot{
                 J.A.R.V.I.S.
             </div>
 
-            <button class="close-btn" id="closeBtn">
+
+            <button
+                class="close-btn"
+                id="closeBtn"
+                aria-label="Kapat">
+
                 ×
+
             </button>
 
         </div>
 
+
         <nav class="nav">
 
-            <button class="nav-btn active" id="homeBtn">
-                <span class="nav-icon">⌂</span>
+
+            <button
+                class="nav-btn active"
+                id="homeBtn">
+
+                <span class="nav-icon">
+                    ⌂
+                </span>
+
                 Ana Ekran
+
             </button>
 
-            <button class="nav-btn" id="chatBtn">
-                <span class="nav-icon">◌</span>
+
+            <button
+                class="nav-btn"
+                id="chatBtn">
+
+                <span class="nav-icon">
+                    ◌
+                </span>
+
                 JARVIS Chat
+
             </button>
 
-            <button class="nav-btn" id="settingsBtn">
-                <span class="nav-icon">⚙</span>
+
+            <button
+                class="nav-btn"
+                id="settingsBtn">
+
+                <span class="nav-icon">
+                    ⚙
+                </span>
+
                 Ayarlar
+
             </button>
+
 
         </nav>
 
@@ -1576,300 +2280,451 @@ body.fun .system-dot{
 
 <script>
 
-/* ==============================
+/* =========================================================
    J.A.R.V.I.S.
    KARAHAN INC.
-================================ */
+========================================================= */
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
 const API = "/chat";
 
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
+const chat =
+    document.getElementById("chat");
 
-const menuBtn = document.getElementById("menuBtn");
-const closeBtn = document.getElementById("closeBtn");
+const input =
+    document.getElementById("input");
 
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
+const sendBtn =
+    document.getElementById("sendBtn");
 
-const settings = document.getElementById("settings");
-const home = document.getElementById("home");
+const menuBtn =
+    document.getElementById("menuBtn");
 
-const homeBtn = document.getElementById("homeBtn");
-const chatBtn = document.getElementById("chatBtn");
-const settingsBtn = document.getElementById("settingsBtn");
+const closeBtn =
+    document.getElementById("closeBtn");
 
-const addressSelect = document.getElementById("addressSelect");
-const themeToggle = document.getElementById("themeToggle");
-const funToggle = document.getElementById("funToggle");
+const sidebar =
+    document.getElementById("sidebar");
 
-const micBtn = document.getElementById("micBtn");
+const overlay =
+    document.getElementById("overlay");
 
-const uiScale = document.getElementById("uiScale");
-const uiScaleValue = document.getElementById("uiScaleValue");
+const settings =
+    document.getElementById("settings");
+
+const home =
+    document.getElementById("home");
+
+const homeBtn =
+    document.getElementById("homeBtn");
+
+const chatBtn =
+    document.getElementById("chatBtn");
+
+const settingsBtn =
+    document.getElementById("settingsBtn");
+
+const addressSelect =
+    document.getElementById("addressSelect");
+
+const themeToggle =
+    document.getElementById("themeToggle");
+
+const funToggle =
+    document.getElementById("funToggle");
+
+const micBtn =
+    document.getElementById("micBtn");
+
+const uiScale =
+    document.getElementById("uiScale");
+
+const uiScaleValue =
+    document.getElementById("uiScaleValue");
 
 
-/* ==============================
+/* =========================================================
    LOCAL STORAGE
-================================ */
+========================================================= */
 
 let address =
-    localStorage.getItem("jarvis_address") ||
-    "Efendim";
+    localStorage.getItem("jarvis_address")
+    || "Efendim";
 
 let funMode =
-    localStorage.getItem("jarvis_fun_mode") === "true";
+    localStorage.getItem("jarvis_fun_mode")
+    === "true";
 
 let theme =
-    localStorage.getItem("jarvis_theme") ||
-    "dark";
+    localStorage.getItem("jarvis_theme")
+    || "dark";
 
 let savedScale =
-    localStorage.getItem("jarvis_ui_scale") ||
-    "100";
+    localStorage.getItem("jarvis_ui_scale")
+    || "100";
 
 
-/* ==============================
+/* =========================================================
    APPLY SETTINGS
-================================ */
+========================================================= */
 
-addressSelect.value = address;
+addressSelect.value =
+    address;
+
 
 if(theme === "light"){
+
     document.body.classList.add("light");
+
     themeToggle.classList.add("on");
+
 }
+
 
 if(funMode){
+
     document.body.classList.add("fun");
+
     funToggle.classList.add("on");
+
 }
 
-let scaleNumber = Number(savedScale);
+
+/* UI SCALE */
+
+let scaleNumber =
+    Number(savedScale);
+
 
 if(
-    !Number.isFinite(scaleNumber) ||
-    scaleNumber < 80 ||
+    !Number.isFinite(scaleNumber)
+    ||
+    scaleNumber < 80
+    ||
     scaleNumber > 120
 ){
+
     scaleNumber = 100;
+
 }
+
 
 document.documentElement.style.setProperty(
     "--ui-scale",
     scaleNumber / 100
 );
 
-uiScale.value = scaleNumber;
-uiScaleValue.textContent = scaleNumber + "%";
+
+uiScale.value =
+    scaleNumber;
+
+uiScaleValue.textContent =
+    scaleNumber + "%";
 
 
-/* ==============================
+/* =========================================================
    SIDEBAR
-================================ */
+========================================================= */
 
 function openMenu(){
 
     sidebar.classList.add("open");
+
     overlay.classList.add("open");
 
 }
 
+
 function closeMenu(){
 
     sidebar.classList.remove("open");
+
     overlay.classList.remove("open");
 
 }
 
-menuBtn.addEventListener("click",openMenu);
-closeBtn.addEventListener("click",closeMenu);
-overlay.addEventListener("click",closeMenu);
+
+menuBtn.addEventListener(
+    "click",
+    openMenu
+);
 
 
-/* ==============================
+closeBtn.addEventListener(
+    "click",
+    closeMenu
+);
+
+
+overlay.addEventListener(
+    "click",
+    closeMenu
+);
+
+
+/* =========================================================
    NAVIGATION
-================================ */
+========================================================= */
 
 function setActive(button){
 
     document
         .querySelectorAll(".nav-btn")
-        .forEach(btn => btn.classList.remove("active"));
+        .forEach(btn => {
+
+            btn.classList.remove("active");
+
+        });
+
 
     button.classList.add("active");
+
 }
 
 
-homeBtn.addEventListener("click",()=>{
+/* HOME */
 
-    closeMenu();
+homeBtn.addEventListener(
+    "click",
+    ()=>{
 
-    home.classList.remove("hidden");
-    settings.classList.remove("open");
+        closeMenu();
 
-    setActive(homeBtn);
+        home.classList.remove("hidden");
 
-});
+        settings.classList.remove("open");
 
+        setActive(homeBtn);
 
-chatBtn.addEventListener("click",()=>{
-
-    closeMenu();
-
-    home.classList.remove("hidden");
-    settings.classList.remove("open");
-
-    setActive(chatBtn);
-
-    setTimeout(()=>{
-        input.focus();
-    },250);
-
-});
+    }
+);
 
 
-settingsBtn.addEventListener("click",()=>{
+/* CHAT */
 
-    closeMenu();
+chatBtn.addEventListener(
+    "click",
+    ()=>{
 
-    settings.classList.add("open");
+        closeMenu();
 
-    setActive(settingsBtn);
+        home.classList.remove("hidden");
 
-});
+        settings.classList.remove("open");
+
+        setActive(chatBtn);
 
 
-/* ==============================
+        setTimeout(
+            ()=>{
+
+                input.focus();
+
+            },
+            250
+        );
+
+    }
+);
+
+
+/* SETTINGS */
+
+settingsBtn.addEventListener(
+    "click",
+    ()=>{
+
+        closeMenu();
+
+        settings.classList.add("open");
+
+        setActive(settingsBtn);
+
+    }
+);
+
+
+/* =========================================================
    ADDRESS
-================================ */
+========================================================= */
 
-addressSelect.addEventListener("change",()=>{
+addressSelect.addEventListener(
+    "change",
+    ()=>{
 
-    address = addressSelect.value;
+        address =
+            addressSelect.value;
 
-    localStorage.setItem(
-        "jarvis_address",
-        address
-    );
+        localStorage.setItem(
+            "jarvis_address",
+            address
+        );
 
-});
+    }
+);
 
 
-/* ==============================
+/* =========================================================
    THEME
-================================ */
+========================================================= */
 
-themeToggle.addEventListener("click",()=>{
+themeToggle.addEventListener(
+    "click",
+    ()=>{
 
-    const isLight =
-        document.body.classList.toggle("light");
-
-    themeToggle.classList.toggle(
-        "on",
-        isLight
-    );
-
-    theme =
-        isLight ? "light" : "dark";
-
-    localStorage.setItem(
-        "jarvis_theme",
-        theme
-    );
-
-});
+        const isLight =
+            document.body.classList.toggle(
+                "light"
+            );
 
 
-/* ==============================
+        themeToggle.classList.toggle(
+            "on",
+            isLight
+        );
+
+
+        theme =
+            isLight
+            ? "light"
+            : "dark";
+
+
+        localStorage.setItem(
+            "jarvis_theme",
+            theme
+        );
+
+    }
+);
+
+
+/* =========================================================
    FUN MODE
-================================ */
+========================================================= */
 
-funToggle.addEventListener("click",()=>{
+funToggle.addEventListener(
+    "click",
+    ()=>{
 
-    funMode =
-        document.body.classList.toggle("fun");
-
-    funToggle.classList.toggle(
-        "on",
-        funMode
-    );
-
-    localStorage.setItem(
-        "jarvis_fun_mode",
-        funMode
-    );
-
-});
+        funMode =
+            document.body.classList.toggle(
+                "fun"
+            );
 
 
-/* ==============================
+        funToggle.classList.toggle(
+            "on",
+            funMode
+        );
+
+
+        localStorage.setItem(
+            "jarvis_fun_mode",
+            funMode
+        );
+
+    }
+);
+
+
+/* =========================================================
    UI SCALE
-================================ */
+========================================================= */
 
-uiScale.addEventListener("input",()=>{
+uiScale.addEventListener(
+    "input",
+    ()=>{
 
-    const value =
-        Number(uiScale.value);
-
-    const scale =
-        value / 100;
-
-    document.documentElement.style.setProperty(
-        "--ui-scale",
-        scale
-    );
-
-    uiScaleValue.textContent =
-        value + "%";
-
-    localStorage.setItem(
-        "jarvis_ui_scale",
-        value
-    );
-
-});
+        const value =
+            Number(uiScale.value);
 
 
-/* ==============================
+        const scale =
+            value / 100;
+
+
+        document.documentElement.style.setProperty(
+            "--ui-scale",
+            scale
+        );
+
+
+        uiScaleValue.textContent =
+            value + "%";
+
+
+        localStorage.setItem(
+            "jarvis_ui_scale",
+            value
+        );
+
+    }
+);
+
+
+/* =========================================================
    ADD MESSAGE
-================================ */
+========================================================= */
 
-function addMessage(text,type="ai"){
+function addMessage(
+    text,
+    type="ai"
+){
 
     const message =
         document.createElement("div");
 
+
     message.className =
         "message " + type;
+
 
     message.textContent =
         text;
 
-    chat.appendChild(message);
 
-    chat.scrollTop =
-        chat.scrollHeight;
+    chat.appendChild(
+        message
+    );
+
+
+    requestAnimationFrame(
+        ()=>{
+
+            chat.scrollTop =
+                chat.scrollHeight;
+
+        }
+    );
+
 
     return message;
+
 }
 
 
-/* ==============================
+/* =========================================================
    TYPING
-================================ */
+========================================================= */
 
 function addTyping(){
 
     const message =
         document.createElement("div");
 
+
     message.className =
         "message ai";
 
+
     message.id =
         "typingMessage";
+
 
     message.innerHTML = `
         <div class="typing">
@@ -1879,37 +2734,58 @@ function addTyping(){
         </div>
     `;
 
-    chat.appendChild(message);
 
-    chat.scrollTop =
-        chat.scrollHeight;
+    chat.appendChild(
+        message
+    );
+
+
+    requestAnimationFrame(
+        ()=>{
+
+            chat.scrollTop =
+                chat.scrollHeight;
+
+        }
+    );
 
 }
 
 
-/* ==============================
+/* =========================================================
    SEND MESSAGE
-================================ */
+========================================================= */
 
 async function sendMessage(){
 
     const text =
         input.value.trim();
 
+
     if(!text){
         return;
     }
+
+
+    /* USER MESSAGE */
 
     addMessage(
         text,
         "user"
     );
 
-    input.value = "";
+
+    input.value =
+        "";
+
+
+    /* TYPING */
 
     addTyping();
 
-    sendBtn.disabled = true;
+
+    sendBtn.disabled =
+        true;
 
 
     try{
@@ -1938,6 +2814,16 @@ async function sendMessage(){
             );
 
 
+        if(!response.ok){
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
         const data =
             await response.json();
 
@@ -1947,8 +2833,11 @@ async function sendMessage(){
                 "typingMessage"
             );
 
+
         if(typing){
+
             typing.remove();
+
         }
 
 
@@ -1979,9 +2868,13 @@ async function sendMessage(){
                 "typingMessage"
             );
 
+
         if(typing){
+
             typing.remove();
+
         }
+
 
         if(funMode){
 
@@ -1999,12 +2892,17 @@ async function sendMessage(){
 
         }
 
-        console.error(error);
+
+        console.error(
+            "JARVIS ERROR:",
+            error
+        );
 
     }
     finally{
 
-        sendBtn.disabled = false;
+        sendBtn.disabled =
+            false;
 
         input.focus();
 
@@ -2013,9 +2911,9 @@ async function sendMessage(){
 }
 
 
-/* ==============================
+/* =========================================================
    SEND BUTTON
-================================ */
+========================================================= */
 
 sendBtn.addEventListener(
     "click",
@@ -2023,16 +2921,17 @@ sendBtn.addEventListener(
 );
 
 
-/* ==============================
+/* =========================================================
    ENTER
-================================ */
+========================================================= */
 
 input.addEventListener(
     "keydown",
     event => {
 
         if(
-            event.key === "Enter" &&
+            event.key === "Enter"
+            &&
             !event.shiftKey
         ){
 
@@ -2046,11 +2945,12 @@ input.addEventListener(
 );
 
 
-/* ==============================
-   VOICE
-================================ */
+/* =========================================================
+   VOICE RECOGNITION
+========================================================= */
 
 let recognition = null;
+
 
 const SpeechRecognition =
     window.SpeechRecognition ||
@@ -2062,54 +2962,65 @@ if(SpeechRecognition){
     recognition =
         new SpeechRecognition();
 
+
     recognition.lang =
         "tr-TR";
 
+
     recognition.continuous =
         false;
+
 
     recognition.interimResults =
         false;
 
 
-    recognition.onstart = ()=>{
+    recognition.onstart =
+        ()=>{
 
-        micBtn.classList.add(
-            "active"
-        );
+            micBtn.classList.add(
+                "active"
+            );
 
-    };
-
-
-    recognition.onend = ()=>{
-
-        micBtn.classList.remove(
-            "active"
-        );
-
-    };
+        };
 
 
-    recognition.onresult = event =>{
+    recognition.onend =
+        ()=>{
 
-        const transcript =
-            event.results[0][0].transcript;
+            micBtn.classList.remove(
+                "active"
+            );
 
-        input.value =
-            transcript;
-
-        input.focus();
-
-    };
+        };
 
 
-    recognition.onerror = ()=>{
+    recognition.onresult =
+        event =>{
 
-        micBtn.classList.remove(
-            "active"
-        );
+            const transcript =
+                event
+                    .results[0][0]
+                    .transcript;
 
-    };
+
+            input.value =
+                transcript;
+
+
+            input.focus();
+
+        };
+
+
+    recognition.onerror =
+        ()=>{
+
+            micBtn.classList.remove(
+                "active"
+            );
+
+        };
 
 
     micBtn.addEventListener(
@@ -2120,16 +3031,20 @@ if(SpeechRecognition){
 
                 recognition.start();
 
-            }catch(e){
+            }
+            catch(error){
 
-                console.log(e);
+                console.log(
+                    error
+                );
 
             }
 
         }
     );
 
-}else{
+}
+else{
 
     micBtn.addEventListener(
         "click",
@@ -2146,34 +3061,67 @@ if(SpeechRecognition){
 }
 
 
-/* ==============================
-   STARTUP
-================================ */
+/* =========================================================
+   MOBILE KEYBOARD / RESIZE
+========================================================= */
 
-window.addEventListener(
-    "load",
-    ()=>{
+let lastHeight =
+    window.innerHeight;
 
-        setTimeout(()=>{
-
-            input.focus();
-
-        },500);
-
-    }
-);
-
-
-/* ==============================
-   KEYBOARD / MOBILE
-================================ */
 
 window.addEventListener(
     "resize",
     ()=>{
 
-        chat.scrollTop =
-            chat.scrollHeight;
+        const newHeight =
+            window.innerHeight;
+
+
+        /*
+           Klavye açıldığında chat'i
+           otomatik olarak aşağı taşı.
+        */
+
+        if(
+            newHeight < lastHeight - 100
+        ){
+
+            setTimeout(
+                ()=>{
+
+                    chat.scrollTop =
+                        chat.scrollHeight;
+
+                },
+                100
+            );
+
+        }
+
+
+        lastHeight =
+            newHeight;
+
+    }
+);
+
+
+/* =========================================================
+   STARTUP
+========================================================= */
+
+window.addEventListener(
+    "load",
+    ()=>{
+
+        setTimeout(
+            ()=>{
+
+                input.focus();
+
+            },
+            500
+        );
 
     }
 );
