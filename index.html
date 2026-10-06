@@ -49,8 +49,7 @@ body {
         ),
         #02070a;
 
-    transition:
-        background 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 button,
@@ -74,10 +73,8 @@ button:active {
 
 .header {
     height: 72px;
-
     display: flex;
     align-items: center;
-
     padding: 0 16px;
 
     border-bottom:
@@ -96,11 +93,9 @@ button:active {
 .logo-small {
     width: 44px;
     height: 44px;
-
     border-radius: 50%;
 
-    border:
-        2px solid #00e5ff;
+    border: 2px solid #00e5ff;
 
     display: flex;
     align-items: center;
@@ -126,7 +121,6 @@ button:active {
 .brand-title {
     font-size: 18px;
     font-weight: 800;
-
     letter-spacing: 2px;
 }
 
@@ -135,9 +129,7 @@ button:active {
         rgba(255, 255, 255, 0.5);
 
     font-size: 9px;
-
     letter-spacing: 3px;
-
     margin-top: 2px;
 }
 
@@ -169,8 +161,7 @@ button:active {
 
     font-size: 22px;
 
-    transition:
-        0.2s ease;
+    transition: 0.2s ease;
 }
 
 .menu-button:hover {
@@ -195,9 +186,7 @@ button:active {
 
 .hud {
     flex: 1;
-
     position: relative;
-
     overflow: hidden;
 }
 
@@ -405,11 +394,11 @@ button:active {
 
 
 /* =====================================================
-   WAITING MESSAGE
+   WAITING
 ===================================================== */
 
 .waiting-message {
-    min-width: 170px;
+    min-width: 190px;
 }
 
 .waiting-title {
@@ -467,10 +456,6 @@ button:active {
 
     outline: none;
 
-    /*
-    16px özellikle iPhone'da
-    otomatik zoom'u engeller.
-    */
     font-size: 16px;
 
     box-shadow:
@@ -775,39 +760,8 @@ button:active {
 
 
 /* =====================================================
-   PRESENTATION PROGRESS
+   PROGRESS
 ===================================================== */
-
-.presentation-progress {
-    margin-top: 2px;
-
-    padding: 12px;
-
-    border:
-        1px solid rgba(0, 229, 255, 0.16);
-
-    border-radius: 13px;
-
-    background:
-        rgba(0, 229, 255, 0.035);
-}
-
-.presentation-stage {
-    color: #00e5ff;
-
-    font-weight: 700;
-
-    font-size: 13px;
-}
-
-.presentation-sub {
-    margin-top: 5px;
-
-    color:
-        rgba(255, 255, 255, 0.5);
-
-    font-size: 10px;
-}
 
 .progress-bar {
     width: 100%;
@@ -845,13 +799,11 @@ button:active {
 
 .error-list {
     max-height: 50vh;
-
     overflow-y: auto;
 }
 
 .error-item {
     padding: 10px;
-
     margin-bottom: 8px;
 
     border-radius: 10px;
@@ -1085,8 +1037,6 @@ body.fun-mode .status {
     </button>
 
 
-    <!-- AKADEMİK MENÜ -->
-
     <div
         id="teacherMenu"
         style="display:none;"
@@ -1237,9 +1187,6 @@ body.fun-mode .status {
 
     <div class="hud">
 
-
-        <!-- CORE -->
-
         <div class="hud-core">
 
             <div class="ring one"></div>
@@ -1255,8 +1202,6 @@ body.fun-mode .status {
         </div>
 
 
-        <!-- STATUS -->
-
         <div
             id="status"
             class="status"
@@ -1265,15 +1210,11 @@ body.fun-mode .status {
         </div>
 
 
-        <!-- CHAT -->
-
         <div
             id="chat"
             class="chat"
         ></div>
 
-
-        <!-- INPUT -->
 
         <div class="input-area">
 
@@ -1320,8 +1261,6 @@ let presentationPolling = null;
 
 let dotsTimer = null;
 
-let progressTimer = null;
-
 
 /* =====================================================
    WAIT MESSAGES
@@ -1354,42 +1293,27 @@ function $(id) {
 
 
 /* =====================================================
-   SAFE TEXT
+   ESCAPE
 ===================================================== */
 
 function escapeHTML(text) {
 
     return String(text)
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+        .replace(/&/g, "&amp;")
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+        .replace(/</g, "&lt;")
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+        .replace(/>/g, "&gt;")
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+        .replace(/"/g, "&quot;")
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/'/g, "&#039;");
 }
 
 
 /* =====================================================
-   FORMAT MESSAGE
+   FORMAT
 ===================================================== */
 
 function formatText(text) {
@@ -1407,7 +1331,7 @@ function formatText(text) {
 
 
 /* =====================================================
-   CHAT MESSAGE
+   MESSAGE
 ===================================================== */
 
 function addMessage(
@@ -1481,7 +1405,6 @@ function closeModals() {
 
             }
         );
-
 }
 
 
@@ -1513,9 +1436,7 @@ function handleLoginKey(event) {
         event.preventDefault();
 
         login();
-
     }
-
 }
 
 
@@ -1566,10 +1487,13 @@ async function login() {
 
                     body:
                         JSON.stringify({
+
                             username:
                                 username,
+
                             password:
                                 password
+
                         })
 
                 }
@@ -1588,7 +1512,6 @@ async function login() {
             throw new Error(
                 "Sunucudan geçersiz yanıt geldi."
             );
-
         }
 
 
@@ -1630,7 +1553,6 @@ async function login() {
 
             currentMode =
                 "normal";
-
         }
 
 
@@ -1660,22 +1582,7 @@ async function login() {
 
         showGreeting();
 
-
-        if (
-            currentUser === "ilknur"
-        ) {
-
-            $("status")
-                .textContent =
-                "AKADEMİK ASİSTAN HAZIR";
-
-        } else {
-
-            $("status")
-                .textContent =
-                "K.A.R.V.I.S. HAZIR";
-
-        }
+        updateStatus();
 
 
     } catch (error) {
@@ -1689,9 +1596,7 @@ async function login() {
             "Sunucuya bağlanılamadı.\n\n" +
             error.message
         );
-
     }
-
 }
 
 
@@ -1712,9 +1617,40 @@ function applyUserTheme() {
         document.body.classList.add(
             "sinem-mode"
         );
+    }
+}
 
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function updateStatus() {
+
+    if (funMode) {
+
+        $("status")
+            .textContent =
+            "EĞLENCE MODU";
+
+        return;
     }
 
+
+    if (
+        currentUser === "ilknur"
+    ) {
+
+        $("status")
+            .textContent =
+            "AKADEMİK ASİSTAN HAZIR";
+
+    } else {
+
+        $("status")
+            .textContent =
+            "K.A.R.V.I.S. HAZIR";
+    }
 }
 
 
@@ -1748,7 +1684,6 @@ function updateSidebar() {
 
         funButton.style.display =
             "block";
-
     }
 
 
@@ -1767,7 +1702,6 @@ function updateSidebar() {
 
             }
         );
-
 }
 
 
@@ -1820,7 +1754,7 @@ function selectAcademicMode(
             "🧪 Sınav / Quiz modu aktif. Hocam, soru ve sınav hazırlayabilirim.",
 
         presentation:
-            "📊 Sunum Hazırlama aktif. Hocam, konu yazmanız yeterli."
+            "📊 Sunum Hazırlama modu aktif. Sunum isteğinizi yazmanız yeterli."
 
     };
 
@@ -1831,6 +1765,8 @@ function selectAcademicMode(
         "ai"
     );
 
+
+    updateStatus();
 }
 
 
@@ -1886,9 +1822,7 @@ function showGreeting() {
             "Varsayılan olarak Ders Asistanı aktif.",
             "ai"
         );
-
     }
-
 }
 
 
@@ -1920,8 +1854,7 @@ function getWaitingMessage() {
                 "Hocam, soruları hazırlıyorum...",
 
             presentation:
-                "Hocam, sunumu hazırlıyorum..."
-
+                "Hocam, isteğinizi değerlendiriyorum..."
         };
 
 
@@ -1929,7 +1862,6 @@ function getWaitingMessage() {
             messages[currentMode] ||
             "Hocam, hemen ilgileniyorum..."
         );
-
     }
 
 
@@ -1939,12 +1871,11 @@ function getWaitingMessage() {
             waitMessages.length
         )
     ];
-
 }
 
 
 /* =====================================================
-   BUSY STATUS
+   BUSY
 ===================================================== */
 
 function setBusy(
@@ -1964,12 +1895,77 @@ function setBusy(
     $("messageInput")
         .disabled =
         value;
-
 }
 
 
 /* =====================================================
-   NORMAL CHAT
+   PRESENTATION INTENT
+===================================================== */
+
+function isPresentationRequest(
+    message
+) {
+
+    const text =
+        String(message)
+            .toLocaleLowerCase(
+                "tr-TR"
+            )
+            .trim();
+
+
+    const presentationWords = [
+
+        "sunum hazırla",
+        "sunum hazırlar",
+        "sunum oluştur",
+        "sunum oluşturur",
+        "sunum yap",
+        "sunum hazırlay",
+        "slayt hazırla",
+        "slayt oluştur",
+        "slayt yap",
+        "slaytlık sunum",
+        "slaytlık",
+        "powerpoint hazırla",
+        "powerpoint oluştur",
+        "ppt hazırla",
+        "pptx hazırla",
+        "pdf sunum",
+        "sunum pdf",
+        "sunum dosyası",
+        "sunum hazırlamak",
+        "sunum istiyorum"
+    ];
+
+
+    for (
+        const word of presentationWords
+    ) {
+
+        if (
+            text.includes(word)
+        ) {
+
+            return true;
+        }
+    }
+
+
+    if (
+        /\b\d+\s*slayt\b/i.test(text)
+    ) {
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/* =====================================================
+   SEND MESSAGE
 ===================================================== */
 
 async function sendMessage() {
@@ -2019,16 +2015,30 @@ async function sendMessage() {
         waiting
     );
 
-
     $("chat").scrollTop =
         $("chat").scrollHeight;
 
 
     try {
 
+        /*
+         * SADECE GERÇEKTEN SUNUM İSTENDİĞİNDE
+         * PRESENTATION ENDPOINTİ ÇALIŞIR.
+         *
+         * Merhaba -> /chat
+         * Devlet nedir -> /chat
+         * Atatürk kimdir -> /chat
+         * Sunum hazırla -> /presentation
+         */
+
+        const presentationRequested =
+            isPresentationRequest(
+                message
+            );
+
+
         if (
-            currentUser === "ilknur" &&
-            currentMode === "presentation"
+            presentationRequested
         ) {
 
             await createPresentation(
@@ -2036,11 +2046,13 @@ async function sendMessage() {
                 waiting
             );
 
+
         } else {
 
             const response =
                 await fetch(
-                    API + "/chat",
+                    API +
+                    "/chat",
                     {
 
                         method:
@@ -2069,40 +2081,77 @@ async function sendMessage() {
                 );
 
 
-            const data =
-                await response.json();
+            let data;
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch {
+
+                throw new Error(
+                    "Sunucudan geçersiz JSON yanıtı geldi."
+                );
+            }
 
 
-            if (!response.ok) {
+            if (
+                !response.ok
+            ) {
 
                 throw new Error(
                     data.detail ||
                     data.message ||
+                    data.error ||
                     "Yanıt alınamadı."
                 );
-
             }
 
 
             waiting.remove();
 
 
-            addMessage(
+            /*
+             * Yeni main.py:
+             *
+             * response
+             *
+             * Eski sürümler:
+             *
+             * reply
+             * answer
+             * message
+             */
+
+            const answer =
+                data.response ||
                 data.reply ||
                 data.answer ||
-                "Yanıt alınamadı.",
+                data.message ||
+                "K.A.R.V.I.S. yanıt oluşturamadı.";
+
+
+            addMessage(
+                answer,
                 "ai"
             );
-
         }
 
 
     } catch (error) {
 
+        console.error(
+            "Mesaj gönderme hatası:",
+            error
+        );
+
+
         waiting.remove();
 
+
         addMessage(
-            "Bir sorun oluştu: " +
+            "Bir sorun oluştu:\n" +
             error.message,
             "ai"
         );
@@ -2115,14 +2164,12 @@ async function sendMessage() {
         setBusy(false);
 
         input.focus();
-
     }
-
 }
 
 
 /* =====================================================
-   PRESENTATION
+   CREATE PRESENTATION
 ===================================================== */
 
 async function createPresentation(
@@ -2132,11 +2179,6 @@ async function createPresentation(
 
     stopPresentationAnimation();
 
-
-    /*
-    İlk mesaj:
-    İçerik hazırlanıyor
-    */
 
     const progressMessage =
         document.createElement(
@@ -2153,7 +2195,7 @@ async function createPresentation(
             id="presentationStage"
             class="waiting-title"
         >
-            İçerik hazırlanıyor
+            Sunum hazırlanıyor
             <span id="presentationDots"></span>
         </div>
 
@@ -2191,14 +2233,10 @@ async function createPresentation(
 
     try {
 
-        /*
-        YENİ MAIN.PY
-        hemen job_id döndürüyor.
-        */
-
         const response =
             await fetch(
-                API + "/presentation",
+                API +
+                "/presentation",
                 {
 
                     method:
@@ -2227,18 +2265,31 @@ async function createPresentation(
             );
 
 
-        const data =
-            await response.json();
+        let data;
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                "Sunum sunucusundan geçersiz yanıt geldi."
+            );
+        }
 
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
                 data.detail ||
                 data.message ||
+                data.error ||
                 "Sunum başlatılamadı."
             );
-
         }
 
 
@@ -2249,7 +2300,6 @@ async function createPresentation(
             throw new Error(
                 "Sunum işi başlatıldı fakat job_id alınamadı."
             );
-
         }
 
 
@@ -2265,19 +2315,18 @@ async function createPresentation(
 
         progressMessage.remove();
 
+
         addMessage(
             "❌ Sunum oluşturulurken bir sorun oluştu:\n" +
             error.message,
             "ai"
         );
-
     }
-
 }
 
 
 /* =====================================================
-   PRESENTATION POLLING
+   POLL PRESENTATION
 ===================================================== */
 
 async function pollPresentation(
@@ -2342,7 +2391,6 @@ async function pollPresentation(
                                 throw new Error(
                                     "Sunum durumu alınamadı."
                                 );
-
                             }
 
 
@@ -2356,8 +2404,18 @@ async function pollPresentation(
                             );
 
 
+                            /*
+                             * YENİ BACKEND:
+                             *
+                             * queued
+                             * working
+                             * completed
+                             * error
+                             */
+
                             if (
-                                data.completed
+                                data.status ===
+                                "completed"
                             ) {
 
                                 clearInterval(
@@ -2371,16 +2429,28 @@ async function pollPresentation(
                                 stopPresentationAnimation();
 
 
+                                const fileUrl =
+                                    data.download_url ||
+                                    data.file_url ||
+                                    (
+                                        data.file
+                                            ? "/generated/" +
+                                              data.file
+                                            : null
+                                    );
+
+
                                 if (
-                                    data.success &&
-                                    data.file_url
+                                    fileUrl
                                 ) {
 
                                     progressElement.remove();
 
+
                                     showPresentationResult(
-                                        data.file_url
+                                        fileUrl
                                     );
+
 
                                     resolve();
 
@@ -2388,15 +2458,49 @@ async function pollPresentation(
 
                                     progressElement.remove();
 
+
                                     reject(
                                         new Error(
                                             data.error ||
-                                            "Sunum oluşturulamadı."
+                                            "Sunum tamamlandı fakat PDF dosyası bulunamadı."
                                         )
                                     );
-
                                 }
 
+
+                                return;
+                            }
+
+
+                            if (
+                                data.status ===
+                                "error"
+                            ) {
+
+                                clearInterval(
+                                    presentationPolling
+                                );
+
+                                presentationPolling =
+                                    null;
+
+
+                                stopPresentationAnimation();
+
+
+                                progressElement.remove();
+
+
+                                reject(
+                                    new Error(
+                                        data.error ||
+                                        data.message ||
+                                        "Sunum oluşturulamadı."
+                                    )
+                                );
+
+
+                                return;
                             }
 
 
@@ -2410,8 +2514,8 @@ async function pollPresentation(
                                 null;
 
                             reject(error);
-
                         }
+
 
                     },
                     600
@@ -2419,7 +2523,6 @@ async function pollPresentation(
 
         }
     );
-
 }
 
 
@@ -2442,6 +2545,7 @@ function updatePresentationUI(
             "#presentationStage"
         );
 
+
     const detail =
         progressElement.querySelector(
             "#presentationDetail"
@@ -2454,14 +2558,27 @@ function updatePresentationUI(
 
 
     let title =
-        "İçerik hazırlanıyor";
+        "Sunum hazırlanıyor";
 
 
     let detailText =
-        "K.A.R.V.I.S. sunum içeriğini hazırlıyor...";
+        "K.A.R.V.I.S. sunumu hazırlıyor...";
 
 
     if (
+        data.status === "queued"
+    ) {
+
+        title =
+            "Sunum sıraya alındı";
+
+        detailText =
+            "K.A.R.V.I.S. sunum oluşturma işlemini başlatıyor...";
+
+    }
+
+
+    else if (
         data.stage === "content"
     ) {
 
@@ -2481,6 +2598,7 @@ function updatePresentationUI(
         title =
             "Görseller aranıyor";
 
+
         if (
             data.total
         ) {
@@ -2495,7 +2613,6 @@ function updatePresentationUI(
 
             detailText =
                 "Sunuma uygun görseller aranıyor...";
-
         }
 
     }
@@ -2507,6 +2624,7 @@ function updatePresentationUI(
 
         title =
             "PDF oluşturuluyor";
+
 
         if (
             data.total
@@ -2522,13 +2640,13 @@ function updatePresentationUI(
 
             detailText =
                 "PDF dosyası hazırlanıyor...";
-
         }
 
     }
 
 
     else if (
+        data.status === "completed" ||
         data.stage === "completed"
     ) {
 
@@ -2542,6 +2660,7 @@ function updatePresentationUI(
 
 
     else if (
+        data.status === "error" ||
         data.stage === "error"
     ) {
 
@@ -2551,7 +2670,6 @@ function updatePresentationUI(
         detailText =
             data.error ||
             "Bilinmeyen bir hata oluştu.";
-
     }
 
 
@@ -2560,18 +2678,18 @@ function updatePresentationUI(
         ' <span id="presentationDots"></span>';
 
 
-    if (detail) {
+    if (
+        detail
+    ) {
 
         detail.textContent =
             detailText;
-
     }
-
 }
 
 
 /* =====================================================
-   DOT ANIMATION
+   DOTS
 ===================================================== */
 
 function startPresentationAnimation() {
@@ -2604,7 +2722,6 @@ function startPresentationAnimation() {
             ) {
 
                 dotState = 1;
-
             }
 
 
@@ -2612,7 +2729,6 @@ function startPresentationAnimation() {
                 ".".repeat(
                     dotState
                 );
-
         };
 
 
@@ -2624,12 +2740,11 @@ function startPresentationAnimation() {
             updateDots,
             450
         );
-
 }
 
 
 /* =====================================================
-   STOP DOT ANIMATION
+   STOP PRESENTATION
 ===================================================== */
 
 function stopPresentationAnimation() {
@@ -2644,23 +2759,7 @@ function stopPresentationAnimation() {
 
         dotsTimer =
             null;
-
     }
-
-
-    if (
-        presentationPolling
-    ) {
-
-        clearInterval(
-            presentationPolling
-        );
-
-        presentationPolling =
-            null;
-
-    }
-
 }
 
 
@@ -2677,8 +2776,14 @@ function showPresentationResult(
             "div"
         );
 
+
     div.className =
         "message ai";
+
+
+    const fullUrl =
+        API +
+        fileUrl;
 
 
     div.innerHTML = `
@@ -2687,39 +2792,81 @@ function showPresentationResult(
             style="
                 color:#00e5ff;
                 font-weight:800;
+                font-size:15px;
                 margin-bottom:8px;
             "
         >
-            📊 Sunum hazır Hocam.
+            📊 Sunum hazır.
         </div>
+
 
         <div
             style="
                 color:rgba(255,255,255,.65);
                 font-size:12px;
-                margin-bottom:12px;
+                line-height:1.5;
+                margin-bottom:14px;
             "
         >
             K.A.R.V.I.S. sunumu başarıyla oluşturdu.
+            PDF dosyasını aşağıdaki butondan indirebilirsiniz.
         </div>
 
-        <a
-            href="${escapeHTML(
-                API + fileUrl
-            )}"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div
             style="
-                display:inline-block;
-                padding:10px 13px;
-                border-radius:11px;
-                background:rgba(0,229,255,.08);
-                border:1px solid rgba(0,229,255,.25);
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
             "
         >
-            📥 PDF Sunumunu Aç
-        </a>
 
+            <a
+                href="${escapeHTML(fullUrl)}"
+                download
+                style="
+                    display:inline-flex;
+                    align-items:center;
+                    justify-content:center;
+                    padding:11px 15px;
+                    border-radius:12px;
+                    background:#00e5ff;
+                    color:#001014;
+                    font-weight:800;
+                    text-decoration:none;
+                    box-shadow:
+                        0 0 16px
+                        rgba(0,229,255,.25);
+                "
+            >
+                📥 PDF'Yİ İNDİR
+            </a>
+
+
+            <a
+                href="${escapeHTML(fullUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                    display:inline-flex;
+                    align-items:center;
+                    justify-content:center;
+                    padding:11px 15px;
+                    border-radius:12px;
+                    background:
+                        rgba(0,229,255,.07);
+                    border:
+                        1px solid
+                        rgba(0,229,255,.25);
+                    color:#00e5ff;
+                    font-weight:700;
+                    text-decoration:none;
+                "
+            >
+                👁 PDF'Yİ AÇ
+            </a>
+
+        </div>
     `;
 
 
@@ -2730,7 +2877,6 @@ function showPresentationResult(
 
     $("chat").scrollTop =
         $("chat").scrollHeight;
-
 }
 
 
@@ -2763,7 +2909,6 @@ async function newChat() {
 
 
     showGreeting();
-
 }
 
 
@@ -2788,7 +2933,8 @@ async function openErrors() {
 
         const response =
             await fetch(
-                API + "/errors"
+                API +
+                "/errors"
             );
 
 
@@ -2808,7 +2954,6 @@ async function openErrors() {
                 "Kayıtlı hata bulunmuyor.";
 
             return;
-
         }
 
 
@@ -2816,6 +2961,7 @@ async function openErrors() {
             document.createElement(
                 "div"
             );
+
 
         wrapper.className =
             "error-list";
@@ -2831,6 +2977,7 @@ async function openErrors() {
                         document.createElement(
                             "div"
                         );
+
 
                     div.className =
                         "error-item";
@@ -2853,13 +3000,13 @@ async function openErrors() {
                     wrapper.appendChild(
                         div
                     );
-
                 }
             );
 
 
         $("errorContent")
             .innerHTML = "";
+
 
         $("errorContent")
             .appendChild(
@@ -2872,9 +3019,7 @@ async function openErrors() {
         $("errorContent").textContent =
             "Hatalar alınamadı:\n" +
             error.message;
-
     }
-
 }
 
 
@@ -2906,25 +3051,16 @@ function toggleFunMode() {
             "ai"
         );
 
-        $("status")
-            .textContent =
-            "EĞLENCE MODU";
-
     } else {
 
         addMessage(
             "Profesyonel Moda geri döndüm.",
             "ai"
         );
-
-        $("status")
-            .textContent =
-            currentUser === "ilknur"
-                ? "AKADEMİK ASİSTAN HAZIR"
-                : "K.A.R.V.I.S. HAZIR";
-
     }
 
+
+    updateStatus();
 }
 
 
@@ -2941,9 +3077,7 @@ function handleKey(event) {
         event.preventDefault();
 
         sendMessage();
-
     }
-
 }
 
 
@@ -2968,7 +3102,6 @@ function initialize() {
 
         currentUser =
             savedUser;
-
     }
 
 
@@ -2986,7 +3119,6 @@ function initialize() {
 
         currentMode =
             "normal";
-
     }
 
 
@@ -2995,6 +3127,8 @@ function initialize() {
     updateSidebar();
 
     showGreeting();
+
+    updateStatus();
 
 
     setTimeout(
@@ -3006,7 +3140,6 @@ function initialize() {
         },
         150
     );
-
 }
 
 
