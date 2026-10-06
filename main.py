@@ -46,12 +46,109 @@ FONT_DIR.mkdir(exist_ok=True)
 # =========================================================
 # PDF FONT
 # =========================================================
+# Türkçe karakter desteği için DejaVuSans kullanılır.
+# Font dosyaları yoksa Render üzerinde otomatik indirilir.
+# =========================================================
 
 REGULAR_FONT = "Helvetica"
 BOLD_FONT = "Helvetica-Bold"
 
 REGULAR_FONT_FILE = FONT_DIR / "DejaVuSans.ttf"
 BOLD_FONT_FILE = FONT_DIR / "DejaVuSans-Bold.ttf"
+
+
+def download_font(url, output_path):
+
+    try:
+
+        if output_path.exists():
+
+            if output_path.stat().st_size > 50000:
+                return True
+
+        print(
+            "PDF fontu indiriliyor:",
+            output_path.name
+        )
+
+        response = requests.get(
+            url,
+            timeout=30,
+            headers={
+                "User-Agent":
+                    "KARVIS-KARAHAN-INC/1.0"
+            }
+        )
+
+        response.raise_for_status()
+
+        content = response.content
+
+        if len(content) < 50000:
+
+            print(
+                "Font dosyası geçersiz:",
+                output_path.name
+            )
+
+            return False
+
+        with open(
+            output_path,
+            "wb"
+        ) as file:
+
+            file.write(content)
+
+        print(
+            "PDF fontu indirildi:",
+            output_path.name
+        )
+
+        return True
+
+    except Exception as error:
+
+        print(
+            "Font indirme hatası:",
+            output_path.name,
+            error
+        )
+
+        return False
+
+
+def ensure_pdf_fonts():
+
+    regular_url = (
+        "https://raw.githubusercontent.com/"
+        "dejavu-fonts/dejavu-fonts/"
+        "master/ttf/DejaVuSans.ttf"
+    )
+
+    bold_url = (
+        "https://raw.githubusercontent.com/"
+        "dejavu-fonts/dejavu-fonts/"
+        "master/ttf/DejaVuSans-Bold.ttf"
+    )
+
+    if not REGULAR_FONT_FILE.exists():
+
+        download_font(
+            regular_url,
+            REGULAR_FONT_FILE
+        )
+
+    if not BOLD_FONT_FILE.exists():
+
+        download_font(
+            bold_url,
+            BOLD_FONT_FILE
+        )
+
+
+ensure_pdf_fonts()
+
 
 try:
 
@@ -83,6 +180,17 @@ except Exception as error:
         "Font yükleme hatası:",
         error
     )
+
+
+print(
+    "PDF normal font:",
+    REGULAR_FONT
+)
+
+print(
+    "PDF kalın font:",
+    BOLD_FONT
+)
 
 
 # =========================================================
@@ -1147,9 +1255,7 @@ def download_openverse_visual(
                     "wb"
                 ) as file:
 
-                    file.write(
-                        content
-                    )
+                    file.write(content)
 
                 return output_path
 
@@ -1770,7 +1876,6 @@ def create_presentation_pdf(
 
     pdf.save()
 
-    # PDF gerçekten oluşmuş mu?
     if not pdf_path.exists():
 
         raise FileNotFoundError(
@@ -2202,11 +2307,6 @@ def presentation(
 
         filename = pdf_path.name
 
-        # =================================================
-        # ÖNEMLİ:
-        # FRONTEND data.file_url BEKLİYOR
-        # =================================================
-
         file_url = (
             "/generated/"
             + filename
@@ -2233,7 +2333,6 @@ def presentation(
             "file_url":
                 file_url,
 
-            # Geriye dönük uyumluluk
             "download_url":
                 file_url
         }
@@ -2281,7 +2380,6 @@ def generated_file(
         filename
     )
 
-    # Sadece PDF dosyalarına izin ver
     if not safe_name.lower().endswith(
         ".pdf"
     ):
