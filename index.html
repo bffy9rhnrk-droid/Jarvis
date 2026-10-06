@@ -2,66 +2,15 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
+<meta name="theme-color" content="#050b10">
 
-<title>J.A.R.V.I.S. - Karahan INC.</title>
+<title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
-
-/* =========================================================
-   TEMA
-========================================================= */
-
-:root {
-    --bg-main: #01050b;
-    --bg-grad-1: rgba(0, 105, 170, .20);
-    --bg-grad-2: rgba(0, 45, 75, .12);
-
-    --text-primary: #00d9ff;
-    --text-secondary: rgba(180, 240, 255, .8);
-    --text-glow: #00eaff;
-
-    --hud-ring: rgba(0, 170, 255, .25);
-    --hud-ring-glow: rgba(0, 150, 255, .12);
-
-    --menu-bg: rgba(3, 15, 25, 0.90);
-    --menu-border: #00bfff;
-    --menu-item-bg: rgba(0, 100, 150, .08);
-
-    --chat-input-bg: rgba(2, 18, 30, .75);
-    --chat-user-bg: rgba(0, 120, 175, .35);
-    --chat-bot-bg: rgba(3, 19, 30, .88);
-}
-
-[data-theme="light"] {
-    --bg-main: #e8f1f8;
-    --bg-grad-1: rgba(0, 105, 170, .05);
-    --bg-grad-2: rgba(0, 45, 75, .02);
-
-    --text-primary: #004d80;
-    --text-secondary: #006699;
-    --text-glow: #0099cc;
-
-    --hud-ring: rgba(0, 100, 180, .3);
-    --hud-ring-glow: rgba(0, 100, 180, .1);
-
-    --menu-bg: rgba(240, 248, 255, 0.94);
-    --menu-border: #006699;
-    --menu-item-bg: rgba(0, 100, 150, .05);
-
-    --chat-input-bg: rgba(255, 255, 255, .85);
-    --chat-user-bg: rgba(0, 120, 175, .15);
-    --chat-bot-bg: rgba(255, 255, 255, .92);
-}
-
-
-/* =========================================================
-   TEMEL
-========================================================= */
 
 * {
     box-sizing: border-box;
@@ -71,1039 +20,743 @@
 html,
 body {
     margin: 0;
+    padding: 0;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
-
+    min-height: 100%;
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        Arial,
         sans-serif;
-
-    background: var(--bg-main);
-    color: var(--text-primary);
-
-    transition:
-        background .5s ease,
-        color .5s ease;
 }
 
 body {
-    position: relative;
 
     background:
         radial-gradient(
-            circle at 50% 42%,
-            var(--bg-grad-1) 0%,
-            var(--bg-grad-2) 22%,
-            transparent 48%
+            circle at 50% 30%,
+            rgba(0, 238, 255, 0.09),
+            transparent 35%
         ),
-        var(--bg-main);
+        #03070a;
+
+    color: #dffcff;
+
+    overflow: hidden;
+
+    transition:
+        background 0.3s,
+        color 0.3s;
 }
 
+
+/* ============================================================
+   BACKGROUND
+   ============================================================ */
+
 body::before {
+
     content: "";
 
-    position: absolute;
+    position: fixed;
+
     inset: 0;
 
-    opacity: .20;
+    pointer-events: none;
 
     background-image:
         linear-gradient(
-            var(--text-primary) 1px,
+            rgba(0, 220, 255, 0.025) 1px,
             transparent 1px
         ),
         linear-gradient(
             90deg,
-            var(--text-primary) 1px,
+            rgba(0, 220, 255, 0.025) 1px,
             transparent 1px
         );
 
     background-size: 35px 35px;
 
-    mask-image:
-        radial-gradient(
-            circle,
-            black 20%,
-            transparent 75%
-        );
-
-    pointer-events: none;
+    opacity: 0.5;
 }
 
 
-/* =========================================================
-   SCROLLBAR
-========================================================= */
+/* ============================================================
+   APP
+   ============================================================ */
 
-::-webkit-scrollbar {
-    width: 6px;
+.app {
+
+    position: relative;
+
+    width: 100%;
+    height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+
+    height: 75px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+
+    border-bottom:
+        1px solid rgba(0, 238, 255, 0.15);
+
+    background:
+        rgba(3, 10, 14, 0.88);
+
+    backdrop-filter: blur(16px);
+
+    z-index: 20;
 }
 
-::-webkit-scrollbar-thumb {
-    background: var(--hud-ring);
+.menu-button {
+
+    width: 45px;
+    height: 45px;
+
+    border:
+        1px solid rgba(0, 238, 255, 0.3);
+
+    border-radius: 12px;
+
+    background:
+        rgba(0, 238, 255, 0.05);
+
+    color: #00eaff;
+
+    font-size: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.brand {
+
+    margin-left: 14px;
+}
+
+.brand-main {
+
+    font-size: 19px;
+
+    letter-spacing: 4px;
+
+    font-weight: 700;
+
+    color: #e9fdff;
+}
+
+.brand-sub {
+
+    margin-top: 3px;
+
+    font-size: 9px;
+
+    letter-spacing: 3px;
+
+    color: #00eaff;
+
+    opacity: 0.8;
+}
+
+.status {
+
+    margin-left: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+
+    color: #72ffb2;
+}
+
+.status-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #72ffb2;
+
+    box-shadow:
+        0 0 10px #72ffb2;
+}
+
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+.main {
+
+    flex: 1;
+
+    position: relative;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ============================================================
+   HUD
+   ============================================================ */
+
+.hud {
+
+    height: 260px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.hud-circle {
+
+    position: relative;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0, 238, 255, 0.35);
+
+    box-shadow:
+        0 0 35px rgba(0, 238, 255, 0.08),
+        inset 0 0 30px rgba(0, 238, 255, 0.04);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    animation:
+        hudPulse 4s ease-in-out infinite;
+}
+
+.hud-circle::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 13px;
+
+    border-radius: 50%;
+
+    border:
+        1px dashed rgba(0, 238, 255, 0.45);
+
+    animation:
+        rotateHud 18s linear infinite;
+}
+
+.hud-circle::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 30px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0, 238, 255, 0.18);
+}
+
+.k-logo {
+
+    position: relative;
+
+    z-index: 2;
+
+    font-size: 64px;
+
+    font-weight: 800;
+
+    color: #00eaff;
+
+    text-shadow:
+        0 0 10px rgba(0, 238, 255, 0.8),
+        0 0 35px rgba(0, 238, 255, 0.35);
+}
+
+@keyframes rotateHud {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes hudPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.025);
+    }
+}
+
+
+/* ============================================================
+   CHAT
+   ============================================================ */
+
+.chat {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding:
+        5px 15px 15px;
+
+    scroll-behavior: smooth;
+}
+
+.chat::-webkit-scrollbar {
+
+    width: 4px;
+}
+
+.chat::-webkit-scrollbar-thumb {
+
+    background:
+        rgba(0, 238, 255, 0.25);
+
     border-radius: 10px;
 }
 
 
-/* =========================================================
-   KÖŞELER
-========================================================= */
+/* ============================================================
+   MESSAGE
+   ============================================================ */
 
-.corner {
-    position: absolute;
+.message {
 
-    width: 75px;
-    height: 75px;
+    max-width: 88%;
 
-    border-color: var(--hud-ring);
+    margin-bottom: 13px;
 
-    pointer-events: none;
+    padding: 13px 15px;
 
-    z-index: 1;
-}
+    border-radius: 15px;
 
-.corner.tl {
-    top: 12px;
-    left: 12px;
+    font-size: 14px;
 
-    border-top: 1px solid;
-    border-left: 1px solid;
-}
+    line-height: 1.55;
 
-.corner.tr {
-    top: 12px;
-    right: 12px;
+    white-space: pre-wrap;
 
-    border-top: 1px solid;
-    border-right: 1px solid;
-}
-
-.corner.bl {
-    bottom: 12px;
-    left: 12px;
-
-    border-bottom: 1px solid;
-    border-left: 1px solid;
-}
-
-.corner.br {
-    bottom: 12px;
-    right: 12px;
-
-    border-bottom: 1px solid;
-    border-right: 1px solid;
-}
-
-
-/* =========================================================
-   ÜST BAR
-========================================================= */
-
-.top {
-    position: absolute;
-
-    top: 22px;
-    left: 20px;
-    right: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    z-index: 50;
-}
-
-.menu-button {
-    width: 50px;
-    height: 50px;
-
-    border-radius: 12px;
-
-    border: 1px solid var(--text-primary);
-
-    background: var(--chat-input-bg);
-
-    backdrop-filter: blur(8px);
-
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    gap: 6px;
-
-    box-shadow:
-        0 0 10px var(--hud-ring-glow);
-
-    cursor: pointer;
-
-    transition: all .3s ease;
-}
-
-.menu-button:active {
-    transform: scale(.94);
-}
-
-.menu-button span {
-    width: 24px;
-    height: 2px;
-
-    border-radius: 4px;
-
-    background: var(--text-primary);
-
-    box-shadow:
-        0 0 5px var(--text-glow);
-}
-
-.status {
-    display: flex;
-
-    align-items: center;
-    gap: 8px;
-
-    padding: 8px 15px;
-
-    border: 1px solid var(--hud-ring);
-
-    border-radius: 20px;
-
-    background: var(--chat-input-bg);
-
-    backdrop-filter: blur(8px);
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    color: var(--text-secondary);
-
-    font-weight: bold;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    background: var(--text-glow);
-
-    box-shadow:
-        0 0 10px var(--text-glow);
-
-    animation: onlinePulse 1.5s infinite;
-}
-
-.status.offline {
-    border-color: #ff4545;
-    color: #ff7070;
-}
-
-.status.offline .status-dot {
-    background: #ff4545;
-
-    box-shadow:
-        0 0 10px #ff4545;
-}
-
-
-/* =========================================================
-   HUD
-========================================================= */
-
-.hud {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    width: min(88vw, 390px);
-    height: min(88vw, 390px);
-
-    transform:
-        translate(-50%, -54%);
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-}
-
-.outer-ring {
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-
-    border-radius: 50%;
-
-    border: 1px solid var(--hud-ring);
-
-    box-shadow:
-        0 0 35px var(--hud-ring-glow);
+    word-break: break-word;
 
     animation:
-        slowRotate 20s linear infinite;
+        messageIn 0.25s ease;
 }
 
-.segment-ring {
-    position: absolute;
+@keyframes messageIn {
 
-    width: 92%;
-    height: 92%;
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
 
-    border-radius: 50%;
-
-    border: 3px dashed var(--hud-ring);
-
-    animation:
-        reverseRotate 14s linear infinite;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.logo {
-    position: relative;
+.message.user {
 
-    width: 140px;
-    height: 140px;
+    margin-left: auto;
 
-    border-radius: 50%;
+    background:
+        rgba(0, 238, 255, 0.10);
+
+    border:
+        1px solid rgba(0, 238, 255, 0.18);
+
+    color: #e9fdff;
+}
+
+.message.jarvis {
+
+    margin-right: auto;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    color: #dffcff;
+}
+
+.message.error {
+
+    margin-right: auto;
+
+    background:
+        rgba(255, 55, 75, 0.08);
+
+    border:
+        1px solid rgba(255, 55, 75, 0.5);
+
+    color: #ff9ca8;
+
+    box-shadow:
+        0 0 20px rgba(255, 55, 75, 0.08);
+}
+
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+
+.input-area {
+
+    padding:
+        10px 12px calc(12px + env(safe-area-inset-bottom));
+
+    border-top:
+        1px solid rgba(0, 238, 255, 0.12);
+
+    background:
+        rgba(3, 10, 14, 0.94);
+
+    backdrop-filter: blur(16px);
 
     display: flex;
 
-    justify-content: center;
-    align-items: center;
-
-    background: var(--chat-input-bg);
-
-    backdrop-filter: blur(10px);
-
-    border: 2px solid var(--text-primary);
-
-    box-shadow:
-        0 0 25px var(--hud-ring-glow),
-        inset 0 0 35px var(--hud-ring-glow);
-
-    z-index: 5;
-
-    animation:
-        logoPulse 3s ease-in-out infinite;
-}
-
-.logo span {
-    font-size: 85px;
-
-    font-weight: 700;
-
-    color: var(--text-primary);
-
-    line-height: 1;
-
-    text-shadow:
-        0 0 10px var(--text-glow);
-}
-
-
-/* =========================================================
-   MARKA
-========================================================= */
-
-.brand {
-    position: absolute;
-
-    top: calc(50% + 205px);
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    text-align: center;
-
-    white-space: nowrap;
+    gap: 9px;
 
     z-index: 10;
 }
 
-.brand-title {
-    font-size: 24px;
+.input {
 
-    font-weight: 600;
+    flex: 1;
 
-    letter-spacing: 6px;
+    min-width: 0;
 
-    color: var(--text-primary);
+    height: 48px;
 
-    text-shadow:
-        0 0 10px var(--text-glow);
+    padding: 0 15px;
+
+    border:
+        1px solid rgba(0, 238, 255, 0.2);
+
+    border-radius: 14px;
+
+    outline: none;
+
+    background:
+        rgba(0, 238, 255, 0.04);
+
+    color: white;
+
+    font-size: 16px;
+
+    -webkit-appearance: none;
 }
 
-.brand-subtitle {
-    margin-top: 5px;
+.input::placeholder {
 
-    font-size: 11px;
+    color:
+        rgba(220, 250, 255, 0.38);
+}
 
-    letter-spacing: 4px;
+.input:focus {
 
-    color: var(--text-secondary);
+    border-color:
+        rgba(0, 238, 255, 0.55);
 
-    font-weight: bold;
+    box-shadow:
+        0 0 18px rgba(0, 238, 255, 0.08);
+}
+
+.send {
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        #00dff5;
+
+    color: #001014;
+
+    font-size: 19px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 18px rgba(0, 238, 255, 0.18);
+}
+
+.send:disabled {
+
+    opacity: 0.45;
+
+    cursor: default;
 }
 
 
-/* =========================================================
-   MENÜ
-========================================================= */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 
-.menu {
+.sidebar {
+
     position: fixed;
 
     top: 0;
     left: 0;
 
-    width: 320px;
-    height: 100%;
+    width: 285px;
+    height: 100dvh;
 
-    background: var(--menu-bg);
-
-    backdrop-filter: blur(18px);
-
-    border-right:
-        1px solid var(--menu-border);
-
-    box-shadow:
-        8px 0 35px rgba(0,0,0,.3);
+    z-index: 100;
 
     transform:
         translateX(-105%);
 
     transition:
-        transform .4s cubic-bezier(
-            .175,
-            .885,
-            .32,
-            1.275
-        );
+        transform 0.3s ease;
 
-    z-index: 100;
+    background:
+        rgba(4, 12, 17, 0.97);
 
-    display: flex;
-    flex-direction: column;
+    border-right:
+        1px solid rgba(0, 238, 255, 0.2);
+
+    backdrop-filter: blur(20px);
+
+    padding: 25px 18px;
 }
 
-.menu.active {
+.sidebar.open {
+
     transform:
         translateX(0);
 }
 
-.menu-header {
-    display: flex;
+.sidebar-title {
 
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 25px;
-
-    border-bottom:
-        1px solid var(--hud-ring);
-}
-
-.menu-header h2 {
-    margin: 0;
-
-    font-size: 18px;
+    font-size: 11px;
 
     letter-spacing: 3px;
 
-    color: var(--text-primary);
+    color: #00eaff;
 
-    text-shadow:
-        0 0 5px var(--text-glow);
+    margin-bottom: 25px;
 }
 
-.close-menu {
-    border: 0;
+.sidebar-item {
 
-    background: transparent;
-
-    color: var(--text-primary);
-
-    font-size: 28px;
-
-    cursor: pointer;
-}
-
-.menu-content {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 20px 25px;
-}
-
-.menu-section-title {
-    font-size: 12px;
-
-    letter-spacing: 2px;
-
-    color: var(--text-secondary);
-
-    margin-bottom: 15px;
-
-    margin-top: 10px;
-
-    border-bottom:
-        1px dashed var(--hud-ring);
-
-    padding-bottom: 5px;
-}
-
-
-/* =========================================================
-   AYARLAR
-========================================================= */
-
-.setting-item {
-    display: flex;
-
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 12px 15px;
-
-    background: var(--menu-item-bg);
-
-    border:
-        1px solid var(--hud-ring);
-
-    border-radius: 8px;
-
-    font-size: 14px;
-
-    margin-bottom: 15px;
-}
-
-.toggle-switch {
-    position: relative;
-
-    display: inline-block;
-
-    width: 44px;
-    height: 24px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-
-    cursor: pointer;
-
-    inset: 0;
-
-    background:
-        rgba(0,0,0,.5);
-
-    border:
-        1px solid var(--text-primary);
-
-    border-radius: 24px;
-
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-
-    content: "";
-
-    height: 16px;
-    width: 16px;
-
-    left: 3px;
-    bottom: 3px;
-
-    background:
-        var(--text-glow);
-
-    border-radius: 50%;
-
-    transition: .4s;
-
-    box-shadow:
-        0 0 5px var(--text-glow);
-}
-
-input:checked + .slider {
-    background:
-        var(--text-primary);
-}
-
-input:checked + .slider:before {
-    transform:
-        translateX(20px);
-
-    background:
-        #fff;
-}
-
-
-/* =========================================================
-   HAFIZA BUTONU
-========================================================= */
-
-.memory-button {
     width: 100%;
 
-    padding: 13px;
+    padding: 14px;
 
-    margin-top: 5px;
-
-    border-radius: 9px;
+    margin-bottom: 9px;
 
     border:
-        1px solid var(--hud-ring);
+        1px solid rgba(0, 238, 255, 0.1);
+
+    border-radius: 12px;
 
     background:
-        var(--menu-item-bg);
+        rgba(0, 238, 255, 0.035);
 
-    color:
-        var(--text-primary);
+    color: #dffcff;
+
+    text-align: left;
 
     font-size: 13px;
 
     cursor: pointer;
 }
 
-.memory-button:active {
-    transform: scale(.98);
-}
+.sidebar-item:hover {
 
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.menu-footer {
-    padding: 20px;
-
-    text-align: center;
-
-    border-top:
-        1px solid var(--hud-ring);
-
-    background:
-        rgba(0,0,0,.1);
-}
-
-.menu-footer small {
-    display: block;
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    color:
-        var(--text-secondary);
-}
-
-.menu-footer .dev-name {
-    margin-top: 5px;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    letter-spacing: 4px;
-
-    color:
-        var(--text-primary);
-
-    text-shadow:
-        0 0 8px var(--text-glow);
+    border-color:
+        rgba(0, 238, 255, 0.4);
 }
 
 .overlay {
+
     position: fixed;
 
     inset: 0;
 
-    background:
-        rgba(0,0,0,.5);
+    z-index: 90;
 
-    backdrop-filter:
-        blur(3px);
+    background:
+        rgba(0, 0, 0, 0.55);
 
     opacity: 0;
 
     pointer-events: none;
 
-    transition: .3s;
-
-    z-index: 90;
+    transition:
+        opacity 0.3s;
 }
 
-.overlay.active {
+.overlay.show {
+
     opacity: 1;
 
     pointer-events: auto;
 }
 
 
-/* =========================================================
-   MESAJLAR
-========================================================= */
+/* ============================================================
+   LIGHT MODE
+   ============================================================ */
 
-.messages {
-    position: absolute;
-
-    top: 90px;
-
-    left: 15px;
-    right: 15px;
-
-    bottom: 92px;
-
-    overflow-y: auto;
-
-    padding: 10px;
-
-    z-index: 20;
-
-    scroll-behavior: smooth;
-
-    -webkit-overflow-scrolling: touch;
-}
-
-.message {
-    max-width: 84%;
-
-    margin: 10px 0;
-
-    padding: 12px 16px;
-
-    border-radius: 12px;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-
-    backdrop-filter:
-        blur(5px);
-
-    box-shadow:
-        0 4px 15px rgba(0,0,0,.1);
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-}
-
-.user {
-    margin-left: auto;
+body.light {
 
     background:
-        var(--chat-user-bg);
+        #eef7f9;
 
-    border:
-        1px solid var(--hud-ring);
-
-    color:
-        var(--text-primary);
-
-    border-bottom-right-radius:
-        2px;
+    color: #092027;
 }
 
-.jarvis {
-    margin-right: auto;
+body.light .header {
 
     background:
-        var(--chat-bot-bg);
+        rgba(245, 252, 253, 0.92);
+}
 
-    border:
-        1px solid var(--hud-ring);
+body.light .brand-main {
 
-    color:
-        var(--text-secondary);
+    color: #092027;
+}
 
-    border-bottom-left-radius:
-        2px;
+body.light .message.jarvis {
+
+    color: #092027;
+
+    background:
+        rgba(0, 0, 0, 0.04);
+}
+
+body.light .input-area {
+
+    background:
+        rgba(245, 252, 253, 0.95);
+}
+
+body.light .input {
+
+    color: #092027;
+
+    background:
+        rgba(0, 0, 0, 0.03);
+}
+
+body.light .sidebar {
+
+    background:
+        rgba(245, 252, 253, 0.98);
+
+    color: #092027;
 }
 
 
-/* =========================================================
-   DÜŞÜNME ANİMASYONU
-========================================================= */
+/* ============================================================
+   THINKING
+   ============================================================ */
 
 .thinking {
+
     display: inline-flex;
 
-    align-items: center;
-
     gap: 5px;
+
+    align-items: center;
 }
 
 .thinking span {
+
     width: 5px;
     height: 5px;
 
     border-radius: 50%;
 
-    background:
-        var(--text-primary);
+    background: #00eaff;
 
     animation:
         thinking 1.2s infinite;
 }
 
 .thinking span:nth-child(2) {
-    animation-delay: .2s;
+
+    animation-delay: 0.15s;
 }
 
 .thinking span:nth-child(3) {
-    animation-delay: .4s;
-}
 
-
-/* =========================================================
-   CHAT
-========================================================= */
-
-.chat {
-    position: absolute;
-
-    left: 15px;
-    right: 15px;
-
-    bottom: 18px;
-
-    height: 60px;
-
-    display: flex;
-
-    gap: 10px;
-
-    z-index: 40;
-}
-
-.chat input {
-    flex: 1;
-
-    min-width: 0;
-
-    height: 100%;
-
-    border-radius: 15px;
-
-    border:
-        1px solid var(--hud-ring);
-
-    outline: none;
-
-    padding:
-        0 20px;
-
-    /*
-       iPhone'da otomatik zoom oluşmaması için
-       font-size minimum 16px.
-    */
-    font-size: 16px;
-
-    color:
-        var(--text-primary);
-
-    background:
-        var(--chat-input-bg);
-
-    backdrop-filter:
-        blur(10px);
-
-    box-shadow:
-        0 0 15px var(--hud-ring-glow);
-}
-
-.chat input:focus {
-    border-color:
-        var(--text-glow);
-
-    box-shadow:
-        0 0 20px var(--hud-ring);
-}
-
-.chat input::placeholder {
-    color:
-        var(--text-secondary);
-
-    opacity: .7;
-}
-
-.send {
-    width: 60px;
-    height: 60px;
-
-    flex-shrink: 0;
-
-    border-radius: 15px;
-
-    border:
-        1px solid var(--text-primary);
-
-    background:
-        var(--chat-input-bg);
-
-    backdrop-filter:
-        blur(10px);
-
-    color:
-        var(--text-primary);
-
-    font-size: 20px;
-
-    box-shadow:
-        0 0 15px var(--hud-ring-glow);
-
-    cursor: pointer;
-
-    transition: all .2s ease;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-}
-
-.send:active {
-    transform:
-        scale(.92);
-}
-
-.send:disabled {
-    opacity: .45;
-
-    cursor: not-allowed;
-}
-
-
-/* =========================================================
-   ANİMASYONLAR
-========================================================= */
-
-@keyframes slowRotate {
-
-    from {
-        transform:
-            rotate(0deg);
-    }
-
-    to {
-        transform:
-            rotate(360deg);
-    }
-}
-
-@keyframes reverseRotate {
-
-    from {
-        transform:
-            rotate(360deg);
-    }
-
-    to {
-        transform:
-            rotate(0deg);
-    }
-}
-
-@keyframes onlinePulse {
-
-    0%,
-    100% {
-        opacity: .45;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-@keyframes logoPulse {
-
-    0%,
-    100% {
-        box-shadow:
-            0 0 25px var(--hud-ring-glow),
-            inset 0 0 20px var(--hud-ring-glow);
-    }
-
-    50% {
-        box-shadow:
-            0 0 40px var(--text-glow),
-            inset 0 0 35px var(--text-glow);
-    }
+    animation-delay: 0.3s;
 }
 
 @keyframes thinking {
 
     0%,
-    60%,
+    70%,
     100% {
-        transform:
-            translateY(0);
-
-        opacity: .4;
+        opacity: 0.25;
+        transform: translateY(0);
     }
 
-    30% {
-        transform:
-            translateY(-4px);
-
+    35% {
         opacity: 1;
-    }
-}
-
-
-/* =========================================================
-   KÜÇÜK EKRAN
-========================================================= */
-
-@media (max-height: 720px) {
-
-    .hud {
-        width: 280px;
-        height: 280px;
-    }
-
-    .logo {
-        width: 100px;
-        height: 100px;
-    }
-
-    .logo span {
-        font-size: 60px;
-    }
-
-    .brand {
-        top:
-            calc(50% + 165px);
-    }
-
-    .brand-title {
-        font-size: 20px;
+        transform: translateY(-3px);
     }
 }
 
@@ -1113,465 +766,322 @@ input:checked + .slider:before {
 
 <body>
 
-<!-- =====================================================
-     KÖŞELER
-===================================================== -->
+<div class="app">
 
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
+    <!-- SIDEBAR -->
 
+    <aside
+        id="sidebar"
+        class="sidebar"
+    >
 
-<!-- =====================================================
-     SOL MENÜ
-===================================================== -->
-
-<div class="menu" id="menu">
-
-    <div class="menu-header">
-
-        <h2>SİSTEM AĞI</h2>
+        <div class="sidebar-title">
+            SİSTEM AĞI
+        </div>
 
         <button
-            class="close-menu"
-            onclick="closeMenu()"
-        >
-            ×
-        </button>
-
-    </div>
-
-
-    <div class="menu-content">
-
-        <div class="menu-section-title">
-            SİSTEM AYARLARI
-        </div>
-
-
-        <div class="setting-item">
-
-            <span>
-                Gündüz Modu
-            </span>
-
-            <label class="toggle-switch">
-
-                <input
-                    type="checkbox"
-                    id="theme-toggle"
-                    onchange="toggleTheme()"
-                >
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-
-        <div class="menu-section-title">
-            J.A.R.V.I.S. HAFIZASI
-        </div>
-
-
-        <button
-            class="memory-button"
+            class="sidebar-item"
             onclick="showMemory()"
         >
-            🧠 Hafızayı Kontrol Et
+            🧠 Bellek
         </button>
-
-
-        <div
-            class="menu-section-title"
-            style="margin-top:25px;"
-        >
-            SİSTEM
-        </div>
-
 
         <button
-            class="memory-button"
-            onclick="checkServer()"
+            class="sidebar-item"
+            onclick="checkHealth()"
         >
-            ⚡ Sistem Durumunu Kontrol Et
+            ◉ Sistem Durumu
         </button>
 
-    </div>
+        <button
+            class="sidebar-item"
+            onclick="toggleTheme()"
+        >
+            ◐ Gece / Gündüz
+        </button>
 
+        <button
+            class="sidebar-item"
+            onclick="clearChat()"
+        >
+            × Sohbeti Temizle
+        </button>
 
-    <div class="menu-footer">
-
-        <small>
-            SYSTEM DEVELOPED BY
-        </small>
-
-        <div class="dev-name">
-            KARAHAN INC.
-        </div>
-
-    </div>
-
-</div>
-
-
-<div
-    class="overlay"
-    id="overlay"
-    onclick="closeMenu()"
-></div>
-
-
-<!-- =====================================================
-     ÜST BAR
-===================================================== -->
-
-<div class="top">
-
-    <button
-        class="menu-button"
-        onclick="openMenu()"
-    >
-
-        <span></span>
-        <span></span>
-        <span></span>
-
-    </button>
-
+    </aside>
 
     <div
-        class="status"
-        id="system-status"
-    >
-
-        <div class="status-dot"></div>
-
-        <span id="status-text">
-            SYSTEM ONLINE
-        </span>
-
-    </div>
-
-</div>
+        id="overlay"
+        class="overlay"
+        onclick="closeMenu()"
+    ></div>
 
 
-<!-- =====================================================
-     ANA HUD
-===================================================== -->
+    <!-- HEADER -->
 
-<div class="hud">
+    <header class="header">
 
-    <div class="outer-ring"></div>
+        <button
+            class="menu-button"
+            onclick="toggleMenu()"
+        >
+            ☰
+        </button>
 
-    <div class="segment-ring"></div>
+        <div class="brand">
 
-    <div class="logo">
+            <div class="brand-main">
+                J.A.R.V.I.S.
+            </div>
 
-        <span>K</span>
+            <div class="brand-sub">
+                KARAHAN INC. OS v9.0
+            </div>
 
-    </div>
+        </div>
 
-</div>
+        <div class="status">
 
+            <span class="status-dot" id="statusDot"></span>
 
-<!-- =====================================================
-     MARKA
-===================================================== -->
+            <span id="statusText">
+                ONLINE
+            </span>
 
-<div class="brand">
+        </div>
 
-    <div class="brand-title">
-        J.A.R.V.I.S.
-    </div>
-
-    <div class="brand-subtitle">
-        KARAHAN INC. OS v6.0
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     MESAJLAR
-===================================================== -->
-
-<div
-    class="messages"
-    id="messages"
->
-
-    <div class="message jarvis">
-
-        Sistemlere erişim sağlandı.
-        Karahan INC. protokolleri devrede.
-
-        Size nasıl yardımcı olabilirim efendim?
-
-    </div>
-
-</div>
+    </header>
 
 
-<!-- =====================================================
-     CHAT
-===================================================== -->
+    <!-- MAIN -->
 
-<div class="chat">
+    <main class="main">
 
-    <input
-        id="input"
-        type="text"
-        placeholder="J.A.R.V.I.S.'e komut ver..."
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="sentences"
-        spellcheck="false"
-    >
+        <section class="hud">
 
-    <button
-        class="send"
-        id="send-button"
-        onclick="sendMessage()"
-    >
-        ➤
-    </button>
+            <div class="hud-circle">
+
+                <div class="k-logo">
+                    K
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHAT -->
+
+        <section
+            id="chat"
+            class="chat"
+        >
+
+            <div class="message jarvis">
+                Merhaba efendim. Ben J.A.R.V.I.S. Nasıl yardımcı olabilirim?
+            </div>
+
+        </section>
+
+
+        <!-- INPUT -->
+
+        <div class="input-area">
+
+            <input
+                id="messageInput"
+                class="input"
+                type="text"
+                autocomplete="off"
+                autocorrect="on"
+                spellcheck="true"
+                placeholder="J.A.R.V.I.S.'e bir şey sorun..."
+                onkeydown="handleKey(event)"
+            >
+
+            <button
+                id="sendButton"
+                class="send"
+                onclick="sendMessage()"
+            >
+                ↑
+            </button>
+
+        </div>
+
+    </main>
 
 </div>
 
 
 <script>
 
-/* =========================================================
-   GLOBAL
-========================================================= */
+/* ============================================================
+   ELEMENTS
+   ============================================================ */
+
+const chat = document.getElementById("chat");
+
+const input = document.getElementById(
+    "messageInput"
+);
+
+const sendButton = document.getElementById(
+    "sendButton"
+);
+
+const sidebar = document.getElementById(
+    "sidebar"
+);
+
+const overlay = document.getElementById(
+    "overlay"
+);
+
+const statusText = document.getElementById(
+    "statusText"
+);
+
+const statusDot = document.getElementById(
+    "statusDot"
+);
 
 let isSending = false;
 
 
-/* =========================================================
-   MENÜ
-========================================================= */
+/* ============================================================
+   MENU
+   ============================================================ */
 
-function openMenu() {
+function toggleMenu() {
 
-    document
-        .getElementById("menu")
-        .classList
-        .add("active");
+    sidebar.classList.toggle("open");
 
-    document
-        .getElementById("overlay")
-        .classList
-        .add("active");
+    overlay.classList.toggle(
+        "show"
+    );
 }
-
 
 function closeMenu() {
 
-    document
-        .getElementById("menu")
-        .classList
-        .remove("active");
+    sidebar.classList.remove(
+        "open"
+    );
 
-    document
-        .getElementById("overlay")
-        .classList
-        .remove("active");
+    overlay.classList.remove(
+        "show"
+    );
 }
 
 
-/* =========================================================
-   TEMA
-========================================================= */
-
-function applySavedTheme() {
-
-    const savedTheme =
-        localStorage.getItem(
-            "jarvis-theme"
-        );
-
-    const toggle =
-        document.getElementById(
-            "theme-toggle"
-        );
-
-    if (savedTheme === "light") {
-
-        document.body
-            .setAttribute(
-                "data-theme",
-                "light"
-            );
-
-        toggle.checked = true;
-
-    } else {
-
-        document.body
-            .removeAttribute(
-                "data-theme"
-            );
-
-        toggle.checked = false;
-    }
-}
-
-
-function toggleTheme() {
-
-    const toggle =
-        document.getElementById(
-            "theme-toggle"
-        );
-
-    if (toggle.checked) {
-
-        document.body
-            .setAttribute(
-                "data-theme",
-                "light"
-            );
-
-        localStorage.setItem(
-            "jarvis-theme",
-            "light"
-        );
-
-    } else {
-
-        document.body
-            .removeAttribute(
-                "data-theme"
-            );
-
-        localStorage.setItem(
-            "jarvis-theme",
-            "dark"
-        );
-    }
-}
-
-
-/* =========================================================
-   MESAJ EKLEME
-========================================================= */
+/* ============================================================
+   MESSAGE
+   ============================================================ */
 
 function addMessage(
     text,
-    type
+    type = "jarvis"
 ) {
 
-    const messages =
-        document.getElementById(
-            "messages"
-        );
+    const message =
+        document.createElement("div");
 
-    const element =
-        document.createElement(
-            "div"
-        );
-
-    element.className =
+    message.className =
         "message " + type;
 
-    element.textContent =
+    message.textContent =
         text;
 
-    messages.appendChild(
-        element
-    );
+    chat.appendChild(message);
 
-    messages.scrollTop =
-        messages.scrollHeight;
+    chat.scrollTop =
+        chat.scrollHeight;
 
-    return element;
+    return message;
 }
 
 
-/* =========================================================
-   DÜŞÜNÜYOR
-========================================================= */
+/* ============================================================
+   THINKING
+   ============================================================ */
 
-function createThinkingMessage() {
+function addThinking() {
 
-    const messages =
-        document.getElementById(
-            "messages"
-        );
+    const message =
+        document.createElement("div");
 
-    const element =
-        document.createElement(
-            "div"
-        );
-
-    element.className =
+    message.className =
         "message jarvis";
 
-    element.innerHTML = `
-        <span class="thinking">
-            JARVIS düşünüyor
+    message.id =
+        "thinkingMessage";
+
+    message.innerHTML = `
+        <div class="thinking">
             <span></span>
             <span></span>
             <span></span>
-        </span>
+        </div>
     `;
 
-    messages.appendChild(
-        element
-    );
+    chat.appendChild(message);
 
-    messages.scrollTop =
-        messages.scrollHeight;
-
-    return element;
+    chat.scrollTop =
+        chat.scrollHeight;
 }
 
 
-/* =========================================================
-   KİMLİK CEVABI
-========================================================= */
+function removeThinking() {
 
-function isIdentityQuestion(
-    message
-) {
+    const thinking =
+        document.getElementById(
+            "thinkingMessage"
+        );
 
-    const lower =
-        message.toLowerCase();
-
-    return (
-        lower.includes("kim tarafından yapıldın") ||
-        lower.includes("seni kim yaptı") ||
-        lower.includes("kim geliştirdi") ||
-        lower.includes("yaratıcın kim") ||
-        lower.includes("sahibin kim") ||
-        lower.includes("kimin eserisin")
-    );
+    if (thinking) {
+        thinking.remove();
+    }
 }
 
 
-/* =========================================================
-   ANA CHAT
-========================================================= */
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+function setOnline() {
+
+    statusText.textContent =
+        "ONLINE";
+
+    statusDot.style.background =
+        "#72ffb2";
+
+    statusDot.style.boxShadow =
+        "0 0 10px #72ffb2";
+}
+
+
+function setOffline() {
+
+    statusText.textContent =
+        "ERROR";
+
+    statusDot.style.background =
+        "#ff566b";
+
+    statusDot.style.boxShadow =
+        "0 0 10px #ff566b";
+}
+
+
+/* ============================================================
+   SEND
+   ============================================================ */
 
 async function sendMessage() {
 
     if (isSending) {
         return;
     }
-
-    const input =
-        document.getElementById(
-            "input"
-        );
-
-    const sendButton =
-        document.getElementById(
-            "send-button"
-        );
 
     const message =
         input.value.trim();
@@ -1580,13 +1090,9 @@ async function sendMessage() {
         return;
     }
 
-
     isSending = true;
 
     sendButton.disabled = true;
-
-
-    /* Kullanıcı mesajı */
 
     addMessage(
         message,
@@ -1595,56 +1101,9 @@ async function sendMessage() {
 
     input.value = "";
 
-
-    /* -----------------------------------------------------
-       ÖZEL KİMLİK CEVABI
-    ----------------------------------------------------- */
-
-    if (isIdentityQuestion(message)) {
-
-        const loading =
-            createThinkingMessage();
-
-        setTimeout(() => {
-
-            loading.textContent =
-                "Ben, gelişmiş yapay zeka sistemlerine entegre edilmiş bir modelim. Karahan INC. tarafından geliştirildim ve kodlandım.";
-
-            isSending = false;
-
-            sendButton.disabled = false;
-
-        }, 500);
-
-        return;
-    }
-
-
-    /* -----------------------------------------------------
-       DÜŞÜNME
-    ----------------------------------------------------- */
-
-    const loading =
-        createThinkingMessage();
-
+    addThinking();
 
     try {
-
-        /*
-         * ÖNEMLİ:
-         *
-         * /chat adresini aynı domain üzerinden çağırıyoruz.
-         *
-         * Böylece deploy edildiğinde:
-         *
-         * https://site.com
-         *
-         * üzerinden:
-         *
-         * https://site.com/chat
-         *
-         * çalışır.
-         */
 
         const response =
             await fetch(
@@ -1654,217 +1113,412 @@ async function sendMessage() {
 
                     headers: {
                         "Content-Type":
-                            "application/json",
-
-                        "Accept":
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
-                            message:
-                                message
-                        })
+                    body: JSON.stringify({
+                        message: message
+                    })
                 }
             );
 
+        removeThinking();
 
-        /* HTTP hatası */
+
+        /* ====================================================
+           HTTP ERROR
+           ==================================================== */
 
         if (!response.ok) {
 
-            let errorText =
-                "";
+            let errorData = null;
 
             try {
-
-                errorText =
-                    await response.text();
-
+                errorData =
+                    await response.json();
             } catch (_) {
-
-                errorText =
-                    "";
+                errorData = null;
             }
 
-            console.error(
-                "JARVIS HTTP HATASI:",
-                response.status,
-                errorText
+            let errorText =
+                "⚠️ J.A.R.V.I.S. HATA\n\n";
+
+            errorText +=
+                "HTTP Hata Kodu: " +
+                response.status +
+                "\n\n";
+
+            if (
+                errorData &&
+                errorData.response
+            ) {
+
+                errorText +=
+                    errorData.response;
+
+            } else {
+
+                errorText +=
+                    "Sunucu HTTP " +
+                    response.status +
+                    " hatası döndürdü.";
+            }
+
+            addMessage(
+                errorText,
+                "error"
             );
 
-            throw new Error(
-                "Sunucu HTTP " +
-                response.status
-            );
+            setOffline();
+
+            return;
         }
 
 
-        /* JSON kontrolü */
+        /* ====================================================
+           JSON
+           ==================================================== */
+
+        let data;
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (error) {
+
+            addMessage(
+                "⚠️ J.A.R.V.I.S. HATA\n\n" +
+                "Hata kodu: INVALID_JSON\n\n" +
+                "Sunucudan geçerli JSON alınamadı.\n\n" +
+                "Detay: " +
+                error.message,
+                "error"
+            );
+
+            setOffline();
+
+            return;
+        }
+
+
+        /* ====================================================
+           BACKEND ERROR
+           ==================================================== */
+
+        if (
+            data.status === "error"
+        ) {
+
+            let errorText =
+                data.response ||
+                "⚠️ J.A.R.V.I.S. HATA";
+
+            /*
+             * Backend zaten hata kodunu gönderiyorsa
+             * aynen göster.
+             */
+
+            if (
+                data.error_code &&
+                !errorText.includes(
+                    data.error_code
+                )
+            ) {
+
+                errorText +=
+                    "\n\nHata kodu: " +
+                    data.error_code;
+            }
+
+            if (
+                data.error_detail &&
+                !errorText.includes(
+                    data.error_detail
+                )
+            ) {
+
+                errorText +=
+                    "\n\nTeknik detay:\n" +
+                    data.error_detail;
+            }
+
+            addMessage(
+                errorText,
+                "error"
+            );
+
+            setOffline();
+
+            return;
+        }
+
+
+        /* ====================================================
+           SUCCESS
+           ==================================================== */
+
+        if (
+            typeof data.response !==
+            "string"
+        ) {
+
+            addMessage(
+                "⚠️ J.A.R.V.I.S. HATA\n\n" +
+                "Hata kodu: INVALID_RESPONSE\n\n" +
+                "Sunucu geçerli bir cevap göndermedi.",
+                "error"
+            );
+
+            setOffline();
+
+            return;
+        }
+
+        addMessage(
+            data.response,
+            "jarvis"
+        );
+
+        setOnline();
+
+    } catch (error) {
+
+        removeThinking();
+
+        /*
+         * FETCH gerçekten başarısız olduysa
+         * gerçek JavaScript hata bilgisini göster.
+         */
+
+        addMessage(
+            "⚠️ J.A.R.V.I.S. HATA\n\n" +
+            "Hata kodu: FRONTEND_FETCH_ERROR\n\n" +
+            "Detay:\n" +
+            error.message,
+            "error"
+        );
+
+        setOffline();
+
+        console.error(
+            "JARVIS FETCH ERROR:",
+            error
+        );
+
+    } finally {
+
+        isSending = false;
+
+        sendButton.disabled =
+            false;
+
+        input.focus();
+    }
+}
+
+
+/* ============================================================
+   ENTER
+   ============================================================ */
+
+function handleKey(event) {
+
+    if (
+        event.key === "Enter"
+        && !event.shiftKey
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+    }
+}
+
+
+/* ============================================================
+   HEALTH
+   ============================================================ */
+
+async function checkHealth() {
+
+    closeMenu();
+
+    try {
+
+        const response =
+            await fetch("/health");
 
         const data =
             await response.json();
 
-
-        console.log(
-            "JARVIS API:",
-            data
-        );
-
-
-        /* Backend hata döndürdüyse */
-
         if (
-            data.status ===
-            "error"
+            data.status === "online"
         ) {
 
-            console.error(
-                "JARVIS BACKEND HATASI:",
-                data.error
+            addMessage(
+                "🟢 SİSTEM DURUMU\n\n" +
+                "Sunucu: ONLINE\n" +
+                "J.A.R.V.I.S. sürümü: " +
+                data.version +
+                "\n" +
+                "Model: " +
+                data.model +
+                "\n" +
+                "Groq API: " +
+                (
+                    data.groq_configured
+                    ? "BAĞLI"
+                    : "BAĞLI DEĞİL"
+                ),
+                "jarvis"
             );
 
-            throw new Error(
-                data.error ||
-                "Backend hata döndürdü."
+            setOnline();
+
+        } else {
+
+            addMessage(
+                "⚠️ J.A.R.V.I.S. HATA\n\n" +
+                "Health endpoint beklenmeyen cevap verdi:\n" +
+                JSON.stringify(data),
+                "error"
             );
+
+            setOffline();
         }
-
-
-        /* Cevap kontrolü */
-
-        if (
-            typeof data.response !==
-            "string" ||
-            !data.response.trim()
-        ) {
-
-            console.error(
-                "Geçersiz JARVIS cevabı:",
-                data
-            );
-
-            throw new Error(
-                "Backend geçerli cevap göndermedi."
-            );
-        }
-
-
-        /* -------------------------------------------------
-           BAŞARILI CEVAP
-        ------------------------------------------------- */
-
-        loading.textContent =
-            data.response.trim();
-
-
-        /* Sistem online */
-
-        setSystemOnline();
-
 
     } catch (error) {
 
-        console.error(
-            "JARVIS BAĞLANTI HATASI:",
-            error
+        addMessage(
+            "⚠️ J.A.R.V.I.S. HATA\n\n" +
+            "Hata kodu: HEALTH_CHECK_ERROR\n\n" +
+            "Detay:\n" +
+            error.message,
+            "error"
         );
 
-
-        /*
-         * Gerçek hata durumunda göster.
-         */
-
-        loading.textContent =
-            "Üzgünüm efendim, bağlantıda bir sorun oluştu. Lütfen birkaç saniye sonra tekrar deneyin.";
-
-        setSystemOffline();
+        setOffline();
     }
-
-
-    messagesScroll();
-
-
-    isSending = false;
-
-    sendButton.disabled = false;
-
-    input.focus();
 }
 
 
-/* =========================================================
-   SCROLL
-========================================================= */
+/* ============================================================
+   MEMORY
+   ============================================================ */
 
-function messagesScroll() {
+async function showMemory() {
 
-    const messages =
-        document.getElementById(
-            "messages"
+    closeMenu();
+
+    try {
+
+        const response =
+            await fetch("/memory");
+
+        const data =
+            await response.json();
+
+        if (
+            data.status !== "success"
+        ) {
+
+            throw new Error(
+                JSON.stringify(data)
+            );
+        }
+
+        const memory =
+            data.memory || {};
+
+        addMessage(
+            "🧠 J.A.R.V.I.S. BELLEĞİ\n\n" +
+            JSON.stringify(
+                memory,
+                null,
+                2
+            ),
+            "jarvis"
         );
 
-    messages.scrollTop =
-        messages.scrollHeight;
+    } catch (error) {
+
+        addMessage(
+            "⚠️ J.A.R.V.I.S. HATA\n\n" +
+            "Hata kodu: MEMORY_ERROR\n\n" +
+            "Detay:\n" +
+            error.message,
+            "error"
+        );
+    }
 }
 
 
-/* =========================================================
-   SİSTEM DURUMU
-========================================================= */
+/* ============================================================
+   CLEAR CHAT
+   ============================================================ */
 
-function setSystemOnline() {
+function clearChat() {
 
-    const status =
-        document.getElementById(
-            "system-status"
-        );
+    closeMenu();
 
-    const text =
-        document.getElementById(
-            "status-text"
-        );
+    chat.innerHTML = "";
 
-    status.classList.remove(
-        "offline"
-    );
-
-    text.textContent =
-        "SYSTEM ONLINE";
-}
-
-
-function setSystemOffline() {
-
-    const status =
-        document.getElementById(
-            "system-status"
-        );
-
-    const text =
-        document.getElementById(
-            "status-text"
-        );
-
-    status.classList.add(
-        "offline"
-    );
-
-    text.textContent =
-        "SYSTEM ERROR";
-
-    setTimeout(
-        checkServer,
-        3000
+    addMessage(
+        "Sohbet ekranı temizlendi efendim.",
+        "jarvis"
     );
 }
 
 
-/* =========================================================
-   SERVER CHECK
-========================================================= */
+/* ============================================================
+   THEME
+   ============================================================ */
 
-async function checkServer() {
+function toggleTheme() {
+
+    document.body.classList.toggle(
+        "light"
+    );
+
+    const light =
+        document.body.classList.contains(
+            "light"
+        );
+
+    localStorage.setItem(
+        "jarvis-theme",
+        light
+            ? "light"
+            : "dark"
+    );
+
+    closeMenu();
+}
+
+
+function loadTheme() {
+
+    const theme =
+        localStorage.getItem(
+            "jarvis-theme"
+        );
+
+    if (theme === "light") {
+
+        document.body.classList.add(
+            "light"
+        );
+    }
+}
+
+
+/* ============================================================
+   INITIAL HEALTH CHECK
+   ============================================================ */
+
+async function initialHealthCheck() {
 
     try {
 
@@ -1872,252 +1526,44 @@ async function checkServer() {
             await fetch(
                 "/health",
                 {
-                    method: "GET",
                     cache: "no-store"
                 }
             );
 
-        if (!response.ok) {
+        if (response.ok) {
 
-            throw new Error(
-                "Health HTTP " +
-                response.status
-            );
-        }
-
-        const data =
-            await response.json();
-
-        console.log(
-            "SYSTEM HEALTH:",
-            data
-        );
-
-        if (
-            data.status ===
-            "online"
-        ) {
-
-            setSystemOnline();
-
-            return true;
-        }
-
-        throw new Error(
-            "Server online değil."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "HEALTH CHECK:",
-            error
-        );
-
-        setSystemOffline();
-
-        return false;
-    }
-}
-
-
-/* =========================================================
-   HAFIZA
-========================================================= */
-
-async function showMemory() {
-
-    try {
-
-        const response =
-            await fetch(
-                "/memory",
-                {
-                    method: "GET",
-                    cache: "no-store"
-                }
-            );
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Memory HTTP " +
-                response.status
-            );
-        }
-
-        const data =
-            await response.json();
-
-        console.log(
-            "JARVIS MEMORY:",
-            data
-        );
-
-
-        const memory =
-            data.memory || {};
-
-        const profile =
-            memory.profile || {};
-
-        const projects =
-            memory.projects || {};
-
-        const vehicles =
-            memory.vehicles || {};
-
-
-        let text =
-            "J.A.R.V.I.S. HAFIZA RAPORU\n\n";
-
-
-        if (
-            Object.keys(profile).length
-        ) {
-
-            text +=
-                "PROFİL\n";
-
-            Object.entries(
-                profile
-            ).forEach(
-                ([key, value]) => {
-
-                    const actual =
-                        typeof value ===
-                        "object"
-                            ? value.value
-                            : value;
-
-                    text +=
-                        key +
-                        ": " +
-                        actual +
-                        "\n";
-                }
-            );
-
-            text += "\n";
-        }
-
-
-        if (
-            Object.keys(projects).length
-        ) {
-
-            text +=
-                "PROJELER\n";
-
-            Object.entries(
-                projects
-            ).forEach(
-                ([key, value]) => {
-
-                    const actual =
-                        typeof value ===
-                        "object"
-                            ? value.value
-                            : value;
-
-                    text +=
-                        key +
-                        ": " +
-                        actual +
-                        "\n";
-                }
-            );
-
-            text += "\n";
-        }
-
-
-        if (
-            Object.keys(vehicles).length
-        ) {
-
-            text +=
-                "ARAÇLAR\n";
-
-            Object.entries(
-                vehicles
-            ).forEach(
-                ([key, value]) => {
-
-                    const actual =
-                        typeof value ===
-                        "object"
-                            ? value.value
-                            : value;
-
-                    text +=
-                        key +
-                        ": " +
-                        actual +
-                        "\n";
-                }
-            );
-        }
-
-
-        alert(text);
-
-    } catch (error) {
-
-        console.error(
-            "HAFIZA HATASI:",
-            error
-        );
-
-        alert(
-            "Efendim, hafıza sistemine şu anda erişilemiyor."
-        );
-    }
-}
-
-
-/* =========================================================
-   ENTER
-========================================================= */
-
-document
-    .getElementById("input")
-    .addEventListener(
-        "keydown",
-        function(event) {
+            const data =
+                await response.json();
 
             if (
-                event.key ===
-                "Enter"
+                data.status === "online"
             ) {
 
-                event.preventDefault();
+                setOnline();
 
-                sendMessage();
+                return;
             }
         }
-    );
+
+    } catch (_) {}
+
+    setOffline();
+}
 
 
-/* =========================================================
-   SAYFA AÇILIŞI
-========================================================= */
+/* ============================================================
+   START
+   ============================================================ */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    () => {
 
-        applySavedTheme();
+        loadTheme();
 
-        /*
-         * Sayfa açıldığında backend'i kontrol et.
-         */
+        initialHealthCheck();
 
-        checkServer();
-
-        document
-            .getElementById("input")
-            .focus();
+        input.focus();
     }
 );
 
