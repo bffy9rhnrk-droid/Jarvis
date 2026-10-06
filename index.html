@@ -217,7 +217,8 @@ button:active{
     flex-direction:column;
     gap:8px;
     padding-bottom:4px;
-    scrollbar-width:none
+    scrollbar-width:none;
+    scroll-behavior:auto
 }
 
 .chat::-webkit-scrollbar{
@@ -865,9 +866,7 @@ body.fun-mode .status{
 
 </div>
 
-<!-- =====================================================
-     PROFILE
-===================================================== -->
+<!-- PROFILE -->
 
 <div
     id="profileModal"
@@ -908,9 +907,7 @@ body.fun-mode .status{
 
 </div>
 
-<!-- =====================================================
-     ERROR MODAL
-===================================================== -->
+<!-- ERROR MODAL -->
 
 <div
     id="errorModal"
@@ -937,9 +934,7 @@ body.fun-mode .status{
 
 </div>
 
-<!-- =====================================================
-     MAIN
-===================================================== -->
+<!-- MAIN -->
 
 <div class="main">
 
@@ -1057,6 +1052,11 @@ function addMessage(
 
     chat.appendChild(div);
 
+    /*
+     * Normal mesaj geldiğinde aşağı kaydır.
+     * Sunum durum güncellemelerinde bu fonksiyon
+     * kullanılmadığı için ekran sürekli hareket etmez.
+     */
     chat.scrollTop =
         chat.scrollHeight;
 
@@ -1873,8 +1873,10 @@ async function createPresentation(
         progressMessage
     );
 
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
+    /*
+     * Burada artık otomatik scroll YOK.
+     * Sunum paneli mevcut konumunda kalır.
+     */
 
     startPresentationAnimation();
 
@@ -1934,9 +1936,6 @@ async function createPresentation(
             );
         }
 
-        /*
-         * İlk durum hemen gösterilir.
-         */
         updatePresentationUI(
             data,
             progressMessage
@@ -2451,47 +2450,32 @@ function updatePresentationUI(
         }
     }
 
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
+    /*
+     * ÇOK ÖNEMLİ:
+     *
+     * Burada artık:
+     *
+     * $("chat").scrollTop =
+     *     $("chat").scrollHeight;
+     *
+     * YOK.
+     *
+     * Böylece 600 ms'de bir ekran aşağı atlamaz.
+     */
 }
 
 function startPresentationAnimation(){
 
     stopPresentationAnimation();
 
-    let dotState = 0;
+    /*
+     * Eski sistemde burada her 450 ms'de
+     * durum metnine müdahale ediliyordu.
+     *
+     * Artık gerçek backend mesajını değiştirmiyoruz.
+     */
 
-    function updateDots(){
-
-        const current =
-            document.querySelector(
-                "#presentationCurrent"
-            );
-
-        if(!current){
-            return;
-        }
-
-        dotState++;
-
-        if(dotState > 3){
-            dotState = 1;
-        }
-
-        /*
-         * Mevcut mesajın sonuna animasyonlu
-         * noktalar eklemek yerine ayrı bir
-         * görsel efekt uyguluyoruz.
-         */
-    }
-
-    updateDots();
-
-    dotsTimer =
-        setInterval(
-            updateDots,
-            450
-        );
+    dotsTimer = null;
 }
 
 function stopPresentationAnimation(){
@@ -2598,6 +2582,11 @@ function showPresentationResult(
         div
     );
 
+    /*
+     * Sonuç geldiğinde sadece bir kez aşağıya getiriyoruz.
+     * Bu, normal bir kullanıcı hareketidir ve sürekli
+     * scroll problemi oluşturmaz.
+     */
     $("chat").scrollTop =
         $("chat").scrollHeight;
 }
