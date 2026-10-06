@@ -1,7 +1,7 @@
 # ============================================================
 # K.A.R.V.I.S. - KARAHAN INC.
 # Professional AI Assistant Backend
-# Presentation Engine v30.0.0
+# Presentation Engine v31.0.0
 # ============================================================
 
 import os
@@ -15,6 +15,7 @@ import traceback
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from io import BytesIO
+from difflib import SequenceMatcher
 
 import requests
 
@@ -31,17 +32,24 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 
+
 # ============================================================
 # APP
 # ============================================================
 
-APP_VERSION = "30.0.0"
+APP_VERSION = "31.0.0"
+
 BASE_DIR = Path(__file__).resolve().parent
 GENERATED_DIR = BASE_DIR / "generated"
 GENERATED_DIR.mkdir(exist_ok=True)
+
 INDEX_FILE = BASE_DIR / "index.html"
 
-app = FastAPI(title="K.A.R.V.I.S. - KARAHAN INC.", version=APP_VERSION)
+app = FastAPI(
+    title="K.A.R.V.I.S. - KARAHAN INC.",
+    version=APP_VERSION
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -50,20 +58,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ============================================================
 # API KEYS
 # ============================================================
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+
 GOOGLE_IMAGE_API_KEY = os.getenv("GOOGLE_IMAGE_API_KEY", "").strip()
 GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID", "").strip()
 
-groq_client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1") if GROQ_API_KEY else None
-openrouter_client = OpenAI(api_key=OPENROUTER_API_KEY, base_url="https://openrouter.ai/api/v1") if OPENROUTER_API_KEY else None
+groq_client = (
+    OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    if GROQ_API_KEY
+    else None
+)
 
-GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
-OPENROUTER_MODELS = ["openai/gpt-oss-20b:free"]
+openrouter_client = (
+    OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
+    if OPENROUTER_API_KEY
+    else None
+)
+
+
+GROQ_MODELS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+]
+
+OPENROUTER_MODELS = [
+    "openai/gpt-oss-20b:free",
+]
+
 
 # ============================================================
 # MEMORY / ERROR LOG
@@ -71,6 +104,7 @@ OPENROUTER_MODELS = ["openai/gpt-oss-20b:free"]
 
 MEMORY_FILE = BASE_DIR / "memory.json"
 ERROR_FILE = BASE_DIR / "errors.json"
+
 memory_lock = threading.Lock()
 error_lock = threading.Lock()
 
@@ -79,16 +113,25 @@ def read_json_file(path, default):
     try:
         if not path.exists():
             return default
+
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
+
     except Exception:
         return default
 
 
 def write_json_file(path, data):
     temp = path.with_suffix(".tmp")
+
     with open(temp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(
+            data,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
     temp.replace(path)
 
 
@@ -96,17 +139,24 @@ def save_error(message, details=None):
     try:
         with error_lock:
             data = read_json_file(ERROR_FILE, [])
+
             data.append({
                 "time": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "error": str(message),
-                "details": str(details or ""),
+                "details": str(details or "")
             })
-            write_json_file(ERROR_FILE, data[-100:])
+
+            write_json_file(
+                ERROR_FILE,
+                data[-100:]
+            )
+
     except Exception:
         pass
 
+
 # ============================================================
-# USERS / LOGIN
+# USERS
 # ============================================================
 
 USERS = {
@@ -116,18 +166,21 @@ USERS = {
         "role": "owner",
         "style": "professional",
     },
+
     "betul": {
         "name": "Betül",
         "password": "1234",
         "role": "user",
         "style": "professional",
     },
+
     "sinem": {
         "name": "Sinem",
         "password": "3021",
         "role": "user",
         "style": "professional",
     },
+
     "ilknur": {
         "name": "İlknur",
         "password": "1111",
@@ -136,6 +189,10 @@ USERS = {
     },
 }
 
+
+# ============================================================
+# MODELS
+# ============================================================
 
 class LoginRequest(BaseModel):
     username: str
@@ -154,14 +211,29 @@ class PresentationRequest(BaseModel):
     username: str = "karahan"
 
 
+# ============================================================
+# LOGIN
+# ============================================================
+
 @app.post("/login")
 async def login(request: LoginRequest):
+
     username = (request.username or "").strip().lower()
     password = request.password or ""
+
     user = USERS.get(username)
 
-    if user is None or user.get("password", "") != password:
-        raise HTTPException(status_code=401, detail="Kullanıcı adı veya şifre hatalı.")
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Kullanıcı adı veya şifre hatalı."
+        )
+
+    if user.get("password", "") != password:
+        raise HTTPException(
+            status_code=401,
+            detail="Kullanıcı adı veya şifre hatalı."
+        )
 
     public_user = {
         "username": username,
@@ -174,433 +246,1953 @@ async def login(request: LoginRequest):
         "success": True,
         "username": username,
         "user": public_user,
-        "message": "Giriş başarılı.",
+        "message": "Giriş başarılı."
     }
 
+
 # ============================================================
-# AI
+# AI SYSTEMS
 # ============================================================
 
-PROFESSIONAL_SYSTEM = (
-    "Sen K.A.R.V.I.S. isimli profesyonel Türkçe yapay zeka asistanısın. "
-    "Yanıtların doğru, açık, doğal, bağlama uygun ve gereksiz tekrar içermeyen Türkçe olmalıdır."
-)
+PROFESSIONAL_SYSTEM = """
+Sen K.A.R.V.I.S. isimli profesyonel Türkçe yapay zeka asistanısın.
 
-ACADEMIC_SYSTEM = (
-    "Sen K.A.R.V.I.S. isimli akademik yardımcı asistansın. "
-    "Kullanıcıya 'Hocam' diye hitap et. Dilin resmi, akademik, ölçülü ve kurumsal olsun. "
-    "Gereksiz emoji, aşırı samimi ifade, argo ve sohbet dili kullanma. "
-    "Uygun olduğunda yanıtı başlık, açıklama, maddeler ve sonuç şeklinde düzenle. "
-    "Araştırma taleplerinde kaynaklar, yöntem, bulgular ve değerlendirme ayrımını koru. "
-    "Ders anlatımında kavramları açık ve öğretici biçimde açıkla. "
-    "Quiz taleplerinde sınav formatını koru ve cevapları istenmeden doğrudan açığa çıkarma. "
-    "Sunum metinlerinde kısa, okunabilir ve slayta uygun akademik ifadeler kullan."
-)
+Yanıtların:
+- doğru,
+- açık,
+- doğal,
+- bağlama uygun,
+- gereksiz tekrar içermeyen
+Türkçe olmalıdır.
+
+Bilmediğin bir bilgiyi kesin gerçekmiş gibi uydurma.
+Kaynak verilmişse yalnızca kaynaklarla desteklenen bilgileri kullan.
+"""
 
 
-def call_groq(prompt, model, system_prompt=PROFESSIONAL_SYSTEM):
+ACADEMIC_SYSTEM = """
+Sen K.A.R.V.I.S. isimli akademik yardımcı asistansın.
+
+Kullanıcıya "Hocam" diye hitap et.
+
+Dil:
+- resmi,
+- akademik,
+- kurumsal,
+- açık,
+- ölçülü
+
+olmalıdır.
+
+Gereksiz emoji, argo ve aşırı samimi ifade kullanma.
+
+Araştırma taleplerinde:
+- kaynaklar,
+- yöntem,
+- bulgular,
+- değerlendirme
+
+ayrımını koru.
+
+Ders anlatımında kavramları sistematik ve öğretici biçimde açıkla.
+
+Quiz taleplerinde sınav formatını koru.
+
+Sunum hazırlarken:
+- kaynaklara dayalı,
+- doğru,
+- birbirini tekrar etmeyen,
+- kısa,
+- akademik,
+- slayta uygun
+
+metin üret.
+"""
+
+
+# ============================================================
+# AI CALLS
+# ============================================================
+
+def call_groq(
+    prompt,
+    model,
+    system_prompt=PROFESSIONAL_SYSTEM
+):
     if not groq_client:
         return None
+
     try:
+
         response = groq_client.chat.completions.create(
             model=model,
+
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
             ],
-            temperature=0.35,
-            max_tokens=5000,
+
+            temperature=0.20,
+            max_tokens=5000
         )
+
         return response.choices[0].message.content
+
     except Exception:
-        save_error("Groq error", traceback.format_exc())
+        save_error(
+            "Groq error",
+            traceback.format_exc()
+        )
+
         return None
 
 
-def call_openrouter(prompt, model, system_prompt=PROFESSIONAL_SYSTEM):
+def call_openrouter(
+    prompt,
+    model,
+    system_prompt=PROFESSIONAL_SYSTEM
+):
     if not openrouter_client:
         return None
+
     try:
+
         response = openrouter_client.chat.completions.create(
             model=model,
+
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
             ],
-            temperature=0.35,
-            max_tokens=5000,
+
+            temperature=0.20,
+            max_tokens=5000
         )
+
         return response.choices[0].message.content
+
     except Exception:
-        save_error("OpenRouter error", traceback.format_exc())
+        save_error(
+            "OpenRouter error",
+            traceback.format_exc()
+        )
+
         return None
 
 
-def ask_ai(prompt, system_prompt=PROFESSIONAL_SYSTEM):
+def ask_ai(
+    prompt,
+    system_prompt=PROFESSIONAL_SYSTEM
+):
+
     for model in GROQ_MODELS:
-        result = call_groq(prompt, model, system_prompt)
+
+        result = call_groq(
+            prompt,
+            model,
+            system_prompt
+        )
+
         if result:
             return result
+
     for model in OPENROUTER_MODELS:
-        result = call_openrouter(prompt, model, system_prompt)
+
+        result = call_openrouter(
+            prompt,
+            model,
+            system_prompt
+        )
+
         if result:
             return result
+
     return None
 
-# ============================================================
-# JSON EXTRACTION
-# ============================================================
 
+# ============================================================
+# JSON
+# ============================================================
 
 def extract_json(text):
+
     if not text:
         return None
+
     text = text.strip()
-    text = re.sub(r"^```json", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"^```", "", text)
-    text = re.sub(r"```$", "", text).strip()
+
+    text = re.sub(
+        r"^```json",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"^```",
+        "",
+        text
+    )
+
+    text = re.sub(
+        r"```$",
+        "",
+        text
+    ).strip()
+
     try:
         return json.loads(text)
     except Exception:
         pass
+
     start = text.find("{")
     end = text.rfind("}")
+
     if start >= 0 and end > start:
+
         try:
-            return json.loads(text[start:end + 1])
+            return json.loads(
+                text[start:end + 1]
+            )
         except Exception:
             pass
+
     return None
 
+
 # ============================================================
-# PRESENTATION OUTLINE
+# WEB RESEARCH
 # ============================================================
 
+WEB_HEADERS = {
+    "User-Agent":
+        "KARVIS-KARAHAN-INC/31.0 academic research"
+}
 
-def fallback_presentation(topic, slide_count):
-    content_count = max(3, slide_count - 2)
+
+def clean_text(text):
+
+    if not text:
+        return ""
+
+    text = re.sub(
+        r"<[^>]+>",
+        " ",
+        str(text)
+    )
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+
+
+def search_wikipedia(
+    topic,
+    language="tr",
+    limit=6
+):
+    """
+    Wikipedia'dan konuya ilişkin gerçek kaynaklar toplar.
+    """
+
+    try:
+
+        api = (
+            f"https://{language}.wikipedia.org/w/api.php"
+        )
+
+        response = requests.get(
+            api,
+            params={
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": topic,
+                "gsrnamespace": 0,
+                "gsrlimit": limit,
+                "prop": "extracts|info",
+                "exintro": True,
+                "explaintext": True,
+                "inprop": "url",
+                "format": "json",
+            },
+            headers=WEB_HEADERS,
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        pages = (
+            response.json()
+            .get("query", {})
+            .get("pages", {})
+        )
+
+        results = []
+
+        for page in pages.values():
+
+            title = clean_text(
+                page.get("title", "")
+            )
+
+            extract = clean_text(
+                page.get("extract", "")
+            )
+
+            url = (
+                page.get("fullurl")
+                or
+                f"https://{language}.wikipedia.org/wiki/"
+                + title.replace(" ", "_")
+            )
+
+            if not title or not extract:
+                continue
+
+            results.append({
+                "title": title,
+                "text": extract[:5000],
+                "url": url,
+                "source": "Wikipedia"
+            })
+
+        return results
+
+    except Exception:
+
+        save_error(
+            "Wikipedia research error",
+            traceback.format_exc()
+        )
+
+        return []
+
+
+def search_google_web(topic):
+
+    if not GOOGLE_IMAGE_API_KEY or not GOOGLE_CSE_ID:
+        return []
+
+    try:
+
+        response = requests.get(
+            "https://www.googleapis.com/customsearch/v1",
+
+            params={
+                "key": GOOGLE_IMAGE_API_KEY,
+                "cx": GOOGLE_CSE_ID,
+                "q": topic,
+                "num": 8,
+                "safe": "active"
+            },
+
+            headers=WEB_HEADERS,
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        items = response.json().get(
+            "items",
+            []
+        )
+
+        results = []
+
+        for item in items:
+
+            title = clean_text(
+                item.get("title", "")
+            )
+
+            snippet = clean_text(
+                item.get("snippet", "")
+            )
+
+            link = item.get(
+                "link",
+                ""
+            )
+
+            if not title or not snippet:
+                continue
+
+            results.append({
+                "title": title,
+                "text": snippet,
+                "url": link,
+                "source": "Web"
+            })
+
+        return results
+
+    except Exception:
+
+        save_error(
+            "Google web search error",
+            traceback.format_exc()
+        )
+
+        return []
+
+
+def research_topic(topic):
+
+    sources = []
+
+    # --------------------------------------------------------
+    # 1. Turkish Wikipedia
+    # --------------------------------------------------------
+
+    sources.extend(
+        search_wikipedia(
+            topic,
+            "tr",
+            6
+        )
+    )
+
+    # --------------------------------------------------------
+    # 2. English Wikipedia
+    # --------------------------------------------------------
+
+    if len(sources) < 5:
+
+        sources.extend(
+            search_wikipedia(
+                topic,
+                "en",
+                5
+            )
+        )
+
+    # --------------------------------------------------------
+    # 3. Google Custom Search
+    # --------------------------------------------------------
+
+    google_sources = search_google_web(
+        topic
+    )
+
+    sources.extend(
+        google_sources
+    )
+
+    # --------------------------------------------------------
+    # Duplicate source removal
+    # --------------------------------------------------------
+
+    unique = []
+    seen = set()
+
+    for source in sources:
+
+        url = source.get(
+            "url",
+            ""
+        )
+
+        if not url:
+            continue
+
+        if url in seen:
+            continue
+
+        seen.add(url)
+        unique.append(source)
+
+    return unique[:15]
+
+
+def format_sources_for_ai(sources):
+
+    if not sources:
+        return (
+            "Kullanılabilir harici kaynak bulunamadı. "
+            "Bu durumda doğrulanmamış özel istatistikler "
+            "ve kesin sayısal iddialar üretme."
+        )
+
+    blocks = []
+
+    for index, source in enumerate(
+        sources,
+        start=1
+    ):
+
+        blocks.append(
+            f"""
+KAYNAK {index}
+Başlık: {source.get("title", "")}
+Kaynak: {source.get("source", "")}
+URL: {source.get("url", "")}
+İçerik:
+{source.get("text", "")[:3500]}
+"""
+        )
+
+    return "\n".join(blocks)
+
+
+# ============================================================
+# PRESENTATION FALLBACK
+# ============================================================
+
+def fallback_presentation(
+    topic,
+    slide_count
+):
+
+    content_count = max(
+        3,
+        slide_count - 2
+    )
+
     templates = [
-        ("Temel Kavramlar", f"{topic} konusunun temel kavramları, kapsamı ve ana bileşenleri açıklanmaktadır."),
-        ("Tarihsel Gelişim", f"{topic} ile ilgili düşüncelerin ve uygulamaların tarihsel gelişimi temel dönüm noktaları üzerinden incelenmektedir."),
-        ("Temel Unsurlar", f"{topic} başlığını oluşturan temel unsurlar ve bu unsurlar arasındaki ilişkiler sistematik biçimde ele alınmaktadır."),
-        ("Toplumsal Etkiler", f"{topic} konusunun birey, toplum ve kurumlar üzerindeki başlıca etkileri değerlendirilmektedir."),
-        ("Günümüzdeki Önemi", f"{topic} günümüzde farklı alanlarda önemini korumakta ve değişen koşullara bağlı olarak yeni uygulamalar kazanmaktadır."),
-        ("Değerlendirme", f"{topic} açısından mevcut yaklaşımların güçlü ve sınırlı yönleri birlikte değerlendirilerek genel bir çerçeve oluşturulmaktadır."),
+        (
+            "Temel Kavramlar",
+            f"{topic} konusunun temel kavramları, kapsamı ve ana bileşenleri açıklanmaktadır."
+        ),
+
+        (
+            "Tarihsel Gelişim",
+            f"{topic} konusunun ortaya çıkışı ve tarihsel gelişimindeki önemli değişimler ele alınmaktadır."
+        ),
+
+        (
+            "Temel Unsurlar",
+            f"{topic} başlığını oluşturan temel unsurlar ve bu unsurlar arasındaki ilişkiler incelenmektedir."
+        ),
+
+        (
+            "Uygulama Alanları",
+            f"{topic} kapsamında kullanılan başlıca yöntemler, uygulamalar ve kullanım alanları değerlendirilmektedir."
+        ),
+
+        (
+            "Etkileri",
+            f"{topic} konusunun bireyler, toplum ve ilgili kurumlar üzerindeki başlıca etkileri açıklanmaktadır."
+        ),
+
+        (
+            "Günümüzdeki Önemi",
+            f"{topic} konusunun günümüzdeki önemi ve değişen koşullar karşısındaki konumu değerlendirilmektedir."
+        ),
+
+        (
+            "Genel Değerlendirme",
+            f"{topic} açısından temel bulgular ve öne çıkan noktalar bütüncül biçimde değerlendirilmektedir."
+        )
     ]
+
     slides = []
+
     for i in range(content_count):
-        title, paragraph = templates[i % len(templates)]
+
+        title, paragraph = templates[
+            i % len(templates)
+        ]
+
         slides.append({
             "title": title,
             "paragraph": paragraph,
-            "visual_query": f"{topic} {title} academic educational",
+            "visual_query":
+                f"{topic} {title} documentary academic",
+            "sources": []
         })
+
     return {
         "title": topic,
         "subtitle": "Akademik Sunum",
-        "cover_visual_query": f"{topic} academic professional",
+        "cover_visual_query":
+            f"{topic} academic professional",
         "slides": slides,
         "conclusion": {
             "title": "Sonuç ve Değerlendirme",
-            "paragraph": f"{topic} farklı boyutlarıyla değerlendirildiğinde, temel kavramların, uygulamaların ve toplumsal sonuçların birlikte ele alınmasının konunun bütüncül biçimde anlaşılması açısından önemli olduğu görülmektedir.",
-            "visual_query": f"{topic} conclusion academic",
-        },
+            "paragraph":
+                f"{topic} farklı boyutlarıyla değerlendirildiğinde, temel kavramların, uygulamaların ve etkilerin birlikte ele alınmasının konunun bütüncül biçimde anlaşılması açısından önemli olduğu görülmektedir.",
+            "visual_query":
+                f"{topic} conclusion academic",
+            "sources": []
+        }
     }
 
 
-def create_presentation_outline(topic, slide_count):
-    content_count = max(3, slide_count - 2)
+# ============================================================
+# TEXT SIMILARITY
+# ============================================================
+
+def normalize_similarity_text(text):
+
+    text = str(text or "").lower()
+
+    text = re.sub(
+        r"[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]",
+        " ",
+        text
+    )
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+
+
+def text_similarity(a, b):
+
+    a = normalize_similarity_text(a)
+    b = normalize_similarity_text(b)
+
+    if not a or not b:
+        return 0
+
+    return SequenceMatcher(
+        None,
+        a,
+        b
+    ).ratio()
+
+
+def has_duplicate_content(
+    paragraph,
+    previous_paragraphs,
+    threshold=0.68
+):
+
+    for previous in previous_paragraphs:
+
+        if text_similarity(
+            paragraph,
+            previous
+        ) >= threshold:
+
+            return True
+
+    return False
+
+
+# ============================================================
+# PRESENTATION PLAN
+# ============================================================
+
+def create_presentation_plan(
+    topic,
+    slide_count,
+    sources
+):
+
+    content_count = max(
+        3,
+        slide_count - 2
+    )
+
+    source_text = format_sources_for_ai(
+        sources
+    )
+
     prompt = f"""
-K.A.R.V.I.S. için profesyonel bir üniversite sunumu hazırla.
+Bir üniversite düzeyinde akademik sunum için
+SLAYT PLANI oluştur.
 
 KONU:
 {topic}
 
-TOPLAM SLAYT SAYISI:
+TOPLAM SLAYT:
 {slide_count}
 
-Toplam slayt sayısı tam olarak {slide_count} olmalı.
-Yapı: 1 kapak + {content_count} içerik + 1 sonuç.
+Yapı:
+
+1 kapak
+{content_count} içerik
+1 sonuç
+
+ÖNEMLİ:
+
+Her içerik slaytının farklı bir amacı olmalı.
+
+Aynı bilgiyi farklı başlıklarla tekrar etme.
+
+Örneğin:
+
+Yanlış:
+- Tanım
+- Temel Kavram
+- Kavramın Özellikleri
+
+Eğer bunların hepsi aynı bilgiyi anlatıyorsa bunları ayrı slaytlara bölme.
+
+Bunun yerine konuya göre farklı boyutlar seç:
+
+- tanım
+- tarihsel gelişim
+- yapı
+- süreç
+- uygulama
+- örnek
+- etkiler
+- avantaj/dezavantaj
+- güncel durum
+- değerlendirme
+
+Konuya uygun olanları seç.
+
+KAYNAKLAR:
+
+{source_text}
 
 Yalnızca JSON döndür:
+
 {{
-  "title": "Ana başlık",
-  "subtitle": "Kısa akademik alt başlık",
+  "title": "Ana sunum başlığı",
+  "subtitle": "Akademik alt başlık",
   "cover_visual_query": "English image search query",
   "slides": [
     {{
-      "title": "Kısa başlık",
-      "paragraph": "Akademik açıklama",
-      "visual_query": "Unique English visual search query"
+      "title": "Slayt başlığı",
+      "objective": "Bu slaytın anlatacağı özgün konu",
+      "visual_query": "English image search query"
     }}
   ],
   "conclusion": {{
     "title": "Sonuç ve Değerlendirme",
-    "paragraph": "Akademik sonuç",
-    "visual_query": "Unique English visual search query"
+    "objective": "Sunumun genel değerlendirmesi",
+    "visual_query": "English image search query"
   }}
 }}
 
 Kurallar:
+
 - Türkçe yaz.
-- Her içerik slaytı farklı bir boyutu anlatsın.
-- Başlıklar farklı olsun.
-- Paragraflar akademik ve anlaşılır olsun; yaklaşık 80-130 kelime hedefle.
-- Gereksiz madde işareti kullanma.
-- Visual query alanları İngilizce ve birbirinden farklı olsun.
-- Görseller konuyla doğrudan ilişkili olsun.
-- Sonuç slaytı konuyu gerçekten değerlendirsin.
+- Tam olarak {content_count} içerik slaytı oluştur.
+- Her objective birbirinden farklı olmalı.
+- Aynı konuyu tekrar eden slayt oluşturma.
+- Görsel sorguları birbirinden farklı olmalı.
+- Görsel sorguları İngilizce olmalı.
+- Görsel sorguları gerçek fotoğraf/şema/harita/nesne aramaya uygun olmalı.
+- Sonuç slaytı önceki slaytların kopyası olmamalı.
 - JSON dışında hiçbir şey yazma.
 """
-    result = ask_ai(prompt, ACADEMIC_SYSTEM)
-    data = extract_json(result)
-    if not data:
-        return fallback_presentation(topic, slide_count)
 
-    slides = data.get("slides", [])
+    result = ask_ai(
+        prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    data = extract_json(
+        result
+    )
+
+    if not data:
+        return fallback_presentation(
+            topic,
+            slide_count
+        )
+
+    raw_slides = data.get(
+        "slides",
+        []
+    )
+
     clean_slides = []
-    for slide in slides:
-        if not isinstance(slide, dict):
+
+    used_titles = set()
+
+    for slide in raw_slides:
+
+        if not isinstance(
+            slide,
+            dict
+        ):
             continue
-        title = str(slide.get("title", "")).strip()
-        paragraph = str(slide.get("paragraph", "")).strip()
-        query = str(slide.get("visual_query", "")).strip()
-        if not title or not paragraph:
+
+        title = str(
+            slide.get(
+                "title",
+                ""
+            )
+        ).strip()
+
+        objective = str(
+            slide.get(
+                "objective",
+                ""
+            )
+        ).strip()
+
+        visual_query = str(
+            slide.get(
+                "visual_query",
+                ""
+            )
+        ).strip()
+
+        if not title or not objective:
             continue
+
+        title_key = normalize_similarity_text(
+            title
+        )
+
+        if title_key in used_titles:
+            continue
+
+        used_titles.add(
+            title_key
+        )
+
         clean_slides.append({
             "title": title,
-            "paragraph": paragraph,
-            "visual_query": query or f"{topic} {title} academic",
+            "objective": objective,
+            "visual_query":
+                visual_query
+                or f"{topic} {title} academic",
         })
 
     if len(clean_slides) < content_count:
-        return fallback_presentation(topic, slide_count)
 
-    clean_slides = clean_slides[:content_count]
-    conclusion = data.get("conclusion", {})
-    if not isinstance(conclusion, dict):
-        conclusion = {}
-    conclusion_paragraph = str(conclusion.get("paragraph", "")).strip()
-    if not conclusion_paragraph:
-        conclusion_paragraph = f"{topic} farklı boyutlarıyla değerlendirildiğinde, temel kavramların ve uygulamaların birlikte ele alınmasının konunun bütüncül biçimde anlaşılması açısından önemli olduğu görülmektedir."
+        return fallback_presentation(
+            topic,
+            slide_count
+        )
+
+    clean_slides = clean_slides[
+        :content_count
+    ]
+
+    conclusion_data = data.get(
+        "conclusion",
+        {}
+    )
+
+    if not isinstance(
+        conclusion_data,
+        dict
+    ):
+        conclusion_data = {}
 
     return {
-        "title": str(data.get("title") or topic).strip(),
-        "subtitle": str(data.get("subtitle") or "Akademik Sunum").strip(),
-        "cover_visual_query": str(data.get("cover_visual_query") or f"{topic} academic professional").strip(),
+        "title":
+            str(
+                data.get(
+                    "title",
+                    topic
+                )
+            ).strip()
+            or topic,
+
+        "subtitle":
+            str(
+                data.get(
+                    "subtitle",
+                    "Akademik Sunum"
+                )
+            ).strip()
+            or "Akademik Sunum",
+
+        "cover_visual_query":
+            str(
+                data.get(
+                    "cover_visual_query",
+                    f"{topic} academic professional"
+                )
+            ).strip(),
+
         "slides": clean_slides,
+
         "conclusion": {
-            "title": str(conclusion.get("title") or "Sonuç ve Değerlendirme").strip(),
-            "paragraph": conclusion_paragraph,
-            "visual_query": str(conclusion.get("visual_query") or f"{topic} conclusion academic").strip(),
-        },
+            "title":
+                str(
+                    conclusion_data.get(
+                        "title",
+                        "Sonuç ve Değerlendirme"
+                    )
+                ).strip(),
+
+            "objective":
+                str(
+                    conclusion_data.get(
+                        "objective",
+                        "Konunun genel değerlendirmesi"
+                    )
+                ).strip(),
+
+            "visual_query":
+                str(
+                    conclusion_data.get(
+                        "visual_query",
+                        f"{topic} conclusion academic"
+                    )
+                ).strip()
+        }
     }
+
+
+# ============================================================
+# INDIVIDUAL SLIDE CONTENT
+# ============================================================
+
+def generate_slide_content(
+    topic,
+    slide,
+    sources,
+    previous_paragraphs
+):
+
+    source_text = format_sources_for_ai(
+        sources
+    )
+
+    prompt = f"""
+Aşağıdaki akademik sunum için SADECE BU SLAYTIN
+içeriğini oluştur.
+
+ANA KONU:
+{topic}
+
+SLAYT BAŞLIĞI:
+{slide["title"]}
+
+BU SLAYTIN ÖZGÜN AMACI:
+{slide["objective"]}
+
+KAYNAKLAR:
+{source_text}
+
+ÖNCEKİ SLAYT METİNLERİ:
+{chr(10).join(previous_paragraphs[-5:]) if previous_paragraphs else "Henüz yok."}
+
+ÇOK ÖNEMLİ:
+
+Bu slayt önceki slaytların tekrarını yapmamalıdır.
+
+Sadece bu slaytın özgün amacını anlat.
+
+Kaynaklarda bulunmayan kesin istatistik, tarih,
+oran, kişi, kurum veya olay uydurma.
+
+Kaynaklarda bilgi yoksa bunu açıkça belirt veya
+genel açıklama yap.
+
+Akademik ama anlaşılır Türkçe kullan.
+
+80-120 kelime civarında bir açıklama üret.
+
+Görsel için İngilizce bir arama sorgusu oluştur.
+
+Yalnızca JSON döndür:
+
+{{
+  "paragraph": "Slayt açıklaması",
+  "visual_query": "English visual search query",
+  "source_indexes": [1, 2]
+}}
+
+JSON dışında hiçbir şey yazma.
+"""
+
+    result = ask_ai(
+        prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    data = extract_json(
+        result
+    )
+
+    if not data:
+        return None
+
+    paragraph = str(
+        data.get(
+            "paragraph",
+            ""
+        )
+    ).strip()
+
+    visual_query = str(
+        data.get(
+            "visual_query",
+            slide.get(
+                "visual_query",
+                f"{topic} academic"
+            )
+        )
+    ).strip()
+
+    source_indexes = data.get(
+        "source_indexes",
+        []
+    )
+
+    if not isinstance(
+        source_indexes,
+        list
+    ):
+        source_indexes = []
+
+    selected_sources = []
+
+    for index in source_indexes:
+
+        try:
+            index = int(index) - 1
+
+            if (
+                0 <= index < len(sources)
+            ):
+                selected_sources.append(
+                    sources[index]
+                )
+
+        except Exception:
+            continue
+
+    if not selected_sources:
+        selected_sources = sources[:2]
+
+    if not paragraph:
+        return None
+
+    return {
+        "paragraph": paragraph,
+        "visual_query":
+            visual_query
+            or slide.get(
+                "visual_query",
+                f"{topic} academic"
+            ),
+        "sources": selected_sources
+    }
+
+
+# ============================================================
+# BUILD COMPLETE PRESENTATION
+# ============================================================
+
+def build_verified_presentation(
+    topic,
+    slide_count
+):
+
+    sources = research_topic(
+        topic
+    )
+
+    plan = create_presentation_plan(
+        topic,
+        slide_count,
+        sources
+    )
+
+    previous_paragraphs = []
+
+    final_slides = []
+
+    for slide in plan["slides"]:
+
+        generated = None
+
+        # ----------------------------------------------------
+        # First generation
+        # ----------------------------------------------------
+
+        generated = generate_slide_content(
+            topic,
+            slide,
+            sources,
+            previous_paragraphs
+        )
+
+        # ----------------------------------------------------
+        # Duplicate protection
+        # ----------------------------------------------------
+
+        if generated:
+
+            duplicate = has_duplicate_content(
+                generated["paragraph"],
+                previous_paragraphs
+            )
+
+            if duplicate:
+
+                regeneration_prompt = f"""
+Bu slaytın metni önceki slaytlara fazla benziyor.
+
+ANA KONU:
+{topic}
+
+SLAYT:
+{slide["title"]}
+
+AMAÇ:
+{slide["objective"]}
+
+YENİ METİN ÖNCEKİ SLAYTLARLA
+ANLAM OLARAK ÇAKIŞMAMALI.
+
+ÖNCEKİ METİNLER:
+
+{chr(10).join(previous_paragraphs)}
+
+Kaynaklara bağlı kal.
+
+80-120 kelime arasında,
+özgün ve akademik yeni bir açıklama yaz.
+
+Yalnızca JSON:
+
+{{
+  "paragraph": "Yeni açıklama",
+  "visual_query": "English image query"
+}}
+"""
+
+                retry = ask_ai(
+                    regeneration_prompt,
+                    ACADEMIC_SYSTEM
+                )
+
+                retry_data = extract_json(
+                    retry
+                )
+
+                if retry_data:
+
+                    retry_paragraph = str(
+                        retry_data.get(
+                            "paragraph",
+                            ""
+                        )
+                    ).strip()
+
+                    if (
+                        retry_paragraph
+                        and not has_duplicate_content(
+                            retry_paragraph,
+                            previous_paragraphs,
+                            0.72
+                        )
+                    ):
+
+                        generated["paragraph"] = (
+                            retry_paragraph
+                        )
+
+                        generated["visual_query"] = (
+                            str(
+                                retry_data.get(
+                                    "visual_query",
+                                    generated["visual_query"]
+                                )
+                            ).strip()
+                        )
+
+        # ----------------------------------------------------
+        # Fallback
+        # ----------------------------------------------------
+
+        if not generated:
+
+            generated = {
+                "paragraph":
+                    slide["objective"],
+                "visual_query":
+                    slide["visual_query"],
+                "sources":
+                    sources[:2]
+            }
+
+        final_slide = {
+            "title":
+                slide["title"],
+
+            "paragraph":
+                generated["paragraph"],
+
+            "visual_query":
+                generated["visual_query"],
+
+            "sources":
+                generated.get(
+                    "sources",
+                    sources[:2]
+                )
+        }
+
+        final_slides.append(
+            final_slide
+        )
+
+        previous_paragraphs.append(
+            final_slide["paragraph"]
+        )
+
+    # ========================================================
+    # CONCLUSION
+    # ========================================================
+
+    conclusion = plan[
+        "conclusion"
+    ]
+
+    conclusion_prompt = f"""
+Bir akademik sunumun SONUÇ slaydını oluştur.
+
+KONU:
+{topic}
+
+SONUÇ SLAYTININ AMACI:
+{conclusion.get("objective", "")}
+
+SUNUMDAKİ SLAYTLAR:
+
+{chr(10).join(
+    [
+        f"- {slide['title']}: {slide['paragraph']}"
+        for slide in final_slides
+    ]
+)}
+
+KAYNAKLAR:
+
+{format_sources_for_ai(sources)}
+
+Kurallar:
+
+- Önceki slaytların cümlelerini kopyalama.
+- Yeni bilgi uydurma.
+- Sunumda anlatılan ana noktaları sentezle.
+- Konuya ilişkin genel değerlendirme yap.
+- Akademik ve net Türkçe kullan.
+- Yaklaşık 70-100 kelime.
+- Görsel sorgusu İngilizce olsun.
+
+Yalnızca JSON:
+
+{{
+  "paragraph": "Sonuç metni",
+  "visual_query": "English conclusion visual query",
+  "source_indexes": [1, 2]
+}}
+"""
+
+    conclusion_result = ask_ai(
+        conclusion_prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    conclusion_data = extract_json(
+        conclusion_result
+    )
+
+    if conclusion_data:
+
+        conclusion_paragraph = str(
+            conclusion_data.get(
+                "paragraph",
+                ""
+            )
+        ).strip()
+
+        conclusion_visual = str(
+            conclusion_data.get(
+                "visual_query",
+                ""
+            )
+        ).strip()
+
+    else:
+
+        conclusion_paragraph = (
+            "Sunum kapsamında ele alınan temel "
+            "kavramlar, gelişim süreci, uygulamalar "
+            "ve etkiler birlikte değerlendirildiğinde "
+            "konunun çok boyutlu bir yapıya sahip "
+            "olduğu görülmektedir."
+        )
+
+        conclusion_visual = (
+            conclusion.get(
+                "visual_query",
+                f"{topic} conclusion academic"
+            )
+        )
+
+    conclusion_sources = sources[:3]
+
+    return {
+        "title":
+            plan["title"],
+
+        "subtitle":
+            plan["subtitle"],
+
+        "cover_visual_query":
+            plan["cover_visual_query"],
+
+        "slides":
+            final_slides,
+
+        "conclusion": {
+            "title":
+                "Sonuç ve Değerlendirme",
+
+            "paragraph":
+                conclusion_paragraph,
+
+            "visual_query":
+                conclusion_visual,
+
+            "sources":
+                conclusion_sources
+        },
+
+        "research_sources":
+            sources
+    }
+
 
 # ============================================================
 # IMAGE SEARCH
 # ============================================================
 
 IMAGE_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36 K.A.R.V.I.S./30.0"
+    "User-Agent":
+        "Mozilla/5.0 "
+        "(X11; Linux x86_64) "
+        "AppleWebKit/537.36 "
+        "Chrome/140 Safari/537.36 "
+        "K.A.R.V.I.S./31.0"
 }
 
 
 def get_wikimedia_candidates(query):
+
     try:
-        r = requests.get(
+
+        response = requests.get(
             "https://commons.wikimedia.org/w/api.php",
+
             params={
-                "action": "query", "generator": "search", "gsrsearch": query,
-                "gsrnamespace": 6, "gsrlimit": 15, "prop": "imageinfo",
-                "iiprop": "url|mime|size", "iiurlwidth": 1400, "format": "json",
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": query,
+                "gsrnamespace": 6,
+                "gsrlimit": 20,
+                "prop": "imageinfo",
+                "iiprop": "url|mime|size",
+                "iiurlwidth": 1600,
+                "format": "json"
             },
+
             headers=IMAGE_HEADERS,
-            timeout=15,
+            timeout=15
         )
-        if r.status_code != 200:
+
+        if response.status_code != 200:
             return []
-        pages = r.json().get("query", {}).get("pages", {})
+
+        pages = (
+            response.json()
+            .get("query", {})
+            .get("pages", {})
+        )
+
         results = []
+
         for page in pages.values():
-            info = page.get("imageinfo") or []
+
+            info = page.get(
+                "imageinfo",
+                []
+            )
+
             if not info:
                 continue
+
             item = info[0]
-            image_url = item.get("thumburl") or item.get("url")
-            mime = item.get("mime", "")
-            if image_url and mime.startswith("image/"):
-                results.append(image_url)
+
+            image_url = (
+                item.get("thumburl")
+                or
+                item.get("url")
+            )
+
+            mime = item.get(
+                "mime",
+                ""
+            )
+
+            if (
+                image_url
+                and mime.startswith("image/")
+            ):
+
+                results.append(
+                    image_url
+                )
+
         return results
+
     except Exception:
+
         return []
 
 
 def get_openverse_candidates(query):
+
     try:
-        r = requests.get(
+
+        response = requests.get(
             "https://api.openverse.org/v1/images/",
-            params={"q": query, "page_size": 15},
+
+            params={
+                "q": query,
+                "page_size": 20
+            },
+
             headers=IMAGE_HEADERS,
-            timeout=15,
+            timeout=15
         )
-        if r.status_code != 200:
+
+        if response.status_code != 200:
             return []
-        return [
-            item.get("thumbnail") or item.get("url")
-            for item in r.json().get("results", [])
-            if item.get("thumbnail") or item.get("url")
-        ]
+
+        results = []
+
+        for item in response.json().get(
+            "results",
+            []
+        ):
+
+            url = (
+                item.get("thumbnail")
+                or
+                item.get("url")
+            )
+
+            if url:
+                results.append(url)
+
+        return results
+
     except Exception:
+
         return []
 
 
 def get_google_candidates_api(query):
-    """Uses Google Custom Search when credentials are configured."""
-    if not GOOGLE_IMAGE_API_KEY or not GOOGLE_CSE_ID:
+
+    if not GOOGLE_IMAGE_API_KEY:
         return []
+
+    if not GOOGLE_CSE_ID:
+        return []
+
     try:
-        r = requests.get(
+
+        response = requests.get(
             "https://www.googleapis.com/customsearch/v1",
+
             params={
-                "key": GOOGLE_IMAGE_API_KEY,
-                "cx": GOOGLE_CSE_ID,
-                "q": query,
-                "searchType": "image",
-                "num": 3,
-                "safe": "active",
+                "key":
+                    GOOGLE_IMAGE_API_KEY,
+
+                "cx":
+                    GOOGLE_CSE_ID,
+
+                "q":
+                    query,
+
+                "searchType":
+                    "image",
+
+                "num":
+                    3,
+
+                "safe":
+                    "active"
             },
+
             headers=IMAGE_HEADERS,
-            timeout=15,
+            timeout=15
         )
-        if r.status_code != 200:
+
+        if response.status_code != 200:
             return []
-        items = r.json().get("items", [])
-        return [item.get("link") for item in items[:3] if item.get("link")]
+
+        items = response.json().get(
+            "items",
+            []
+        )
+
+        return [
+            item.get("link")
+            for item in items[:3]
+            if item.get("link")
+        ]
+
     except Exception:
+
         return []
 
 
 def get_google_candidates_html(query):
-    """Best-effort Google Images fallback; only the first three image URLs are considered."""
+
     try:
-        r = requests.get(
+
+        response = requests.get(
             "https://www.google.com/search",
-            params={"tbm": "isch", "q": query, "safe": "active", "hl": "en"},
+
+            params={
+                "tbm": "isch",
+                "q": query,
+                "safe": "active",
+                "hl": "en"
+            },
+
             headers=IMAGE_HEADERS,
-            timeout=15,
+            timeout=15
         )
-        if r.status_code != 200:
+
+        if response.status_code != 200:
             return []
-        html = r.text
+
+        html = response.text
+
         candidates = []
 
-        # Google embeds image URLs in several JSON-like forms. Collect only direct http(s) image-looking URLs.
         patterns = [
             r'"(https?://[^"\\]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"\\]*)?)"',
-            r'\["(https?://[^"\\]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"\\]*)?)"',
+            r'$begin:math:display$\"\(https\?\:\/\/\[\^\"\\$end:math:display$+?\.(?:jpg|jpeg|png|webp)(?:\?[^"\\]*)?)"'
         ]
+
         for pattern in patterns:
-            for match in re.findall(pattern, html, flags=re.IGNORECASE):
-                url = match.replace("\\u003d", "=").replace("\\u0026", "&")
-                if url.startswith("http") and url not in candidates:
-                    candidates.append(url)
+
+            matches = re.findall(
+                pattern,
+                html,
+                flags=re.IGNORECASE
+            )
+
+            for match in matches:
+
+                url = (
+                    match
+                    .replace(
+                        "\\u003d",
+                        "="
+                    )
+                    .replace(
+                        "\\u0026",
+                        "&"
+                    )
+                )
+
+                if (
+                    url.startswith("http")
+                    and url not in candidates
+                ):
+
+                    candidates.append(
+                        url
+                    )
+
                 if len(candidates) >= 3:
                     return candidates[:3]
+
         return candidates[:3]
+
     except Exception:
+
         return []
 
 
 def get_google_candidates(query):
-    api_results = get_google_candidates_api(query)
-    if api_results:
-        return api_results[:3]
-    return get_google_candidates_html(query)[:3]
 
+    results = get_google_candidates_api(
+        query
+    )
+
+    if results:
+        return results[:3]
+
+    return get_google_candidates_html(
+        query
+    )[:3]
+
+
+# ============================================================
+# IMAGE QUALITY
+# ============================================================
 
 def image_hash(image):
+
     try:
-        small = image.convert("RGB").resize((96, 96))
-        return hashlib.sha256(small.tobytes()).hexdigest()
+
+        small = (
+            image
+            .convert("RGB")
+            .resize((96, 96))
+        )
+
+        return hashlib.sha256(
+            small.tobytes()
+        ).hexdigest()
+
     except Exception:
+
         return None
 
 
-def download_image_unique(url, used_urls, used_hashes, lock):
+def image_quality_score(image):
+
     try:
+
+        width, height = image.size
+
+        if width < 500:
+            return 0
+
+        if height < 300:
+            return 0
+
+        ratio = width / height
+
+        score = 0
+
+        # Good presentation ratios
+        if 1.2 <= ratio <= 2.2:
+            score += 30
+
+        if width >= 1000:
+            score += 30
+        elif width >= 700:
+            score += 20
+
+        if height >= 600:
+            score += 20
+        elif height >= 400:
+            score += 10
+
+        # Very extreme ratios are undesirable.
+        if ratio < 0.7 or ratio > 3.0:
+            score -= 30
+
+        return score
+
+    except Exception:
+
+        return 0
+
+
+def download_image_unique(
+    url,
+    used_urls,
+    used_hashes,
+    lock
+):
+
+    try:
+
         with lock:
+
             if url in used_urls:
                 return None
-        response = requests.get(url, headers=IMAGE_HEADERS, timeout=20)
+
+        response = requests.get(
+            url,
+            headers=IMAGE_HEADERS,
+            timeout=20
+        )
+
         if response.status_code != 200:
             return None
-        content_type = response.headers.get("Content-Type", "").lower()
-        if content_type and not content_type.startswith("image/"):
+
+        content_type = (
+            response.headers
+            .get(
+                "Content-Type",
+                ""
+            )
+            .lower()
+        )
+
+        if (
+            content_type
+            and not content_type.startswith("image/")
+        ):
             return None
-        image = Image.open(BytesIO(response.content))
+
+        image = Image.open(
+            BytesIO(
+                response.content
+            )
+        )
+
         image.load()
-        if image.width < 300 or image.height < 200:
+
+        if (
+            image.width < 400
+            or image.height < 250
+        ):
             return None
-        h = image_hash(image)
+
+        quality = image_quality_score(
+            image
+        )
+
+        if quality <= 0:
+            return None
+
+        h = image_hash(
+            image
+        )
+
         if not h:
             return None
+
         with lock:
-            if url in used_urls or h in used_hashes:
+
+            if url in used_urls:
                 return None
+
+            if h in used_hashes:
+                return None
+
             used_urls.add(url)
             used_hashes.add(h)
+
         return image.convert("RGB")
+
     except Exception:
+
         return None
 
 
-def find_unique_image(queries, used_urls, used_hashes, lock):
-    candidates = []
+# ============================================================
+# IMAGE SEARCH PIPELINE
+# ============================================================
+
+def expand_image_queries(
+    topic,
+    title,
+    visual_query
+):
+
+    queries = []
+
+    if visual_query:
+        queries.append(
+            visual_query
+        )
+
+    queries.append(
+        f"{topic} {title} documentary"
+    )
+
+    queries.append(
+        f"{topic} {title} photograph"
+    )
+
+    queries.append(
+        f"{topic} {title} academic"
+    )
+
+    # Preserve order / remove duplicates.
+    result = []
+
+    seen = set()
+
     for query in queries:
-        # 1) Prefer usable/open image sources.
-        candidates.extend(get_wikimedia_candidates(query))
-        candidates.extend(get_openverse_candidates(query))
-        # 2) If those do not work, try Google's first three image results.
-        candidates.extend(get_google_candidates(query)[:3])
-        if len(candidates) >= 30:
+
+        query = query.strip()
+
+        if not query:
+            continue
+
+        key = query.lower()
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+
+        result.append(query)
+
+    return result
+
+
+def find_unique_image(
+    queries,
+    used_urls,
+    used_hashes,
+    lock
+):
+
+    candidate_urls = []
+
+    # --------------------------------------------------------
+    # Wikimedia
+    # --------------------------------------------------------
+
+    for query in queries:
+
+        candidate_urls.extend(
+            get_wikimedia_candidates(
+                query
+            )
+        )
+
+        if len(candidate_urls) >= 30:
             break
 
-    unique_candidates = []
-    seen = set()
-    for url in candidates:
-        if not url or url in seen:
-            continue
-        seen.add(url)
-        unique_candidates.append(url)
+    # --------------------------------------------------------
+    # Openverse
+    # --------------------------------------------------------
 
-    for url in unique_candidates:
-        image = download_image_unique(url, used_urls, used_hashes, lock)
+    if len(candidate_urls) < 8:
+
+        for query in queries:
+
+            candidate_urls.extend(
+                get_openverse_candidates(
+                    query
+                )
+            )
+
+            if len(candidate_urls) >= 30:
+                break
+
+    # --------------------------------------------------------
+    # Google - first 3
+    # --------------------------------------------------------
+
+    if len(candidate_urls) < 8:
+
+        for query in queries:
+
+            candidate_urls.extend(
+                get_google_candidates(
+                    query
+                )[:3]
+            )
+
+            if len(candidate_urls) >= 15:
+                break
+
+    # --------------------------------------------------------
+    # Unique URL list
+    # --------------------------------------------------------
+
+    unique_urls = []
+
+    seen = set()
+
+    for url in candidate_urls:
+
+        if not url:
+            continue
+
+        if url in seen:
+            continue
+
+        seen.add(url)
+
+        unique_urls.append(url)
+
+    # --------------------------------------------------------
+    # Try images
+    # --------------------------------------------------------
+
+    for url in unique_urls:
+
+        image = download_image_unique(
+            url,
+            used_urls,
+            used_hashes,
+            lock
+        )
+
         if image is not None:
             return image
+
     return None
+
 
 # ============================================================
 # FONT SYSTEM
 # ============================================================
 
-
 def find_font(bold=False):
-    candidates = (
-        [
-            BASE_DIR / "fonts" / "DejaVuSans-Bold.ttf",
-            Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-            Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"),
+
+    if bold:
+
+        candidates = [
+            BASE_DIR /
+            "fonts" /
+            "DejaVuSans-Bold.ttf",
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/dejavu/"
+                "DejaVuSans-Bold.ttf"
+            ),
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/liberation2/"
+                "LiberationSans-Bold.ttf"
+            )
         ]
-        if bold else
-        [
-            BASE_DIR / "fonts" / "DejaVuSans.ttf",
-            Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
-            Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf"),
+
+    else:
+
+        candidates = [
+            BASE_DIR /
+            "fonts" /
+            "DejaVuSans.ttf",
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/dejavu/"
+                "DejaVuSans.ttf"
+            ),
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/liberation2/"
+                "LiberationSans-Regular.ttf"
+            )
         ]
-    )
+
     for path in candidates:
+
         if path.exists():
             return str(path)
+
     return None
 
 
@@ -608,134 +2200,477 @@ FONT_REGULAR = find_font(False)
 FONT_BOLD = find_font(True)
 
 
-def karvis_font(size, bold=False):
-    path = FONT_BOLD if bold else FONT_REGULAR
+def karvis_font(
+    size,
+    bold=False
+):
+
+    path = (
+        FONT_BOLD
+        if bold
+        else FONT_REGULAR
+    )
+
     try:
+
         if path:
-            return ImageFont.truetype(path, max(8, int(size)))
+
+            return ImageFont.truetype(
+                path,
+                max(8, int(size))
+            )
+
     except Exception:
         pass
+
     return ImageFont.load_default()
 
+
 # ============================================================
-# TEXT FITTING SYSTEM
+# TEXT FITTING
 # ============================================================
 
+def text_width(
+    draw,
+    text,
+    font
+):
 
-def text_width(draw, text, font):
     try:
-        return draw.textlength(text, font=font)
+
+        return draw.textlength(
+            text,
+            font=font
+        )
+
     except Exception:
+
         try:
-            box = draw.textbbox((0, 0), text, font=font)
+
+            box = draw.textbbox(
+                (0, 0),
+                text,
+                font=font
+            )
+
             return box[2] - box[0]
+
         except Exception:
-            return len(text) * max(8, getattr(font, "size", 12) * 0.55)
+
+            return (
+                len(text)
+                * max(
+                    8,
+                    getattr(
+                        font,
+                        "size",
+                        12
+                    ) * 0.55
+                )
+            )
 
 
-def font_line_height(font, extra=0):
-    size = max(8, int(getattr(font, "size", 20)))
+def font_line_height(
+    font,
+    extra=0
+):
+
+    size = max(
+        8,
+        int(
+            getattr(
+                font,
+                "size",
+                20
+            )
+        )
+    )
+
     return size + extra
 
 
-def wrap_pixel_text(draw, text, font, max_width):
-    words = str(text or "").replace("\n", " \n ").split()
+def wrap_pixel_text(
+    draw,
+    text,
+    font,
+    max_width
+):
+
+    words = (
+        str(text or "")
+        .replace(
+            "\n",
+            " \n "
+        )
+        .split()
+    )
+
     lines = []
     current = ""
+
     for word in words:
+
         if word == "\\n":
+
             if current:
-                lines.append(current)
+                lines.append(
+                    current
+                )
+
                 current = ""
+
             continue
-        candidate = word if not current else current + " " + word
-        if text_width(draw, candidate, font) <= max_width:
+
+        candidate = (
+            word
+            if not current
+            else current + " " + word
+        )
+
+        if (
+            text_width(
+                draw,
+                candidate,
+                font
+            )
+            <= max_width
+        ):
+
             current = candidate
             continue
+
         if current:
-            lines.append(current)
-        # Prevent a single very long word from escaping the box.
-        if text_width(draw, word, font) <= max_width:
+            lines.append(
+                current
+            )
+
+        if (
+            text_width(
+                draw,
+                word,
+                font
+            )
+            <= max_width
+        ):
+
             current = word
+
         else:
+
             chunk = ""
+
             for ch in word:
+
                 test = chunk + ch
-                if text_width(draw, test, font) <= max_width:
+
+                if (
+                    text_width(
+                        draw,
+                        test,
+                        font
+                    )
+                    <= max_width
+                ):
+
                     chunk = test
+
                 else:
+
                     if chunk:
-                        lines.append(chunk)
+                        lines.append(
+                            chunk
+                        )
+
                     chunk = ch
+
             current = chunk
+
     if current:
-        lines.append(current)
+        lines.append(
+            current
+        )
+
     return lines
 
 
-def truncate_lines(draw, lines, font, max_width, max_lines):
+def truncate_lines(
+    draw,
+    lines,
+    font,
+    max_width,
+    max_lines
+):
+
     if len(lines) <= max_lines:
         return lines
-    lines = lines[:max_lines]
+
+    lines = lines[
+        :max_lines
+    ]
+
     last = lines[-1]
     ellipsis = "…"
-    while last and text_width(draw, last + ellipsis, font) > max_width:
+
+    while (
+        last
+        and
+        text_width(
+            draw,
+            last + ellipsis,
+            font
+        ) > max_width
+    ):
+
         last = last[:-1]
-    lines[-1] = (last.rstrip() + ellipsis) if last else ellipsis
+
+    lines[-1] = (
+        last.rstrip() + ellipsis
+        if last
+        else ellipsis
+    )
+
     return lines
 
 
-def fit_text(draw, text, max_width, max_height, start_size, min_size=14, bold=False, spacing_ratio=0.30):
-    text = str(text or "").strip()
-    if not text:
-        return karvis_font(start_size, bold), [], 0
+def fit_text(
+    draw,
+    text,
+    max_width,
+    max_height,
+    start_size,
+    min_size=14,
+    bold=False,
+    spacing_ratio=0.30
+):
 
-    size = int(start_size)
+    text = str(
+        text or ""
+    ).strip()
+
+    if not text:
+
+        return (
+            karvis_font(
+                start_size,
+                bold
+            ),
+            [],
+            0
+        )
+
+    size = int(
+        start_size
+    )
+
     while size >= min_size:
-        font = karvis_font(size, bold)
-        spacing = max(4, int(size * spacing_ratio))
-        lines = wrap_pixel_text(draw, text, font, max_width)
-        line_h = font_line_height(font, spacing)
-        max_lines = max(1, int(max_height // line_h))
+
+        font = karvis_font(
+            size,
+            bold
+        )
+
+        spacing = max(
+            4,
+            int(
+                size
+                * spacing_ratio
+            )
+        )
+
+        lines = wrap_pixel_text(
+            draw,
+            text,
+            font,
+            max_width
+        )
+
+        line_h = font_line_height(
+            font,
+            spacing
+        )
+
+        max_lines = max(
+            1,
+            int(
+                max_height
+                // line_h
+            )
+        )
+
         if len(lines) <= max_lines:
-            return font, lines, spacing
+
+            return (
+                font,
+                lines,
+                spacing
+            )
+
         size -= 1
 
-    font = karvis_font(min_size, bold)
-    spacing = max(4, int(min_size * spacing_ratio))
-    lines = wrap_pixel_text(draw, text, font, max_width)
-    line_h = font_line_height(font, spacing)
-    max_lines = max(1, int(max_height // line_h))
-    lines = truncate_lines(draw, lines, font, max_width, max_lines)
-    return font, lines, spacing
-
-
-def draw_fit_text(draw, text, xy, max_width, max_height, start_size, min_size=14, fill=(255, 255, 255), bold=False, spacing_ratio=0.30):
-    font, lines, spacing = fit_text(
-        draw, text, max_width, max_height, start_size, min_size, bold, spacing_ratio
+    font = karvis_font(
+        min_size,
+        bold
     )
+
+    spacing = max(
+        4,
+        int(
+            min_size
+            * spacing_ratio
+        )
+    )
+
+    lines = wrap_pixel_text(
+        draw,
+        text,
+        font,
+        max_width
+    )
+
+    line_h = font_line_height(
+        font,
+        spacing
+    )
+
+    max_lines = max(
+        1,
+        int(
+            max_height
+            // line_h
+        )
+    )
+
+    lines = truncate_lines(
+        draw,
+        lines,
+        font,
+        max_width,
+        max_lines
+    )
+
+    return (
+        font,
+        lines,
+        spacing
+    )
+
+
+def draw_fit_text(
+    draw,
+    text,
+    xy,
+    max_width,
+    max_height,
+    start_size,
+    min_size=14,
+    fill=(255, 255, 255),
+    bold=False,
+    spacing_ratio=0.30
+):
+
+    font, lines, spacing = fit_text(
+        draw,
+        text,
+        max_width,
+        max_height,
+        start_size,
+        min_size,
+        bold,
+        spacing_ratio
+    )
+
     x, y = xy
-    line_h = font_line_height(font, spacing)
+
+    line_h = font_line_height(
+        font,
+        spacing
+    )
+
     for line in lines:
-        draw.text((x, y), line, font=font, fill=fill)
+
+        draw.text(
+            (x, y),
+            line,
+            font=font,
+            fill=fill
+        )
+
         y += line_h
-    return y, font, lines
+
+    return (
+        y,
+        font,
+        lines
+    )
 
 
-def rounded_mask(size, radius):
-    mask = Image.new("L", size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size[0], size[1]), radius=radius, fill=255)
+# ============================================================
+# IMAGE DESIGN
+# ============================================================
+
+def rounded_mask(
+    size,
+    radius
+):
+
+    mask = Image.new(
+        "L",
+        size,
+        0
+    )
+
+    ImageDraw.Draw(
+        mask
+    ).rounded_rectangle(
+        (
+            0,
+            0,
+            size[0],
+            size[1]
+        ),
+        radius=radius,
+        fill=255
+    )
+
     return mask
 
 
-def prepare_image(image, size):
-    return ImageOps.fit(image.convert("RGB"), size, method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+def prepare_image(
+    image,
+    size
+):
+
+    return ImageOps.fit(
+        image.convert("RGB"),
+        size,
+        method=Image.Resampling.LANCZOS,
+        centering=(0.5, 0.5)
+    )
 
 
-def paste_round_image(base, image, box, radius=30):
+def paste_round_image(
+    base,
+    image,
+    box,
+    radius=30
+):
+
     x, y, w, h = box
-    image = prepare_image(image, (w, h))
-    base.paste(image, (x, y), rounded_mask((w, h), radius))
+
+    image = prepare_image(
+        image,
+        (w, h)
+    )
+
+    base.paste(
+        image,
+        (x, y),
+        rounded_mask(
+            (w, h),
+            radius
+        )
+    )
+
 
 # ============================================================
 # SLIDE DESIGN
@@ -743,337 +2678,1294 @@ def paste_round_image(base, image, box, radius=30):
 
 SLIDE_WIDTH = 1600
 SLIDE_HEIGHT = 900
+
 PDF_WIDTH = 16 * inch
 PDF_HEIGHT = 9 * inch
 
 
-def create_cover_slide(title, subtitle, image, output_path):
-    img = Image.new("RGB", (SLIDE_WIDTH, SLIDE_HEIGHT), (5, 10, 18))
+def create_cover_slide(
+    title,
+    subtitle,
+    image,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5, 10, 18)
+    )
+
     if image is not None:
-        bg = prepare_image(image, (SLIDE_WIDTH, SLIDE_HEIGHT))
-        dark = Image.new("RGBA", bg.size, (2, 7, 13, 165))
-        img = Image.alpha_composite(bg.convert("RGBA"), dark).convert("RGB")
 
-    draw = ImageDraw.Draw(img)
-    draw.rectangle((80, 75, 410, 81), fill=(0, 229, 255))
-    draw.text((80, 110), "K.A.R.V.I.S.", font=karvis_font(26, True), fill=(0, 229, 255))
-    draw.text((80, 148), "KARAHAN INC.", font=karvis_font(17), fill=(160, 175, 190))
+        bg = prepare_image(
+            image,
+            (
+                SLIDE_WIDTH,
+                SLIDE_HEIGHT
+            )
+        )
 
-    draw_fit_text(
-        draw, title, (80, 275), 1050, 275, 72, 38,
-        fill=(245, 250, 255), bold=True, spacing_ratio=0.18
-    )
-    draw_fit_text(
-        draw, subtitle, (85, 570), 980, 95, 28, 18,
-        fill=(180, 195, 210), bold=False, spacing_ratio=0.20
-    )
+        dark = Image.new(
+            "RGBA",
+            bg.size,
+            (2, 7, 13, 165)
+        )
 
-    draw.text((80, 810), "AKADEMİK SUNUM", font=karvis_font(18, True), fill=(0, 229, 255))
-    draw.text((80, 845), "K.A.R.V.I.S. • KARAHAN INC.", font=karvis_font(15), fill=(110, 125, 140))
-    img.save(output_path, "PNG", optimize=True)
+        img = Image.alpha_composite(
+            bg.convert("RGBA"),
+            dark
+        ).convert("RGB")
 
-
-def create_content_slide(slide_number, total_slides, title, paragraph, image, output_path):
-    img = Image.new("RGB", (SLIDE_WIDTH, SLIDE_HEIGHT), (5, 11, 19))
-    draw = ImageDraw.Draw(img)
-
-    draw.rectangle((70, 55, 1530, 58), fill=(18, 45, 58))
-    draw.rectangle((70, 55, 280, 58), fill=(0, 229, 255))
-    draw.text((70, 82), "K.A.R.V.I.S.", font=karvis_font(21, True), fill=(0, 229, 255))
-    draw.text((70, 111), "KARAHAN INC.", font=karvis_font(14), fill=(110, 130, 145))
-
-    draw_fit_text(
-        draw, title, (70, 165), 700, 105, 45, 24,
-        fill=(245, 250, 255), bold=True, spacing_ratio=0.18
+    draw = ImageDraw.Draw(
+        img
     )
 
-    left_x, left_y, left_w, left_h = 70, 300, 700, 500
-    draw.rounded_rectangle((left_x, left_y, left_x + left_w, left_y + left_h), radius=28, fill=(10, 20, 30), outline=(22, 48, 62), width=2)
-    draw.text((105, 335), "AKADEMİK AÇIKLAMA", font=karvis_font(18, True), fill=(0, 229, 255))
-    draw.rectangle((105, 372, 190, 376), fill=(0, 229, 255))
-
-    # Text is dynamically reduced/wrapped so it remains inside the card.
-    draw_fit_text(
-        draw, paragraph, (105, 415), 625, 335, 25, 13,
-        fill=(215, 225, 235), bold=False, spacing_ratio=0.30
+    draw.rectangle(
+        (80, 75, 410, 81),
+        fill=(0, 229, 255)
     )
 
-    image_x, image_y, image_w, image_h = 825, 165, 705, 635
-    draw.rounded_rectangle((image_x, image_y, image_x + image_w, image_y + image_h), radius=32, fill=(9, 18, 27), outline=(25, 51, 65), width=2)
+    draw.text(
+        (80, 110),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            26,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (80, 148),
+        "KARAHAN INC.",
+        font=karvis_font(
+            17
+        ),
+        fill=(160, 175, 190)
+    )
+
+    draw_fit_text(
+        draw,
+        title,
+        (80, 275),
+        1050,
+        275,
+        72,
+        38,
+        fill=(245, 250, 255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    draw_fit_text(
+        draw,
+        subtitle,
+        (85, 570),
+        980,
+        95,
+        28,
+        18,
+        fill=(180, 195, 210),
+        bold=False,
+        spacing_ratio=0.20
+    )
+
+    draw.text(
+        (80, 810),
+        "AKADEMİK SUNUM",
+        font=karvis_font(
+            18,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (80, 845),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(110, 125, 140)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
+
+def format_source_footer(
+    sources,
+    max_sources=2
+):
+
+    if not sources:
+        return "Kaynak: K.A.R.V.I.S. araştırma motoru"
+
+    names = []
+
+    for source in sources[:max_sources]:
+
+        title = source.get(
+            "title",
+            ""
+        ).strip()
+
+        if title:
+            names.append(
+                title
+            )
+
+    if not names:
+        return "Kaynak: K.A.R.V.I.S."
+
+    return "Kaynak: " + " • ".join(
+        names
+    )
+
+
+def create_content_slide(
+    slide_number,
+    total_slides,
+    title,
+    paragraph,
+    image,
+    sources,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5, 11, 19)
+    )
+
+    draw = ImageDraw.Draw(
+        img
+    )
+
+    draw.rectangle(
+        (70, 55, 1530, 58),
+        fill=(18, 45, 58)
+    )
+
+    draw.rectangle(
+        (70, 55, 280, 58),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (70, 82),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            21,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (70, 111),
+        "KARAHAN INC.",
+        font=karvis_font(
+            14
+        ),
+        fill=(110, 130, 145)
+    )
+
+    draw_fit_text(
+        draw,
+        title,
+        (70, 165),
+        700,
+        105,
+        45,
+        24,
+        fill=(245, 250, 255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    left_x = 70
+    left_y = 300
+    left_w = 700
+    left_h = 500
+
+    draw.rounded_rectangle(
+        (
+            left_x,
+            left_y,
+            left_x + left_w,
+            left_y + left_h
+        ),
+        radius=28,
+        fill=(10, 20, 30),
+        outline=(22, 48, 62),
+        width=2
+    )
+
+    draw.text(
+        (105, 335),
+        "AKADEMİK AÇIKLAMA",
+        font=karvis_font(
+            18,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw.rectangle(
+        (105, 372, 190, 376),
+        fill=(0, 229, 255)
+    )
+
+    draw_fit_text(
+        draw,
+        paragraph,
+        (105, 415),
+        625,
+        335,
+        25,
+        13,
+        fill=(215, 225, 235),
+        bold=False,
+        spacing_ratio=0.30
+    )
+
+    image_x = 825
+    image_y = 165
+    image_w = 705
+    image_h = 635
+
+    draw.rounded_rectangle(
+        (
+            image_x,
+            image_y,
+            image_x + image_w,
+            image_y + image_h
+        ),
+        radius=32,
+        fill=(9, 18, 27),
+        outline=(25, 51, 65),
+        width=2
+    )
+
     if image is not None:
-        paste_round_image(img, image, (image_x + 10, image_y + 10, image_w - 20, image_h - 20), 25)
+
+        paste_round_image(
+            img,
+            image,
+            (
+                image_x + 10,
+                image_y + 10,
+                image_w - 20,
+                image_h - 20
+            ),
+            25
+        )
+
     else:
-        draw.text((image_x + 220, image_y + 280), "K.A.R.V.I.S.", font=karvis_font(42, True), fill=(0, 229, 255))
 
-    draw.text((70, 842), "K.A.R.V.I.S. • KARAHAN INC.", font=karvis_font(15), fill=(90, 110, 125))
-    draw.text((1430, 842), f"{slide_number:02d} / {total_slides:02d}", font=karvis_font(16, True), fill=(0, 229, 255))
-    img.save(output_path, "PNG", optimize=True)
+        draw.text(
+            (
+                image_x + 220,
+                image_y + 280
+            ),
+            "K.A.R.V.I.S.",
+            font=karvis_font(
+                42,
+                True
+            ),
+            fill=(0, 229, 255)
+        )
 
+    # --------------------------------------------------------
+    # SOURCE FOOTER
+    # --------------------------------------------------------
 
-def create_conclusion_slide(total_slides, title, paragraph, image, output_path):
-    img = Image.new("RGB", (SLIDE_WIDTH, SLIDE_HEIGHT), (5, 11, 19))
-    draw = ImageDraw.Draw(img)
-
-    draw.rectangle((70, 55, 1530, 58), fill=(18, 45, 58))
-    draw.rectangle((70, 55, 520, 58), fill=(0, 229, 255))
-    draw.text((70, 90), "K.A.R.V.I.S.", font=karvis_font(22, True), fill=(0, 229, 255))
-    draw.text((70, 120), "KARAHAN INC.", font=karvis_font(14), fill=(110, 130, 145))
-
-    draw_fit_text(
-        draw, title, (70, 205), 750, 85, 54, 30,
-        fill=(245, 250, 255), bold=True, spacing_ratio=0.18
+    source_text = format_source_footer(
+        sources
     )
 
-    draw.rounded_rectangle((70, 310, 820, 750), radius=30, fill=(10, 20, 30), outline=(22, 48, 62), width=2)
-    draw.text((110, 350), "SONUÇ VE DEĞERLENDİRME", font=karvis_font(19, True), fill=(0, 229, 255))
+    draw_fit_text(
+        draw,
+        source_text,
+        (70, 805),
+        1250,
+        28,
+        12,
+        9,
+        fill=(100, 120, 135),
+        bold=False,
+        spacing_ratio=0.10
+    )
+
+    draw.text(
+        (70, 842),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(90, 110, 125)
+    )
+
+    draw.text(
+        (1430, 842),
+        f"{slide_number:02d} / {total_slides:02d}",
+        font=karvis_font(
+            16,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
+
+def create_conclusion_slide(
+    total_slides,
+    title,
+    paragraph,
+    image,
+    sources,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5, 11, 19)
+    )
+
+    draw = ImageDraw.Draw(
+        img
+    )
+
+    draw.rectangle(
+        (70, 55, 1530, 58),
+        fill=(18, 45, 58)
+    )
+
+    draw.rectangle(
+        (70, 55, 520, 58),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (70, 90),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            22,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw.text(
+        (70, 120),
+        "KARAHAN INC.",
+        font=karvis_font(
+            14
+        ),
+        fill=(110, 130, 145)
+    )
 
     draw_fit_text(
-        draw, paragraph, (110, 405), 650, 300, 27, 13,
-        fill=(220, 230, 238), bold=False, spacing_ratio=0.30
+        draw,
+        title,
+        (70, 205),
+        750,
+        85,
+        54,
+        30,
+        fill=(245, 250, 255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    draw.rounded_rectangle(
+        (70, 310, 820, 750),
+        radius=30,
+        fill=(10, 20, 30),
+        outline=(22, 48, 62),
+        width=2
+    )
+
+    draw.text(
+        (110, 350),
+        "SONUÇ VE DEĞERLENDİRME",
+        font=karvis_font(
+            19,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    draw_fit_text(
+        draw,
+        paragraph,
+        (110, 405),
+        650,
+        300,
+        27,
+        13,
+        fill=(220, 230, 238),
+        bold=False,
+        spacing_ratio=0.30
     )
 
     if image is not None:
-        paste_round_image(img, image, (880, 185, 620, 565), 35)
-    else:
-        draw.rounded_rectangle((880, 185, 1500, 750), radius=35, fill=(8, 22, 31), outline=(0, 229, 255), width=2)
-        draw.text((1050, 430), "K.A.R.V.I.S.", font=karvis_font(42, True), fill=(0, 229, 255))
 
-    draw.text((70, 835), "K.A.R.V.I.S. • KARAHAN INC.", font=karvis_font(15), fill=(90, 110, 125))
-    draw.text((1430, 835), f"{total_slides:02d} / {total_slides:02d}", font=karvis_font(16, True), fill=(0, 229, 255))
-    img.save(output_path, "PNG", optimize=True)
+        paste_round_image(
+            img,
+            image,
+            (
+                880,
+                185,
+                620,
+                565
+            ),
+            35
+        )
+
+    else:
+
+        draw.rounded_rectangle(
+            (
+                880,
+                185,
+                1500,
+                750
+            ),
+            radius=35,
+            fill=(8, 22, 31),
+            outline=(0, 229, 255),
+            width=2
+        )
+
+        draw.text(
+            (1050, 430),
+            "K.A.R.V.I.S.",
+            font=karvis_font(
+                42,
+                True
+            ),
+            fill=(0, 229, 255)
+        )
+
+    source_text = format_source_footer(
+        sources,
+        3
+    )
+
+    draw_fit_text(
+        draw,
+        source_text,
+        (70, 805),
+        1250,
+        28,
+        12,
+        9,
+        fill=(100, 120, 135),
+        bold=False,
+        spacing_ratio=0.10
+    )
+
+    draw.text(
+        (70, 835),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(90, 110, 125)
+    )
+
+    draw.text(
+        (1430, 835),
+        f"{total_slides:02d} / {total_slides:02d}",
+        font=karvis_font(
+            16,
+            True
+        ),
+        fill=(0, 229, 255)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
 
 # ============================================================
-# PDF CREATION
+# PDF
 # ============================================================
 
+def create_presentation_pdf(
+    presentation_id,
+    outline,
+    images
+):
 
-def create_presentation_pdf(presentation_id, outline, images):
     title = outline["title"]
-    subtitle = outline.get("subtitle", "Akademik Sunum")
+    subtitle = outline.get(
+        "subtitle",
+        "Akademik Sunum"
+    )
+
     slides = outline["slides"]
+
     conclusion = outline["conclusion"]
+
     total_slides = len(slides) + 2
 
-    presentation_dir = GENERATED_DIR / f"presentation_{presentation_id}"
-    slides_dir = presentation_dir / "slides"
-    slides_dir.mkdir(parents=True, exist_ok=True)
+    presentation_dir = (
+        GENERATED_DIR
+        / f"presentation_{presentation_id}"
+    )
+
+    slides_dir = (
+        presentation_dir
+        / "slides"
+    )
+
+    slides_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
     slide_paths = []
 
-    cover_path = slides_dir / "slide_01.png"
-    create_cover_slide(title, subtitle, images.get("cover"), str(cover_path))
-    slide_paths.append(cover_path)
+    # --------------------------------------------------------
+    # COVER
+    # --------------------------------------------------------
 
-    for index, slide in enumerate(slides, start=2):
-        slide_path = slides_dir / f"slide_{index:02d}.png"
+    cover_path = (
+        slides_dir
+        / "slide_01.png"
+    )
+
+    create_cover_slide(
+        title,
+        subtitle,
+        images.get("cover"),
+        str(cover_path)
+    )
+
+    slide_paths.append(
+        cover_path
+    )
+
+    # --------------------------------------------------------
+    # CONTENT
+    # --------------------------------------------------------
+
+    for index, slide in enumerate(
+        slides,
+        start=2
+    ):
+
+        slide_path = (
+            slides_dir
+            / f"slide_{index:02d}.png"
+        )
+
         create_content_slide(
             slide_number=index,
             total_slides=total_slides,
             title=slide["title"],
             paragraph=slide["paragraph"],
-            image=images.get(f"slide_{index}"),
-            output_path=str(slide_path),
+            image=images.get(
+                f"slide_{index}"
+            ),
+            sources=slide.get(
+                "sources",
+                []
+            ),
+            output_path=str(
+                slide_path
+            )
         )
-        slide_paths.append(slide_path)
 
-    conclusion_path = slides_dir / f"slide_{total_slides:02d}.png"
+        slide_paths.append(
+            slide_path
+        )
+
+    # --------------------------------------------------------
+    # CONCLUSION
+    # --------------------------------------------------------
+
+    conclusion_path = (
+        slides_dir
+        / f"slide_{total_slides:02d}.png"
+    )
+
     create_conclusion_slide(
         total_slides=total_slides,
         title=conclusion["title"],
         paragraph=conclusion["paragraph"],
         image=images.get("conclusion"),
-        output_path=str(conclusion_path),
+        sources=conclusion.get(
+            "sources",
+            []
+        ),
+        output_path=str(
+            conclusion_path
+        )
     )
-    slide_paths.append(conclusion_path)
 
-    pdf_filename = f"karvis_sunum_{presentation_id}.pdf"
-    pdf_path = GENERATED_DIR / pdf_filename
-    pdf = canvas.Canvas(str(pdf_path), pagesize=(PDF_WIDTH, PDF_HEIGHT))
+    slide_paths.append(
+        conclusion_path
+    )
+
+    # --------------------------------------------------------
+    # PDF
+    # --------------------------------------------------------
+
+    pdf_filename = (
+        f"karvis_sunum_{presentation_id}.pdf"
+    )
+
+    pdf_path = (
+        GENERATED_DIR
+        / pdf_filename
+    )
+
+    pdf = canvas.Canvas(
+        str(pdf_path),
+        pagesize=(
+            PDF_WIDTH,
+            PDF_HEIGHT
+        )
+    )
+
     for path in slide_paths:
-        pdf.drawImage(str(path), 0, 0, width=PDF_WIDTH, height=PDF_HEIGHT, preserveAspectRatio=False, mask="auto")
+
+        pdf.drawImage(
+            str(path),
+            0,
+            0,
+            width=PDF_WIDTH,
+            height=PDF_HEIGHT,
+            preserveAspectRatio=False,
+            mask="auto"
+        )
+
         pdf.showPage()
+
     pdf.save()
+
     return pdf_filename
+
 
 # ============================================================
 # PRESENTATION JOB SYSTEM
 # ============================================================
 
 PRESENTATION_JOBS = {}
+
 presentation_lock = threading.Lock()
 
 
 def create_job():
+
     job_id = uuid.uuid4().hex
+
     with presentation_lock:
+
         PRESENTATION_JOBS[job_id] = {
             "id": job_id,
             "status": "queued",
             "progress": 0,
-            "message": "Sunum hazırlanıyor...",
+            "message":
+                "Sunum hazırlanıyor...",
             "file": None,
             "download_url": None,
-            "error": None,
+            "error": None
         }
+
     return job_id
 
 
-def update_job(job_id, **kwargs):
+def update_job(
+    job_id,
+    **kwargs
+):
+
     with presentation_lock:
+
         if job_id in PRESENTATION_JOBS:
-            PRESENTATION_JOBS[job_id].update(kwargs)
+
+            PRESENTATION_JOBS[
+                job_id
+            ].update(
+                kwargs
+            )
 
 
-def presentation_worker(job_id, topic, slide_count):
+# ============================================================
+# PRESENTATION WORKER
+# ============================================================
+
+def presentation_worker(
+    job_id,
+    topic,
+    slide_count
+):
+
     try:
-        update_job(job_id, status="working", progress=5, message="Sunum planı oluşturuluyor...")
-        outline = create_presentation_outline(topic, slide_count)
-        slides = outline["slides"]
 
-        update_job(job_id, progress=20, message="Görseller aranıyor...")
+        # ----------------------------------------------------
+        # RESEARCH
+        # ----------------------------------------------------
+
+        update_job(
+            job_id,
+            status="working",
+            progress=5,
+            message="Güvenilir kaynaklar araştırılıyor..."
+        )
+
+        outline = build_verified_presentation(
+            topic,
+            slide_count
+        )
+
+        slides = outline[
+            "slides"
+        ]
+
+        research_sources = outline.get(
+            "research_sources",
+            []
+        )
+
+        update_job(
+            job_id,
+            progress=35,
+            message=(
+                f"{len(research_sources)} "
+                "kaynak üzerinden içerik doğrulanıyor..."
+            )
+        )
+
+        # ----------------------------------------------------
+        # IMAGE TASKS
+        # ----------------------------------------------------
+
+        update_job(
+            job_id,
+            progress=40,
+            message="Slayt görselleri aranıyor..."
+        )
+
         used_urls = set()
         used_hashes = set()
+
         lock = threading.Lock()
-        image_tasks = {
-            "cover": [outline.get("cover_visual_query", topic)],
-            "conclusion": [outline["conclusion"].get("visual_query", f"{topic} conclusion")],
-        }
-        for index, slide in enumerate(slides, start=2):
-            image_tasks[f"slide_{index}"] = [slide.get("visual_query", f"{topic} academic")]
+
+        image_tasks = {}
+
+        # Cover
+        image_tasks["cover"] = [
+            outline.get(
+                "cover_visual_query",
+                topic
+            )
+        ]
+
+        # Content slides
+        for index, slide in enumerate(
+            slides,
+            start=2
+        ):
+
+            image_tasks[
+                f"slide_{index}"
+            ] = expand_image_queries(
+                topic,
+                slide["title"],
+                slide.get(
+                    "visual_query",
+                    ""
+                )
+            )
+
+        # Conclusion
+        image_tasks["conclusion"] = (
+            expand_image_queries(
+                topic,
+                "conclusion",
+                outline[
+                    "conclusion"
+                ].get(
+                    "visual_query",
+                    f"{topic} conclusion"
+                )
+            )
+        )
 
         images = {}
-        total_tasks = len(image_tasks)
-        completed = 0
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = {
-                executor.submit(find_unique_image, queries, used_urls, used_hashes, lock): key
-                for key, queries in image_tasks.items()
-            }
-            for future in as_completed(futures):
-                key = futures[future]
-                try:
-                    images[key] = future.result()
-                except Exception:
-                    images[key] = None
-                completed += 1
-                progress = 20 + int(completed / total_tasks * 45)
-                update_job(job_id, progress=progress, message=f"Görseller hazırlanıyor ({completed}/{total_tasks})...")
 
-        update_job(job_id, progress=70, message="Profesyonel slaytlar oluşturuluyor...")
-        pdf_filename = create_presentation_pdf(job_id, outline, images)
+        total_tasks = len(
+            image_tasks
+        )
+
+        completed = 0
+
+        # ----------------------------------------------------
+        # PARALLEL IMAGE SEARCH
+        # ----------------------------------------------------
+
+        with ThreadPoolExecutor(
+            max_workers=4
+        ) as executor:
+
+            futures = {
+                executor.submit(
+                    find_unique_image,
+                    queries,
+                    used_urls,
+                    used_hashes,
+                    lock
+                ): key
+
+                for key, queries
+                in image_tasks.items()
+            }
+
+            for future in as_completed(
+                futures
+            ):
+
+                key = futures[
+                    future
+                ]
+
+                try:
+
+                    images[key] = (
+                        future.result()
+                    )
+
+                except Exception:
+
+                    images[key] = None
+
+                completed += 1
+
+                progress = (
+                    40
+                    +
+                    int(
+                        completed
+                        / total_tasks
+                        * 35
+                    )
+                )
+
+                update_job(
+                    job_id,
+                    progress=progress,
+                    message=(
+                        "Görseller hazırlanıyor "
+                        f"({completed}/{total_tasks})..."
+                    )
+                )
+
+        # ----------------------------------------------------
+        # PDF
+        # ----------------------------------------------------
+
+        update_job(
+            job_id,
+            progress=78,
+            message="Profesyonel slaytlar oluşturuluyor..."
+        )
+
+        pdf_filename = (
+            create_presentation_pdf(
+                job_id,
+                outline,
+                images
+            )
+        )
+
+        # ----------------------------------------------------
+        # COMPLETED
+        # ----------------------------------------------------
+
         update_job(
             job_id,
             status="completed",
             progress=100,
             message="Sunum hazırlandı.",
             file=pdf_filename,
-            download_url=f"/generated/{pdf_filename}",
+            download_url=
+                f"/generated/{pdf_filename}"
         )
+
     except Exception as e:
-        save_error("Presentation worker error", traceback.format_exc())
-        update_job(job_id, status="error", progress=0, message="Sunum oluşturulamadı.", error=str(e))
+
+        save_error(
+            "Presentation worker error",
+            traceback.format_exc()
+        )
+
+        update_job(
+            job_id,
+            status="error",
+            progress=0,
+            message="Sunum oluşturulamadı.",
+            error=str(e)
+        )
+
 
 # ============================================================
-# ROUTES
+# HOME
 # ============================================================
 
 @app.get("/")
 async def home():
-    if not INDEX_FILE.exists():
-        return JSONResponse({"app": "K.A.R.V.I.S.", "version": APP_VERSION, "status": "online"})
-    return FileResponse(INDEX_FILE)
 
+    if not INDEX_FILE.exists():
+
+        return JSONResponse({
+            "app":
+                "K.A.R.V.I.S.",
+            "version":
+                APP_VERSION,
+            "status":
+                "online"
+        })
+
+    return FileResponse(
+        INDEX_FILE
+    )
+
+
+# ============================================================
+# HEALTH
+# ============================================================
 
 @app.get("/health")
 async def health():
+
     return {
-        "status": "online",
-        "app": "K.A.R.V.I.S.",
-        "version": APP_VERSION,
-        "groq": bool(GROQ_API_KEY),
-        "openrouter": bool(OPENROUTER_API_KEY),
-        "google_image_search": bool(GOOGLE_IMAGE_API_KEY and GOOGLE_CSE_ID),
+        "status":
+            "online",
+
+        "app":
+            "K.A.R.V.I.S.",
+
+        "version":
+            APP_VERSION,
+
+        "groq":
+            bool(
+                GROQ_API_KEY
+            ),
+
+        "openrouter":
+            bool(
+                OPENROUTER_API_KEY
+            ),
+
+        "google_image_search":
+            bool(
+                GOOGLE_IMAGE_API_KEY
+                and
+                GOOGLE_CSE_ID
+            ),
+
+        "research_engine":
+            True,
+
+        "wikipedia":
+            True,
+
+        "openverse":
+            True,
+
+        "presentation_engine":
+            "31.0.0"
     }
+
 
 # ============================================================
 # CHAT
 # ============================================================
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
-    message = (request.message or "").strip()
+async def chat(
+    request: ChatRequest
+):
+
+    message = (
+        request.message
+        or ""
+    ).strip()
+
     if not message:
-        return {"response": "Nasıl yardımcı olabilirim efendim?", "message": "Nasıl yardımcı olabilirim efendim?"}
 
-    username = (request.username or "karahan").strip().lower()
-    mode = (request.mode or "normal").strip().lower()
-    user = USERS.get(username, USERS["karahan"])
+        return {
+            "response":
+                "Nasıl yardımcı olabilirim efendim?",
 
-    if user.get("role") == "teacher" or user.get("style") == "academic" or mode in {"academic", "research", "lesson", "quiz", "article", "teacher"}:
-        system_prompt = ACADEMIC_SYSTEM
-        mode_instruction = f"Akademik çalışma modu: {mode}. Kullanıcıya 'Hocam' diye hitap et."
+            "message":
+                "Nasıl yardımcı olabilirim efendim?"
+        }
+
+    username = (
+        request.username
+        or "karahan"
+    ).strip().lower()
+
+    mode = (
+        request.mode
+        or "normal"
+    ).strip().lower()
+
+    user = USERS.get(
+        username,
+        USERS["karahan"]
+    )
+
+    if (
+        user.get("role")
+        == "teacher"
+
+        or
+
+        user.get("style")
+        == "academic"
+
+        or
+
+        mode in {
+            "academic",
+            "research",
+            "lesson",
+            "quiz",
+            "article",
+            "teacher"
+        }
+    ):
+
+        system_prompt = (
+            ACADEMIC_SYSTEM
+        )
+
+        mode_instruction = (
+            f"Akademik çalışma modu: {mode}. "
+            "Kullanıcıya 'Hocam' diye hitap et."
+        )
+
     else:
-        system_prompt = PROFESSIONAL_SYSTEM
-        mode_instruction = f"Çalışma modu: {mode}."
+
+        system_prompt = (
+            PROFESSIONAL_SYSTEM
+        )
+
+        mode_instruction = (
+            f"Çalışma modu: {mode}."
+        )
 
     prompt = f"""
-Kullanıcı profili: {username}
+Kullanıcı profili:
+{username}
+
 {mode_instruction}
 
 Kullanıcının mesajı:
 {message}
 
-Yanıtı doğrudan ver. Kullanıcı açıkça istemediyse gereksiz uzun açıklamalar yapma.
+Yanıtı doğrudan ver.
+
+Kullanıcı açıkça istemediyse
+gereksiz uzun açıklamalar yapma.
+
+Bilmediğin bilgileri uydurma.
 """
-    result = ask_ai(prompt, system_prompt)
+
+    result = ask_ai(
+        prompt,
+        system_prompt
+    )
+
     if not result:
-        result = "Şu anda yapay zeka servislerine bağlanamıyorum. API anahtarlarını kontrol etmen gerekiyor."
-    return {"response": result, "message": result}
+
+        result = (
+            "Şu anda yapay zeka "
+            "servislerine bağlanamıyorum. "
+            "API anahtarlarını kontrol etmen gerekiyor."
+        )
+
+    return {
+        "response":
+            result,
+
+        "message":
+            result
+    }
+
 
 # ============================================================
-# PRESENTATION
+# PRESENTATION ROUTE
 # ============================================================
 
 @app.post("/presentation")
-async def create_presentation(request: PresentationRequest, background_tasks: BackgroundTasks):
-    topic = (request.topic or "").strip()
+async def create_presentation(
+    request: PresentationRequest,
+    background_tasks: BackgroundTasks
+):
+
+    topic = (
+        request.topic
+        or ""
+    ).strip()
+
     if not topic:
-        raise HTTPException(status_code=400, detail="Sunum konusu boş olamaz.")
+
+        raise HTTPException(
+            status_code=400,
+            detail="Sunum konusu boş olamaz."
+        )
+
     try:
-        requested_count = int(request.slide_count)
+
+        requested_count = int(
+            request.slide_count
+        )
+
     except Exception:
+
         requested_count = 7
-    slide_count = max(5, min(requested_count, 12))
+
+    slide_count = max(
+        5,
+        min(
+            requested_count,
+            12
+        )
+    )
+
     job_id = create_job()
-    background_tasks.add_task(presentation_worker, job_id, topic, slide_count)
-    return {"success": True, "job_id": job_id, "status": "queued", "message": "Sunum oluşturuluyor..."}
+
+    background_tasks.add_task(
+        presentation_worker,
+        job_id,
+        topic,
+        slide_count
+    )
+
+    return {
+        "success":
+            True,
+
+        "job_id":
+            job_id,
+
+        "status":
+            "queued",
+
+        "message":
+            "Sunum oluşturuluyor..."
+    }
 
 
-@app.get("/presentation-status/{job_id}")
-async def presentation_status(job_id: str):
+# ============================================================
+# PRESENTATION STATUS
+# ============================================================
+
+@app.get(
+    "/presentation-status/{job_id}"
+)
+async def presentation_status(
+    job_id: str
+):
+
     with presentation_lock:
-        job = PRESENTATION_JOBS.get(job_id)
+
+        job = PRESENTATION_JOBS.get(
+            job_id
+        )
+
         if not job:
-            raise HTTPException(status_code=404, detail="Sunum bulunamadı.")
+
+            raise HTTPException(
+                status_code=404,
+                detail="Sunum bulunamadı."
+            )
+
         return dict(job)
+
 
 # ============================================================
 # GENERATED FILES
 # ============================================================
 
-@app.get("/generated/{filename}")
-async def generated_file(filename: str):
-    safe_name = Path(filename).name
-    file_path = GENERATED_DIR / safe_name
-    if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="Dosya bulunamadı.")
-    if safe_name.lower().endswith(".pdf"):
+@app.get(
+    "/generated/{filename}"
+)
+async def generated_file(
+    filename: str
+):
+
+    safe_name = Path(
+        filename
+    ).name
+
+    file_path = (
+        GENERATED_DIR
+        / safe_name
+    )
+
+    if (
+        not file_path.exists()
+        or
+        not file_path.is_file()
+    ):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Dosya bulunamadı."
+        )
+
+    if safe_name.lower().endswith(
+        ".pdf"
+    ):
+
         return FileResponse(
             path=file_path,
             media_type="application/pdf",
             filename=safe_name,
-            headers={"Content-Disposition": f'attachment; filename="{safe_name}"'},
+            headers={
+                "Content-Disposition":
+                    f'attachment; filename="{safe_name}"'
+            }
         )
-    return FileResponse(path=file_path)
+
+    return FileResponse(
+        path=file_path
+    )
+
 
 # ============================================================
 # MEMORY
@@ -1081,25 +3973,74 @@ async def generated_file(filename: str):
 
 @app.get("/memory")
 async def get_memory():
+
     with memory_lock:
-        return {"memory": read_json_file(MEMORY_FILE, [])}
+
+        return {
+            "memory":
+                read_json_file(
+                    MEMORY_FILE,
+                    []
+                )
+        }
 
 
 @app.post("/memory")
-async def add_memory(data: dict):
-    text = str(data.get("text", "")).strip()
+async def add_memory(
+    data: dict
+):
+
+    text = str(
+        data.get(
+            "text",
+            ""
+        )
+    ).strip()
+
     if not text:
-        return {"success": False}
+
+        return {
+            "success":
+                False
+        }
+
     with memory_lock:
-        memories = read_json_file(MEMORY_FILE, [])
+
+        memories = read_json_file(
+            MEMORY_FILE,
+            []
+        )
+
         memories.append({
-            "id": uuid.uuid4().hex,
-            "text": text,
-            "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "id":
+                uuid.uuid4().hex,
+
+            "text":
+                text,
+
+            "created_at":
+                time.strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
         })
-        memories = memories[-200:]
-        write_json_file(MEMORY_FILE, memories)
-    return {"success": True, "memory": memories}
+
+        memories = memories[
+            -200:
+        ]
+
+        write_json_file(
+            MEMORY_FILE,
+            memories
+        )
+
+    return {
+        "success":
+            True,
+
+        "memory":
+            memories
+    }
+
 
 # ============================================================
 # NEW CHAT
@@ -1107,7 +4048,15 @@ async def add_memory(data: dict):
 
 @app.post("/new-chat")
 async def new_chat():
-    return {"success": True, "message": "Yeni sohbet başlatıldı."}
+
+    return {
+        "success":
+            True,
+
+        "message":
+            "Yeni sohbet başlatıldı."
+    }
+
 
 # ============================================================
 # ERRORS
@@ -1115,7 +4064,15 @@ async def new_chat():
 
 @app.get("/errors")
 async def errors():
-    return {"errors": read_json_file(ERROR_FILE, [])}
+
+    return {
+        "errors":
+            read_json_file(
+                ERROR_FILE,
+                []
+            )
+    }
+
 
 # ============================================================
 # STARTUP
@@ -1123,25 +4080,113 @@ async def errors():
 
 @app.on_event("startup")
 async def startup():
-    GENERATED_DIR.mkdir(exist_ok=True)
-    print("=" * 60)
+
+    GENERATED_DIR.mkdir(
+        exist_ok=True
+    )
+
+    print("=" * 65)
     print("K.A.R.V.I.S. - KARAHAN INC.")
-    print(f"Version: {APP_VERSION}")
-    print("Backend: ONLINE")
-    print("Groq:", "ACTIVE" if GROQ_API_KEY else "NOT CONFIGURED")
-    print("OpenRouter:", "ACTIVE" if OPENROUTER_API_KEY else "NOT CONFIGURED")
-    print("Google Images:", "API ACTIVE" if GOOGLE_IMAGE_API_KEY and GOOGLE_CSE_ID else "BEST-EFFORT FALLBACK")
-    print("Presentation Engine: 16:9")
-    print("PDF Download: ENABLED")
-    print("Dynamic Text Fit: ENABLED")
-    print("Academic Teacher Mode: ENABLED")
-    print("Profile Login: ENABLED")
-    print("=" * 60)
+    print(
+        f"Version: {APP_VERSION}"
+    )
+
+    print(
+        "Backend: ONLINE"
+    )
+
+    print(
+        "Groq:",
+        "ACTIVE"
+        if GROQ_API_KEY
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "OpenRouter:",
+        "ACTIVE"
+        if OPENROUTER_API_KEY
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "Google Search:",
+        "ACTIVE"
+        if GOOGLE_IMAGE_API_KEY
+        and GOOGLE_CSE_ID
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "Wikipedia Research: ENABLED"
+    )
+
+    print(
+        "Openverse Images: ENABLED"
+    )
+
+    print(
+        "Google Images Fallback: ENABLED"
+    )
+
+    print(
+        "Fact-Based Presentation: ENABLED"
+    )
+
+    print(
+        "Duplicate Slide Protection: ENABLED"
+    )
+
+    print(
+        "Per-Slide AI Generation: ENABLED"
+    )
+
+    print(
+        "Source Footer: ENABLED"
+    )
+
+    print(
+        "Dynamic Text Fit: ENABLED"
+    )
+
+    print(
+        "Academic Teacher Mode: ENABLED"
+    )
+
+    print(
+        "Profile Login: ENABLED"
+    )
+
+    print(
+        "PDF Download: ENABLED"
+    )
+
+    print(
+        "Presentation Engine: 16:9"
+    )
+
+    print("=" * 65)
+
 
 # ============================================================
 # LOCAL RUN
 # ============================================================
 
 if __name__ == "__main__":
+
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=False)
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=int(
+            os.getenv(
+                "PORT",
+                "8000"
+            )
+        ),
+        reload=False
+    )
