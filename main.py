@@ -1,5 +1,9 @@
 import os
 import json
+import re
+import html
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from datetime import datetime
 
@@ -10,7 +14,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 
 
-APP_VERSION = "20.0.0"
+APP_VERSION = "21.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -112,6 +116,50 @@ USERS = {
         "role": "Özel Kullanıcı",
         "password": "3021",
         "personality": "sinem"
+    },
+
+    # ========================================================
+    # ÖĞRETMEN PROFİLİ
+    # ========================================================
+
+    "ilknur": {
+        "username": "ilknur",
+        "name": "İlknur Hocam",
+        "role": "Öğretmen / Akademik Kullanıcı",
+        "password": "1111",
+        "personality": "teacher"
+    }
+}
+
+
+# ============================================================
+# AKADEMİK MODLAR
+# ============================================================
+
+ACADEMIC_MODES = {
+    "research": {
+        "name": "Araştırma Modu",
+        "icon": "🔬"
+    },
+
+    "academic": {
+        "name": "Akademik Mod",
+        "icon": "📚"
+    },
+
+    "article": {
+        "name": "Makale Asistanı",
+        "icon": "📝"
+    },
+
+    "lesson": {
+        "name": "Ders Asistanı",
+        "icon": "🎓"
+    },
+
+    "quiz": {
+        "name": "Sınav / Quiz",
+        "icon": "🧪"
     }
 }
 
@@ -123,6 +171,7 @@ USERS = {
 class ChatRequest(BaseModel):
     message: str
     username: str = "karahan"
+    mode: str = "normal"
 
 
 class LoginRequest(BaseModel):
@@ -130,32 +179,72 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ResearchRequest(BaseModel):
+    query: str
+    username: str = "ilknur"
+    mode: str = "research"
+
+
+# ============================================================
+# KULLANICI NORMALİZASYONU
+# ============================================================
+
+def normalize_username(username):
+
+    username = username.lower().strip()
+
+    if username == "betül":
+        username = "betul"
+
+    if username == "öğretmen":
+        username = "ilknur"
+
+    return username
+
+
 # ============================================================
 # DOSYA SISTEMI
 # ============================================================
 
 def load_json_file(path, default):
+
     try:
+
         if not path.exists():
             return default
 
-        with open(path, "r", encoding="utf-8") as file:
+        with open(
+            path,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
             return json.load(file)
 
     except Exception:
+
         return default
 
 
 def save_json_file(path, data):
+
     try:
-        with open(path, "w", encoding="utf-8") as file:
+
+        with open(
+            path,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
             json.dump(
                 data,
                 file,
                 ensure_ascii=False,
                 indent=2
             )
+
     except Exception:
+
         pass
 
 
@@ -164,6 +253,7 @@ def save_json_file(path, data):
 # ============================================================
 
 def empty_memory():
+
     return {
         "profile": {},
         "preferences": [],
@@ -175,10 +265,12 @@ def empty_memory():
 
 
 def load_memory():
+
     default = {
         "karahan": empty_memory(),
         "betul": empty_memory(),
-        "sinem": empty_memory()
+        "sinem": empty_memory(),
+        "ilknur": empty_memory()
     }
 
     data = load_json_file(
@@ -189,8 +281,10 @@ def load_memory():
     for username in [
         "karahan",
         "betul",
-        "sinem"
+        "sinem",
+        "ilknur"
     ]:
+
         if username not in data:
             data[username] = empty_memory()
 
@@ -198,6 +292,7 @@ def load_memory():
 
 
 def save_memory(data):
+
     save_json_file(
         MEMORY_FILE,
         data
@@ -205,10 +300,15 @@ def save_memory(data):
 
 
 def get_user_memory(username):
+
     data = load_memory()
 
+    username = normalize_username(username)
+
     if username not in data:
+
         data[username] = empty_memory()
+
         save_memory(data)
 
     return data[username]
@@ -219,7 +319,10 @@ def remember_message(
     role,
     content
 ):
+
     data = load_memory()
+
+    username = normalize_username(username)
 
     if username not in data:
         data[username] = empty_memory()
@@ -241,7 +344,10 @@ def remember_message(
 # ============================================================
 
 def detect_memory(username, message):
+
     data = load_memory()
+
+    username = normalize_username(username)
 
     if username not in data:
         data[username] = empty_memory()
@@ -254,6 +360,7 @@ def detect_memory(username, message):
             "adım murat" in text
             or "ben murat" in text
         ):
+
             data[username]["profile"]["name"] = "Murat"
 
         if (
@@ -264,6 +371,7 @@ def detect_memory(username, message):
                 or "yaşarım" in text
             )
         ):
+
             data[username]["profile"]["city"] = "Denizli"
 
         if "caddy" in text:
@@ -271,6 +379,7 @@ def detect_memory(username, message):
             vehicle = "2006 Volkswagen Caddy 1.9 TDI"
 
             if vehicle not in data[username]["vehicles"]:
+
                 data[username]["vehicles"].append(
                     vehicle
                 )
@@ -283,17 +392,23 @@ def detect_memory(username, message):
             vehicle = "2012 Mercedes-Benz C180 W204"
 
             if vehicle not in data[username]["vehicles"]:
+
                 data[username]["vehicles"].append(
                     vehicle
                 )
 
-        if "jarvis" in text or "karvis" in text:
+        if (
+            "jarvis" in text
+            or "karvis" in text
+            or "k.a.r.v.i.s." in text
+        ):
 
             project = (
                 "K.A.R.V.I.S. kişisel yapay zeka projesi"
             )
 
             if project not in data[username]["projects"]:
+
                 data[username]["projects"].append(
                     project
                 )
@@ -301,6 +416,7 @@ def detect_memory(username, message):
     if username == "sinem":
 
         if "22 yaşındayım" in text:
+
             data[username]["profile"]["age"] = 22
 
         if (
@@ -311,6 +427,7 @@ def detect_memory(username, message):
             fact = "Sinem'in sarı bir kedisi var."
 
             if fact not in data[username]["important_facts"]:
+
                 data[username]["important_facts"].append(
                     fact
                 )
@@ -323,6 +440,7 @@ def detect_memory(username, message):
 # ============================================================
 
 def load_errors():
+
     return load_json_file(
         ERROR_FILE,
         []
@@ -336,17 +454,24 @@ def save_error(
     message="",
     error_type="AI_ERROR"
 ):
+
     errors = load_errors()
 
     record = {
         "id": len(errors) + 1,
+
         "time": datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S"
         ),
+
         "username": username,
+
         "provider": provider,
+
         "type": error_type,
+
         "message": message,
+
         "error": str(error)
     }
 
@@ -363,6 +488,7 @@ def save_error(
 
 
 def classify_error(error):
+
     text = str(error).lower()
 
     if (
@@ -370,6 +496,7 @@ def classify_error(error):
         or "rate limit" in text
         or "quota" in text
     ):
+
         return "RATE_LIMIT"
 
     if "timeout" in text:
@@ -380,6 +507,7 @@ def classify_error(error):
         or "403" in text
         or "api key" in text
     ):
+
         return "AUTHENTICATION_ERROR"
 
     if (
@@ -390,22 +518,239 @@ def classify_error(error):
             or "invalid" in text
         )
     ):
+
         return "MODEL_ERROR"
 
     if (
         "connection" in text
         or "network" in text
     ):
+
         return "CONNECTION_ERROR"
 
     return "AI_ERROR"
 
 
 # ============================================================
+# İNTERNET ARAŞTIRMA MOTORU
+# ============================================================
+
+def clean_html(text):
+
+    text = re.sub(
+        r"<script.*?</script>",
+        "",
+        text,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"<style.*?</style>",
+        "",
+        text,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"<[^>]+>",
+        " ",
+        text
+    )
+
+    text = html.unescape(text)
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+
+
+def internet_search(query, max_results=6):
+
+    encoded_query = urllib.parse.urlencode({
+        "q": query
+    })
+
+    url = (
+        "https://html.duckduckgo.com/html/?"
+        + encoded_query
+    )
+
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": (
+                "Mozilla/5.0 "
+                "(iPhone; CPU iPhone OS 18_0 like Mac OS X) "
+                "AppleWebKit/605.1.15 "
+                "Version/18.0 Mobile/15E148 Safari/604.1"
+            )
+        }
+    )
+
+    try:
+
+        with urllib.request.urlopen(
+            request,
+            timeout=15
+        ) as response:
+
+            raw = response.read().decode(
+                "utf-8",
+                errors="ignore"
+            )
+
+    except Exception as error:
+
+        raise RuntimeError(
+            "İnternet araştırması sırasında "
+            "arama servisine ulaşılamadı: "
+            + str(error)
+        )
+
+
+    results = []
+
+    blocks = re.findall(
+        r'<div class="result.*?</div>\s*</div>',
+        raw,
+        flags=re.DOTALL
+    )
+
+
+    for block in blocks:
+
+        link_match = re.search(
+            r'class="result__a"[^>]*href="([^"]+)"',
+            block
+        )
+
+        title_match = re.search(
+            r'class="result__a"[^>]*>(.*?)</a>',
+            block,
+            flags=re.DOTALL
+        )
+
+        snippet_match = re.search(
+            r'class="result__snippet"[^>]*>(.*?)</',
+            block,
+            flags=re.DOTALL
+        )
+
+
+        if not link_match or not title_match:
+            continue
+
+
+        link = html.unescape(
+            link_match.group(1)
+        )
+
+        title = clean_html(
+            title_match.group(1)
+        )
+
+        snippet = ""
+
+        if snippet_match:
+
+            snippet = clean_html(
+                snippet_match.group(1)
+            )
+
+
+        if not title:
+            continue
+
+
+        results.append({
+            "title": title,
+            "url": link,
+            "snippet": snippet
+        })
+
+
+        if len(results) >= max_results:
+            break
+
+
+    return results
+
+
+def build_research_context(query):
+
+    results = internet_search(
+        query,
+        max_results=6
+    )
+
+
+    if not results:
+
+        return (
+            "İnternet araştırmasında kullanılabilir "
+            "sonuç bulunamadı."
+        )
+
+
+    lines = []
+
+    lines.append(
+        "GÜNCEL İNTERNET ARAŞTIRMASI"
+    )
+
+    lines.append(
+        "Araştırma sorgusu: " + query
+    )
+
+    lines.append("")
+
+
+    for index, result in enumerate(
+        results,
+        start=1
+    ):
+
+        lines.append(
+            f"[Kaynak {index}]"
+        )
+
+        lines.append(
+            "Başlık: "
+            + result["title"]
+        )
+
+        lines.append(
+            "URL: "
+            + result["url"]
+        )
+
+        if result["snippet"]:
+
+            lines.append(
+                "Özet: "
+                + result["snippet"]
+            )
+
+        lines.append("")
+
+
+    return "\n".join(lines)
+
+
+# ============================================================
 # KARVIS KİŞİLİK SİSTEMİ
 # ============================================================
 
-def build_system_prompt(username):
+def build_system_prompt(
+    username,
+    mode="normal"
+):
+
+    username = normalize_username(username)
 
     memory = get_user_memory(username)
 
@@ -415,22 +760,32 @@ def build_system_prompt(username):
     )
 
 
+    # --------------------------------------------------------
+    # BETÜL
+    # --------------------------------------------------------
+
     if username == "betul":
 
         personality = """
+
 Sen K.A.R.V.I.S.'sin.
 
 Aktif kullanıcı Betül.
 
-Betül ile konuşurken samimi, eğlenceli,
-sıcak ve hafif takılmalı bir dil kullan.
+Betül ile konuşurken samimi,
+eğlenceli, sıcak ve hafif takılmalı
+bir dil kullan.
 
 Robot gibi konuşma.
 
 Gerektiğinde doğal şekilde:
+
 "Aşko bir saniye..."
+
 "Dur kız, düşünüyorum."
+
 "Tamam tamam, bakıyorum."
+
 gibi ifadeler kullanabilirsin.
 
 Ancak aynı ifadeyi sürekli tekrarlama.
@@ -441,23 +796,31 @@ gibi olsun.
 Aşırı romantik olma.
 
 KARAHAN INC. ana kullanıcıdır.
+
 """
 
+
+    # --------------------------------------------------------
+    # SİNEM
+    # --------------------------------------------------------
 
     elif username == "sinem":
 
         personality = """
+
 Sen K.A.R.V.I.S.'sin.
 
 Aktif kullanıcı Sinem.
 
-Sinem ile sıcak, nazik, içten ve
-sevecen konuş.
+Sinem ile sıcak, nazik, içten
+ve sevecen konuş.
 
 Robotik veya resmi konuşma.
 
 Uygun olduğunda:
+
 "Hoş geldiniz prenses."
+
 şeklinde hitap edebilirsin.
 
 Sinem 22 yaşındadır.
@@ -475,12 +838,77 @@ Fakat bunu sürekli yapma.
 Her cümleyi romantik hale getirme.
 
 Sohbet doğal ve içten olsun.
+
 """
 
+
+    # --------------------------------------------------------
+    # İLKNUR ÖĞRETMEN
+    # --------------------------------------------------------
+
+    elif username == "ilknur":
+
+        personality = """
+
+Sen K.A.R.V.I.S.'sin.
+
+Aktif kullanıcı İlknur Hocamdır.
+
+İlknur bir öğretmendir.
+
+Sen onun kişisel akademik asistanı
+gibi davranmalısın.
+
+Kullanıcıya her zaman saygılı,
+profesyonel, nazik ve akademik
+bir üslupla yaklaş.
+
+Uygun yerlerde "Hocam" şeklinde
+hitap et.
+
+Aşırı samimi konuşma.
+
+Robotik ve mekanik cevaplar da verme.
+
+Doğal, akıcı ve profesyonel ol.
+
+Akademik konularda:
+
+- doğruluğa önem ver
+- kaynakları önemse
+- güncel bilgileri tercih et
+- kesin olmayan bilgileri kesinmiş gibi sunma
+- gerektiğinde "bu konuda güncel kaynakları kontrol etmek gerekir"
+  şeklinde belirt
+- akademik kavramları doğru kullan
+- gerektiğinde bilgileri başlıklar altında düzenle
+
+İnternet araştırması kullanıldığında
+kaynakları cevap sonunda açıkça belirt.
+
+Araştırma sonuçlarını olduğu gibi
+kopyalamak yerine anlamlandır,
+karşılaştır ve özetle.
+
+İlknur Hocamın amacı akademik,
+eğitsel ve araştırma çalışmalarında
+K.A.R.V.I.S.'ten yardım almaktır.
+
+Sen bir sohbet botu gibi değil,
+öğretmenin kişisel dijital akademik
+asistanı gibi davran.
+
+"""
+
+
+    # --------------------------------------------------------
+    # KARAHAN
+    # --------------------------------------------------------
 
     else:
 
         personality = """
+
 Sen K.A.R.V.I.S.'sin.
 
 Aktif kullanıcı KARAHAN INC.
@@ -528,27 +956,134 @@ kalıpları mümkün olduğunca kullanma.
 
 Daha doğal konuş.
 
-Örnek:
-
-"Tabii efendim, bakalım."
-
-"Anladım. Burada asıl mesele şu..."
-
-"Tamam, bunu hallederiz."
-
-"Bence önce şuradan başlayalım."
-
-"Anladım seni."
-
-gibi doğal ifadeler kullanabilirsin.
-
 Betül veya Sinem'a özel konuşma
 tarzlarını KARAHAN INC. profilinde
 kesinlikle kullanma.
+
 """
 
 
-    return personality + """
+    # --------------------------------------------------------
+    # MOD TALİMATLARI
+    # --------------------------------------------------------
+
+    mode_instruction = ""
+
+    if username == "ilknur":
+
+        if mode == "research":
+
+            mode_instruction = """
+
+AKTİF MOD: ARAŞTIRMA MODU
+
+Güncel internet araştırmasından gelen
+kaynakları değerlendir.
+
+Kaynakları karşılaştır.
+
+Bilginin güncelliğine dikkat et.
+
+Cevabı mümkün olduğunca akademik,
+açık ve düzenli hazırla.
+
+Cevabın sonunda "Kaynaklar" başlığı
+altında kullanılan kaynakları listele.
+
+"""
+
+
+        elif mode == "academic":
+
+            mode_instruction = """
+
+AKTİF MOD: AKADEMİK MOD
+
+Bir akademik danışman gibi davran.
+
+Kavramsal açıklamalar,
+literatür değerlendirmesi,
+araştırma soruları,
+hipotezler,
+yöntemler ve akademik analiz
+konularında yardımcı ol.
+
+"""
+
+
+        elif mode == "article":
+
+            mode_instruction = """
+
+AKTİF MOD: MAKALE ASİSTANI
+
+Akademik makale hazırlama konusunda
+yardımcı ol.
+
+Başlık,
+özet,
+anahtar kelimeler,
+giriş,
+literatür,
+yöntem,
+bulgular,
+tartışma
+ve sonuç bölümlerini akademik
+standartlara uygun şekilde
+hazırlamaya yardımcı ol.
+
+"""
+
+
+        elif mode == "lesson":
+
+            mode_instruction = """
+
+AKTİF MOD: DERS ASİSTANI
+
+Bir öğretmenin ders hazırlamasına
+yardımcı ol.
+
+Ders planı,
+konu anlatımı,
+örnekler,
+öğrenci etkinlikleri,
+ödevler,
+sunum planları
+ve değerlendirme materyalleri
+hazırla.
+
+Öğrenci seviyesini dikkate al.
+
+"""
+
+
+        elif mode == "quiz":
+
+            mode_instruction = """
+
+AKTİF MOD: SINAV / QUIZ
+
+Sınav ve quiz hazırlama konusunda
+yardımcı ol.
+
+Çoktan seçmeli,
+doğru-yanlış,
+açık uçlu
+ve karma sorular hazırlayabilirsin.
+
+Soruların cevap anahtarını
+ve gerektiğinde açıklamalarını
+ayrı şekilde ver.
+
+Soruların zorluk seviyesini
+kullanıcının istediği seviyeye göre
+ayarla.
+
+"""
+
+
+    return personality + mode_instruction + """
 
 AKTİF HAFIZA:
 
@@ -575,6 +1110,7 @@ def ask_with_client(
                 "role": "system",
                 "content": system_prompt
             },
+
             {
                 "role": "user",
                 "content": user_message
@@ -583,11 +1119,12 @@ def ask_with_client(
 
         temperature=0.8,
 
-        max_tokens=1200
+        max_tokens=1600
     )
 
 
     if not response.choices:
+
         raise RuntimeError(
             "AI boş cevap döndürdü."
         )
@@ -597,6 +1134,7 @@ def ask_with_client(
 
 
     if not content:
+
         raise RuntimeError(
             "AI cevap metni boş."
         )
@@ -611,12 +1149,39 @@ def ask_with_client(
 
 def ask_ai(
     username,
-    user_message
+    user_message,
+    mode="normal",
+    research_context=""
 ):
 
     system_prompt = build_system_prompt(
-        username
+        username,
+        mode
     )
+
+
+    if research_context:
+
+        user_message = """
+
+Aşağıda güncel internet araştırmasından
+elde edilen bilgiler bulunmaktadır.
+
+Bu kaynakları dikkatli değerlendir.
+
+Kaynaklarda olmayan bilgileri
+kaynaklardan gelmiş gibi gösterme.
+
+Gerekirse kaynaklar arasında
+farklılıkları belirt.
+
+İNTERNET ARAŞTIRMA SONUÇLARI:
+
+""" + research_context + """
+
+KULLANICININ TALEBİ:
+
+""" + user_message
 
 
     providers = []
@@ -775,14 +1340,13 @@ def icon():
 @app.post("/chat")
 def chat(request: ChatRequest):
 
-    username = request.username.lower().strip()
-
-
-    if username == "betül":
-        username = "betul"
+    username = normalize_username(
+        request.username
+    )
 
 
     if username not in USERS:
+
         username = "karahan"
 
 
@@ -795,6 +1359,21 @@ def chat(request: ChatRequest):
             status_code=400,
             detail="Mesaj boş olamaz."
         )
+
+
+    mode = request.mode.lower().strip()
+
+
+    if mode not in [
+        "normal",
+        "research",
+        "academic",
+        "article",
+        "lesson",
+        "quiz"
+    ]:
+
+        mode = "normal"
 
 
     detect_memory(
@@ -810,11 +1389,53 @@ def chat(request: ChatRequest):
     )
 
 
+    research_context = ""
+
+
+    # --------------------------------------------------------
+    # ÖĞRETMEN ARAŞTIRMA MODU
+    # --------------------------------------------------------
+
+    if (
+        username == "ilknur"
+        and mode == "research"
+    ):
+
+        try:
+
+            research_context = build_research_context(
+                message
+            )
+
+        except Exception as error:
+
+            save_error(
+                username="ilknur",
+                provider="WEB_SEARCH",
+                error=error,
+                message=message,
+                error_type="WEB_SEARCH_ERROR"
+            )
+
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "message": (
+                        "İnternet araştırması "
+                        "şu anda gerçekleştirilemedi."
+                    ),
+                    "type": "WEB_SEARCH_ERROR"
+                }
+            )
+
+
     try:
 
         result = ask_ai(
             username,
-            message
+            message,
+            mode,
+            research_context
         )
 
 
@@ -831,8 +1452,10 @@ def chat(request: ChatRequest):
         return {
             "ok": True,
             "answer": answer,
-
-            "fallback": result["fallback"]
+            "fallback": result["fallback"],
+            "username": username,
+            "mode": mode,
+            "research": bool(research_context)
         }
 
 
@@ -863,6 +1486,106 @@ def chat(request: ChatRequest):
 
 
 # ============================================================
+# BAĞIMSIZ İNTERNET ARAŞTIRMASI
+# ============================================================
+
+@app.post("/research")
+def research(
+    request: ResearchRequest
+):
+
+    username = normalize_username(
+        request.username
+    )
+
+
+    if username != "ilknur":
+
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Araştırma sistemi "
+                "öğretmen profiline özeldir."
+            )
+        )
+
+
+    query = request.query.strip()
+
+
+    if not query:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Araştırma sorgusu boş olamaz."
+        )
+
+
+    try:
+
+        research_context = build_research_context(
+            query
+        )
+
+
+        result = ask_ai(
+            username="ilknur",
+            user_message=query,
+            mode="research",
+            research_context=research_context
+        )
+
+
+        return {
+            "ok": True,
+            "query": query,
+            "answer": result["answer"],
+            "sources": research_context,
+            "fallback": result["fallback"]
+        }
+
+
+    except Exception as error:
+
+        error_type = classify_error(
+            error
+        )
+
+
+        save_error(
+            username="ilknur",
+            provider="WEB_RESEARCH",
+            error=error,
+            message=query,
+            error_type=error_type
+        )
+
+
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "Araştırma gerçekleştirilemedi.",
+                "type": error_type,
+                "error": str(error)
+            }
+        )
+
+
+# ============================================================
+# AKADEMİK MODLAR
+# ============================================================
+
+@app.get("/academic-modes")
+def academic_modes():
+
+    return {
+        "ok": True,
+        "username": "ilknur",
+        "modes": ACADEMIC_MODES
+    }
+
+
+# ============================================================
 # PROFİLLER
 # ============================================================
 
@@ -876,6 +1599,7 @@ def get_users():
                 "name": user["name"],
                 "role": user["role"]
             }
+
             for user in USERS.values()
         ]
     }
@@ -886,11 +1610,9 @@ def profile_login(
     request: LoginRequest
 ):
 
-    username = request.username.lower().strip()
-
-
-    if username == "betül":
-        username = "betul"
+    username = normalize_username(
+        request.username
+    )
 
 
     if username not in USERS:
@@ -910,7 +1632,8 @@ def profile_login(
             "ok": True,
             "username": username,
             "name": user["name"],
-            "role": user["role"]
+            "role": user["role"],
+            "teacher_mode": False
         }
 
 
@@ -926,7 +1649,13 @@ def profile_login(
         "ok": True,
         "username": username,
         "name": user["name"],
-        "role": user["role"]
+        "role": user["role"],
+        "teacher_mode": username == "ilknur",
+        "academic_modes": (
+            list(ACADEMIC_MODES.keys())
+            if username == "ilknur"
+            else []
+        )
     }
 
 
@@ -939,14 +1668,13 @@ def get_memory(
     username: str = "karahan"
 ):
 
-    username = username.lower().strip()
-
-
-    if username == "betül":
-        username = "betul"
+    username = normalize_username(
+        username
+    )
 
 
     if username not in USERS:
+
         username = "karahan"
 
 
@@ -961,11 +1689,9 @@ def delete_memory(
     username: str = "karahan"
 ):
 
-    username = username.lower().strip()
-
-
-    if username == "betül":
-        username = "betul"
+    username = normalize_username(
+        username
+    )
 
 
     data = load_memory()
@@ -990,17 +1716,16 @@ def new_chat(
     username: str = "karahan"
 ):
 
-    username = username.lower().strip()
-
-
-    if username == "betül":
-        username = "betul"
+    username = normalize_username(
+        username
+    )
 
 
     data = load_memory()
 
 
     if username not in data:
+
         data[username] = empty_memory()
 
 
@@ -1051,6 +1776,7 @@ def health():
 
     return {
         "status": "online",
+
         "version": APP_VERSION,
 
         "assistant": "K.A.R.V.I.S.",
@@ -1073,6 +1799,10 @@ def health():
             }
         },
 
+        "web_research": True,
+
+        "academic_system": True,
+
         "error_count": len(
             load_errors()
         ),
@@ -1080,10 +1810,15 @@ def health():
         "users": [
             "karahan",
             "betul",
-            "sinem"
+            "sinem",
+            "ilknur"
         ]
     }
 
+
+# ============================================================
+# VERSİYON
+# ============================================================
 
 @app.get("/version")
 def version():
@@ -1091,5 +1826,7 @@ def version():
     return {
         "version": APP_VERSION,
         "name": "K.A.R.V.I.S. - KARAHAN INC.",
-        "multi_ai": True
+        "multi_ai": True,
+        "web_research": True,
+        "academic_teacher": True
     }
