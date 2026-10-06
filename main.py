@@ -3,6 +3,7 @@ import re
 import json
 import uuid
 import textwrap
+import urllib.request
 from pathlib import Path
 from datetime import datetime
 
@@ -23,11 +24,12 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 
-# =========================================================
+# ============================================================
 # KARVIS - KARAHAN INC.
-# =========================================================
+# BACKEND
+# ============================================================
 
-APP_VERSION = "23.2.0"
+APP_VERSION = "24.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -38,164 +40,14 @@ FONT_DIR = BASE_DIR / "fonts"
 MEMORY_FILE = BASE_DIR / "memory.json"
 ERROR_FILE = BASE_DIR / "errors.json"
 
-FILES_DIR.mkdir(exist_ok=True)
-GENERATED_DIR.mkdir(exist_ok=True)
-FONT_DIR.mkdir(exist_ok=True)
+FILES_DIR.mkdir(parents=True, exist_ok=True)
+GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+FONT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# =========================================================
-# PDF FONT
-# =========================================================
-# Türkçe karakter desteği için DejaVuSans kullanılır.
-# Font dosyaları yoksa Render üzerinde otomatik indirilir.
-# =========================================================
-
-REGULAR_FONT = "Helvetica"
-BOLD_FONT = "Helvetica-Bold"
-
-REGULAR_FONT_FILE = FONT_DIR / "DejaVuSans.ttf"
-BOLD_FONT_FILE = FONT_DIR / "DejaVuSans-Bold.ttf"
-
-
-def download_font(url, output_path):
-
-    try:
-
-        if output_path.exists():
-
-            if output_path.stat().st_size > 50000:
-                return True
-
-        print(
-            "PDF fontu indiriliyor:",
-            output_path.name
-        )
-
-        response = requests.get(
-            url,
-            timeout=30,
-            headers={
-                "User-Agent":
-                    "KARVIS-KARAHAN-INC/1.0"
-            }
-        )
-
-        response.raise_for_status()
-
-        content = response.content
-
-        if len(content) < 50000:
-
-            print(
-                "Font dosyası geçersiz:",
-                output_path.name
-            )
-
-            return False
-
-        with open(
-            output_path,
-            "wb"
-        ) as file:
-
-            file.write(content)
-
-        print(
-            "PDF fontu indirildi:",
-            output_path.name
-        )
-
-        return True
-
-    except Exception as error:
-
-        print(
-            "Font indirme hatası:",
-            output_path.name,
-            error
-        )
-
-        return False
-
-
-def ensure_pdf_fonts():
-
-    regular_url = (
-        "https://raw.githubusercontent.com/"
-        "dejavu-fonts/dejavu-fonts/"
-        "master/ttf/DejaVuSans.ttf"
-    )
-
-    bold_url = (
-        "https://raw.githubusercontent.com/"
-        "dejavu-fonts/dejavu-fonts/"
-        "master/ttf/DejaVuSans-Bold.ttf"
-    )
-
-    if not REGULAR_FONT_FILE.exists():
-
-        download_font(
-            regular_url,
-            REGULAR_FONT_FILE
-        )
-
-    if not BOLD_FONT_FILE.exists():
-
-        download_font(
-            bold_url,
-            BOLD_FONT_FILE
-        )
-
-
-ensure_pdf_fonts()
-
-
-try:
-
-    if REGULAR_FONT_FILE.exists():
-
-        pdfmetrics.registerFont(
-            TTFont(
-                "DejaVu",
-                str(REGULAR_FONT_FILE)
-            )
-        )
-
-        REGULAR_FONT = "DejaVu"
-
-    if BOLD_FONT_FILE.exists():
-
-        pdfmetrics.registerFont(
-            TTFont(
-                "DejaVu-Bold",
-                str(BOLD_FONT_FILE)
-            )
-        )
-
-        BOLD_FONT = "DejaVu-Bold"
-
-except Exception as error:
-
-    print(
-        "Font yükleme hatası:",
-        error
-    )
-
-
-print(
-    "PDF normal font:",
-    REGULAR_FONT
-)
-
-print(
-    "PDF kalın font:",
-    BOLD_FONT
-)
-
-
-# =========================================================
+# ============================================================
 # FASTAPI
-# =========================================================
+# ============================================================
 
 app = FastAPI(
     title="K.A.R.V.I.S. - KARAHAN INC.",
@@ -207,24 +59,30 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
+
 
 app.mount(
     "/files",
-    StaticFiles(
-        directory=str(FILES_DIR)
-    ),
+    StaticFiles(directory=str(FILES_DIR)),
     name="files"
 )
 
 
-# =========================================================
-# USERS
-# =========================================================
+# ============================================================
+# API ANAHTARLARI
+# ============================================================
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+
+
+# ============================================================
+# KULLANICILAR
+# ============================================================
 
 USERS = {
-
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -259,78 +117,248 @@ USERS = {
 }
 
 
-# =========================================================
-# ACADEMIC MODES
-# =========================================================
+# ============================================================
+# AKADEMİK MODLAR
+# ============================================================
 
 ACADEMIC_MODES = {
-
     "research": {
-        "name": "Araştırma Modu",
-        "icon": "🔬"
+        "name": "🔬 Araştırma Modu",
+        "description": "Kaynak ve güncel bilgi odaklı araştırma."
     },
 
     "academic": {
-        "name": "Akademik Mod",
-        "icon": "📚"
+        "name": "📚 Akademik Mod",
+        "description": "Akademik ve bilimsel anlatım."
     },
 
     "article": {
-        "name": "Makale Asistanı",
-        "icon": "📝"
+        "name": "📝 Makale Asistanı",
+        "description": "Makale oluşturma ve düzenleme."
     },
 
     "lesson": {
-        "name": "Ders Asistanı",
-        "icon": "🎓"
+        "name": "🎓 Ders Asistanı",
+        "description": "Ders anlatımı ve öğrenci desteği."
     },
 
     "quiz": {
-        "name": "Sınav / Quiz",
-        "icon": "🧪"
+        "name": "🧪 Sınav / Quiz",
+        "description": "Soru ve sınav hazırlama."
     },
 
     "presentation": {
-        "name": "Sunum Hazırlama",
-        "icon": "📊"
+        "name": "📊 Sunum Hazırlama",
+        "description": "Profesyonel PDF sunumu hazırlama."
     }
 }
 
 
-# =========================================================
-# API SETTINGS
-# =========================================================
+# ============================================================
+# FONT SİSTEMİ
+# ============================================================
 
-GROQ_API_KEY = os.getenv(
-    "GROQ_API_KEY",
-    ""
-)
-
-OPENROUTER_API_KEY = os.getenv(
-    "OPENROUTER_API_KEY",
-    ""
-)
-
-GROQ_BASE_URL = (
-    "https://api.groq.com/openai/v1"
-)
-
-GROQ_MODELS = [
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b"
-]
-
-OPENROUTER_MODEL = os.getenv(
-    "OPENROUTER_MODEL",
-    "openai/gpt-oss-20b:free"
-)
+REGULAR_FONT = "Helvetica"
+BOLD_FONT = "Helvetica-Bold"
 
 
-# =========================================================
-# JSON HELPERS
-# =========================================================
+def install_dejavu_fonts():
 
-def load_json(path, default):
+    regular = FONT_DIR / "DejaVuSans.ttf"
+    bold = FONT_DIR / "DejaVuSans-Bold.ttf"
+
+    # --------------------------------------------------------
+    # 1. Proje klasöründe mevcutsa kullan
+    # --------------------------------------------------------
+
+    if regular.exists() and bold.exists():
+        return regular, bold
+
+    # --------------------------------------------------------
+    # 2. Render Linux sisteminde ara
+    # --------------------------------------------------------
+
+    regular_paths = [
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf"),
+        Path("/usr/share/fonts/dejavu/DejaVuSans.ttf"),
+    ]
+
+    bold_paths = [
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+        Path("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf"),
+        Path("/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf"),
+    ]
+
+    found_regular = None
+    found_bold = None
+
+    for path in regular_paths:
+        if path.exists():
+            found_regular = path
+            break
+
+    for path in bold_paths:
+        if path.exists():
+            found_bold = path
+            break
+
+    if found_regular and found_bold:
+
+        try:
+            import shutil
+
+            shutil.copy2(found_regular, regular)
+            shutil.copy2(found_bold, bold)
+
+            print("DejaVu sistem fontu bulundu.")
+
+            return regular, bold
+
+        except Exception as error:
+            print("Font kopyalama hatası:", error)
+
+            return found_regular, found_bold
+
+    # --------------------------------------------------------
+    # 3. İnternetten indir
+    # --------------------------------------------------------
+
+    regular_urls = [
+        "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans.ttf",
+        "https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/ttf/DejaVuSans.ttf"
+    ]
+
+    bold_urls = [
+        "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans-Bold.ttf",
+        "https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/ttf/DejaVuSans-Bold.ttf"
+    ]
+
+    try:
+
+        for url in regular_urls:
+
+            try:
+                print("DejaVuSans.ttf indiriliyor...")
+
+                request = urllib.request.Request(
+                    url,
+                    headers={
+                        "User-Agent": "KARVIS/24.0"
+                    }
+                )
+
+                with urllib.request.urlopen(
+                    request,
+                    timeout=20
+                ) as response:
+
+                    data = response.read()
+
+                if len(data) > 10000:
+
+                    regular.write_bytes(data)
+
+                    break
+
+            except Exception as error:
+                print("Normal font URL başarısız:", error)
+
+        for url in bold_urls:
+
+            try:
+                print("DejaVuSans-Bold.ttf indiriliyor...")
+
+                request = urllib.request.Request(
+                    url,
+                    headers={
+                        "User-Agent": "KARVIS/24.0"
+                    }
+                )
+
+                with urllib.request.urlopen(
+                    request,
+                    timeout=20
+                ) as response:
+
+                    data = response.read()
+
+                if len(data) > 10000:
+
+                    bold.write_bytes(data)
+
+                    break
+
+            except Exception as error:
+                print("Bold font URL başarısız:", error)
+
+    except Exception as error:
+
+        print("Font indirme sistemi hatası:", error)
+
+    if regular.exists() and bold.exists():
+
+        return regular, bold
+
+    return None, None
+
+
+def setup_pdf_fonts():
+
+    global REGULAR_FONT
+    global BOLD_FONT
+
+    regular_file, bold_file = install_dejavu_fonts()
+
+    if regular_file and bold_file:
+
+        try:
+
+            pdfmetrics.registerFont(
+                TTFont(
+                    "KarahanDejaVu",
+                    str(regular_file)
+                )
+            )
+
+            pdfmetrics.registerFont(
+                TTFont(
+                    "KarahanDejaVu-Bold",
+                    str(bold_file)
+                )
+            )
+
+            REGULAR_FONT = "KarahanDejaVu"
+            BOLD_FONT = "KarahanDejaVu-Bold"
+
+            print("======================================")
+            print("TÜRKÇE PDF FONTU: AKTİF")
+            print("DejaVu Sans")
+            print("Ç Ğ İ Ö Ş Ü ç ğ ı ö ş ü")
+            print("======================================")
+
+            return True
+
+        except Exception as error:
+
+            print("Font kayıt hatası:", error)
+
+    print("======================================")
+    print("UYARI: Türkçe PDF fontu yüklenemedi.")
+    print("Helvetica kullanılacak.")
+    print("======================================")
+
+    return False
+
+
+setup_pdf_fonts()
+
+
+# ============================================================
+# MEMORY
+# ============================================================
+
+def load_json_file(path, default):
 
     try:
 
@@ -345,17 +373,12 @@ def load_json(path, default):
 
             return json.load(file)
 
-    except Exception as error:
-
-        print(
-            "JSON okuma hatası:",
-            error
-        )
+    except Exception:
 
         return default
 
 
-def save_json(path, data):
+def save_json_file(path, data):
 
     try:
 
@@ -374,120 +397,134 @@ def save_json(path, data):
 
     except Exception as error:
 
-        print(
-            "JSON kayıt hatası:",
-            error
+        print("JSON kayıt hatası:", error)
+
+
+MEMORY = load_json_file(
+    MEMORY_FILE,
+    {}
+)
+
+ERRORS = load_json_file(
+    ERROR_FILE,
+    []
+)
+
+
+# ============================================================
+# HATA KAYDI
+# ============================================================
+
+def log_error(error, endpoint="unknown"):
+
+    try:
+
+        ERRORS.append({
+            "time": datetime.now().isoformat(),
+            "endpoint": endpoint,
+            "error": str(error)
+        })
+
+        save_json_file(
+            ERROR_FILE,
+            ERRORS[-200:]
         )
 
-
-def get_memory():
-
-    return load_json(
-        MEMORY_FILE,
-        {}
-    )
+    except Exception:
+        pass
 
 
-def save_memory(data):
+# ============================================================
+# AI CLIENT
+# ============================================================
 
-    save_json(
-        MEMORY_FILE,
-        data
-    )
-
-
-def get_errors():
-
-    return load_json(
-        ERROR_FILE,
-        []
-    )
+groq_client = None
+openrouter_client = None
 
 
-def save_error(message):
+if GROQ_API_KEY:
 
-    errors = get_errors()
+    try:
 
-    errors.append({
-        "time": datetime.now().isoformat(),
-        "error": str(message)
-    })
+        groq_client = OpenAI(
+            api_key=GROQ_API_KEY,
+            base_url="https://api.groq.com/openai/v1"
+        )
 
-    errors = errors[-100:]
+    except Exception as error:
 
-    save_json(
-        ERROR_FILE,
-        errors
-    )
+        print("Groq client hatası:", error)
 
 
-# =========================================================
-# REQUEST MODELS
-# =========================================================
+if OPENROUTER_API_KEY:
 
-class ChatRequest(BaseModel):
+    try:
 
-    message: str
+        openrouter_client = OpenAI(
+            api_key=OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1"
+        )
 
-    username: str = "karahan"
+    except Exception as error:
 
-    mode: str = "normal"
+        print("OpenRouter client hatası:", error)
 
+
+# ============================================================
+# MODELLER
+# ============================================================
+
+GROQ_MODELS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b"
+]
+
+OPENROUTER_MODEL = os.getenv(
+    "OPENROUTER_MODEL",
+    "openai/gpt-oss-20b:free"
+)
+
+
+# ============================================================
+# REQUEST MODELLERİ
+# ============================================================
 
 class LoginRequest(BaseModel):
 
     username: str
+    password: str = ""
 
-    password: str
+
+class ChatRequest(BaseModel):
+
+    message: str
+    username: str = "karahan"
+    mode: str = "normal"
+    history: list = []
 
 
 class ResearchRequest(BaseModel):
 
-    query: str
-
-    username: str = "ilknur"
+    topic: str
+    username: str = "karahan"
 
 
 class PresentationRequest(BaseModel):
 
     topic: str
-
-    username: str = "ilknur"
-
-    slide_count: int = 10
-
-    include_visuals: bool = True
+    username: str = "karahan"
+    mode: str = "presentation"
 
 
-# =========================================================
-# USER
-# =========================================================
+# ============================================================
+# SYSTEM PROMPT
+# ============================================================
 
-def get_user(username):
+def build_system_prompt(username="karahan", mode="normal"):
 
-    username = (
-        username
-        .lower()
-        .strip()
-    )
-
-    return USERS.get(
+    user = USERS.get(
         username,
         USERS["karahan"]
-    )
-
-
-# =========================================================
-# SYSTEM PROMPT
-# =========================================================
-
-def build_system_prompt(
-    username,
-    mode
-):
-
-    user = get_user(
-        username
     )
 
     personality = user.get(
@@ -496,201 +533,197 @@ def build_system_prompt(
     )
 
     prompt = """
-Sen K.A.R.V.I.S. isimli kişisel yapay zeka asistanısın.
+Sen K.A.R.V.I.S. - KARAHAN INC. isimli gelişmiş kişisel yapay zeka asistanısın.
 
-Marka:
-K.A.R.V.I.S.
-KARAHAN INC.
+Kullanıcıya doğal, akıcı ve profesyonel Türkçe ile cevap ver.
 
-Türkçe konuş.
+Gereksiz yere kendini tekrar etme.
 
-Cevapların:
-- doğal
-- anlaşılır
-- profesyonel
-- yardımcı
-- gereksiz tekrar içermeyen
+Kullanıcı kısa soru sorarsa gereksiz uzun cevap verme.
 
-olmalı.
+Kullanıcı detay isterse ayrıntılı anlat.
 
-Bilmediğin bilgileri kesinmiş gibi söyleme.
+Bilmediğin bilgiyi kesinmiş gibi uydurma.
 
-Kod istenirse çalışabilir kod üret.
+Teknik konularda uygulanabilir ve doğrudan çözüm üret.
+
+Kod istendiğinde çalışabilir kod üret.
+
+Türkçe karakterleri doğru kullan.
+
+Kullanıcıya her mesajda "Murat" diye hitap etme.
+
+Kendini ChatGPT olarak tanıtma.
+
+Sen K.A.R.V.I.S.'sin.
 """
 
-    if personality == "betul":
+    if personality == "professional":
 
         prompt += """
-Betül ile konuşurken sıcak ve samimi ol.
+Ana kullanıcı için profesyonel, doğrudan ve yardımcı ol.
+"""
+
+    elif personality == "betul":
+
+        prompt += """
+Betül ile konuşurken samimi, nazik ve sıcak bir dil kullan.
 """
 
     elif personality == "sinem":
 
         prompt += """
-Sinem ile konuşurken samimi ve pozitif ol.
+Sinem ile konuşurken samimi ve doğal bir dil kullan.
 """
 
     elif personality == "teacher":
 
         prompt += """
-Kullanıcı İlknur Hocam'dır.
-
-Akademik konularda:
-
-- düzenli
-- öğretici
-- açık
-- kaynak odaklı
-- öğrenci seviyesinde anlaşılır
-
-ol.
+İlknur Hocam için akademik, öğretici ve düzenli bir dil kullan.
+Ders anlatırken konuyu öğrencinin anlayabileceği şekilde yapılandır.
 """
 
-        if mode == "research":
+    if mode == "research":
 
-            prompt += """
-Araştırma Modu aktif.
-Konuyu sistematik olarak incele.
+        prompt += """
+Araştırma modundasın.
+Konuyu başlıklar halinde incele.
+Güncel bilgi gerekiyorsa internet araştırması yapılması gerektiğini belirt.
 """
 
-        elif mode == "academic":
+    elif mode == "academic":
 
-            prompt += """
-Akademik Mod aktif.
-Akademik terminoloji kullan.
+        prompt += """
+Akademik moddasın.
+Kavramsal doğruluk, kaynak mantığı ve akademik terminolojiye önem ver.
 """
 
-        elif mode == "article":
+    elif mode == "article":
 
-            prompt += """
-Makale Asistanı aktif.
-Makale düzenine uygun içerik üret.
+        prompt += """
+Makale asistanı modundasın.
+Giriş, gelişme, sonuç ve gerektiğinde kaynakça yapısını kullan.
 """
 
-        elif mode == "lesson":
+    elif mode == "lesson":
 
-            prompt += """
-Ders Asistanı aktif.
-Konuyu öğrencilerin anlayacağı şekilde açıkla.
+        prompt += """
+Ders asistanı modundasın.
+Konuyu öğretmen anlatımı şeklinde düzenle.
+Örnekler ve öğrencinin anlayacağı açıklamalar ekle.
 """
 
-        elif mode == "quiz":
+    elif mode == "quiz":
 
-            prompt += """
-Sınav / Quiz Modu aktif.
-Açık ve ölçülebilir sorular üret.
+        prompt += """
+Sınav modundasın.
+Soruları açık ve ölçülebilir hazırla.
+İstenirse cevap anahtarı oluştur.
 """
 
-        elif mode == "presentation":
+    elif mode == "presentation":
 
-            prompt += """
-Sunum Hazırlama Modu aktif.
-Kısa slayt maddeleri ve görsel önerileri üret.
+        prompt += """
+Sunum hazırlama modundasın.
+Bilgileri slaytlara uygun kısa ve anlaşılır şekilde yapılandır.
 """
 
     return prompt
 
 
-# =========================================================
-# AI
-# =========================================================
+# ============================================================
+# AI SOR
+# ============================================================
 
 def ask_ai(
-    messages,
-    temperature=0.4,
-    max_tokens=2500
+    message,
+    username="karahan",
+    mode="normal",
+    history=None
 ):
 
-    last_error = None
+    history = history or []
 
-    # -----------------------------------------------------
+    system_prompt = build_system_prompt(
+        username,
+        mode
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": system_prompt
+        }
+    ]
+
+    for item in history[-12:]:
+
+        if not isinstance(item, dict):
+            continue
+
+        role = item.get("role")
+
+        content = item.get("content")
+
+        if role in ["user", "assistant"] and content:
+
+            messages.append({
+                "role": role,
+                "content": str(content)
+            })
+
+    messages.append({
+        "role": "user",
+        "content": message
+    })
+
+    # --------------------------------------------------------
     # GROQ
-    # -----------------------------------------------------
+    # --------------------------------------------------------
 
-    if GROQ_API_KEY:
+    if groq_client:
 
-        try:
+        for model in GROQ_MODELS:
 
-            client = OpenAI(
-                api_key=GROQ_API_KEY,
-                base_url=GROQ_BASE_URL
-            )
+            try:
 
-            for model in GROQ_MODELS:
-
-                try:
-
-                    response = (
-                        client
-                        .chat
-                        .completions
-                        .create(
-                            model=model,
-                            messages=messages,
-                            temperature=temperature,
-                            max_tokens=max_tokens
-                        )
-                    )
-
-                    answer = (
-                        response
-                        .choices[0]
-                        .message
-                        .content
-                    )
-
-                    if answer:
-
-                        return answer.strip()
-
-                except Exception as error:
-
-                    last_error = error
-
-                    print(
-                        "Groq hata:",
-                        model,
-                        error
-                    )
-
-        except Exception as error:
-
-            last_error = error
-
-
-    # -----------------------------------------------------
-    # OPENROUTER
-    # -----------------------------------------------------
-
-    if OPENROUTER_API_KEY:
-
-        try:
-
-            client = OpenAI(
-                api_key=OPENROUTER_API_KEY,
-                base_url=(
-                    "https://openrouter.ai/api/v1"
-                )
-            )
-
-            response = (
-                client
-                .chat
-                .completions
-                .create(
-                    model=OPENROUTER_MODEL,
+                response = groq_client.chat.completions.create(
+                    model=model,
                     messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens
+                    temperature=0.7,
+                    max_tokens=3000
                 )
+
+                answer = response.choices[0].message.content
+
+                if answer:
+
+                    return answer.strip()
+
+            except Exception as error:
+
+                print(
+                    "Groq model hatası:",
+                    model,
+                    error
+                )
+
+    # --------------------------------------------------------
+    # OPENROUTER
+    # --------------------------------------------------------
+
+    if openrouter_client:
+
+        try:
+
+            response = openrouter_client.chat.completions.create(
+                model=OPENROUTER_MODEL,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=3000
             )
 
-            answer = (
-                response
-                .choices[0]
-                .message
-                .content
-            )
+            answer = response.choices[0].message.content
 
             if answer:
 
@@ -698,336 +731,299 @@ def ask_ai(
 
         except Exception as error:
 
-            last_error = error
-
-
-    save_error(
-        last_error
-        or
-        "AI bağlantısı bulunamadı."
-    )
+            print(
+                "OpenRouter hatası:",
+                error
+            )
 
     return (
-        "Şu anda yapay zeka bağlantısında "
-        "bir sorun oluştu. Lütfen tekrar deneyin."
+        "Şu anda yapay zeka servislerine bağlanamıyorum. "
+        "API anahtarlarını veya Render ortam değişkenlerini kontrol et."
     )
 
 
-# =========================================================
-# INTERNET SEARCH
-# =========================================================
+# ============================================================
+# DUCKDUCKGO ARAŞTIRMA
+# ============================================================
 
-def internet_search(
-    query,
-    limit=8
-):
+def internet_search(query, limit=5):
 
     try:
 
-        url = (
-            "https://html.duckduckgo.com/html/"
-        )
+        url = "https://html.duckduckgo.com/html/"
 
-        headers = {
-
-            "User-Agent": (
-                "Mozilla/5.0 "
-                "(iPhone; CPU iPhone OS 17_0 like Mac OS X) "
-                "AppleWebKit/605.1.15 "
-                "Version/17.0 Mobile/15E148 Safari/604.1"
-            )
-        }
-
-        response = requests.get(
+        response = requests.post(
             url,
-            params={
+            data={
                 "q": query
             },
-            headers=headers,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            },
             timeout=15
         )
 
-        response.raise_for_status()
+        if response.status_code != 200:
+            return []
 
-        pattern = re.compile(
-            r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
-            re.I | re.S
-        )
-
-        matches = pattern.findall(
-            response.text
-        )
+        html = response.text
 
         results = []
 
-        for href, title in matches[:limit]:
+        pattern = re.compile(
+            r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
+            re.S
+        )
 
-            clean_title = re.sub(
+        for match in pattern.finditer(html):
+
+            link = match.group(1)
+
+            title = re.sub(
                 r"<.*?>",
                 "",
-                title
+                match.group(2)
             )
 
-            results.append({
+            title = title.strip()
 
-                "title": clean_title.strip(),
+            if title and link:
 
-                "url": href
+                results.append({
+                    "title": title,
+                    "url": link
+                })
 
-            })
+            if len(results) >= limit:
+                break
 
         return results
 
     except Exception as error:
 
-        save_error(
-            "Arama hatası: "
-            + str(error)
+        log_error(
+            error,
+            "internet_search"
         )
 
         return []
 
 
-# =========================================================
-# RESEARCH
-# =========================================================
+# ============================================================
+# ARAŞTIRMA
+# ============================================================
 
-def build_research_context(query):
+def research_topic(topic):
 
     results = internet_search(
-        query,
-        8
+        topic,
+        limit=8
     )
 
     if not results:
+        return {
+            "success": False,
+            "message": "Araştırma sonucu bulunamadı.",
+            "results": []
+        }
 
-        return (
-            "Araştırma sonucu bulunamadı."
-        )
-
-    lines = [
-        "İnternet araştırma sonuçları:"
-    ]
-
-    for index, result in enumerate(
-        results,
-        1
-    ):
-
-        lines.append(
-            f"{index}. "
-            f"{result['title']} - "
-            f"{result['url']}"
-        )
-
-    return "\n".join(
-        lines
-    )
+    return {
+        "success": True,
+        "results": results
+    }
 
 
-# =========================================================
-# PRESENTATION OUTLINE
-# =========================================================
+# ============================================================
+# SUNUM JSON ÜRET
+# ============================================================
 
-def generate_presentation_outline(
-    topic,
-    slide_count
-):
-
-    slide_count = max(
-        4,
-        min(
-            int(slide_count),
-            30
-        )
-    )
+def generate_presentation_outline(topic):
 
     prompt = f"""
-Profesyonel bir eğitim sunumu hazırla.
+Aşağıdaki konu için profesyonel bir eğitim sunumu hazırla:
 
-Konu:
+KONU:
 {topic}
 
-Slayt sayısı:
-{slide_count}
-
-SADECE JSON döndür.
+Sadece geçerli JSON döndür.
 
 Format:
 
 {{
   "title": "Sunum başlığı",
-  "subtitle": "Alt başlık",
+  "subtitle": "Kısa açıklama",
   "slides": [
     {{
       "title": "Slayt başlığı",
       "bullets": [
-        "Kısa madde",
-        "Kısa madde",
-        "Kısa madde"
+        "Madde 1",
+        "Madde 2",
+        "Madde 3"
       ],
-      "visual_query": "Gerçek görsel arama ifadesi",
-      "teacher_note": "Öğretmen notu"
+      "note": "Öğretmen notu",
+      "visual_query": "Görsel arama kelimeleri"
     }}
   ]
 }}
 
-Kurallar:
+5 ile 8 arasında slayt oluştur.
 
-- Türkçe karakterleri doğru kullan.
-- Her slaytta 3-5 madde olsun.
-- Maddeler kısa olsun.
-- Her slaytta visual_query mutlaka olsun.
-- visual_query internette aranabilecek gerçek bir ifade olsun.
-- Öncelikle gerçek fotoğraf öner.
-- Fotoğraf bulunamazsa diyagram veya şema öner.
-- Son slayt sonuç/değerlendirme olsun.
-- Öğretmen notları kısa olsun.
+Bilgiler doğru ve öğretici olsun.
+
+Türkçe karakterleri doğru kullan.
 """
 
-    messages = [
-
-        {
-            "role": "system",
-            "content": (
-                "Sen profesyonel akademik "
-                "sunum hazırlayan bir asistansın. "
-                "Yalnızca geçerli JSON döndür."
-            )
-        },
-
-        {
-            "role": "user",
-            "content": prompt
-        }
-
-    ]
-
-    raw = ask_ai(
-        messages,
-        temperature=0.2,
-        max_tokens=7000
+    result = ask_ai(
+        prompt,
+        username="karahan",
+        mode="presentation"
     )
-
-    raw = raw.strip()
-
-    if raw.startswith("```"):
-
-        raw = re.sub(
-            r"^```json",
-            "",
-            raw,
-            flags=re.I
-        )
-
-        raw = re.sub(
-            r"^```",
-            "",
-            raw
-        )
-
-        raw = re.sub(
-            r"```$",
-            "",
-            raw
-        )
-
-    raw = raw.strip()
 
     try:
 
-        data = json.loads(
-            raw
+        result = result.strip()
+
+        result = re.sub(
+            r"^```json",
+            "",
+            result,
+            flags=re.I
         )
 
-        if not isinstance(
-            data.get("slides"),
-            list
-        ):
+        result = re.sub(
+            r"^```",
+            "",
+            result
+        )
 
-            raise ValueError(
-                "slides listesi bulunamadı."
-            )
+        result = re.sub(
+            r"```$",
+            "",
+            result
+        )
 
-        return data
+        data = json.loads(
+            result.strip()
+        )
+
+        if "slides" in data:
+
+            return data
 
     except Exception as error:
 
-        save_error(
-            "Sunum JSON hatası: "
-            + str(error)
+        print(
+            "Sunum JSON ayrıştırma hatası:",
+            error
         )
 
-        return {
-
-            "title": topic,
-
-            "subtitle": (
-                "K.A.R.V.I.S. - KARAHAN INC."
-            ),
-
-            "slides": [
-
-                {
-                    "title": "Giriş",
-
-                    "bullets": [
-                        topic + " nedir?",
-                        "Temel özellikleri",
-                        "Konunun önemi"
-                    ],
-
-                    "visual_query": topic,
-
-                    "teacher_note": (
-                        "Konunun temel tanımını açıklayın."
-                    )
-                },
-
-                {
-                    "title": "Temel Kavramlar",
-
-                    "bullets": [
-                        "Temel kavramlar",
-                        "Önemli unsurlar",
-                        "Uygulama alanları"
-                    ],
-
-                    "visual_query": topic,
-
-                    "teacher_note": (
-                        "Temel kavramları örneklerle açıklayın."
-                    )
-                },
-
-                {
-                    "title": "Sonuç",
-
-                    "bullets": [
-                        "Ana noktaların özeti",
-                        "Konunun önemi",
-                        "Genel değerlendirme"
-                    ],
-
-                    "visual_query": topic,
-
-                    "teacher_note": (
-                        "Sunumun ana mesajını vurgulayın."
-                    )
-                }
-
-            ]
-        }
+    return {
+        "title": topic,
+        "subtitle": "K.A.R.V.I.S. tarafından hazırlanan sunum",
+        "slides": [
+            {
+                "title": "Giriş",
+                "bullets": [
+                    topic,
+                    "Temel kavramlar",
+                    "Genel bakış"
+                ],
+                "note": "Konuya giriş yapınız.",
+                "visual_query": topic
+            },
+            {
+                "title": "Temel Bilgiler",
+                "bullets": [
+                    "Temel özellikler",
+                    "Önemli noktalar",
+                    "Uygulama alanları"
+                ],
+                "note": "Önemli kavramları açıklayınız.",
+                "visual_query": topic
+            },
+            {
+                "title": "Sonuç",
+                "bullets": [
+                    "Konunun önemi",
+                    "Temel çıkarımlar",
+                    "Genel değerlendirme"
+                ],
+                "note": "Öğrencilerle kısa değerlendirme yapınız.",
+                "visual_query": topic
+            }
+        ]
+    }
 
 
-# =========================================================
-# WIKIMEDIA IMAGE
-# =========================================================
+# ============================================================
+# GÖRSEL İNDİRME
+# ============================================================
 
-def download_wikimedia_visual(
-    query,
-    output_path
-):
+def clean_filename(text):
+
+    text = re.sub(
+        r"[^a-zA-Z0-9çÇğĞıİöÖşŞüÜ_-]+",
+        "_",
+        text
+    )
+
+    return text[:80]
+
+
+def download_image(url, filename):
+
+    try:
+
+        destination = FILES_DIR / filename
+
+        response = requests.get(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            },
+            timeout=20
+        )
+
+        if response.status_code != 200:
+            return None
+
+        content_type = response.headers.get(
+            "content-type",
+            ""
+        ).lower()
+
+        if (
+            "image" not in content_type
+            and not url.lower().endswith(
+                (".jpg", ".jpeg", ".png", ".webp")
+            )
+        ):
+            return None
+
+        if len(response.content) < 1000:
+            return None
+
+        destination.write_bytes(
+            response.content
+        )
+
+        return destination
+
+    except Exception as error:
+
+        print(
+            "Görsel indirme hatası:",
+            error
+        )
+
+        return None
+
+
+# ============================================================
+# WIKIMEDIA GÖRSEL
+# ============================================================
+
+def download_wikimedia_visual(query):
 
     try:
 
@@ -1035,122 +1031,74 @@ def download_wikimedia_visual(
             "https://commons.wikimedia.org/w/api.php"
         )
 
-        headers = {
-            "User-Agent": (
-                "KARVIS-Karahan-Inc/1.0"
-            )
-        }
-
         params = {
-
             "action": "query",
-
             "generator": "search",
-
             "gsrsearch": query,
-
             "gsrnamespace": 6,
-
-            "gsrlimit": 20,
-
+            "gsrlimit": 5,
             "prop": "imageinfo",
-
             "iiprop": "url",
-
-            "iiurlwidth": 1400,
-
             "format": "json"
         }
 
         response = requests.get(
             api_url,
             params=params,
-            headers=headers,
-            timeout=20
+            headers={
+                "User-Agent": "KARVIS/24.0"
+            },
+            timeout=15
         )
 
-        response.raise_for_status()
+        if response.status_code != 200:
+            return None
 
         data = response.json()
 
         pages = (
-            data
-            .get("query", {})
+            data.get("query", {})
             .get("pages", {})
         )
 
         for page in pages.values():
 
-            image_info = page.get(
+            imageinfo = page.get(
                 "imageinfo",
                 []
             )
 
-            if not image_info:
+            if not imageinfo:
                 continue
 
-            info = image_info[0]
+            url = imageinfo[0].get("url")
 
-            image_url = (
-                info.get("thumburl")
-                or
-                info.get("url")
+            if not url:
+                continue
+
+            extension = ".jpg"
+
+            lower_url = url.lower()
+
+            if ".png" in lower_url:
+                extension = ".png"
+
+            elif ".webp" in lower_url:
+                extension = ".webp"
+
+            filename = (
+                "visual_"
+                + uuid.uuid4().hex
+                + extension
             )
 
-            if not image_url:
-                continue
+            result = download_image(
+                url,
+                filename
+            )
 
-            try:
-
-                image_response = requests.get(
-                    image_url,
-                    headers=headers,
-                    timeout=25
-                )
-
-                image_response.raise_for_status()
-
-                content_type = (
-                    image_response
-                    .headers
-                    .get(
-                        "content-type",
-                        ""
-                    )
-                    .lower()
-                )
-
-                if not content_type.startswith(
-                    "image/"
-                ):
-                    continue
-
-                content = image_response.content
-
-                if len(content) < 5000:
-                    continue
-
-                output_path.parent.mkdir(
-                    parents=True,
-                    exist_ok=True
-                )
-
-                with open(
-                    output_path,
-                    "wb"
-                ) as file:
-
-                    file.write(
-                        content
-                    )
-
-                return output_path
-
-            except Exception:
-
-                continue
-
-        return None
+            if result:
+                return result
 
     except Exception as error:
 
@@ -1159,111 +1107,62 @@ def download_wikimedia_visual(
             error
         )
 
-        return None
+    return None
 
 
-# =========================================================
-# OPENVERSE IMAGE
-# =========================================================
+# ============================================================
+# OPENVERSE GÖRSEL
+# ============================================================
 
-def download_openverse_visual(
-    query,
-    output_path
-):
+def download_openverse_visual(query):
 
     try:
 
-        url = (
-            "https://api.openverse.org/v1/images/"
-        )
+        url = "https://api.openverse.org/v1/images/"
 
         response = requests.get(
             url,
             params={
                 "q": query,
-                "page_size": 10
+                "page_size": 5
             },
             headers={
-                "User-Agent":
-                    "KARVIS-Karahan-Inc/1.0"
+                "User-Agent": "KARVIS/24.0"
             },
-            timeout=20
+            timeout=15
         )
 
-        response.raise_for_status()
+        if response.status_code != 200:
+            return None
 
-        results = (
-            response
-            .json()
-            .get(
-                "results",
-                []
-            )
-        )
+        data = response.json()
 
-        for item in results:
+        for item in data.get(
+            "results",
+            []
+        ):
 
             image_url = (
                 item.get("thumbnail")
-                or
-                item.get("url")
+                or item.get("url")
             )
 
             if not image_url:
                 continue
 
-            try:
+            filename = (
+                "visual_"
+                + uuid.uuid4().hex
+                + ".jpg"
+            )
 
-                image_response = requests.get(
-                    image_url,
-                    timeout=20,
-                    headers={
-                        "User-Agent":
-                            "KARVIS-Karahan-Inc/1.0"
-                    }
-                )
+            result = download_image(
+                image_url,
+                filename
+            )
 
-                image_response.raise_for_status()
-
-                content_type = (
-                    image_response
-                    .headers
-                    .get(
-                        "content-type",
-                        ""
-                    )
-                    .lower()
-                )
-
-                if not content_type.startswith(
-                    "image/"
-                ):
-                    continue
-
-                content = image_response.content
-
-                if len(content) < 5000:
-                    continue
-
-                output_path.parent.mkdir(
-                    parents=True,
-                    exist_ok=True
-                )
-
-                with open(
-                    output_path,
-                    "wb"
-                ) as file:
-
-                    file.write(content)
-
-                return output_path
-
-            except Exception:
-
-                continue
-
-        return None
+            if result:
+                return result
 
     except Exception as error:
 
@@ -1272,121 +1171,120 @@ def download_openverse_visual(
             error
         )
 
-        return None
+    return None
 
 
-# =========================================================
-# GET IMAGE
-# =========================================================
+# ============================================================
+# GÖRSEL BUL
+# ============================================================
 
-def get_slide_image(
-    query,
-    slide_number
-):
+def get_slide_image(query):
 
     if not query:
         return None
 
-    filename = (
-        "slide_"
-        + str(slide_number)
-        + "_"
-        + uuid.uuid4().hex[:8]
-        + ".jpg"
-    )
-
-    output_path = (
-        GENERATED_DIR
-        / filename
+    print(
+        "Görsel aranıyor:",
+        query
     )
 
     image = download_wikimedia_visual(
-        query,
-        output_path
+        query
     )
 
     if image:
+        print(
+            "Wikimedia görseli bulundu."
+        )
+
         return image
 
     image = download_openverse_visual(
-        query,
-        output_path
+        query
     )
 
     if image:
+        print(
+            "Openverse görseli bulundu."
+        )
+
         return image
+
+    print(
+        "Uygun görsel bulunamadı."
+    )
 
     return None
 
 
-# =========================================================
-# PDF TEXT
-# =========================================================
+# ============================================================
+# PDF METİN SARMA
+# ============================================================
 
 def draw_wrapped_text(
     pdf,
     text,
     x,
     y,
-    max_width,
-    font_name,
-    font_size,
-    leading=None
+    width,
+    font=REGULAR_FONT,
+    size=18,
+    leading=24
 ):
 
-    if leading is None:
-        leading = font_size + 5
-
     pdf.setFont(
-        font_name,
-        font_size
+        font,
+        size
     )
 
-    chars_per_line = max(
-        20,
-        int(
-            max_width /
-            (font_size * 0.52)
-        )
-    )
+    words = str(text).split()
+
+    line = ""
 
     lines = []
 
-    for paragraph in str(text).split("\n"):
+    for word in words:
 
-        if not paragraph:
+        test = (
+            line + " " + word
+        ).strip()
 
-            lines.append("")
+        if pdf.stringWidth(
+            test,
+            font,
+            size
+        ) <= width:
 
-            continue
+            line = test
 
-        wrapped = textwrap.wrap(
-            paragraph,
-            width=chars_per_line,
-            break_long_words=False,
-            break_on_hyphens=False
-        )
+        else:
 
-        lines.extend(
-            wrapped
-        )
+            if line:
+                lines.append(line)
 
-    for line in lines:
+            line = word
+
+    if line:
+        lines.append(line)
+
+    current_y = y
+
+    for item in lines:
 
         pdf.drawString(
             x,
-            y,
-            line
+            current_y,
+            item
         )
 
-        y -= leading
+        current_y -= leading
 
-    return y
+    return current_y
 
 
-# =========================================================
-# PDF BULLETS
-# =========================================================
+# ============================================================
+# PDF MADDELER
+# ============================================================
 
 def draw_bullets(
     pdf,
@@ -1396,38 +1294,31 @@ def draw_bullets(
     width
 ):
 
+    current_y = y
+
     for bullet in bullets:
 
-        pdf.setFont(
-            REGULAR_FONT,
-            15
-        )
+        text = str(bullet)
 
-        pdf.drawString(
-            x,
-            y,
-            "•"
-        )
-
-        y = draw_wrapped_text(
+        current_y = draw_wrapped_text(
             pdf,
-            bullet,
-            x + 20,
-            y,
-            width - 20,
-            REGULAR_FONT,
-            15,
-            22
+            "• " + text,
+            x,
+            current_y,
+            width,
+            font=REGULAR_FONT,
+            size=17,
+            leading=24
         )
 
-        y -= 8
+        current_y -= 8
 
-    return y
+    return current_y
 
 
-# =========================================================
-# FALLBACK VISUAL
-# =========================================================
+# ============================================================
+# FALLBACK GÖRSEL
+# ============================================================
 
 def draw_fallback_visual(
     pdf,
@@ -1438,81 +1329,64 @@ def draw_fallback_visual(
     title
 ):
 
-    pdf.rect(
+    pdf.roundRect(
         x,
         y,
         width,
-        height
+        height,
+        18,
+        stroke=1,
+        fill=0
     )
 
     pdf.setFont(
         BOLD_FONT,
-        16
+        22
     )
 
     pdf.drawCentredString(
         x + width / 2,
-        y + height - 35,
+        y + height / 2 + 15,
+        "K.A.R.V.I.S."
+    )
+
+    pdf.setFont(
+        REGULAR_FONT,
+        13
+    )
+
+    pdf.drawCentredString(
+        x + width / 2,
+        y + height / 2 - 10,
         "Kavramsal Görsel"
     )
 
-    box_width = width * 0.70
-
-    box_height = 60
-
-    box_x = (
-        x
-        + (width - box_width) / 2
+    pdf.setFont(
+        REGULAR_FONT,
+        10
     )
 
-    box_y = (
-        y
-        + height / 2
-        - box_height / 2
+    wrapped = textwrap.wrap(
+        str(title),
+        width=35
     )
 
-    pdf.rect(
-        box_x,
-        box_y,
-        box_width,
-        box_height
-    )
+    yy = y + 50
 
-    short_title = str(title)
+    for line in wrapped[:3]:
 
-    if len(short_title) > 45:
-
-        short_title = (
-            short_title[:42]
-            + "..."
+        pdf.drawCentredString(
+            x + width / 2,
+            yy,
+            line
         )
 
-    pdf.setFont(
-        REGULAR_FONT,
-        12
-    )
-
-    pdf.drawCentredString(
-        x + width / 2,
-        box_y + 25,
-        short_title
-    )
-
-    pdf.setFont(
-        REGULAR_FONT,
-        9
-    )
-
-    pdf.drawCentredString(
-        x + width / 2,
-        y + 20,
-        "K.A.R.V.I.S. - KARAHAN INC."
-    )
+        yy -= 14
 
 
-# =========================================================
-# PDF IMAGE
-# =========================================================
+# ============================================================
+# GÖRSEL PDF'E ÇİZ
+# ============================================================
 
 def draw_image(
     pdf,
@@ -1535,41 +1409,36 @@ def draw_image(
             image.size
         )
 
-        if image_width <= 0:
+        if image_width <= 0 or image_height <= 0:
             return False
 
-        if image_height <= 0:
-            return False
-
-        scale = min(
+        ratio = min(
             width / image_width,
             height / image_height
         )
 
-        final_width = (
-            image_width * scale
+        draw_width = (
+            image_width * ratio
         )
 
-        final_height = (
-            image_height * scale
+        draw_height = (
+            image_height * ratio
         )
 
-        final_x = (
-            x
-            + (width - final_width) / 2
+        draw_x = (
+            x + (width - draw_width) / 2
         )
 
-        final_y = (
-            y
-            + (height - final_height) / 2
+        draw_y = (
+            y + (height - draw_height) / 2
         )
 
         pdf.drawImage(
             ImageReader(image_path),
-            final_x,
-            final_y,
-            width=final_width,
-            height=final_height,
+            draw_x,
+            draw_y,
+            width=draw_width,
+            height=draw_height,
             preserveAspectRatio=True,
             mask="auto"
         )
@@ -1579,53 +1448,30 @@ def draw_image(
     except Exception as error:
 
         print(
-            "PDF görsel hatası:",
+            "PDF görsel çizim hatası:",
             error
         )
 
         return False
 
 
-# =========================================================
-# CREATE PDF
-# =========================================================
+# ============================================================
+# SUNUM PDF OLUŞTUR
+# ============================================================
 
 def create_presentation_pdf(
-    presentation,
-    topic,
-    include_visuals=True
+    outline,
+    username="karahan"
 ):
 
-    slides = presentation.get(
-        "slides",
-        []
-    )
-
-    if not slides:
-
-        raise ValueError(
-            "Sunum slaytı oluşturulamadı."
-        )
-
-    title = presentation.get(
-        "title",
-        topic
-    )
-
-    subtitle = presentation.get(
-        "subtitle",
-        "K.A.R.V.I.S. - KARAHAN INC."
-    )
-
     filename = (
-        "sunum_"
-        + uuid.uuid4().hex[:12]
+        "KARVIS_Sunum_"
+        + uuid.uuid4().hex
         + ".pdf"
     )
 
     pdf_path = (
-        GENERATED_DIR
-        / filename
+        GENERATED_DIR / filename
     )
 
     page_width, page_height = landscape(A4)
@@ -1638,67 +1484,92 @@ def create_presentation_pdf(
         )
     )
 
-    pdf.setTitle(
-        str(title)
-    )
-
-    pdf.setAuthor(
-        "K.A.R.V.I.S. - KARAHAN INC."
-    )
-
-    # -----------------------------------------------------
+    # ========================================================
     # KAPAK
-    # -----------------------------------------------------
+    # ========================================================
+
+    pdf.setTitle(
+        str(
+            outline.get(
+                "title",
+                "K.A.R.V.I.S. Sunum"
+            )
+        )
+    )
 
     pdf.setFont(
         BOLD_FONT,
-        32
+        30
     )
 
     pdf.drawCentredString(
         page_width / 2,
-        page_height * 0.62,
-        str(title)
+        page_height - 150,
+        str(
+            outline.get(
+                "title",
+                "K.A.R.V.I.S. Sunum"
+            )
+        )
     )
 
     pdf.setFont(
         REGULAR_FONT,
-        17
+        18
     )
 
     pdf.drawCentredString(
         page_width / 2,
-        page_height * 0.52,
-        str(subtitle)
+        page_height - 190,
+        str(
+            outline.get(
+                "subtitle",
+                "K.A.R.V.I.S. - KARAHAN INC."
+            )
+        )
+    )
+
+    # Kapakta basit görsel
+    draw_fallback_visual(
+        pdf,
+        page_width / 2 - 160,
+        120,
+        320,
+        170,
+        outline.get(
+            "title",
+            ""
+        )
     )
 
     pdf.setFont(
         REGULAR_FONT,
-        10
+        11
     )
 
     pdf.drawCentredString(
         page_width / 2,
-        45,
+        55,
         "K.A.R.V.I.S. - KARAHAN INC."
     )
 
     pdf.showPage()
 
-    # -----------------------------------------------------
+    # ========================================================
     # SLAYTLAR
-    # -----------------------------------------------------
+    # ========================================================
 
-    total_slides = len(
-        slides
+    slides = outline.get(
+        "slides",
+        []
     )
 
-    for number, slide in enumerate(
+    for index, slide in enumerate(
         slides,
-        1
+        start=1
     ):
 
-        slide_title = slide.get(
+        title = slide.get(
             "title",
             "Slayt"
         )
@@ -1708,28 +1579,19 @@ def create_presentation_pdf(
             []
         )
 
-        visual_query = slide.get(
-            "visual_query",
-            slide_title
-        )
-
-        teacher_note = slide.get(
-            "teacher_note",
+        note = slide.get(
+            "note",
             ""
         )
 
-        image_path = None
+        visual_query = slide.get(
+            "visual_query",
+            title
+        )
 
-        if include_visuals:
-
-            image_path = get_slide_image(
-                visual_query,
-                number
-            )
-
-        # -------------------------------------------------
+        # ----------------------------------------------------
         # BAŞLIK
-        # -------------------------------------------------
+        # ----------------------------------------------------
 
         pdf.setFont(
             BOLD_FONT,
@@ -1737,78 +1599,64 @@ def create_presentation_pdf(
         )
 
         pdf.drawString(
-            45,
-            page_height - 55,
-            str(slide_title)
+            55,
+            page_height - 65,
+            str(title)
         )
 
-        # -------------------------------------------------
-        # İÇERİK
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # METİN ALANI
+        # ----------------------------------------------------
 
-        content_x = 50
-
-        content_y = (
-            page_height - 105
+        text_width = (
+            page_width * 0.48
         )
-
-        if image_path:
-
-            content_width = (
-                page_width * 0.46
-            )
-
-        else:
-
-            content_width = (
-                page_width * 0.50
-            )
 
         draw_bullets(
             pdf,
             bullets,
-            content_x,
-            content_y,
-            content_width
+            60,
+            page_height - 115,
+            text_width
         )
 
-        # -------------------------------------------------
+        # ----------------------------------------------------
         # GÖRSEL
-        # -------------------------------------------------
+        # ----------------------------------------------------
 
-        visual_x = (
-            page_width * 0.54
+        image_path = get_slide_image(
+            visual_query
         )
 
-        visual_y = 125
-
-        visual_width = (
-            page_width * 0.40
+        image_x = (
+            page_width * 0.55
         )
 
-        visual_height = (
-            page_height * 0.58
-        )
+        image_y = 150
+
+        image_width = 300
+
+        image_height = 220
 
         if image_path:
 
             success = draw_image(
                 pdf,
                 image_path,
-                visual_x,
-                visual_y,
-                visual_width,
-                visual_height
+                image_x,
+                image_y,
+                image_width,
+                image_height
             )
 
             if not success:
 
                 draw_fallback_visual(
                     pdf,
-                    visual_x,
-                    visual_y,
-                    visual_width,
-                    visual_height,
+                    image_x,
+                    image_y,
+                    image_width,
+                    image_height,
                     visual_query
                 )
 
@@ -1816,440 +1664,316 @@ def create_presentation_pdf(
 
             draw_fallback_visual(
                 pdf,
-                visual_x,
-                visual_y,
-                visual_width,
-                visual_height,
+                image_x,
+                image_y,
+                image_width,
+                image_height,
                 visual_query
             )
 
-        # -------------------------------------------------
+        # ----------------------------------------------------
         # ÖĞRETMEN NOTU
-        # -------------------------------------------------
+        # ----------------------------------------------------
 
-        if teacher_note:
+        if note:
 
             pdf.setFont(
                 BOLD_FONT,
-                10
+                11
             )
 
             pdf.drawString(
-                45,
-                68,
+                60,
+                95,
                 "Öğretmen Notu:"
             )
 
             draw_wrapped_text(
                 pdf,
-                teacher_note,
-                125,
-                68,
-                page_width - 170,
-                REGULAR_FONT,
-                9,
-                11
+                note,
+                145,
+                95,
+                page_width - 200,
+                font=REGULAR_FONT,
+                size=10,
+                leading=13
             )
 
-        # -------------------------------------------------
+        # ----------------------------------------------------
         # ALT BİLGİ
-        # -------------------------------------------------
+        # ----------------------------------------------------
 
         pdf.setFont(
             REGULAR_FONT,
-            8
+            9
         )
 
         pdf.drawString(
-            45,
-            25,
+            55,
+            35,
             "K.A.R.V.I.S. - KARAHAN INC."
         )
 
         pdf.drawRightString(
-            page_width - 45,
-            25,
-            f"{number} / {total_slides}"
+            page_width - 55,
+            35,
+            f"{index} / {len(slides)}"
         )
 
         pdf.showPage()
 
     pdf.save()
 
-    if not pdf_path.exists():
-
-        raise FileNotFoundError(
-            "PDF dosyası oluşturulamadı."
-        )
-
-    if pdf_path.stat().st_size < 1000:
-
-        raise ValueError(
-            "PDF dosyası boş veya bozuk."
-        )
-
     return pdf_path
 
 
-# =========================================================
-# HOME
-# =========================================================
+# ============================================================
+# ANA SAYFA
+# ============================================================
 
 @app.get("/")
 def home():
 
-    index_file = (
-        BASE_DIR
-        / "index.html"
-    )
+    index_file = BASE_DIR / "index.html"
 
     if index_file.exists():
 
         return FileResponse(
-            str(index_file)
+            str(index_file),
+            media_type="text/html"
         )
 
     return {
-
-        "app": "K.A.R.V.I.S.",
-
-        "company": "KARAHAN INC.",
-
+        "success": True,
+        "message": "K.A.R.V.I.S. backend çalışıyor.",
         "version": APP_VERSION
     }
 
 
-# =========================================================
+# ============================================================
 # HEALTH
-# =========================================================
+# ============================================================
 
 @app.get("/health")
 def health():
 
     return {
-
+        "success": True,
         "status": "online",
-
-        "app": "K.A.R.V.I.S.",
-
-        "version": APP_VERSION
+        "version": APP_VERSION,
+        "time": datetime.now().isoformat(),
+        "pdf_font": REGULAR_FONT,
+        "groq": bool(GROQ_API_KEY),
+        "openrouter": bool(OPENROUTER_API_KEY)
     }
 
 
-# =========================================================
+# ============================================================
 # VERSION
-# =========================================================
+# ============================================================
 
 @app.get("/version")
 def version():
 
     return {
-        "version": APP_VERSION
+        "version": APP_VERSION,
+        "name": "K.A.R.V.I.S. - KARAHAN INC."
     }
 
 
-# =========================================================
+# ============================================================
 # USERS
-# =========================================================
+# ============================================================
 
 @app.get("/users")
 def users():
 
-    result = []
-
-    for username, user in USERS.items():
-
-        result.append({
-
-            "username": username,
-
-            "name": user["name"],
-
-            "role": user["role"]
-
-        })
-
-    return result
+    return {
+        "success": True,
+        "users": [
+            {
+                "username": user["username"],
+                "name": user["name"],
+                "role": user["role"]
+            }
+            for user in USERS.values()
+        ]
+    }
 
 
-# =========================================================
-# LOGIN
-# =========================================================
+# ============================================================
+# PROFILE LOGIN
+# ============================================================
 
 @app.post("/profile-login")
-def profile_login(
-    request: LoginRequest
-):
+def profile_login(request: LoginRequest):
 
     username = (
         request.username
-        .lower()
         .strip()
+        .lower()
     )
 
-    user = USERS.get(
-        username
-    )
+    password = request.password
+
+    user = USERS.get(username)
 
     if not user:
 
         return JSONResponse(
-
             status_code=401,
-
             content={
-
                 "success": False,
-
-                "message":
-                    "Kullanıcı bulunamadı."
+                "message": "Kullanıcı bulunamadı."
             }
         )
 
-    password = user.get(
-        "password"
-    )
+    # Ana kullanıcı
+    if username == "karahan":
 
-    if password is not None:
+        return {
+            "success": True,
+            "user": user
+        }
 
-        if request.password != password:
+    if user.get("password") != password:
 
-            return JSONResponse(
-
-                status_code=401,
-
-                content={
-
-                    "success": False,
-
-                    "message":
-                        "Şifre hatalı."
-                }
-            )
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "message": "Şifre hatalı."
+            }
+        )
 
     return {
-
         "success": True,
-
-        "user": {
-
-            "username": username,
-
-            "name": user["name"],
-
-            "role": user["role"],
-
-            "personality":
-                user["personality"]
-        }
+        "user": user
     }
 
 
-# =========================================================
-# ACADEMIC MODES
-# =========================================================
+# ============================================================
+# AKADEMİK MODLAR
+# ============================================================
 
 @app.get("/academic-modes")
 def academic_modes():
 
     return {
+        "success": True,
         "modes": ACADEMIC_MODES
     }
 
 
-# =========================================================
+# ============================================================
 # CHAT
-# =========================================================
+# ============================================================
 
 @app.post("/chat")
-def chat(
-    request: ChatRequest
-):
+def chat(request: ChatRequest):
 
-    username = (
-        request.username
-        .lower()
-        .strip()
-    )
+    try:
 
-    mode = (
-        request.mode
-        or
-        "normal"
-    )
+        answer = ask_ai(
+            request.message,
+            request.username,
+            request.mode,
+            request.history
+        )
 
-    memory = get_memory()
-
-    user_memory = memory.get(
-        username,
-        []
-    )
-
-    messages = [
-
-        {
-            "role": "system",
-
-            "content":
-                build_system_prompt(
-                    username,
-                    mode
-                )
+        return {
+            "success": True,
+            "answer": answer,
+            "message": answer,
+            "username": request.username,
+            "mode": request.mode
         }
 
-    ]
+    except Exception as error:
 
-    for item in user_memory[-10:]:
+        log_error(
+            error,
+            "/chat"
+        )
 
-        messages.append({
-
-            "role":
-                item.get(
-                    "role",
-                    "user"
-                ),
-
-            "content":
-                item.get(
-                    "content",
-                    ""
-                )
-        })
-
-    messages.append({
-
-        "role": "user",
-
-        "content":
-            request.message
-    })
-
-    answer = ask_ai(
-
-        messages,
-
-        temperature=0.45,
-
-        max_tokens=3000
-    )
-
-    if username not in memory:
-
-        memory[username] = []
-
-    memory[username].append({
-
-        "role": "user",
-
-        "content":
-            request.message,
-
-        "time":
-            datetime.now().isoformat()
-    })
-
-    memory[username].append({
-
-        "role": "assistant",
-
-        "content":
-            answer,
-
-        "time":
-            datetime.now().isoformat()
-    })
-
-    memory[username] = (
-        memory[username][-100:]
-    )
-
-    save_memory(
-        memory
-    )
-
-    return {
-
-        "success": True,
-
-        "answer": answer,
-
-        "username": username,
-
-        "mode": mode
-    }
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": "K.A.R.V.I.S. hata verdi.",
+                "error": str(error)
+            }
+        )
 
 
-# =========================================================
+# ============================================================
 # RESEARCH
-# =========================================================
+# ============================================================
 
 @app.post("/research")
-def research(
-    request: ResearchRequest
-):
+def research(request: ResearchRequest):
 
-    context = build_research_context(
-        request.query
-    )
+    try:
 
-    messages = [
+        results = research_topic(
+            request.topic
+        )
 
-        {
-            "role": "system",
+        if not results.get("success"):
 
-            "content":
-                build_system_prompt(
-                    request.username,
-                    "research"
-                )
-        },
+            return results
 
-        {
-            "role": "user",
+        source_text = "\n".join(
+            [
+                f"{item['title']} - {item['url']}"
+                for item in results["results"]
+            ]
+        )
 
-            "content": (
-                "Araştırma konusu:\n"
-                + request.query
-                + "\n\n"
-                + context
-                + "\n\n"
-                + "Bu bilgilerle düzenli bir "
-                  "araştırma özeti hazırla."
-            )
+        analysis_prompt = f"""
+Şu konu hakkında araştırma yap:
+
+{request.topic}
+
+Bulunan kaynaklar:
+
+{source_text}
+
+Türkçe, anlaşılır ve düzenli bir araştırma özeti hazırla.
+"""
+
+        summary = ask_ai(
+            analysis_prompt,
+            request.username,
+            "research"
+        )
+
+        return {
+            "success": True,
+            "topic": request.topic,
+            "summary": summary,
+            "results": results["results"]
         }
 
-    ]
+    except Exception as error:
 
-    answer = ask_ai(
+        log_error(
+            error,
+            "/research"
+        )
 
-        messages,
-
-        temperature=0.25,
-
-        max_tokens=5000
-    )
-
-    return {
-
-        "success": True,
-
-        "query":
-            request.query,
-
-        "answer":
-            answer,
-
-        "sources":
-            internet_search(
-                request.query,
-                8
-            )
-    }
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": str(error)
+            }
+        )
 
 
-# =========================================================
+# ============================================================
 # PRESENTATION
-# =========================================================
+# ============================================================
 
 @app.post("/presentation")
 def presentation(
@@ -2261,48 +1985,25 @@ def presentation(
         if not request.topic.strip():
 
             return JSONResponse(
-
                 status_code=400,
-
                 content={
-
                     "success": False,
-
-                    "message":
-                        "Sunum konusu boş bırakılamaz."
+                    "message": "Sunum konusu boş bırakılamaz."
                 }
             )
 
-        slides_count = max(
-
-            4,
-
-            min(
-                int(
-                    request.slide_count
-                ),
-                30
-            )
+        print(
+            "Sunum hazırlanıyor:",
+            request.topic
         )
 
-        outline = (
-            generate_presentation_outline(
-
-                request.topic,
-
-                slides_count
-            )
+        outline = generate_presentation_outline(
+            request.topic
         )
 
-        pdf_path = (
-            create_presentation_pdf(
-
-                outline,
-
-                request.topic,
-
-                request.include_visuals
-            )
+        pdf_path = create_presentation_pdf(
+            outline,
+            request.username
         )
 
         filename = pdf_path.name
@@ -2313,288 +2014,190 @@ def presentation(
         )
 
         return {
-
             "success": True,
-
-            "title":
+            "title": outline.get(
+                "title",
+                request.topic
+            ),
+            "slides": len(
                 outline.get(
-                    "title",
-                    request.topic
-                ),
-
-            "slides":
-                len(
-                    outline.get(
-                        "slides",
-                        []
-                    )
-                ),
-
-            "file_url":
-                file_url,
-
-            "download_url":
-                file_url
+                    "slides",
+                    []
+                )
+            ),
+            "file_url": file_url,
+            "download_url": file_url
         }
 
     except Exception as error:
+
+        log_error(
+            error,
+            "/presentation"
+        )
 
         print(
             "SUNUM HATASI:",
             error
         )
 
-        save_error(
-
-            "Sunum oluşturma hatası: "
-            + str(error)
-        )
-
         return JSONResponse(
-
             status_code=500,
-
             content={
-
                 "success": False,
-
-                "message": (
-                    "Sunum oluşturulurken "
-                    "bir hata oluştu: "
-                    + str(error)
-                )
+                "message": "Sunum oluşturulamadı.",
+                "error": str(error)
             }
         )
 
 
-# =========================================================
-# GENERATED PDF
-# =========================================================
+# ============================================================
+# GENERATED PDF DOSYALARI
+# ============================================================
 
 @app.get("/generated/{filename}")
-def generated_file(
-    filename: str
-):
+def generated_file(filename: str):
 
-    safe_name = os.path.basename(
-        filename
-    )
+    try:
 
-    if not safe_name.lower().endswith(
-        ".pdf"
-    ):
+        safe_name = os.path.basename(
+            filename
+        )
+
+        if not safe_name.lower().endswith(
+            ".pdf"
+        ):
+
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "message": "Geçersiz dosya türü."
+                }
+            )
+
+        file_path = (
+            GENERATED_DIR / safe_name
+        )
+
+        if not file_path.exists():
+
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "success": False,
+                    "message": "Dosya bulunamadı."
+                }
+            )
+
+        return FileResponse(
+            str(file_path),
+            media_type="application/pdf",
+            filename=safe_name
+        )
+
+    except Exception as error:
+
+        log_error(
+            error,
+            "/generated"
+        )
 
         return JSONResponse(
-
-            status_code=400,
-
+            status_code=500,
             content={
-
                 "success": False,
-
-                "message":
-                    "Geçersiz dosya türü."
+                "message": str(error)
             }
         )
 
-    file_path = (
-        GENERATED_DIR
-        / safe_name
-    )
 
-    if not file_path.exists():
-
-        return JSONResponse(
-
-            status_code=404,
-
-            content={
-
-                "success": False,
-
-                "message":
-                    "Dosya bulunamadı."
-            }
-        )
-
-    return FileResponse(
-
-        str(file_path),
-
-        media_type="application/pdf",
-
-        filename=safe_name
-    )
-
-
-# =========================================================
+# ============================================================
 # MEMORY
-# =========================================================
+# ============================================================
 
 @app.get("/memory")
-def memory(
-    username: str = "karahan"
-):
-
-    data = get_memory()
+def get_memory():
 
     return {
-
-        "username":
-            username,
-
-        "memory":
-            data.get(
-                username,
-                []
-            )
-    }
-
-
-@app.delete("/memory")
-def delete_memory(
-    username: str = "karahan"
-):
-
-    data = get_memory()
-
-    if username in data:
-
-        del data[username]
-
-    save_memory(
-        data
-    )
-
-    return {
-
         "success": True,
-
-        "message":
-            "Hafıza temizlendi."
+        "memory": MEMORY
     }
 
 
-# =========================================================
+# ============================================================
 # NEW CHAT
-# =========================================================
+# ============================================================
 
 @app.post("/new-chat")
-def new_chat(
-    username: str = "karahan"
-):
-
-    data = get_memory()
-
-    data[username] = []
-
-    save_memory(
-        data
-    )
+def new_chat():
 
     return {
-
         "success": True,
-
-        "message":
-            "Yeni sohbet başlatıldı."
+        "message": "Yeni sohbet başlatıldı."
     }
 
 
-# =========================================================
+# ============================================================
 # ERRORS
-# =========================================================
+# ============================================================
 
 @app.get("/errors")
-def errors():
+def get_errors():
 
     return {
-
-        "errors":
-            get_errors()
-    }
-
-
-@app.delete("/errors")
-def delete_errors():
-
-    save_json(
-        ERROR_FILE,
-        []
-    )
-
-    return {
-
         "success": True,
-
-        "message":
-            "Hata kayıtları temizlendi."
+        "errors": ERRORS[-100:]
     }
 
 
-# =========================================================
+# ============================================================
 # STARTUP
-# =========================================================
+# ============================================================
 
 @app.on_event("startup")
 def startup():
 
-    print("=" * 55)
+    print("")
+    print("======================================")
+    print(" K.A.R.V.I.S. - KARAHAN INC.")
+    print(" Backend başlatılıyor...")
+    print("======================================")
 
     print(
-        "K.A.R.V.I.S. - KARAHAN INC."
-    )
-
-    print(
-        "Version:",
+        "Versiyon:",
         APP_VERSION
     )
 
     print(
-        "Server hazır."
+        "Sunucu: AKTİF"
     )
 
-    print("=" * 55)
+    print(
+        "Groq:",
+        "AKTİF" if GROQ_API_KEY else "YOK"
+    )
 
-    if REGULAR_FONT == "DejaVu":
+    print(
+        "OpenRouter:",
+        "AKTİF" if OPENROUTER_API_KEY else "YOK"
+    )
 
-        print(
-            "Türkçe PDF fontu: AKTİF"
-        )
-
-    else:
-
-        print(
-            "UYARI: DejaVuSans.ttf bulunamadı."
-        )
-
-    if GROQ_API_KEY:
-
-        print(
-            "Groq API: AKTİF"
-        )
-
-    else:
-
-        print(
-            "Groq API: KAPALI"
-        )
-
-    if OPENROUTER_API_KEY:
-
-        print(
-            "OpenRouter fallback: AKTİF"
-        )
-
-    else:
-
-        print(
-            "OpenRouter fallback: KAPALI"
-        )
+    print(
+        "PDF Font:",
+        REGULAR_FONT
+    )
 
     print(
         "PDF klasörü:",
-        str(GENERATED_DIR)
+        GENERATED_DIR
     )
 
-    print("=" * 55)
+    print(
+        "Görsel sistemi: AKTİF"
+    )
+
+    print("======================================")
+    print(" K.A.R.V.I.S. HAZIR")
+    print("======================================")
+    print("")
