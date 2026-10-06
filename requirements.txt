@@ -2,7 +2,4 @@ fastapi
 uvicorn
 openai
 pydantic
-requests
-beautifulsoup4
 reportlab
-Pillow
