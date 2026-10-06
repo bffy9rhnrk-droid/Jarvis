@@ -2310,10 +2310,9 @@ def get_google_candidates(
     query
 ):
 
-    results =
-        get_google_candidates_api(
-            query
-        )
+    results = get_google_candidates_api(
+        query
+    )
 
     if results:
 
@@ -4251,7 +4250,7 @@ def presentation_worker(
                 "visual_query",
                 f"{topic} conclusion"
             )
-        ]
+        )
 
         images = {}
 
