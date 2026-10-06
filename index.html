@@ -304,9 +304,6 @@ button {
         );
 }
 
-
-/* Dış enerji halkası */
-
 .jarvis-orb::before {
     content: "";
 
@@ -325,9 +322,6 @@ button {
         inset 0 0 35px rgba(0,255,255,.04);
 }
 
-
-/* Küçük HUD çizgileri */
-
 .jarvis-orb::after {
     content: "";
 
@@ -344,7 +338,6 @@ button {
     animation:
         spin 28s linear infinite;
 }
-
 
 .ring {
     position: absolute;
@@ -394,9 +387,6 @@ button {
         0 0 50px rgba(0,255,255,.05),
         inset 0 0 25px rgba(0,255,255,.12);
 }
-
-
-/* Merkez K */
 
 .core {
     position: relative;
@@ -499,6 +489,40 @@ button {
 
 
 /* =========================================================
+   AKTİF MOD GÖSTERGESİ
+========================================================= */
+
+.active-mode {
+    display: none;
+
+    margin-top: 12px;
+
+    padding: 7px 13px;
+
+    border:
+        1px solid rgba(0,255,255,.18);
+
+    border-radius: 20px;
+
+    background:
+        rgba(0,255,255,.035);
+
+    color: #78ffff;
+
+    font-size: 9px;
+
+    letter-spacing: 1.5px;
+
+    box-shadow:
+        0 0 18px rgba(0,255,255,.045);
+}
+
+.active-mode.show {
+    display: block;
+}
+
+
+/* =========================================================
    CHAT
 ========================================================= */
 
@@ -562,6 +586,37 @@ button {
         1px solid rgba(255,255,255,.10);
 
     color: white;
+}
+
+
+/* =========================================================
+   ARAŞTIRMA SONUÇLARI
+========================================================= */
+
+.research-card {
+    width: min(720px, 92%);
+
+    margin-top: 12px;
+
+    padding: 14px;
+
+    border:
+        1px solid rgba(0,255,255,.14);
+
+    border-radius: 14px;
+
+    background:
+        rgba(0,255,255,.025);
+
+    color: #9ddfe3;
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+.research-card strong {
+    color: #00ffff;
 }
 
 
@@ -704,6 +759,8 @@ button {
 
     transition:
         left .25s ease;
+
+    overflow-y: auto;
 }
 
 .sidebar.open {
@@ -733,6 +790,59 @@ button {
     color: #00ffff;
 
     font-size: 24px;
+}
+
+.sidebar-profile {
+    display: none;
+
+    margin-top: -10px;
+    margin-bottom: 17px;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid rgba(0,255,255,.12);
+
+    border-radius: 10px;
+
+    background:
+        rgba(0,255,255,.025);
+
+    color: #7fa9ad;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+}
+
+.sidebar-profile.show {
+    display: block;
+}
+
+.sidebar-profile strong {
+    display: block;
+
+    color: #00ffff;
+
+    font-size: 12px;
+
+    margin-bottom: 3px;
+}
+
+.menu-section-title {
+    display: none;
+
+    margin: 18px 4px 9px;
+
+    color: #4f858a;
+
+    font-size: 8px;
+
+    letter-spacing: 2px;
+}
+
+.menu-section-title.show {
+    display: block;
 }
 
 .menu-item {
@@ -766,6 +876,31 @@ button {
 
     background:
         rgba(0,255,255,.055);
+}
+
+.academic-menu {
+    display: none;
+}
+
+.academic-menu.show {
+    display: block;
+}
+
+.academic-menu .menu-item {
+    border-color:
+        rgba(0,220,255,.16);
+}
+
+.academic-menu .menu-item.active {
+    border-color:
+        rgba(0,255,255,.60);
+
+    background:
+        rgba(0,255,255,.08);
+
+    box-shadow:
+        inset 0 0 15px rgba(0,255,255,.035),
+        0 0 15px rgba(0,255,255,.035);
 }
 
 
@@ -1003,6 +1138,34 @@ body.sinem-mode .send-button {
 
 
 /* =========================================================
+   ÖĞRETMEN MODU
+========================================================= */
+
+body.teacher-mode .core,
+body.teacher-mode .ring {
+    border-color: #36dfff;
+}
+
+body.teacher-mode .core {
+    color: #36dfff;
+
+    box-shadow:
+        0 0 28px rgba(54,223,255,.42),
+        0 0 55px rgba(54,223,255,.10);
+}
+
+body.teacher-mode .hero-title {
+    text-shadow:
+        0 0 16px rgba(54,223,255,.20);
+}
+
+body.teacher-mode .sidebar {
+    border-right-color:
+        rgba(54,223,255,.25);
+}
+
+
+/* =========================================================
    EĞLENCE MODU
 ========================================================= */
 
@@ -1033,6 +1196,7 @@ body.fun-mode .ring {
 ========================================================= */
 
 @keyframes spin {
+
     from {
         transform: rotate(0deg);
     }
@@ -1043,6 +1207,7 @@ body.fun-mode .ring {
 }
 
 @keyframes spinReverse {
+
     from {
         transform: rotate(360deg);
     }
@@ -1053,6 +1218,7 @@ body.fun-mode .ring {
 }
 
 @keyframes pulse {
+
     0%,
     100% {
         transform: scale(1);
@@ -1143,6 +1309,13 @@ KARAHAN INTELLIGENT SYSTEM
 
 
 <div
+    class="active-mode"
+    id="activeMode"
+>
+</div>
+
+
+<div
     class="chat"
     id="chat"
 >
@@ -1179,7 +1352,9 @@ KARAHAN INTELLIGENT SYSTEM
 </div>
 
 
-<!-- SIDEBAR -->
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
 
 <div
     class="sidebar"
@@ -1201,6 +1376,19 @@ K.A.R.V.I.S.
 
 </div>
 
+
+<div
+    class="sidebar-profile"
+    id="sidebarProfile"
+>
+<strong id="sidebarProfileName"></strong>
+<span id="sidebarProfileRole"></span>
+</div>
+
+
+<!-- NORMAL MENÜ -->
+
+<div id="normalMenu">
 
 <button
     class="menu-item"
@@ -1236,7 +1424,97 @@ K.A.R.V.I.S.
 </div>
 
 
-<!-- ERROR MODAL -->
+<!-- ÖĞRETMEN MENÜSÜ -->
+
+<div
+    class="menu-section-title"
+    id="academicTitle"
+>
+AKADEMİK ASİSTAN
+</div>
+
+
+<div
+    class="academic-menu"
+    id="academicMenu"
+>
+
+<button
+    class="menu-item"
+    data-mode="research"
+    onclick="selectAcademicMode('research')"
+>
+🔬 Araştırma Modu
+</button>
+
+
+<button
+    class="menu-item"
+    data-mode="academic"
+    onclick="selectAcademicMode('academic')"
+>
+📚 Akademik Mod
+</button>
+
+
+<button
+    class="menu-item"
+    data-mode="article"
+    onclick="selectAcademicMode('article')"
+>
+📝 Makale Asistanı
+</button>
+
+
+<button
+    class="menu-item"
+    data-mode="lesson"
+    onclick="selectAcademicMode('lesson')"
+>
+🎓 Ders Asistanı
+</button>
+
+
+<button
+    class="menu-item"
+    data-mode="quiz"
+    onclick="selectAcademicMode('quiz')"
+>
+🧪 Sınav / Quiz
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="newChat()"
+>
+＋ Yeni Sohbet
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="openProfile()"
+>
+◉ Profil Değiştir
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="openErrors()"
+>
+⚠ Hatalar
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     ERROR MODAL
+====================================================== -->
 
 <div
     class="modal"
@@ -1276,7 +1554,9 @@ Tüm Hataları Temizle
 </div>
 
 
-<!-- PROFILE MODAL -->
+<!-- =====================================================
+     PROFILE MODAL
+====================================================== -->
 
 <div
     class="modal"
@@ -1341,6 +1621,8 @@ const API = "";
 
 let currentUser = "karahan";
 
+let currentMode = "normal";
+
 let funMode = false;
 
 let sending = false;
@@ -1351,13 +1633,16 @@ let sending = false;
 ========================================================= */
 
 function openSidebar() {
+
     document
         .getElementById("sidebar")
         .classList
         .add("open");
 }
 
+
 function closeSidebar() {
+
     document
         .getElementById("sidebar")
         .classList
@@ -1394,6 +1679,113 @@ function addMessage(text, type) {
 
 
 /* =========================================================
+   MOD GÖSTERGESİ
+========================================================= */
+
+function updateModeIndicator() {
+
+    const indicator =
+        document.getElementById("activeMode");
+
+
+    const names = {
+
+        research:
+            "🔬 ARAŞTIRMA MODU",
+
+        academic:
+            "📚 AKADEMİK MOD",
+
+        article:
+            "📝 MAKALE ASİSTANI",
+
+        lesson:
+            "🎓 DERS ASİSTANI",
+
+        quiz:
+            "🧪 SINAV / QUIZ"
+
+    };
+
+
+    if (
+        currentUser === "ilknur" &&
+        names[currentMode]
+    ) {
+
+        indicator.textContent =
+            names[currentMode];
+
+        indicator.classList.add("show");
+
+    } else {
+
+        indicator.classList.remove("show");
+    }
+}
+
+
+/* =========================================================
+   AKADEMİK MOD SEÇ
+========================================================= */
+
+function selectAcademicMode(mode) {
+
+    if (currentUser !== "ilknur") {
+        return;
+    }
+
+
+    currentMode = mode;
+
+
+    document
+        .querySelectorAll(
+            ".academic-menu .menu-item[data-mode]"
+        )
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.mode === mode
+            );
+
+        });
+
+
+    updateModeIndicator();
+
+    closeSidebar();
+
+
+    const modeMessages = {
+
+        research:
+            "🔬 Araştırma Modu aktif. Güncel internet kaynaklarını kullanarak araştırma yapabilirim.",
+
+        academic:
+            "📚 Akademik Mod aktif. Akademik analiz, kavram, literatür ve araştırma konularında hazırım.",
+
+        article:
+            "📝 Makale Asistanı aktif. Makale hazırlama ve akademik metin çalışmalarında hazırım.",
+
+        lesson:
+            "🎓 Ders Asistanı aktif. Ders planı, konu anlatımı ve eğitim materyalleri hazırlayabilirim.",
+
+        quiz:
+            "🧪 Sınav / Quiz modu aktif. Soru, test ve cevap anahtarı hazırlayabilirim."
+
+    };
+
+
+    addMessage(
+        modeMessages[mode],
+        "jarvis"
+    );
+}
+
+
+/* =========================================================
    MESAJ GONDER
 ========================================================= */
 
@@ -1403,18 +1795,22 @@ async function sendMessage() {
         return;
     }
 
+
     const input =
         document.getElementById("messageInput");
 
     const button =
         document.getElementById("sendButton");
 
+
     const message =
         input.value.trim();
+
 
     if (!message) {
         return;
     }
+
 
     sending = true;
 
@@ -1422,7 +1818,11 @@ async function sendMessage() {
 
     input.value = "";
 
-    addMessage(message, "user");
+
+    addMessage(
+        message,
+        "user"
+    );
 
 
     let waitingMessages = [
@@ -1470,11 +1870,29 @@ async function sendMessage() {
     }
 
 
+    if (currentUser === "ilknur") {
+
+        waitingMessages = [
+
+            "Elbette Hocam, hemen araştırıyorum...",
+
+            "Tabii Hocam, konuyu inceliyorum...",
+
+            "Hocam, bilgileri değerlendiriyorum...",
+
+            "Bir dakika Hocam, kaynakları kontrol ediyorum..."
+
+        ];
+    }
+
+
     const waiting =
         document.createElement("div");
 
+
     waiting.className =
         "message jarvis";
+
 
     waiting.textContent =
         waitingMessages[
@@ -1483,6 +1901,7 @@ async function sendMessage() {
                 waitingMessages.length
             )
         ];
+
 
     document
         .getElementById("chat")
@@ -1503,8 +1922,16 @@ async function sendMessage() {
                     },
 
                     body: JSON.stringify({
+
                         message: message,
-                        username: currentUser
+
+                        username: currentUser,
+
+                        mode:
+                            currentUser === "ilknur"
+                                ? currentMode
+                                : "normal"
+
                     })
                 }
             );
@@ -1553,15 +1980,20 @@ async function sendMessage() {
 
 
             addMessage(
+
                 "⚠️ K.A.R.V.I.S. HATA\n\n" +
+
                 errorText +
+
                 (
                     errorType
                         ? "\n\nHata tipi: " +
                           errorType
                         : ""
                 ) +
+
                 "\n\nHata kaydı Hatalar bölümüne kaydedildi.",
+
                 "jarvis"
             );
 
@@ -1585,12 +2017,18 @@ async function sendMessage() {
 
         waiting.remove();
 
+
         addMessage(
+
             "⚠️ K.A.R.V.I.S.\n\n" +
+
             "Sunucuya bağlanırken bir sorun oluştu.\n\n" +
+
             error.message,
+
             "jarvis"
         );
+
 
     } finally {
 
@@ -1634,15 +2072,19 @@ async function newChat() {
 
     closeSidebar();
 
+
     try {
 
         await fetch(
+
             API +
             "/new-chat?username=" +
             encodeURIComponent(currentUser),
+
             {
                 method: "POST"
             }
+
         );
 
     } catch (error) {
@@ -1652,6 +2094,7 @@ async function newChat() {
     document
         .getElementById("chat")
         .innerHTML = "";
+
 
     showGreeting();
 }
@@ -1665,6 +2108,7 @@ function showGreeting() {
 
     const chat =
         document.getElementById("chat");
+
 
     if (chat.children.length > 0) {
         return;
@@ -1689,6 +2133,13 @@ function showGreeting() {
     }
 
 
+    if (currentUser === "ilknur") {
+
+        greeting =
+            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır.";
+    }
+
+
     addMessage(
         greeting,
         "jarvis"
@@ -1704,13 +2155,16 @@ async function openErrors() {
 
     closeSidebar();
 
+
     document
         .getElementById("errorModal")
         .classList
         .add("show");
 
+
     await loadErrors();
 }
+
 
 function closeErrors() {
 
@@ -1726,6 +2180,7 @@ async function loadErrors() {
     const list =
         document.getElementById("errorList");
 
+
     list.innerHTML =
         "Yükleniyor...";
 
@@ -1737,8 +2192,10 @@ async function loadErrors() {
                 API + "/errors"
             );
 
+
         const data =
             await response.json();
+
 
         const errors =
             data.errors || [];
@@ -1762,6 +2219,7 @@ async function loadErrors() {
 
                 const card =
                     document.createElement("div");
+
 
                 card.className =
                     "error-card";
@@ -1816,6 +2274,7 @@ async function clearErrors() {
             "Tüm hata kayıtları silinsin mi?"
         )
     ) {
+
         return;
     }
 
@@ -1823,13 +2282,18 @@ async function clearErrors() {
     try {
 
         await fetch(
+
             API + "/errors",
+
             {
                 method: "DELETE"
             }
+
         );
 
+
         await loadErrors();
+
 
     } catch (error) {
 
@@ -1847,6 +2311,7 @@ async function clearErrors() {
 function openProfile() {
 
     closeSidebar();
+
 
     document
         .getElementById("profileModal")
@@ -1871,10 +2336,12 @@ async function loginProfile() {
             "profileUsername"
         );
 
+
     const passwordInput =
         document.getElementById(
             "profilePassword"
         );
+
 
     const errorBox =
         document.getElementById(
@@ -1904,8 +2371,12 @@ async function loginProfile() {
 
         const response =
             await fetch(
-                API + "/profile-login",
+
+                API +
+                "/profile-login",
+
                 {
+
                     method: "POST",
 
                     headers: {
@@ -1914,10 +2385,17 @@ async function loginProfile() {
                     },
 
                     body: JSON.stringify({
-                        username: username,
-                        password: password
+
+                        username:
+                            username,
+
+                        password:
+                            password
+
                     })
+
                 }
+
             );
 
 
@@ -1945,7 +2423,23 @@ async function loginProfile() {
         );
 
 
+        if (currentUser === "ilknur") {
+
+            currentMode =
+                "research";
+
+        } else {
+
+            currentMode =
+                "normal";
+        }
+
+
         applyUserTheme();
+
+        updateSidebar();
+
+        updateModeIndicator();
 
 
         document
@@ -1954,6 +2448,7 @@ async function loginProfile() {
 
 
         closeProfile();
+
 
         showGreeting();
 
@@ -1974,7 +2469,10 @@ function applyUserTheme() {
 
     document.body
         .classList
-        .remove("sinem-mode");
+        .remove(
+            "sinem-mode",
+            "teacher-mode"
+        );
 
 
     if (currentUser === "sinem") {
@@ -1983,6 +2481,126 @@ function applyUserTheme() {
             .classList
             .add("sinem-mode");
     }
+
+
+    if (currentUser === "ilknur") {
+
+        document.body
+            .classList
+            .add("teacher-mode");
+    }
+}
+
+
+/* =========================================================
+   SIDEBAR KULLANICI GÖRÜNÜMÜ
+========================================================= */
+
+function updateSidebar() {
+
+    const normalMenu =
+        document.getElementById(
+            "normalMenu"
+        );
+
+
+    const academicMenu =
+        document.getElementById(
+            "academicMenu"
+        );
+
+
+    const academicTitle =
+        document.getElementById(
+            "academicTitle"
+        );
+
+
+    const profile =
+        document.getElementById(
+            "sidebarProfile"
+        );
+
+
+    const profileName =
+        document.getElementById(
+            "sidebarProfileName"
+        );
+
+
+    const profileRole =
+        document.getElementById(
+            "sidebarProfileRole"
+        );
+
+
+    if (currentUser === "ilknur") {
+
+        normalMenu.style.display =
+            "none";
+
+
+        academicMenu.classList.add(
+            "show"
+        );
+
+
+        academicTitle.classList.add(
+            "show"
+        );
+
+
+        profile.classList.add(
+            "show"
+        );
+
+
+        profileName.textContent =
+            "İlknur Hocam";
+
+
+        profileRole.textContent =
+            "Öğretmen / Akademik Kullanıcı";
+
+
+    } else {
+
+        normalMenu.style.display =
+            "block";
+
+
+        academicMenu.classList.remove(
+            "show"
+        );
+
+
+        academicTitle.classList.remove(
+            "show"
+        );
+
+
+        profile.classList.remove(
+            "show"
+        );
+    }
+
+
+    document
+        .querySelectorAll(
+            ".academic-menu .menu-item[data-mode]"
+        )
+        .forEach(button => {
+
+            button.classList.toggle(
+
+                "active",
+
+                currentUser === "ilknur" &&
+                button.dataset.mode === currentMode
+
+            );
+
+        });
 }
 
 
@@ -1994,7 +2612,9 @@ function toggleFunMode() {
 
     closeSidebar();
 
-    funMode = !funMode;
+
+    funMode =
+        !funMode;
 
 
     document.body
@@ -2008,14 +2628,19 @@ function toggleFunMode() {
     if (funMode) {
 
         addMessage(
+
             "Eğlence modu aktif. K.A.R.V.I.S. biraz daha rahat takılabilir. 😈",
+
             "jarvis"
         );
+
 
     } else {
 
         addMessage(
+
             "Eğlence modu kapatıldı. Standart K.A.R.V.I.S. sistemine dönüldü.",
+
             "jarvis"
         );
     }
@@ -2029,11 +2654,31 @@ function toggleFunMode() {
 function escapeHtml(text) {
 
     return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
@@ -2050,12 +2695,21 @@ function initialize() {
 
 
     if (
+
         savedUser &&
+
         (
+
             savedUser === "karahan" ||
+
             savedUser === "betul" ||
-            savedUser === "sinem"
+
+            savedUser === "sinem" ||
+
+            savedUser === "ilknur"
+
         )
+
     ) {
 
         currentUser =
@@ -2063,7 +2717,23 @@ function initialize() {
     }
 
 
+    if (currentUser === "ilknur") {
+
+        currentMode =
+            "research";
+
+    } else {
+
+        currentMode =
+            "normal";
+    }
+
+
     applyUserTheme();
+
+    updateSidebar();
+
+    updateModeIndicator();
 
     showGreeting();
 }
