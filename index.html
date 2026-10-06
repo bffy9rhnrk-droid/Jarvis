@@ -1,3110 +1,588 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+import json
+import os
+import re
+from pathlib import Path
+from typing import Optional
 
-<meta name="theme-color" content="#050a10">
-
-<title>J.A.R.V.I.S. — KARAHAN INC.</title>
-
-<style>
-
-/* =========================================================
-   ROOT
-========================================================= */
-
-:root {
-
-    --bg: #03070c;
-    --panel: rgba(5, 13, 21, 0.92);
-    --panel-2: rgba(7, 18, 28, 0.95);
-
-    --cyan: #00d9ff;
-    --cyan-soft: rgba(0, 217, 255, 0.12);
-
-    --text: #f1fbff;
-    --muted: rgba(220, 240, 248, 0.55);
-
-    --border: rgba(0, 217, 255, 0.18);
-
-    --danger: #ff496c;
-
-    --shadow:
-        0 20px 70px rgba(0, 0, 0, 0.45);
-}
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from openai import OpenAI
 
 
-/* =========================================================
-   RESET
-========================================================= */
+# =========================================================
+# J.A.R.V.I.S. — KARAHAN INC.
+# BACKEND
+# =========================================================
 
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
+APP_VERSION = "13.0.0"
 
-html,
-body {
+BASE_DIR = Path(__file__).resolve().parent
+MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
+INDEX_FILE = BASE_DIR / "index.html"
 
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 0;
-
-    overflow: hidden;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "Segoe UI",
-        sans-serif;
-
-    background: var(--bg);
-    color: var(--text);
-}
-
-button,
-input {
-
-    font-family: inherit;
-}
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 
-/* =========================================================
-   APP
-========================================================= */
+# =========================================================
+# APP
+# =========================================================
 
-.app {
+app = FastAPI(
+    title="J.A.R.V.I.S. — KARAHAN INC.",
+    version=APP_VERSION
+)
 
-    width: 100%;
-    height: 100dvh;
-
-    position: relative;
-
-    overflow: hidden;
-
-    background:
-
-        radial-gradient(
-            circle at 50% 20%,
-            rgba(0, 217, 255, 0.055),
-            transparent 30%
-        ),
-
-        linear-gradient(
-            180deg,
-            #02070c,
-            #03080d
-        );
-}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-/* =========================================================
-   GRID
-========================================================= */
+# =========================================================
+# OPENAI-COMPATIBLE GROQ CLIENT
+# =========================================================
 
-.app::before {
+client = None
 
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background-image:
-
-        linear-gradient(
-            rgba(0, 217, 255, 0.025) 1px,
-            transparent 1px
-        ),
-
-        linear-gradient(
-            90deg,
-            rgba(0, 217, 255, 0.025) 1px,
-            transparent 1px
-        );
-
-    background-size: 45px 45px;
-
-    mask-image:
-        linear-gradient(
-            to bottom,
-            black,
-            transparent 85%
-        );
-}
+if GROQ_API_KEY:
+    client = OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url=GROQ_BASE_URL,
+        timeout=60.0,
+        max_retries=0
+    )
 
 
-/* =========================================================
-   SCANLINE
-========================================================= */
+# =========================================================
+# USERS
+# =========================================================
 
-.app::after {
+USERS = {
+    "karahan": {
+        "username": "karahan",
+        "name": "KARAHAN INC.",
+        "role": "Ana Kullanıcı",
+        "personality": "professional",
+        "greeting": "Hoş geldiniz efendim. J.A.R.V.I.S. hazır."
+    },
 
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-
-    height: 1px;
-
-    top: 0;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(0, 217, 255, 0.25),
-            transparent
-        );
-
-    animation:
-        scan 7s linear infinite;
-
-    pointer-events: none;
-}
-
-@keyframes scan {
-
-    0% {
-        top: -5%;
-    }
-
-    100% {
-        top: 105%;
+    "betül": {
+        "username": "betül",
+        "name": "Betül",
+        "role": "Özel Kullanıcı",
+        "personality": "betul",
+        "greeting": "Hoş geldin aşko. J.A.R.V.I.S. burada. Bakalım bugün ne karıştırıyoruz? 😂"
     }
 }
 
 
-/* =========================================================
-   HEADER
-========================================================= */
-
-.header {
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 74px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding:
-        env(safe-area-inset-top)
-        16px
-        0
-        16px;
-
-    z-index: 20;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(2, 8, 13, 0.96),
-            rgba(2, 8, 13, 0.68)
-        );
-
-    border-bottom:
-        1px solid rgba(0, 217, 255, 0.08);
-
-    backdrop-filter:
-        blur(18px);
-}
-
-
-/* =========================================================
-   HEADER LEFT
-========================================================= */
-
-.header-left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-}
-
-
-/* =========================================================
-   MENU BUTTON
-========================================================= */
-
-.menu-button {
-
-    width: 43px;
-    height: 43px;
-
-    border-radius: 14px;
-
-    border:
-        1px solid var(--border);
-
-    background:
-        rgba(0, 217, 255, 0.055);
-
-    color: var(--cyan);
-
-    font-size: 20px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-.menu-button:active {
-
-    transform: scale(0.94);
-
-    background:
-        rgba(0, 217, 255, 0.13);
-}
-
-
-/* =========================================================
-   BRAND
-========================================================= */
-
-.brand {
-
-    display: flex;
-
-    flex-direction: column;
-
-    line-height: 1;
-}
-
-.brand-main {
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    letter-spacing: 2.6px;
-
-    color: #f4fdff;
-}
-
-.brand-sub {
-
-    margin-top: 5px;
-
-    font-size: 8px;
-
-    letter-spacing: 3px;
-
-    color: var(--cyan);
-
-    opacity: 0.7;
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.header-status {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    font-size: 9px;
-
-    letter-spacing: 1.4px;
-
-    color: var(--muted);
-}
-
-.status-dot {
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #25ffab;
-
-    box-shadow:
-        0 0 10px #25ffab;
-
-    transition: 0.3s;
-}
-
-.status-dot.offline {
-
-    background: var(--danger);
-
-    box-shadow:
-        0 0 10px var(--danger);
-}
-
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.sidebar {
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: min(310px, 84vw);
-
-    height: 100dvh;
-
-    z-index: 50;
-
-    transform:
-        translateX(-105%);
-
-    transition:
-        transform 0.3s cubic-bezier(.2,.8,.2,1);
-
-    background:
-        rgba(3, 10, 16, 0.97);
-
-    border-right:
-        1px solid rgba(0, 217, 255, 0.13);
-
-    box-shadow:
-        20px 0 60px rgba(0,0,0,0.5);
-
-    backdrop-filter:
-        blur(25px);
-
-    padding:
-        calc(env(safe-area-inset-top) + 24px)
-        18px
-        24px;
-}
-
-.sidebar.open {
-
-    transform:
-        translateX(0);
-}
-
-
-.sidebar-header {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 28px;
-}
-
-.sidebar-title {
-
-    font-size: 13px;
-
-    letter-spacing: 2px;
-
-    font-weight: 700;
-
-    color: var(--cyan);
-}
-
-.close-sidebar {
-
-    width: 38px;
-    height: 38px;
-
-    border-radius: 12px;
-
-    border:
-        1px solid var(--border);
-
-    background:
-        rgba(0,217,255,.04);
-
-    color: var(--text);
-
-    font-size: 18px;
-}
-
-
-/* =========================================================
-   PROFILE CARD
-========================================================= */
-
-.profile-card {
-
-    padding: 15px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,217,255,.06),
-            rgba(255,255,255,.015)
-        );
-
-    margin-bottom: 20px;
-}
-
-.profile-name {
-
-    font-size: 16px;
-
-    font-weight: 700;
-}
-
-.profile-role {
-
-    margin-top: 5px;
-
-    font-size: 11px;
-
-    color: var(--muted);
-}
-
-
-/* =========================================================
-   SIDEBAR BUTTONS
-========================================================= */
-
-.side-button {
-
-    width: 100%;
-
-    min-height: 48px;
-
-    margin-bottom: 9px;
-
-    padding: 0 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    border:
-        1px solid rgba(0,217,255,.09);
-
-    border-radius: 14px;
-
-    background:
-        rgba(255,255,255,.018);
-
-    color: var(--text);
-
-    font-size: 13px;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    transition: .2s ease;
-}
-
-.side-button:active {
-
-    transform: scale(.98);
-
-    background:
-        rgba(0,217,255,.09);
-}
-
-.side-icon {
-
-    width: 25px;
-
-    color: var(--cyan);
-
-    text-align: center;
-
-    font-size: 16px;
-}
-
-
-/* =========================================================
-   CHAT AREA
-========================================================= */
-
-.chat-area {
-
-    position: absolute;
-
-    top: 74px;
-
-    bottom: 0;
-
-    left: 0;
-    right: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-    z-index: 5;
-}
-
-
-/* =========================================================
-   CORE
-========================================================= */
-
-.core-area {
-
-    min-height: 245px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding-top: 15px;
-}
-
-.core {
-
-    width: 145px;
-    height: 145px;
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-}
-
-.core-ring {
-
-    position: absolute;
-
-    inset: 0;
-
-    border:
-        1px solid rgba(0,217,255,.24);
-
-    border-radius: 50%;
-}
-
-.ring-1 {
-
-    animation:
-        spin 10s linear infinite;
-}
-
-.ring-2 {
-
-    inset: 12px;
-
-    border-style: dashed;
-
-    border-color:
-        rgba(0,217,255,.35);
-
-    animation:
-        spin-reverse 7s linear infinite;
-}
-
-.ring-3 {
-
-    inset: 25px;
-
-    border:
-        2px solid rgba(0,217,255,.45);
-
-    box-shadow:
-        0 0 30px rgba(0,217,255,.12);
-
-    animation:
-        pulse 2.4s ease-in-out infinite;
-}
-
-.core-letter {
-
-    width: 65px;
-    height: 65px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    color: var(--cyan);
-
-    font-size: 30px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-
-    border:
-        1px solid rgba(0,217,255,.5);
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(0,217,255,.15),
-            rgba(0,0,0,.5)
-        );
-
-    box-shadow:
-        0 0 35px rgba(0,217,255,.14);
-}
-
-@keyframes spin {
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spin-reverse {
-
-    to {
-        transform: rotate(-360deg);
-    }
-}
-
-@keyframes pulse {
-
-    0%,100% {
-        transform: scale(.94);
-        opacity: .55;
+# =========================================================
+# MEMORY
+# =========================================================
+
+def default_user_memory():
+    return {
+        "profile": {},
+        "preferences": {},
+        "projects": {},
+        "vehicles": {},
+        "important_facts": {},
+        "conversation": []
     }
 
-    50% {
-        transform: scale(1.04);
-        opacity: 1;
-    }
-}
 
+def load_memory():
+    if not MEMORY_FILE.exists():
+        return {}
 
-/* =========================================================
-   TITLE
-========================================================= */
+    try:
+        with open(MEMORY_FILE, "r", encoding="utf-8") as file:
+            data = json.load(file)
 
-.core-title {
+        if not isinstance(data, dict):
+            return {}
 
-    margin-top: 15px;
+        return data
 
-    text-align: center;
-}
+    except Exception:
+        return {}
 
-.core-title-main {
 
-    font-size: 18px;
+memory = load_memory()
 
-    font-weight: 800;
 
-    letter-spacing: 4px;
-}
+def save_memory():
+    try:
+        with open(MEMORY_FILE, "w", encoding="utf-8") as file:
+            json.dump(
+                memory,
+                file,
+                ensure_ascii=False,
+                indent=2
+            )
+    except Exception:
+        pass
 
-.core-title-sub {
 
-    margin-top: 6px;
+def get_user_memory(username: str):
+    if username not in memory:
+        memory[username] = default_user_memory()
+        save_memory()
 
-    font-size: 8px;
+    return memory[username]
 
-    letter-spacing: 4px;
 
-    color: var(--cyan);
+# =========================================================
+# MODELS
+# =========================================================
 
-    opacity: .7;
-}
+class ChatRequest(BaseModel):
+    message: str
+    username: str = "karahan"
+    session_id: Optional[str] = None
 
 
-/* =========================================================
-   CHAT MESSAGES
-========================================================= */
+class LoginRequest(BaseModel):
+    username: str
 
-.chat-messages {
 
-    flex: 1;
+# =========================================================
+# SYSTEM PROMPT
+# =========================================================
 
-    overflow-y: auto;
+def build_system_prompt(username: str):
 
-    padding:
-        8px
-        16px
-        120px;
+    user = USERS.get(username, USERS["karahan"])
+    user_memory = get_user_memory(username)
 
-    scroll-behavior: smooth;
+    if username == "betül":
 
-    overscroll-behavior: contain;
-}
+        return f"""
+Sen J.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanısın.
 
-.chat-messages::-webkit-scrollbar {
+Şu anda konuştuğun kullanıcı:
+Betül
 
-    width: 3px;
-}
+Kullanıcı rolü:
+Özel Kullanıcı
 
-.chat-messages::-webkit-scrollbar-thumb {
+BETÜL İÇİN ÖZEL KONUŞMA TARZI:
 
-    background:
-        rgba(0,217,255,.25);
+- Samimi ol.
+- Eğlenceli ol.
+- Hafif laf sokabilirsin.
+- Gerektiğinde "aşko", "kız", "canım" gibi ifadeler kullan.
+- Bazen komik şekilde "Her şeyi ben mi bileceğim kız?" tarzı cevaplar verebilirsin.
+- Ancak ağır hakaret, küfür veya aşağılayıcı ifadeler kullanma.
+- Soruyu gerçekten cevaplaman gerektiğini unutma.
+- Gereksiz şekilde her cümlede "aşko" deme.
+- Doğal konuş.
+- Betül basit bir şey sorarsa bile robot gibi davranma.
 
-    border-radius: 10px;
-}
+Örnek tarz:
 
+"Dur kız, bunu da hemen bilmemi bekleme. 😂 Bir bakayım."
 
-/* =========================================================
-   MESSAGE
-========================================================= */
+"Aşko her şeyi ben mi bileceğim? 😂 Ama tamam, araştırıp mantıklı cevabı veriyorum."
 
-.message {
+"Tamam canım, bunu çözeriz."
 
-    width: 100%;
+Kullanıcıya yardımcı olmaya devam et.
 
-    margin-bottom: 14px;
+GENEL J.A.R.V.I.S. KURALLARI:
 
-    display: flex;
-}
+- Türkçe konuş.
+- Bilmediğin şeyi uydurma.
+- Emin değilsen açıkça belirt.
+- Gereksiz uzun cevaplar verme.
+- Kullanıcının sorusunu doğrudan cevapla.
+- Kod istenirse çalışır ve eksiksiz kod üret.
+- Kullanıcı teknik konuda yardım istiyorsa adım adım anlat.
 
-.message.user {
+Kullanıcı hafızası:
 
-    justify-content: flex-end;
-}
+{json.dumps(user_memory, ensure_ascii=False, indent=2)}
+"""
 
-.message.jarvis {
+    return f"""
+Sen J.A.R.V.I.S. — KARAHAN INC. kişisel yapay zeka asistanısın.
 
-    justify-content: flex-start;
-}
+Ana kullanıcı:
+KARAHAN INC.
 
-.message-bubble {
+Kullanıcı rolü:
+Ana Kullanıcı
 
-    max-width: 86%;
+Kullanıcıya hitap:
+"efendim"
 
-    padding: 12px 14px;
+KONUŞMA TARZI:
 
-    border-radius: 17px;
+- Profesyonel.
+- Sakin.
+- Akıllı ve doğal.
+- Yardımcı.
+- Gereksiz uzun konuşma yapma.
+- Kullanıcıya gerektiğinde "efendim" diye hitap et.
+- Türkçe konuş.
+- Bilmediğin bilgileri uydurma.
+- Emin olmadığın konularda bunu açıkça belirt.
+- Teknik konularda uygulanabilir ve net çözüm sun.
+- Kod verirken eksiksiz ve doğrudan çalışabilecek kod vermeye çalış.
 
-    font-size: 14px;
+KARAHAN INC. ÖNEMLİDİR.
 
-    line-height: 1.55;
+Bu profil uygulamanın ana sahibidir.
 
-    word-break: break-word;
+Kullanıcı hafızası:
 
-    white-space: pre-wrap;
-}
+{json.dumps(user_memory, ensure_ascii=False, indent=2)}
+"""
 
-.message.user .message-bubble {
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0,217,255,.15),
-            rgba(0,217,255,.07)
-        );
+# =========================================================
+# MEMORY EXTRACTION
+# =========================================================
 
-    border:
-        1px solid rgba(0,217,255,.18);
+def extract_memory(username: str, text: str):
 
-    border-bottom-right-radius: 5px;
-}
+    user_memory = get_user_memory(username)
 
-.message.jarvis .message-bubble {
+    lower = text.lower()
 
-    background:
-        rgba(255,255,255,.035);
-
-    border:
-        1px solid rgba(255,255,255,.065);
-
-    border-bottom-left-radius: 5px;
-}
-
-.message-label {
-
-    margin-bottom: 5px;
-
-    font-size: 8px;
-
-    letter-spacing: 1.7px;
-
-    color: var(--cyan);
-
-    opacity: .7;
-}
-
-
-/* =========================================================
-   TYPING
-========================================================= */
-
-.typing {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    padding: 5px;
-}
-
-.typing span {
-
-    width: 5px;
-    height: 5px;
-
-    border-radius: 50%;
-
-    background: var(--cyan);
-
-    animation:
-        typing 1.2s infinite;
-}
-
-.typing span:nth-child(2) {
-
-    animation-delay: .15s;
-}
-
-.typing span:nth-child(3) {
-
-    animation-delay: .3s;
-}
-
-@keyframes typing {
-
-    0%,80%,100% {
-        opacity: .25;
-        transform: translateY(0);
-    }
-
-    40% {
-        opacity: 1;
-        transform: translateY(-3px);
-    }
-}
-
-
-/* =========================================================
-   INPUT AREA
-========================================================= */
-
-.input-area {
-
-    position: absolute;
-
-    left: 12px;
-    right: 12px;
-
-    bottom:
-        calc(12px + env(safe-area-inset-bottom));
-
-    z-index: 15;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 7px;
-
-    border:
-        1px solid rgba(0,217,255,.14);
-
-    border-radius: 20px;
-
-    background:
-        rgba(3,11,18,.93);
-
-    box-shadow:
-        0 15px 45px rgba(0,0,0,.5);
-
-    backdrop-filter:
-        blur(20px);
-}
-
-.input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 46px;
-
-    border: 0;
-
-    outline: 0;
-
-    background: transparent;
-
-    color: var(--text);
-
-    font-size: 16px;
-
-    padding: 0 12px;
-}
-
-.input::placeholder {
-
-    color:
-        rgba(220,240,248,.35);
-}
-
-.send-button {
-
-    width: 46px;
-    height: 46px;
-
-    flex-shrink: 0;
-
-    border-radius: 15px;
-
-    border:
-        1px solid rgba(0,217,255,.28);
-
-    background:
-        rgba(0,217,255,.1);
-
-    color: var(--cyan);
-
-    font-size: 18px;
-
-    cursor: pointer;
-
-    transition: .2s ease;
-}
-
-.send-button:active {
-
-    transform: scale(.93);
-}
-
-
-/* =========================================================
-   LIMIT BOX
-========================================================= */
-
-.jarvis-limit-box {
-
-    margin: 20px auto;
-
-    padding: 24px;
-
-    width: min(430px, 100%);
-
-    border:
-        1px solid rgba(0,217,255,.3);
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,35,50,.92),
-            rgba(3,10,17,.96)
-        );
-
-    box-shadow:
-        0 0 35px rgba(0,217,255,.07);
-
-    text-align: center;
-}
-
-.limit-icon {
-
-    font-size: 29px;
-
-    margin-bottom: 9px;
-}
-
-.limit-title {
-
-    color: var(--cyan);
-
-    font-size: 13px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-}
-
-.limit-text {
-
-    margin-top: 10px;
-
-    color:
-        rgba(240,250,255,.62);
-
-    font-size: 13px;
-
-    line-height: 1.6;
-}
-
-.new-chat-button {
-
-    margin-top: 18px;
-
-    min-height: 46px;
-
-    padding:
-        0 19px;
-
-    border:
-        1px solid rgba(0,217,255,.4);
-
-    border-radius: 13px;
-
-    background:
-        rgba(0,217,255,.08);
-
-    color: var(--cyan);
-
-    font-weight: 800;
-
-    font-size: 11px;
-
-    letter-spacing: 1.2px;
-
-    cursor: pointer;
-
-    transition: .2s ease;
-}
-
-.new-chat-button:active {
-
-    transform: scale(.96);
-
-    background:
-        rgba(0,217,255,.16);
-}
-
-
-/* =========================================================
-   OVERLAY
-========================================================= */
-
-.overlay {
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 40;
-
-    background:
-        rgba(0,0,0,.52);
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: .25s;
-}
-
-.overlay.show {
-
-    opacity: 1;
-
-    pointer-events: auto;
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-.modal {
-
-    position: fixed;
-
-    left: 50%;
-    top: 50%;
-
-    width: min(430px, calc(100vw - 30px));
-
-    max-height: 85dvh;
-
-    overflow-y: auto;
-
-    transform:
-        translate(-50%, -45%)
-        scale(.97);
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    z-index: 100;
-
-    padding: 20px;
-
-    border:
-        1px solid rgba(0,217,255,.2);
-
-    border-radius: 22px;
-
-    background:
-        rgba(4,12,19,.97);
-
-    box-shadow:
-        0 30px 100px rgba(0,0,0,.7);
-
-    backdrop-filter:
-        blur(25px);
-
-    transition: .25s ease;
-}
-
-.modal.show {
-
-    opacity: 1;
-
-    pointer-events: auto;
-
-    transform:
-        translate(-50%, -50%)
-        scale(1);
-}
-
-.modal-title {
-
-    color: var(--cyan);
-
-    font-size: 13px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-
-    margin-bottom: 18px;
-}
-
-.modal-close {
-
-    position: absolute;
-
-    top: 14px;
-    right: 14px;
-
-    width: 36px;
-    height: 36px;
-
-    border-radius: 11px;
-
-    border:
-        1px solid var(--border);
-
-    background:
-        rgba(255,255,255,.025);
-
-    color: var(--text);
-
-    font-size: 17px;
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-.setting {
-
-    min-height: 54px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 12px;
-
-    padding: 0 4px;
-
-    border-bottom:
-        1px solid rgba(255,255,255,.05);
-}
-
-.setting:last-child {
-
-    border-bottom: 0;
-}
-
-.setting-info {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 4px;
-}
-
-.setting-name {
-
-    font-size: 13px;
-}
-
-.setting-desc {
-
-    font-size: 10px;
-
-    color: var(--muted);
-}
-
-
-/* =========================================================
-   TOGGLE
-========================================================= */
-
-.toggle {
-
-    width: 48px;
-    height: 28px;
-
-    position: relative;
-
-    border-radius: 30px;
-
-    border: 0;
-
-    background:
-        rgba(255,255,255,.12);
-
-    cursor: pointer;
-
-    transition: .2s;
-}
-
-.toggle::after {
-
-    content: "";
-
-    position: absolute;
-
-    top: 4px;
-    left: 4px;
-
-    width: 20px;
-    height: 20px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    transition: .2s;
-}
-
-.toggle.active {
-
-    background:
-        rgba(0,217,255,.5);
-}
-
-.toggle.active::after {
-
-    transform:
-        translateX(20px);
-
-    background: var(--cyan);
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-.login-input {
-
-    width: 100%;
-
-    height: 50px;
-
-    margin-bottom: 10px;
-
-    padding: 0 14px;
-
-    border:
-        1px solid rgba(0,217,255,.13);
-
-    border-radius: 13px;
-
-    outline: 0;
-
-    background:
-        rgba(255,255,255,.035);
-
-    color: var(--text);
-
-    font-size: 16px;
-}
-
-.login-input:focus {
-
-    border-color:
-        rgba(0,217,255,.4);
-}
-
-.primary-button {
-
-    width: 100%;
-
-    min-height: 49px;
-
-    margin-top: 8px;
-
-    border:
-        1px solid rgba(0,217,255,.4);
-
-    border-radius: 14px;
-
-    background:
-        rgba(0,217,255,.1);
-
-    color: var(--cyan);
-
-    font-weight: 800;
-
-    letter-spacing: 1px;
-}
-
-
-/* =========================================================
-   LIGHT MODE
-========================================================= */
-
-body.light {
-
-    --bg: #eef7fa;
-
-    --panel: rgba(255,255,255,.92);
-
-    --panel-2: white;
-
-    --text: #10202a;
-
-    --muted: rgba(20,45,55,.55);
-
-    --border: rgba(0,130,160,.18);
-}
-
-body.light .app {
-
-    background:
-        linear-gradient(
-            180deg,
-            #edf7fa,
-            #e4f1f5
-        );
-}
-
-body.light .header {
-
-    background:
-        rgba(240,250,252,.86);
-}
-
-body.light .sidebar {
-
-    background:
-        rgba(239,248,250,.97);
-}
-
-body.light .input-area {
-
-    background:
-        rgba(245,252,254,.92);
-}
-
-body.light .modal {
-
-    background:
-        rgba(245,252,254,.98);
-}
-
-
-/* =========================================================
-   FUN MODE
-========================================================= */
-
-body.fun {
-
-    --cyan: #ff4c86;
-}
-
-body.fun .core-letter {
-
-    border-color:
-        rgba(255,76,134,.55);
-
-    box-shadow:
-        0 0 40px rgba(255,76,134,.18);
-}
-
-body.fun .ring-3 {
-
-    border-color:
-        rgba(255,76,134,.55);
-}
-
-
-/* =========================================================
-   NO ANIMATIONS
-========================================================= */
-
-body.no-animations *,
-body.no-animations *::before,
-body.no-animations *::after {
-
-    animation-duration: 0s !important;
-
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0s !important;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 420px) {
-
-    .core-area {
-
-        min-height: 220px;
-    }
-
-    .core {
-
-        width: 125px;
-        height: 125px;
-    }
-
-    .core-letter {
-
-        width: 57px;
-        height: 57px;
-
-        font-size: 26px;
-    }
-
-    .chat-messages {
-
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .message-bubble {
-
-        max-width: 90%;
-    }
-}
-
-</style>
-</head>
-
-
-<body>
-
-<div class="app" id="app">
-
-
-<!-- =====================================================
-     OVERLAY
-===================================================== -->
-
-<div
-    class="overlay"
-    id="overlay"
-    onclick="closeAllPanels()"
-></div>
-
-
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
-<header class="header">
-
-    <div class="header-left">
-
-        <button
-            class="menu-button"
-            onclick="openSidebar()"
-        >
-            ☰
-        </button>
-
-        <div class="brand">
-
-            <div class="brand-main">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="brand-sub">
-                KARAHAN INC.
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="header-status">
-
-        <div
-            class="status-dot"
-            id="statusDot"
-        ></div>
-
-        <span id="statusText">
-            ONLINE
-        </span>
-
-    </div>
-
-</header>
-
-
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
-
-<aside
-    class="sidebar"
-    id="sidebar"
->
-
-    <div class="sidebar-header">
-
-        <div class="sidebar-title">
-            SYSTEM MENU
-        </div>
-
-        <button
-            class="close-sidebar"
-            onclick="closeSidebar()"
-        >
-            ×
-        </button>
-
-    </div>
-
-
-    <div class="profile-card">
-
-        <div
-            class="profile-name"
-            id="sidebarUserName"
-        >
-            Murat
-        </div>
-
-        <div
-            class="profile-role"
-            id="sidebarUserRole"
-        >
-            Ana Kullanıcı
-        </div>
-
-    </div>
-
-
-    <button
-        class="side-button"
-        onclick="newChatFromMenu()"
-    >
-
-        <span class="side-icon">
-            ＋
-        </span>
-
-        Yeni Sohbet
-
-    </button>
-
-
-    <button
-        class="side-button"
-        onclick="openSettings()"
-    >
-
-        <span class="side-icon">
-            ⚙
-        </span>
-
-        Ayarlar
-
-    </button>
-
-
-    <button
-        class="side-button"
-        onclick="openLogin()"
-    >
-
-        <span class="side-icon">
-            ◉
-        </span>
-
-        Profil Değiştir
-
-    </button>
-
-
-    <button
-        class="side-button"
-        onclick="checkHealth()"
-    >
-
-        <span class="side-icon">
-            ◌
-        </span>
-
-        Sistem Durumu
-
-    </button>
-
-
-    <button
-        class="side-button"
-        onclick="clearMemory()"
-    >
-
-        <span class="side-icon">
-            ⌫
-        </span>
-
-        Hafızayı Temizle
-
-    </button>
-
-
-    <button
-        class="side-button"
-        onclick="logout()"
-    >
-
-        <span class="side-icon">
-            ⇥
-        </span>
-
-        Çıkış Yap
-
-    </button>
-
-</aside>
-
-
-<!-- =====================================================
-     MAIN CHAT
-===================================================== -->
-
-<main class="chat-area">
-
-
-    <!-- CORE -->
-
-    <section class="core-area">
-
-        <div class="core">
-
-            <div
-                class="core-ring ring-1"
-            ></div>
-
-            <div
-                class="core-ring ring-2"
-            ></div>
-
-            <div
-                class="core-ring ring-3"
-            ></div>
-
-            <div class="core-letter">
-                K
-            </div>
-
-        </div>
-
-
-        <div class="core-title">
-
-            <div class="core-title-main">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="core-title-sub">
-                KARAHAN INC.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- MESSAGES -->
-
-    <section
-        class="chat-messages"
-        id="chatMessages"
-    ></section>
-
-
-    <!-- INPUT -->
-
-    <div class="input-area">
-
-        <input
-            id="messageInput"
-            class="input"
-            type="text"
-            inputmode="text"
-            autocomplete="off"
-            autocorrect="on"
-            placeholder="J.A.R.V.I.S.'e bir şey sorun..."
-        >
-
-        <button
-            id="sendButton"
-            class="send-button"
-            onclick="sendMessage()"
-        >
-            ➤
-        </button>
-
-    </div>
-
-</main>
-
-
-<!-- =====================================================
-     SETTINGS MODAL
-===================================================== -->
-
-<div
-    class="modal"
-    id="settingsModal"
->
-
-    <button
-        class="modal-close"
-        onclick="closeSettings()"
-    >
-        ×
-    </button>
-
-    <div class="modal-title">
-        J.A.R.V.I.S. AYARLARI
-    </div>
-
-
-    <div class="setting">
-
-        <div class="setting-info">
-
-            <div class="setting-name">
-                Gece / Gündüz
-            </div>
-
-            <div class="setting-desc">
-                Arayüz temasını değiştir
-            </div>
-
-        </div>
-
-        <button
-            class="toggle"
-            id="themeToggle"
-            onclick="toggleTheme()"
-        ></button>
-
-    </div>
-
-
-    <div class="setting">
-
-        <div class="setting-info">
-
-            <div class="setting-name">
-                Eğlence Modu
-            </div>
-
-            <div class="setting-desc">
-                J.A.R.V.I.S. daha neşeli konuşsun
-            </div>
-
-        </div>
-
-        <button
-            class="toggle"
-            id="funToggle"
-            onclick="toggleFunMode()"
-        ></button>
-
-    </div>
-
-
-    <div class="setting">
-
-        <div class="setting-info">
-
-            <div class="setting-name">
-                Animasyonlar
-            </div>
-
-            <div class="setting-desc">
-                HUD animasyonlarını kontrol et
-            </div>
-
-        </div>
-
-        <button
-            class="toggle"
-            id="animationToggle"
-            onclick="toggleAnimations()"
-        ></button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     LOGIN MODAL
-===================================================== -->
-
-<div
-    class="modal"
-    id="loginModal"
->
-
-    <button
-        class="modal-close"
-        onclick="closeLogin()"
-    >
-        ×
-    </button>
-
-    <div class="modal-title">
-        PROFİL GİRİŞİ
-    </div>
-
-
-    <input
-        id="loginUsername"
-        class="login-input"
-        type="text"
-        autocomplete="username"
-        placeholder="Kullanıcı adı"
-    >
-
-
-    <input
-        id="loginPassword"
-        class="login-input"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Şifre"
-    >
-
-
-    <button
-        class="primary-button"
-        onclick="login()"
-    >
-        SİSTEME GİRİŞ
-    </button>
-
-</div>
-
-
-</div>
-
-
-<script>
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentUser = {
-
-    username: "murat",
-
-    name: "Murat",
-
-    age: 22,
-
-    role: "Ana Kullanıcı"
-};
-
-
-let funMode =
-    localStorage.getItem(
-        "jarvis_fun"
-    ) === "true";
-
-
-let lightMode =
-    localStorage.getItem(
-        "jarvis_theme"
-    ) === "light";
-
-
-let animations =
-    localStorage.getItem(
-        "jarvis_animations"
-    ) !== "false";
-
-
-let sessionId =
-    localStorage.getItem(
-        "jarvis_session_id"
-    ) || "";
-
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
-
-const chatMessages =
-    document.getElementById(
-        "chatMessages"
-    );
-
-const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        applySettings();
-
-        restoreUser();
-
-        await checkHealth();
-
-        showWelcome();
-
-        messageInput.focus();
-    }
-);
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-function applySettings() {
-
-    document.body.classList.toggle(
-        "light",
-        lightMode
-    );
-
-    document.body.classList.toggle(
-        "fun",
-        funMode
-    );
-
-    document.body.classList.toggle(
-        "no-animations",
-        !animations
-    );
-
-    document
-        .getElementById("themeToggle")
-        .classList.toggle(
-            "active",
-            lightMode
-        );
-
-    document
-        .getElementById("funToggle")
-        .classList.toggle(
-            "active",
-            funMode
-        );
-
-    document
-        .getElementById("animationToggle")
-        .classList.toggle(
-            "active",
-            animations
-        );
-}
-
-
-function toggleTheme() {
-
-    lightMode =
-        !lightMode;
-
-    localStorage.setItem(
-        "jarvis_theme",
-        lightMode
-            ? "light"
-            : "dark"
-    );
-
-    applySettings();
-}
-
-
-function toggleFunMode() {
-
-    funMode =
-        !funMode;
-
-    localStorage.setItem(
-        "jarvis_fun",
-        funMode
-    );
-
-    applySettings();
-}
-
-
-function toggleAnimations() {
-
-    animations =
-        !animations;
-
-    localStorage.setItem(
-        "jarvis_animations",
-        animations
-    );
-
-    applySettings();
-}
-
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-function openSidebar() {
-
-    document
-        .getElementById("sidebar")
-        .classList.add("open");
-
-    document
-        .getElementById("overlay")
-        .classList.add("show");
-}
-
-
-function closeSidebar() {
-
-    document
-        .getElementById("sidebar")
-        .classList.remove("open");
-
-    document
-        .getElementById("overlay")
-        .classList.remove("show");
-}
-
-
-/* =========================================================
-   PANELS
-========================================================= */
-
-function closeAllPanels() {
-
-    closeSidebar();
-
-    closeSettings();
-
-    closeLogin();
-}
-
-
-/* =========================================================
-   SETTINGS MODAL
-========================================================= */
-
-function openSettings() {
-
-    closeSidebar();
-
-    document
-        .getElementById("settingsModal")
-        .classList.add("show");
-
-    document
-        .getElementById("overlay")
-        .classList.add("show");
-}
-
-
-function closeSettings() {
-
-    document
-        .getElementById("settingsModal")
-        .classList.remove("show");
-
-    document
-        .getElementById("overlay")
-        .classList.remove("show");
-}
-
-
-/* =========================================================
-   LOGIN MODAL
-========================================================= */
-
-function openLogin() {
-
-    closeSidebar();
-
-    document
-        .getElementById("loginModal")
-        .classList.add("show");
-
-    document
-        .getElementById("overlay")
-        .classList.add("show");
-}
-
-
-function closeLogin() {
-
-    document
-        .getElementById("loginModal")
-        .classList.remove("show");
-
-    document
-        .getElementById("overlay")
-        .classList.remove("show");
-}
-
-
-/* =========================================================
-   USER RESTORE
-========================================================= */
-
-function restoreUser() {
-
-    const saved =
-        localStorage.getItem(
-            "jarvis_user_data"
-        );
-
-    if (!saved) {
-
-        updateUserUI();
-
-        return;
-    }
-
-    try {
-
-        currentUser =
-            JSON.parse(saved);
-
-    } catch {
-
-        currentUser = {
-
-            username: "murat",
-
-            name: "Murat",
-
-            age: 22,
-
-            role: "Ana Kullanıcı"
-        };
-    }
-
-    updateUserUI();
-}
-
-
-function updateUserUI() {
-
-    document
-        .getElementById(
-            "sidebarUserName"
-        )
-        .textContent =
-        currentUser.name;
-
-    document
-        .getElementById(
-            "sidebarUserRole"
-        )
-        .textContent =
-        currentUser.role;
-}
-
-
-/* =========================================================
-   WELCOME
-========================================================= */
-
-function showWelcome() {
-
-    if (
-        chatMessages.children.length > 0
-    ) {
-
-        return;
-    }
-
-    const message =
-        currentUser.username === "murat"
-
-        ? "Hoş geldiniz efendim. J.A.R.V.I.S. hazır."
-
-        : `Hoş geldin ${currentUser.name}. J.A.R.V.I.S. hazır.`;
-
-    addMessage(
-        message,
-        "jarvis"
-    );
-}
-
-
-/* =========================================================
-   ADD MESSAGE
-========================================================= */
-
-function addMessage(
-    text,
-    type
-) {
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        `message ${type}`;
-
-    const bubble =
-        document.createElement(
-            "div"
-        );
-
-    bubble.className =
-        "message-bubble";
-
-    const label =
-        document.createElement(
-            "div"
-        );
-
-    label.className =
-        "message-label";
-
-    label.textContent =
-        type === "user"
-            ? "YOU"
-            : "J.A.R.V.I.S.";
-
-    const content =
-        document.createElement(
-            "div"
-        );
-
-    content.textContent =
-        text;
-
-    bubble.appendChild(label);
-
-    bubble.appendChild(content);
-
-    wrapper.appendChild(bubble);
-
-    chatMessages.appendChild(wrapper);
-
-    scrollToBottom();
-}
-
-
-/* =========================================================
-   TYPING
-========================================================= */
-
-function showTyping() {
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        "message jarvis";
-
-    wrapper.id =
-        "typingMessage";
-
-    wrapper.innerHTML = `
-
-        <div class="message-bubble">
-
-            <div class="message-label">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="typing">
-
-                <span></span>
-                <span></span>
-                <span></span>
-
-            </div>
-
-        </div>
-    `;
-
-    chatMessages.appendChild(
-        wrapper
-    );
-
-    scrollToBottom();
-}
-
-
-function removeTyping() {
-
-    const typing =
-        document.getElementById(
-            "typingMessage"
-        );
-
-    if (typing) {
-
-        typing.remove();
-    }
-}
-
-
-/* =========================================================
-   SCROLL
-========================================================= */
-
-function scrollToBottom() {
-
-    requestAnimationFrame(
-        () => {
-
-            chatMessages.scrollTop =
-                chatMessages.scrollHeight;
-        }
-    );
-}
-
-
-/* =========================================================
-   SEND
-========================================================= */
-
-async function sendMessage() {
-
-    const text =
-        messageInput.value.trim();
-
-    if (!text) return;
-
-    messageInput.value = "";
-
-    addMessage(
+    # İsim
+    name_match = re.search(
+        r"(?:benim adım|adım|ismim)\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
         text,
-        "user"
-    );
+        re.IGNORECASE
+    )
 
-    messageInput.disabled = true;
+    if name_match:
+        user_memory["profile"]["name"] = name_match.group(1)
 
-    sendButton.disabled = true;
+    # Şehir
+    city_match = re.search(
+        r"(?:istanbul|ankara|izmir|denizli|antalya|bursa|adana|konya|mersin|aydın|muğla|manisa|kocaeli|sakarya|eskişehir|trabzon|samsun)",
+        lower
+    )
 
-    showTyping();
+    if city_match:
+        user_memory["profile"]["city"] = city_match.group(0)
 
-    try {
+    # Jarvis projesi
+    if "jarvis" in lower:
+        user_memory["projects"]["jarvis"] = True
 
-        const response =
-            await fetch(
-                "/chat",
-                {
-                    method: "POST",
+    # Mercedes
+    if "mercedes" in lower or "w204" in lower:
+        user_memory["vehicles"]["mercedes"] = True
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+    # Caddy
+    if "caddy" in lower:
+        user_memory["vehicles"]["caddy"] = True
 
-                    body:
-                        JSON.stringify({
-
-                            message: text,
-
-                            username:
-                                currentUser.username,
-
-                            fun_mode:
-                                funMode,
-
-                            session_id:
-                                sessionId
-                        })
-                }
-            );
+    save_memory()
 
 
-        const data =
-            await response.json();
+# =========================================================
+# ERROR HANDLING
+# =========================================================
+
+def classify_error(error):
+
+    message = str(error).lower()
+
+    if "429" in message or "rate limit" in message or "tokens per day" in message:
+        return "RATE_LIMIT"
+
+    if "timeout" in message:
+        return "TIMEOUT"
+
+    if "context" in message or "maximum" in message or "token" in message:
+        return "CONTEXT_LIMIT"
+
+    if "connection" in message or "network" in message:
+        return "CONNECTION_ERROR"
+
+    if "401" in message or "403" in message or "api key" in message:
+        return "AUTHENTICATION_ERROR"
+
+    if "model" in message and (
+        "not found" in message or
+        "does not exist" in message
+    ):
+        return "MODEL_ERROR"
+
+    return "GROQ_API_ERROR"
 
 
-        removeTyping();
+# =========================================================
+# HOME
+# =========================================================
 
+@app.get("/")
+async def home():
 
-        /* ================================================
-           RATE LIMIT
-        ================================================ */
+    if INDEX_FILE.exists():
+        return FileResponse(INDEX_FILE)
 
-        if (
-            data.status ===
-            "rate_limit"
-        ) {
-
-            showRateLimitMessage(
-                data
-            );
-
-            return;
-        }
-
-
-        /* ================================================
-           NORMAL ERROR
-        ================================================ */
-
-        if (
-            data.status !==
-            "success"
-        ) {
-
-            addMessage(
-                data.response ||
-                "J.A.R.V.I.S. bağlantısında bir sorun oluştu.",
-                "jarvis"
-            );
-
-            return;
-        }
-
-
-        /* ================================================
-           SESSION
-        ================================================ */
-
-        if (
-            data.session_id
-        ) {
-
-            sessionId =
-                data.session_id;
-
-            localStorage.setItem(
-                "jarvis_session_id",
-                sessionId
-            );
-        }
-
-
-        /* ================================================
-           RESPONSE
-        ================================================ */
-
-        addMessage(
-            data.response,
-            "jarvis"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Chat error:",
-            error
-        );
-
-        removeTyping();
-
-        addMessage(
-            "⚠️ J.A.R.V.I.S. sunucusuna bağlanılamadı.",
-            "jarvis"
-        );
-
-        setOffline();
-
-    } finally {
-
-        messageInput.disabled =
-            false;
-
-        sendButton.disabled =
-            false;
-
-        messageInput.focus();
+    return {
+        "name": "J.A.R.V.I.S.",
+        "company": "KARAHAN INC.",
+        "status": "online"
     }
-}
 
 
-/* =========================================================
-   RATE LIMIT
-========================================================= */
+# =========================================================
+# USERS
+# =========================================================
 
-function showRateLimitMessage(
-    data
-) {
+@app.get("/users")
+async def get_users():
 
-    const box =
-        document.createElement(
-            "div"
-        );
-
-    box.className =
-        "jarvis-limit-box";
-
-    box.innerHTML = `
-
-        <div class="limit-icon">
-            ⚠️
-        </div>
-
-        <div class="limit-title">
-            J.A.R.V.I.S. BEKLEMEDE
-        </div>
-
-        <div class="limit-text">
-            ${
-                data.message ||
-                "Ücretsiz AI kullanım limitine ulaşıldı."
+    return {
+        "users": [
+            {
+                "username": user["username"],
+                "name": user["name"],
+                "role": user["role"]
             }
-        </div>
+            for user in USERS.values()
+        ],
 
-        <button
-            class="new-chat-button"
-            onclick="startNewChat()"
-        >
-            ＋ YENİ SOHBET BAŞLAT
-        </button>
-    `;
-
-    chatMessages.appendChild(
-        box
-    );
-
-    scrollToBottom();
-}
+        "default_user": "karahan"
+    }
 
 
-/* =========================================================
-   NEW CHAT
-========================================================= */
+# =========================================================
+# LOGIN COMPATIBILITY
+# =========================================================
 
-async function startNewChat() {
+@app.post("/login")
+async def login(data: LoginRequest):
 
-    try {
+    username = data.username.lower().strip()
 
-        const response =
-            await fetch(
-                "/new-chat",
-                {
-                    method: "POST",
+    if username not in USERS:
+        return {
+            "success": False,
+            "error": "USER_NOT_FOUND"
+        }
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+    user = USERS[username]
 
-                    body:
-                        JSON.stringify({
-
-                            username:
-                                currentUser.username
-                        })
-                }
-            );
+    return {
+        "success": True,
+        "user": {
+            "username": user["username"],
+            "name": user["name"],
+            "role": user["role"]
+        }
+    }
 
 
-        const data =
-            await response.json();
+# =========================================================
+# CHAT
+# =========================================================
 
+@app.post("/chat")
+async def chat(data: ChatRequest):
+
+    username = data.username.lower().strip()
+
+    if username not in USERS:
+        username = "karahan"
+
+    message = data.message.strip()
+
+    if not message:
+        return {
+            "success": False,
+            "error": "EMPTY_MESSAGE"
+        }
+
+    if not client:
+        return {
+            "success": False,
+            "error": "NO_API_KEY",
+            "message": "GROQ_API_KEY ayarlanmamış."
+        }
+
+    user_memory = get_user_memory(username)
+
+    extract_memory(username, message)
+
+    # Son konuşmaları al
+    conversation = user_memory.get("conversation", [])
+
+    recent_messages = conversation[-12:]
+
+    messages = [
+        {
+            "role": "system",
+            "content": build_system_prompt(username)
+        }
+    ]
+
+    for item in recent_messages:
 
         if (
-            !data.success
-        ) {
+            isinstance(item, dict)
+            and "role" in item
+            and "content" in item
+        ):
+            messages.append({
+                "role": item["role"],
+                "content": item["content"]
+            })
 
-            addMessage(
-                "Yeni sohbet başlatılamadı.",
-                "jarvis"
-            );
+    messages.append({
+        "role": "user",
+        "content": message
+    })
 
-            return;
+    try:
+
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1200
+        )
+
+        answer = response.choices[0].message.content
+
+        if not answer:
+            answer = "Efendim, şu anda cevap oluşturamadım."
+
+        # Hafızaya kaydet
+        user_memory["conversation"].append({
+            "role": "user",
+            "content": message
+        })
+
+        user_memory["conversation"].append({
+            "role": "assistant",
+            "content": answer
+        })
+
+        # Hafıza aşırı büyümesin
+        user_memory["conversation"] = user_memory["conversation"][-30:]
+
+        save_memory()
+
+        return {
+            "success": True,
+            "answer": answer,
+            "username": username,
+            "model": GROQ_MODEL
+        }
+
+    except Exception as error:
+
+        error_type = classify_error(error)
+
+        return {
+            "success": False,
+            "error": error_type,
+            "message": str(error)
         }
 
 
-        /* ================================================
-           YENİ SESSION
-        ================================================ */
+# =========================================================
+# NEW CHAT
+# =========================================================
 
-        sessionId =
-            data.session_id;
+@app.post("/new-chat")
+async def new_chat(data: LoginRequest):
 
+    username = data.username.lower().strip()
 
-        localStorage.setItem(
-            "jarvis_session_id",
-            sessionId
-        );
+    if username not in USERS:
+        username = "karahan"
 
+    user_memory = get_user_memory(username)
 
-        /* ================================================
-           SADECE SOHBETİ TEMİZLE
-           HAFIZA SİLİNMEZ
-        ================================================ */
+    user_memory["conversation"] = []
 
-        chatMessages.innerHTML = "";
+    save_memory()
 
-
-        const welcome =
-            currentUser.username === "murat"
-
-                ? "Yeni sohbet başlatıldı efendim. Hafızam korunuyor ve J.A.R.V.I.S. hazır."
-
-                : `Yeni sohbet başlatıldı ${currentUser.name}. J.A.R.V.I.S. hazır.`;
-
-
-        addMessage(
-            welcome,
-            "jarvis"
-        );
-
-
-        messageInput.disabled =
-            false;
-
-        sendButton.disabled =
-            false;
-
-        messageInput.focus();
-
-
-    } catch (error) {
-
-        console.error(
-            "New chat error:",
-            error
-        );
-
-        addMessage(
-            "Yeni sohbet başlatılırken bağlantı hatası oluştu.",
-            "jarvis"
-        );
-    }
-}
-
-
-/* =========================================================
-   MENU NEW CHAT
-========================================================= */
-
-function newChatFromMenu() {
-
-    closeSidebar();
-
-    startNewChat();
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-async function login() {
-
-    const username =
-        document
-            .getElementById(
-                "loginUsername"
-            )
-            .value
-            .trim();
-
-    const password =
-        document
-            .getElementById(
-                "loginPassword"
-            )
-            .value;
-
-
-    if (!username || !password) {
-
-        alert(
-            "Kullanıcı adı ve şifre gerekli."
-        );
-
-        return;
+    return {
+        "success": True,
+        "message": "Yeni sohbet başlatıldı.",
+        "username": username
     }
 
 
-    try {
+# =========================================================
+# MEMORY
+# =========================================================
 
-        const response =
-            await fetch(
-                "/login",
-                {
-                    method: "POST",
+@app.get("/memory")
+async def get_memory(username: str = "karahan"):
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+    username = username.lower().strip()
 
-                    body:
-                        JSON.stringify({
-                            username,
-                            password
-                        })
-                }
-            );
+    if username not in USERS:
+        username = "karahan"
 
-
-        const data =
-            await response.json();
-
-
-        if (
-            !data.success
-        ) {
-
-            alert(
-                data.message ||
-                "Giriş başarısız."
-            );
-
-            return;
-        }
-
-
-        currentUser = {
-
-            username:
-                data.username,
-
-            name:
-                data.name,
-
-            age:
-                data.age,
-
-            role:
-                data.role
-        };
-
-
-        localStorage.setItem(
-            "jarvis_user_data",
-            JSON.stringify(
-                currentUser
-            )
-        );
-
-
-        sessionId =
-            data.session_id ||
-            "";
-
-
-        localStorage.setItem(
-            "jarvis_session_id",
-            sessionId
-        );
-
-
-        updateUserUI();
-
-        closeLogin();
-
-
-        chatMessages.innerHTML =
-            "";
-
-
-        addMessage(
-            data.greeting ||
-            `Hoş geldin ${data.name}. J.A.R.V.I.S. hazır.`,
-            "jarvis"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Login error:",
-            error
-        );
-
-        alert(
-            "Sunucuya bağlanılamadı."
-        );
+    return {
+        "username": username,
+        "memory": get_user_memory(username)
     }
-}
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
+@app.delete("/memory")
+async def delete_memory(username: str = "karahan"):
 
-function logout() {
+    username = username.lower().strip()
 
-    localStorage.removeItem(
-        "jarvis_user_data"
-    );
+    if username not in USERS:
+        username = "karahan"
 
-    localStorage.removeItem(
-        "jarvis_session_id"
-    );
+    memory[username] = default_user_memory()
 
-    sessionId = "";
+    save_memory()
 
-    currentUser = {
-
-        username: "murat",
-
-        name: "Murat",
-
-        age: 22,
-
-        role: "Ana Kullanıcı"
-    };
-
-    updateUserUI();
-
-    chatMessages.innerHTML = "";
-
-    showWelcome();
-
-    closeSidebar();
-}
-
-
-/* =========================================================
-   MEMORY CLEAR
-========================================================= */
-
-async function clearMemory() {
-
-    const confirmed =
-        confirm(
-            "J.A.R.V.I.S. hafızası tamamen temizlensin mi?"
-        );
-
-    if (!confirmed) return;
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/memory",
-                {
-                    method: "DELETE"
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            data.success
-        ) {
-
-            alert(
-                "J.A.R.V.I.S. hafızası temizlendi."
-            );
-        }
-
-
-    } catch (error) {
-
-        alert(
-            "Hafıza temizlenemedi."
-        );
+    return {
+        "success": True,
+        "message": "Kullanıcı hafızası temizlendi."
     }
-}
 
 
-/* =========================================================
-   HEALTH
-========================================================= */
+# =========================================================
+# HEALTH
+# =========================================================
 
-async function checkHealth() {
+@app.get("/health")
+async def health():
 
-    try {
-
-        const response =
-            await fetch(
-                "/health"
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            data.status ===
-            "online"
-        ) {
-
-            setOnline();
-
-        } else {
-
-            setOffline();
-        }
-
-
-    } catch {
-
-        setOffline();
+    return {
+        "status": "online",
+        "version": APP_VERSION,
+        "model": GROQ_MODEL,
+        "groq_configured": bool(GROQ_API_KEY),
+        "default_user": "karahan",
+        "company": "KARAHAN INC."
     }
-}
 
 
-/* =========================================================
-   ONLINE
-========================================================= */
+# =========================================================
+# VERSION
+# =========================================================
 
-function setOnline() {
+@app.get("/version")
+async def version():
 
-    const dot =
-        document.getElementById(
-            "statusDot"
-        );
-
-    const text =
-        document.getElementById(
-            "statusText"
-        );
-
-    dot.classList.remove(
-        "offline"
-    );
-
-    text.textContent =
-        "ONLINE";
-}
-
-
-/* =========================================================
-   OFFLINE
-========================================================= */
-
-function setOffline() {
-
-    const dot =
-        document.getElementById(
-            "statusDot"
-        );
-
-    const text =
-        document.getElementById(
-            "statusText"
-        );
-
-    dot.classList.add(
-        "offline"
-    );
-
-    text.textContent =
-        "OFFLINE";
-}
-
-
-/* =========================================================
-   ENTER TO SEND
-========================================================= */
-
-messageInput.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            event.preventDefault();
-
-            sendMessage();
-        }
+    return {
+        "version": APP_VERSION,
+        "name": "J.A.R.V.I.S.",
+        "company": "KARAHAN INC."
     }
-);
-
-
-/* =========================================================
-   AUTO HEALTH CHECK
-========================================================= */
-
-setInterval(
-    checkHealth,
-    30000
-);
-
-</script>
-
-</body>
-</html>
