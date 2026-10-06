@@ -10,9 +10,15 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
+<meta name="theme-color" content="#020708">
+
 <title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
 <style>
+
+/* =====================================================
+   TEMEL
+===================================================== */
 
 * {
     box-sizing: border-box;
@@ -23,9 +29,15 @@ html,
 body {
     margin: 0;
     padding: 0;
+
     width: 100%;
     height: 100%;
+    min-height: 100%;
+
     overflow: hidden;
+
+    background: #020708 !important;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -35,31 +47,40 @@ body {
 
 body {
 
+    color: #dffcff;
+
     background:
         radial-gradient(
-            circle at center,
+            circle at 50% 35%,
             #071b20 0%,
             #020708 55%,
-            #000 100%
-        );
-
-    color: #dffcff;
+            #000000 100%
+        ) !important;
 }
 
 
 /* =====================================================
-   ANA
+   ANA UYGULAMA
 ===================================================== */
 
 .app {
 
     width: 100%;
     height: 100dvh;
+    min-height: 100dvh;
 
     display: flex;
     flex-direction: column;
 
     position: relative;
+
+    background:
+        radial-gradient(
+            circle at 50% 30%,
+            rgba(0, 238, 255, 0.025),
+            transparent 45%
+        ),
+        #020708;
 }
 
 
@@ -70,6 +91,7 @@ body {
 .header {
 
     height: 75px;
+    min-height: 75px;
 
     display: flex;
     align-items: center;
@@ -77,24 +99,19 @@ body {
     padding: 0 18px;
 
     border-bottom:
-        1px solid rgba(
-            0,
-            238,
-            255,
-            0.18
-        );
+        1px solid
+        rgba(0, 238, 255, 0.18);
 
     background:
-        rgba(
-            0,
-            10,
-            13,
-            0.82
-        );
+        rgba(2, 7, 8, 0.97) !important;
 
     backdrop-filter: blur(15px);
 
+    -webkit-backdrop-filter: blur(15px);
+
     z-index: 20;
+
+    color: #dffcff;
 }
 
 
@@ -106,20 +123,11 @@ body {
     border-radius: 12px;
 
     border:
-        1px solid rgba(
-            0,
-            238,
-            255,
-            0.3
-        );
+        1px solid
+        rgba(0, 238, 255, 0.3);
 
     background:
-        rgba(
-            0,
-            238,
-            255,
-            0.05
-        );
+        rgba(0, 238, 255, 0.05);
 
     color: #00eaff;
 
@@ -150,12 +158,7 @@ body {
 
     text-shadow:
         0 0 14px
-        rgba(
-            0,
-            238,
-            255,
-            0.55
-        );
+        rgba(0, 238, 255, 0.55);
 }
 
 
@@ -196,8 +199,7 @@ body {
     background: #00ffcc;
 
     box-shadow:
-        0 0 10px
-        #00ffcc;
+        0 0 10px #00ffcc;
 }
 
 
@@ -218,17 +220,13 @@ body {
     background:
         linear-gradient(
             180deg,
-            #061317,
-            #020708
-        );
+            #061317 0%,
+            #020708 100%
+        ) !important;
 
     border-right:
-        1px solid rgba(
-            0,
-            238,
-            255,
-            0.25
-        );
+        1px solid
+        rgba(0, 238, 255, 0.25);
 
     z-index: 100;
 
@@ -239,12 +237,7 @@ body {
 
     box-shadow:
         10px 0 40px
-        rgba(
-            0,
-            0,
-            0,
-            .55
-        );
+        rgba(0, 0, 0, .55);
 }
 
 
@@ -272,20 +265,11 @@ body {
     border: 0;
 
     background:
-        rgba(
-            0,
-            238,
-            255,
-            0.035
-        );
+        rgba(0, 238, 255, 0.035);
 
     border:
-        1px solid rgba(
-            0,
-            238,
-            255,
-            0.12
-        );
+        1px solid
+        rgba(0, 238, 255, 0.12);
 
     color: #d9fbff;
 
@@ -309,7 +293,6 @@ body {
 
 
 .sidebar-item .icon {
-
     margin-right: 10px;
 }
 
@@ -341,12 +324,7 @@ body {
     inset: 0;
 
     background:
-        rgba(
-            0,
-            0,
-            0,
-            .55
-        );
+        rgba(0, 0, 0, .65);
 
     z-index: 90;
 
@@ -371,6 +349,9 @@ body {
     flex-direction: column;
 
     min-height: 0;
+
+    background:
+        transparent !important;
 }
 
 
@@ -382,6 +363,8 @@ body {
         12px;
 
     text-align: center;
+
+    background: transparent !important;
 }
 
 
@@ -399,12 +382,7 @@ body {
 
     border:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .75
-        );
+        rgba(0, 238, 255, .75);
 
     display: flex;
     align-items: center;
@@ -419,23 +397,14 @@ body {
     font-weight: 800;
 
     text-shadow:
-        0 0 20px
-        #00eaff;
+        0 0 20px #00eaff;
 
     box-shadow:
         0 0 30px
-        rgba(
-            0,
-            238,
-            255,
-            .18),
+        rgba(0, 238, 255, .18),
 
         inset 0 0 30px
-        rgba(
-            0,
-            238,
-            255,
-            .1);
+        rgba(0, 238, 255, .1);
 }
 
 
@@ -452,11 +421,7 @@ body {
 
     border:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .3);
+        rgba(0, 238, 255, .3);
 
     animation:
         rotate 8s linear infinite;
@@ -495,15 +460,15 @@ body {
     font-size: 22px;
 
     letter-spacing: 2px;
+
+    color: #eaffff;
 }
 
 
 .hero p {
 
     margin:
-        7px
-        0
-        0;
+        7px 0 0;
 
     color: #67949a;
 
@@ -527,6 +492,10 @@ body {
         12px;
 
     scroll-behavior: smooth;
+
+    background: transparent !important;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 
@@ -557,21 +526,11 @@ body {
     margin-left: auto;
 
     background:
-        rgba(
-            0,
-            238,
-            255,
-            .09
-        );
+        rgba(0, 238, 255, .09);
 
     border:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .2
-        );
+        rgba(0, 238, 255, .2);
 
     color: #e8feff;
 }
@@ -582,21 +541,11 @@ body {
     margin-right: auto;
 
     background:
-        rgba(
-            255,
-            255,
-            255,
-            .035
-        );
+        rgba(255, 255, 255, .035);
 
     border:
         1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .08
-        );
+        rgba(255, 255, 255, .08);
 
     color: #d4edef;
 }
@@ -606,20 +555,10 @@ body {
 
     border:
         1px solid
-        rgba(
-            255,
-            75,
-            75,
-            .5
-        );
+        rgba(255, 75, 75, .5);
 
     background:
-        rgba(
-            255,
-            45,
-            45,
-            .07
-        );
+        rgba(255, 45, 45, .07);
 
     color: #ffb8b8;
 }
@@ -635,8 +574,7 @@ body {
         10px
         12px
         calc(
-            10px
-            +
+            10px +
             env(safe-area-inset-bottom)
         );
 
@@ -646,20 +584,14 @@ body {
 
     border-top:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .14
-        );
+        rgba(0, 238, 255, .14);
 
     background:
-        rgba(
-            0,
-            8,
-            10,
-            .9
-        );
+        rgba(2, 7, 8, .98) !important;
+
+    position: relative;
+
+    z-index: 10;
 }
 
 
@@ -675,30 +607,24 @@ body {
 
     border:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .2
-        );
+        rgba(0, 238, 255, .2);
 
     background:
-        rgba(
-            255,
-            255,
-            255,
-            .035
-        );
+        rgba(255, 255, 255, .035) !important;
 
     color: white;
 
     padding:
-        0
-        14px;
+        0 14px;
 
     outline: none;
 
     font-size: 16px;
+}
+
+
+.input::placeholder {
+    color: #527277;
 }
 
 
@@ -734,12 +660,7 @@ body {
     inset: 0;
 
     background:
-        rgba(
-            0,
-            0,
-            0,
-            .72
-        );
+        rgba(0, 0, 0, .78);
 
     z-index: 200;
 
@@ -769,16 +690,11 @@ body {
     overflow-y: auto;
 
     background:
-        #071215;
+        #071215 !important;
 
     border:
         1px solid
-        rgba(
-            0,
-            238,
-            255,
-            .25
-        );
+        rgba(0, 238, 255, .25);
 
     border-radius: 20px;
 
@@ -786,12 +702,9 @@ body {
 
     box-shadow:
         0 20px 70px
-        rgba(
-            0,
-            0,
-            0,
-            .65
-        );
+        rgba(0, 0, 0, .65);
+
+    color: #dffcff;
 }
 
 
@@ -833,20 +746,10 @@ body {
 
     border:
         1px solid
-        rgba(
-            255,
-            90,
-            90,
-            .22
-        );
+        rgba(255, 90, 90, .22);
 
     background:
-        rgba(
-            255,
-            60,
-            60,
-            .045
-        );
+        rgba(255, 60, 60, .045);
 
     border-radius: 14px;
 
@@ -891,18 +794,12 @@ body {
     display: inline-block;
 
     padding:
-        3px
-        7px;
+        3px 7px;
 
     border-radius: 6px;
 
     background:
-        rgba(
-            255,
-            90,
-            90,
-            .12
-        );
+        rgba(255, 90, 90, .12);
 
     color: #ff9f9f;
 
@@ -939,20 +836,10 @@ body {
 
     border:
         1px solid
-        rgba(
-            255,
-            80,
-            80,
-            .3
-        );
+        rgba(255, 80, 80, .3);
 
     background:
-        rgba(
-            255,
-            60,
-            60,
-            .08
-        );
+        rgba(255, 60, 60, .08);
 
     color: #ff9b9b;
 
@@ -970,40 +857,45 @@ body.sinem-theme {
 
     background:
         radial-gradient(
-            circle at center,
+            circle at 50% 35%,
             #270c1c 0%,
             #090208 55%,
             #000 100%
-        );
+        ) !important;
+}
+
+
+body.sinem-theme .app {
+
+    background:
+        radial-gradient(
+            circle at 50% 30%,
+            rgba(255, 100, 190, .035),
+            transparent 45%
+        ),
+        #090208;
 }
 
 
 body.sinem-theme .header {
 
+    background:
+        rgba(9, 2, 8, .97) !important;
+
     border-bottom-color:
-        rgba(
-            255,
-            90,
-            180,
-            .22
-        );
+        rgba(255, 90, 180, .22);
 }
 
 
-body.sinem-theme .brand-sub,
 body.sinem-theme .brand-main,
+body.sinem-theme .brand-sub,
 body.sinem-theme .hero h1 {
 
     color: #ff8bc7;
 
     text-shadow:
         0 0 14px
-        rgba(
-            255,
-            80,
-            170,
-            .4
-        );
+        rgba(255, 80, 170, .4);
 }
 
 
@@ -1012,21 +904,11 @@ body.sinem-theme .logo {
     color: #ff72bd;
 
     border-color:
-        rgba(
-            255,
-            100,
-            190,
-            .8
-        );
+        rgba(255, 100, 190, .8);
 
     box-shadow:
         0 0 35px
-        rgba(
-            255,
-            70,
-            170,
-            .2
-        );
+        rgba(255, 70, 170, .2);
 }
 
 
@@ -1034,36 +916,77 @@ body.sinem-theme .logo::before,
 body.sinem-theme .logo::after {
 
     border-color:
-        rgba(
-            255,
-            100,
-            190,
-            .35
-        );
+        rgba(255, 100, 190, .35);
+}
+
+
+body.sinem-theme .input-area {
+
+    background:
+        rgba(9, 2, 8, .98) !important;
+
+    border-top-color:
+        rgba(255, 90, 180, .18);
 }
 
 
 body.sinem-theme .send {
 
     background: #ff72bd;
+
+    color: #240716;
 }
 
 
 /* =====================================================
-   RESPONSIVE
+   MOBİL
+===================================================== */
+
+@media (max-width: 480px) {
+
+    .header {
+        height: 70px;
+        min-height: 70px;
+    }
+
+    .brand-main {
+        font-size: 18px;
+        letter-spacing: 3px;
+    }
+
+    .hero {
+        padding-top: 20px;
+    }
+
+    .logo {
+        width: 88px;
+        height: 88px;
+        font-size: 36px;
+    }
+
+    .hero h1 {
+        font-size: 20px;
+    }
+
+    .message {
+        max-width: 92%;
+    }
+}
+
+
+/* =====================================================
+   MASAÜSTÜ
 ===================================================== */
 
 @media (min-width: 700px) {
 
     .chat {
 
-        width: 720px;
-
-        margin: auto;
-
         width: 100%;
 
         max-width: 720px;
+
+        margin: auto;
     }
 
     .input-area {
@@ -1086,7 +1009,9 @@ body.sinem-theme .send {
 <div class="app">
 
 
-    <!-- SIDEBAR -->
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
 
     <aside
         class="sidebar"
@@ -1127,15 +1052,6 @@ body.sinem-theme .send {
 
         <button
             class="sidebar-item"
-            onclick="toggleNight()"
-        >
-            <span class="icon">◐</span>
-            Gece / Gündüz
-        </button>
-
-
-        <button
-            class="sidebar-item"
             onclick="toggleFunMode()"
         >
             <span class="icon">⚡</span>
@@ -1146,6 +1062,7 @@ body.sinem-theme .send {
         <div class="sidebar-bottom">
 
             KARAHAN INC.<br>
+
             J.A.R.V.I.S. v18.0.0
 
         </div>
@@ -1160,7 +1077,9 @@ body.sinem-theme .send {
     ></div>
 
 
-    <!-- HEADER -->
+    <!-- =================================================
+         HEADER
+    ================================================== -->
 
     <header class="header">
 
@@ -1196,7 +1115,9 @@ body.sinem-theme .send {
     </header>
 
 
-    <!-- MAIN -->
+    <!-- =================================================
+         MAIN
+    ================================================== -->
 
     <main class="main">
 
@@ -1251,7 +1172,9 @@ body.sinem-theme .send {
 </div>
 
 
-<!-- PROFILE MODAL -->
+<!-- =====================================================
+     PROFİL MODAL
+===================================================== -->
 
 <div
     class="modal"
@@ -1267,6 +1190,7 @@ body.sinem-theme .send {
             ×
         </button>
 
+
         <div class="modal-title">
             PROFİL DEĞİŞTİR
         </div>
@@ -1276,7 +1200,10 @@ body.sinem-theme .send {
             id="profileUsername"
             class="input"
             placeholder="Kullanıcı adı"
-            style="width:100%;margin-bottom:10px;"
+            style="
+                width:100%;
+                margin-bottom:10px;
+            "
         >
 
 
@@ -1285,13 +1212,19 @@ body.sinem-theme .send {
             class="input"
             type="password"
             placeholder="Şifre"
-            style="width:100%;margin-bottom:10px;"
+            style="
+                width:100%;
+                margin-bottom:10px;
+            "
         >
 
 
         <button
             class="send"
-            style="width:100%;height:48px;"
+            style="
+                width:100%;
+                height:48px;
+            "
             onclick="loginProfile()"
         >
             GİRİŞ YAP
@@ -1312,7 +1245,9 @@ body.sinem-theme .send {
 </div>
 
 
-<!-- ERROR MODAL -->
+<!-- =====================================================
+     HATA MODAL
+===================================================== -->
 
 <div
     class="modal"
@@ -1384,6 +1319,7 @@ const chat =
     document.getElementById(
         "chat"
     );
+
 
 const input =
     document.getElementById(
@@ -1466,7 +1402,8 @@ function addMessage(
     element.className =
         "message " + type;
 
-    element.textContent = text;
+    element.textContent =
+        text;
 
     chat.appendChild(
         element
@@ -1480,12 +1417,14 @@ function addMessage(
 
 
 /* =====================================================
-   BEKLEME MESAJI
+   BEKLEME MESAJLARI
 ===================================================== */
 
 function waitingMessage() {
 
-    if (currentUser === "sinem") {
+    if (
+        currentUser === "sinem"
+    ) {
 
         const messages = [
 
@@ -1508,7 +1447,9 @@ function waitingMessage() {
     }
 
 
-    if (currentUser === "betul") {
+    if (
+        currentUser === "betul"
+    ) {
 
         const messages = [
 
@@ -1544,6 +1485,7 @@ async function sendMessage() {
     const message =
         input.value.trim();
 
+
     if (!message) {
         return;
     }
@@ -1553,6 +1495,7 @@ async function sendMessage() {
         message,
         "user"
     );
+
 
     input.value = "";
 
@@ -1606,6 +1549,7 @@ async function sendMessage() {
                 data.detail ||
                 data.message ||
                 "Bilinmeyen hata.";
+
 
             addMessage(
 
@@ -1676,12 +1620,14 @@ async function openErrors() {
 
     closeSidebar();
 
+
     document
         .getElementById(
             "errorsModal"
         )
         .classList
         .add("active");
+
 
     await loadErrors();
 }
@@ -1751,6 +1697,7 @@ async function loadErrors() {
                     document.createElement(
                         "div"
                     );
+
 
                 card.className =
                     "error-card";
@@ -1911,13 +1858,16 @@ async function newChat() {
     try {
 
         await fetch(
+
             "/new-chat?username=" +
             encodeURIComponent(
                 currentUser
             ),
+
             {
                 method: "POST"
             }
+
         );
 
     } catch (error) {
@@ -1943,6 +1893,7 @@ async function loginProfile() {
             )
             .value
             .trim();
+
 
     const password =
         document
@@ -2059,6 +2010,7 @@ async function loginProfile() {
                 "Tekrar hoş geldiniz efendim. JARVIS tüm sistemleri hazır durumda.",
                 "assistant"
             );
+
         }
 
 
@@ -2079,6 +2031,7 @@ function applyUserTheme() {
     const body =
         document.body;
 
+
     body.classList.remove(
         "sinem-theme"
     );
@@ -2088,6 +2041,7 @@ function applyUserTheme() {
         document.getElementById(
             "greeting"
         );
+
 
     const subtitle =
         document.getElementById(
@@ -2103,11 +2057,14 @@ function applyUserTheme() {
             "sinem-theme"
         );
 
+
         greeting.textContent =
             "Hoş geldiniz prenses";
 
+
         subtitle.textContent =
             "JARVIS sizin için hazır. ❤️";
+
 
     } else if (
         currentUser === "betul"
@@ -2116,13 +2073,16 @@ function applyUserTheme() {
         greeting.textContent =
             "Merhaba Betül";
 
+
         subtitle.textContent =
             "JARVIS hazır.";
+
 
     } else {
 
         greeting.textContent =
             "Merhaba efendim";
+
 
         subtitle.textContent =
             "JARVIS sizin için hazır.";
@@ -2131,19 +2091,7 @@ function applyUserTheme() {
 
 
 /* =====================================================
-   GECE / GÜNDÜZ
-===================================================== */
-
-function toggleNight() {
-
-    document.body.classList.toggle(
-        "day-mode"
-    );
-}
-
-
-/* =====================================================
-   EĞLENCE
+   EĞLENCE MODU
 ===================================================== */
 
 function toggleFunMode() {
@@ -2152,12 +2100,19 @@ function toggleFunMode() {
         !funMode;
 
 
-    if (currentUser === "karahan") {
+    closeSidebar();
+
+
+    if (
+        currentUser === "karahan"
+    ) {
 
         addMessage(
+
             funMode
                 ? "Eğlence modu açıldı efendim. Ancak profesyonel JARVIS protokolü korunuyor."
                 : "Eğlence modu kapatıldı efendim.",
+
             "assistant"
         );
 
