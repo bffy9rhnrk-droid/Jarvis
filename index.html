@@ -2,1127 +2,152 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>K.A.R.V.I.S. - KARAHAN INC.</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    background: #02070a;
-    color: white;
-}
-
-body {
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(0, 229, 255, 0.09),
-            transparent 38%
-        ),
-        radial-gradient(
-            circle at 50% 100%,
-            rgba(0, 229, 255, 0.035),
-            transparent 45%
-        ),
-        #02070a;
-
-    transition: background 0.3s ease;
-}
-
-button,
-input {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-    -webkit-appearance: none;
-}
-
-button:active {
-    transform: scale(0.97);
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.header {
-    height: 72px;
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-
-    border-bottom:
-        1px solid rgba(0, 229, 255, 0.15);
-
-    background:
-        rgba(2, 7, 10, 0.92);
-
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    position: relative;
-    z-index: 10;
-}
-
-.logo-small {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-
-    border: 2px solid #00e5ff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #00e5ff;
-
-    font-size: 21px;
-    font-weight: 800;
-
-    box-shadow:
-        0 0 12px rgba(0, 229, 255, 0.5),
-        inset 0 0 12px rgba(0, 229, 255, 0.12);
-
-    animation:
-        logoPulse 3s ease-in-out infinite;
-}
-
-.brand {
-    margin-left: 12px;
-}
-
-.brand-title {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 2px;
-}
-
-.brand-subtitle {
-    color:
-        rgba(255, 255, 255, 0.5);
-
-    font-size: 9px;
-    letter-spacing: 3px;
-    margin-top: 2px;
-}
-
-.online {
-    margin-left: 10px;
-
-    font-size: 9px;
-
-    color: #00e5ff;
-
-    letter-spacing: 0.5px;
-}
-
-.menu-button {
-    margin-left: auto;
-
-    width: 44px;
-    height: 44px;
-
-    border:
-        1px solid rgba(0, 229, 255, 0.25);
-
-    border-radius: 14px;
-
-    background:
-        rgba(0, 229, 255, 0.05);
-
-    color: #00e5ff;
-
-    font-size: 22px;
-
-    transition: 0.2s ease;
-}
-
-.menu-button:hover {
-    background:
-        rgba(0, 229, 255, 0.12);
-}
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.main {
-    height:
-        calc(100vh - 72px);
-
-    display: flex;
-    flex-direction: column;
-
-    position: relative;
-}
-
-.hud {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
-
-
-/* =====================================================
-   HUD CORE
-===================================================== */
-
-.hud-core {
-    position: absolute;
-
-    left: 50%;
-    top: 38%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: 210px;
-    height: 210px;
-
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ring {
-    position: absolute;
-
-    border-radius: 50%;
-
-    border:
-        1px solid rgba(0, 229, 255, 0.35);
-
-    animation:
-        spin 9s linear infinite;
-}
-
-.ring.one {
-    width: 210px;
-    height: 210px;
-}
-
-.ring.two {
-    width: 170px;
-    height: 170px;
-
-    border-style: dashed;
-
-    animation-duration: 6s;
-    animation-direction: reverse;
-}
-
-.ring.three {
-    width: 130px;
-    height: 130px;
-
-    border-color:
-        rgba(0, 229, 255, 0.7);
-
-    animation-duration: 4s;
-}
-
-.core {
-    width: 82px;
-    height: 82px;
-
-    border-radius: 50%;
-
-    border:
-        2px solid #00e5ff;
-
-    color: #00e5ff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 38px;
-    font-weight: 900;
-
-    box-shadow:
-        0 0 25px rgba(0, 229, 255, 0.7),
-        inset 0 0 20px rgba(0, 229, 255, 0.2);
-
-    z-index: 2;
-
-    transition:
-        0.3s ease;
-}
-
-.status {
-    position: absolute;
-
-    top:
-        calc(38% + 120px);
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    color:
-        rgba(255, 255, 255, 0.5);
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    white-space: nowrap;
-
-    text-align: center;
-
-    transition:
-        0.2s ease;
-}
-
-.status.busy {
-    color: #00e5ff;
-
-    text-shadow:
-        0 0 10px rgba(0, 229, 255, 0.5);
-}
-
-
-/* =====================================================
-   CHAT
-===================================================== */
-
-.chat {
-    position: absolute;
-
-    left: 12px;
-    right: 12px;
-
-    bottom: 100px;
-
-    max-height: 38%;
-
-    overflow-y: auto;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 8px;
-
-    padding-bottom: 4px;
-
-    scrollbar-width: none;
-}
-
-.chat::-webkit-scrollbar {
-    display: none;
-}
-
-.message {
-    max-width: 86%;
-
-    padding:
-        11px 14px;
-
-    border-radius: 15px;
-
-    font-size: 14px;
-
-    line-height: 1.45;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-
-    animation:
-        messageIn 0.2s ease;
-}
-
-.message.ai {
-    align-self: flex-start;
-
-    background:
-        rgba(0, 229, 255, 0.08);
-
-    border:
-        1px solid rgba(0, 229, 255, 0.16);
-}
-
-.message.user {
-    align-self: flex-end;
-
-    background:
-        rgba(255, 255, 255, 0.07);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.1);
-}
-
-.message a {
-    color: #00e5ff;
-    text-decoration: none;
-}
-
-.message a:hover {
-    text-decoration: underline;
-}
-
-
-/* =====================================================
-   WAITING
-===================================================== */
-
-.waiting-message {
-    min-width: 190px;
-}
-
-.waiting-title {
-    color: #00e5ff;
-
-    font-weight: 700;
-
-    margin-bottom: 4px;
-}
-
-.waiting-detail {
-    color:
-        rgba(255, 255, 255, 0.55);
-
-    font-size: 11px;
-}
-
-
-/* =====================================================
-   INPUT
-===================================================== */
-
-.input-area {
-    position: absolute;
-
-    left: 12px;
-    right: 12px;
-
-    bottom: 15px;
-
-    height: 58px;
-
-    display: flex;
-
-    gap: 8px;
-}
-
-.input {
-    min-width: 0;
-
-    flex: 1;
-
-    border:
-        1px solid rgba(0, 229, 255, 0.22);
-
-    border-radius: 18px;
-
-    background:
-        rgba(5, 15, 20, 0.95);
-
-    color: white;
-
-    padding:
-        0 17px;
-
-    outline: none;
-
-    font-size: 16px;
-
-    box-shadow:
-        inset 0 0 12px
-        rgba(0, 229, 255, 0.025);
-}
-
-.input::placeholder {
-    color:
-        rgba(255, 255, 255, 0.38);
-}
-
-.input:focus {
-    border-color:
-        rgba(0, 229, 255, 0.65);
-
-    box-shadow:
-        0 0 14px
-        rgba(0, 229, 255, 0.08);
-}
-
-.send {
-    width: 58px;
-
-    border: 0;
-
-    border-radius: 18px;
-
-    background: #00e5ff;
-
-    color: #001014;
-
-    font-size: 22px;
-
-    font-weight: 900;
-
-    box-shadow:
-        0 0 15px
-        rgba(0, 229, 255, 0.25);
-
-    transition:
-        0.2s ease;
-}
-
-.send:disabled {
-    opacity: 0.45;
-    cursor: default;
-}
-
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-.sidebar {
-    position: fixed;
-
-    left: 0;
-    top: 0;
-    bottom: 0;
-
-    width:
-        min(330px, 88vw);
-
-    background:
-        rgba(2, 7, 10, 0.98);
-
-    border-right:
-        1px solid rgba(0, 229, 255, 0.2);
-
-    z-index: 100;
-
-    transform:
-        translateX(-105%);
-
-    transition:
-        transform 0.25s ease;
-
-    padding:
-        22px 15px;
-
-    overflow-y: auto;
-
-    box-shadow:
-        10px 0 40px
-        rgba(0, 0, 0, 0.35);
-}
-
-.sidebar.open {
-    transform:
-        translateX(0);
-}
-
-.sidebar-title {
-    color: #00e5ff;
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-
-    margin-bottom: 20px;
-}
-
-.menu-item {
-    width: 100%;
-
-    min-height: 48px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.08);
-
-    border-radius: 14px;
-
-    background:
-        rgba(255, 255, 255, 0.035);
-
-    color: white;
-
-    text-align: left;
-
-    padding:
-        12px 14px;
-
-    margin-bottom: 8px;
-
-    transition:
-        0.2s ease;
-}
-
-.menu-item:hover,
-.menu-item.active {
-    border-color:
-        rgba(0, 229, 255, 0.45);
-
-    background:
-        rgba(0, 229, 255, 0.08);
-
-    color: #00e5ff;
-}
-
-.academic-title {
-    margin:
-        22px 5px 10px;
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    color:
-        rgba(255, 255, 255, 0.4);
-}
-
-.close-sidebar {
-    position: absolute;
-
-    right: 14px;
-    top: 15px;
-
-    border: 0;
-
-    background: transparent;
-
-    color: #00e5ff;
-
-    font-size: 24px;
-}
-
-
-/* =====================================================
-   OVERLAY
-===================================================== */
-
-.overlay {
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(0, 0, 0, 0.5);
-
-    backdrop-filter:
-        blur(2px);
-
-    -webkit-backdrop-filter:
-        blur(2px);
-
-    z-index: 90;
-
-    display: none;
-}
-
-.overlay.show {
-    display: block;
-}
-
-
-/* =====================================================
-   MODAL
-===================================================== */
-
-.modal {
-    position: fixed;
-
-    left: 50%;
-    top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width:
-        min(92vw, 440px);
-
-    max-height: 85vh;
-
-    overflow-y: auto;
-
-    background:
-        #071116;
-
-    border:
-        1px solid rgba(0, 229, 255, 0.25);
-
-    border-radius: 22px;
-
-    z-index: 200;
-
-    padding: 22px;
-
-    display: none;
-
-    box-shadow:
-        0 20px 80px
-        rgba(0, 0, 0, 0.55);
-}
-
-.modal.show {
-    display: block;
-}
-
-.modal h2 {
-    margin-top: 0;
-
-    color: #00e5ff;
-}
-
-.modal input {
-    width: 100%;
-
-    height: 48px;
-
-    margin-bottom: 10px;
-
-    border-radius: 12px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.12);
-
-    background:
-        rgba(255, 255, 255, 0.05);
-
-    color: white;
-
-    padding:
-        0 12px;
-
-    font-size: 16px;
-
-    outline: none;
-}
-
-.modal input:focus {
-    border-color:
-        rgba(0, 229, 255, 0.6);
-}
-
-.modal-button {
-    width: 100%;
-
-    height: 46px;
-
-    border: 0;
-
-    border-radius: 12px;
-
-    background: #00e5ff;
-
-    color: #001014;
-
-    font-weight: 800;
-}
-
-.secondary-button {
-    margin-top: 8px;
-
-    background:
-        rgba(255, 255, 255, 0.08);
-
-    color: white;
-}
-
-
-/* =====================================================
-   PROGRESS
-===================================================== */
-
-.progress-bar {
-    width: 100%;
-
-    height: 3px;
-
-    margin-top: 10px;
-
-    overflow: hidden;
-
-    border-radius: 99px;
-
-    background:
-        rgba(255, 255, 255, 0.08);
-}
-
-.progress-bar-inner {
-    width: 20%;
-
-    height: 100%;
-
-    background:
-        #00e5ff;
-
-    border-radius: 99px;
-
-    animation:
-        progressMove 1.1s ease-in-out infinite;
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-.error-list {
-    max-height: 50vh;
-    overflow-y: auto;
-}
-
-.error-item {
-    padding: 10px;
-    margin-bottom: 8px;
-
-    border-radius: 10px;
-
-    background:
-        rgba(255, 70, 70, 0.06);
-
-    border:
-        1px solid rgba(255, 70, 70, 0.12);
-
-    color:
-        rgba(255, 255, 255, 0.8);
-
-    font-size: 12px;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-}
-
-
-/* =====================================================
-   FUN / SINEM
-===================================================== */
-
-body.sinem-mode .ring {
-    border-color:
-        rgba(255, 80, 180, 0.45);
-}
-
-body.sinem-mode .core {
-    color: #ff5ab4;
-
-    border-color: #ff5ab4;
-
-    box-shadow:
-        0 0 25px rgba(255, 90, 180, 0.55),
-        inset 0 0 20px rgba(255, 90, 180, 0.15);
-}
-
-body.fun-mode .ring {
-    border-color:
-        rgba(255, 50, 50, 0.6);
-}
-
-body.fun-mode .core {
-    color: #ff4444;
-
-    border-color: #ff4444;
-
-    box-shadow:
-        0 0 25px rgba(255, 50, 50, 0.6),
-        inset 0 0 20px rgba(255, 50, 50, 0.15);
-}
-
-body.fun-mode .status {
-    color: #ff4444;
-}
-
-
-/* =====================================================
-   ANIMATIONS
-===================================================== */
-
-@keyframes spin {
-
-    from {
-        transform:
-            rotate(0deg);
-    }
-
-    to {
-        transform:
-            rotate(360deg);
-    }
-}
-
-@keyframes logoPulse {
-
-    0%,
-    100% {
-        box-shadow:
-            0 0 12px rgba(0, 229, 255, 0.5),
-            inset 0 0 12px rgba(0, 229, 255, 0.12);
-    }
-
-    50% {
-        box-shadow:
-            0 0 22px rgba(0, 229, 255, 0.75),
-            inset 0 0 16px rgba(0, 229, 255, 0.18);
-    }
-}
-
-@keyframes messageIn {
-
-    from {
-        opacity: 0;
-        transform:
-            translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-        transform:
-            translateY(0);
-    }
-}
-
-@keyframes progressMove {
-
-    0% {
-        transform:
-            translateX(-130%);
-    }
-
-    100% {
-        transform:
-            translateX(550%);
-    }
-}
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#02070a;color:#fff}
+body{background:radial-gradient(circle at center,rgba(0,229,255,.09),transparent 38%),radial-gradient(circle at 50% 100%,rgba(0,229,255,.035),transparent 45%),#02070a}
+button,input{font:inherit}
+button{cursor:pointer;-webkit-appearance:none}
+button:active{transform:scale(.97)}
+
+.header{height:72px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,229,255,.15);background:rgba(2,7,10,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;z-index:10}
+.logo-small{width:44px;height:44px;border-radius:50%;border:2px solid #00e5ff;display:flex;align-items:center;justify-content:center;color:#00e5ff;font-size:21px;font-weight:800;box-shadow:0 0 12px rgba(0,229,255,.5),inset 0 0 12px rgba(0,229,255,.12);animation:logoPulse 3s ease-in-out infinite}
+.brand{margin-left:12px}
+.brand-title{font-size:18px;font-weight:800;letter-spacing:2px}
+.brand-subtitle{color:rgba(255,255,255,.5);font-size:9px;letter-spacing:3px;margin-top:2px}
+.online{margin-left:10px;font-size:9px;color:#00e5ff;letter-spacing:.5px}
+.menu-button{margin-left:auto;width:44px;height:44px;border:1px solid rgba(0,229,255,.25);border-radius:14px;background:rgba(0,229,255,.05);color:#00e5ff;font-size:22px}
+
+.main{height:calc(100vh - 72px);display:flex;flex-direction:column;position:relative}
+.hud{flex:1;position:relative;overflow:hidden}
+
+.hud-core{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:210px;height:210px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,.35);animation:spin 9s linear infinite}
+.ring.one{width:210px;height:210px}
+.ring.two{width:170px;height:170px;border-style:dashed;animation-duration:6s;animation-direction:reverse}
+.ring.three{width:130px;height:130px;border-color:rgba(0,229,255,.7);animation-duration:4s}
+.core{width:82px;height:82px;border-radius:50%;border:2px solid #00e5ff;color:#00e5ff;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;box-shadow:0 0 25px rgba(0,229,255,.7),inset 0 0 20px rgba(0,229,255,.2);z-index:2}
+.status{position:absolute;top:calc(38% + 120px);left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:2px;white-space:nowrap;text-align:center}
+.status.busy{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,.5)}
+
+.chat{position:absolute;left:12px;right:12px;bottom:100px;max-height:38%;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:4px;scrollbar-width:none}
+.chat::-webkit-scrollbar{display:none}
+.message{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word;animation:messageIn .2s ease}
+.message.ai{align-self:flex-start;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.16)}
+.message.user{align-self:flex-end;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.message a{color:#00e5ff;text-decoration:none}
+
+.waiting-message{min-width:190px}
+.waiting-title{color:#00e5ff;font-weight:700;margin-bottom:4px}
+.waiting-detail{color:rgba(255,255,255,.55);font-size:11px}
+
+.input-area{position:absolute;left:12px;right:12px;bottom:15px;height:58px;display:flex;gap:8px}
+.input{min-width:0;flex:1;border:1px solid rgba(0,229,255,.22);border-radius:18px;background:rgba(5,15,20,.95);color:white;padding:0 17px;outline:none;font-size:16px}
+.input::placeholder{color:rgba(255,255,255,.38)}
+.input:focus{border-color:rgba(0,229,255,.65)}
+.send{width:58px;border:0;border-radius:18px;background:#00e5ff;color:#001014;font-size:22px;font-weight:900;box-shadow:0 0 15px rgba(0,229,255,.25)}
+.send:disabled{opacity:.45;cursor:default}
+
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:min(330px,88vw);background:rgba(2,7,10,.98);border-right:1px solid rgba(0,229,255,.2);z-index:100;transform:translateX(-105%);transition:transform .25s ease;padding:22px 15px;overflow-y:auto;box-shadow:10px 0 40px rgba(0,0,0,.35)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-title{color:#00e5ff;font-size:16px;font-weight:800;letter-spacing:2px;margin-bottom:20px}
+.menu-item{width:100%;min-height:48px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035);color:white;text-align:left;padding:12px 14px;margin-bottom:8px;transition:.2s ease}
+.menu-item:hover,.menu-item.active{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.08);color:#00e5ff}
+.academic-title{margin:22px 5px 10px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.4)}
+.close-sidebar{position:absolute;right:14px;top:15px;border:0;background:transparent;color:#00e5ff;font-size:24px}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);z-index:90;display:none}
+.overlay.show{display:block}
+
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,440px);max-height:85vh;overflow-y:auto;background:#071116;border:1px solid rgba(0,229,255,.25);border-radius:22px;z-index:200;padding:22px;display:none;box-shadow:0 20px 80px rgba(0,0,0,.55)}
+.modal.show{display:block}
+.modal h2{margin-top:0;color:#00e5ff}
+.modal input{width:100%;height:48px;margin-bottom:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:white;padding:0 12px;font-size:16px;outline:none}
+.modal-button{width:100%;height:46px;border:0;border-radius:12px;background:#00e5ff;color:#001014;font-weight:800}
+.secondary-button{margin-top:8px;background:rgba(255,255,255,.08);color:white}
+
+.progress-bar{width:100%;height:3px;margin-top:10px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.08)}
+.progress-bar-inner{width:20%;height:100%;background:#00e5ff;border-radius:99px;animation:progressMove 1.1s ease-in-out infinite}
+
+.error-list{max-height:50vh;overflow-y:auto}
+.error-item{padding:10px;margin-bottom:8px;border-radius:10px;background:rgba(255,70,70,.06);border:1px solid rgba(255,70,70,.12);color:rgba(255,255,255,.8);font-size:12px;white-space:pre-wrap;word-break:break-word}
+
+body.sinem-mode .ring{border-color:rgba(255,80,180,.45)}
+body.sinem-mode .core{color:#ff5ab4;border-color:#ff5ab4;box-shadow:0 0 25px rgba(255,90,180,.55),inset 0 0 20px rgba(255,90,180,.15)}
+body.fun-mode .ring{border-color:rgba(255,50,50,.6)}
+body.fun-mode .core{color:#ff4444;border-color:#ff4444;box-shadow:0 0 25px rgba(255,50,50,.6),inset 0 0 20px rgba(255,50,50,.15)}
+body.fun-mode .status{color:#ff4444}
+
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 12px rgba(0,229,255,.5),inset 0 0 12px rgba(0,229,255,.12)}50%{box-shadow:0 0 22px rgba(0,229,255,.75),inset 0 0 16px rgba(0,229,255,.18)}}
+@keyframes messageIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes progressMove{0%{transform:translateX(-130%)}100%{transform:translateX(550%)}}
 </style>
 </head>
 
-
 <body>
 
-
-<!-- ===================================================
-     HEADER
-=================================================== -->
-
 <div class="header">
-
-    <div class="logo-small">
-        K
-    </div>
-
+    <div class="logo-small">K</div>
     <div class="brand">
-
-        <div class="brand-title">
-            K.A.R.V.I.S.
-        </div>
-
-        <div class="brand-subtitle">
-            KARAHAN INC.
-        </div>
-
+        <div class="brand-title">K.A.R.V.I.S.</div>
+        <div class="brand-subtitle">KARAHAN INC.</div>
     </div>
-
-    <div
-        id="onlineStatus"
-        class="online"
-    >
-        ● ONLINE
-    </div>
-
-    <button
-        class="menu-button"
-        onclick="openSidebar()"
-        aria-label="Menüyü aç"
-    >
-        ☰
-    </button>
-
+    <div id="onlineStatus" class="online">● ONLINE</div>
+    <button class="menu-button" onclick="openSidebar()">☰</button>
 </div>
 
+<div id="overlay" class="overlay" onclick="closeSidebar()"></div>
 
-<!-- ===================================================
-     OVERLAY
-=================================================== -->
+<div id="sidebar" class="sidebar">
+    <button class="close-sidebar" onclick="closeSidebar()">×</button>
 
-<div
-    id="overlay"
-    class="overlay"
-    onclick="closeSidebar()"
-></div>
+    <div class="sidebar-title">K.A.R.V.I.S.</div>
 
+    <button class="menu-item" onclick="newChat()">＋ Yeni Sohbet</button>
+    <button class="menu-item" onclick="openErrors()">⚠ Hatalar</button>
+    <button class="menu-item" onclick="openProfile()">◉ Profil Değiştir</button>
 
-<!-- ===================================================
-     SIDEBAR
-=================================================== -->
-
-<div
-    id="sidebar"
-    class="sidebar"
->
-
-    <button
-        class="close-sidebar"
-        onclick="closeSidebar()"
-    >
-        ×
-    </button>
-
-    <div class="sidebar-title">
-        K.A.R.V.I.S.
-    </div>
-
-
-    <button
-        class="menu-item"
-        onclick="newChat()"
-    >
-        ＋ Yeni Sohbet
-    </button>
-
-
-    <button
-        class="menu-item"
-        onclick="openErrors()"
-    >
-        ⚠ Hatalar
-    </button>
-
-
-    <button
-        class="menu-item"
-        onclick="openProfile()"
-    >
-        ◉ Profil Değiştir
-    </button>
-
-
-    <button
-        id="funButton"
-        class="menu-item"
-        onclick="toggleFunMode()"
-    >
+    <button id="funButton" class="menu-item" onclick="toggleFunMode()">
         ◈ Eğlence Modu
     </button>
 
+    <div id="teacherMenu" style="display:none;">
+        <div class="academic-title">AKADEMİK ASİSTAN</div>
 
-    <div
-        id="teacherMenu"
-        style="display:none;"
-    >
-
-        <div class="academic-title">
-            AKADEMİK ASİSTAN
-        </div>
-
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="research"
-            onclick="selectAcademicMode('research')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="research" onclick="selectAcademicMode('research')">
             🔬 Araştırma Modu
         </button>
 
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="academic"
-            onclick="selectAcademicMode('academic')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="academic" onclick="selectAcademicMode('academic')">
             📚 Akademik Mod
         </button>
 
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="article"
-            onclick="selectAcademicMode('article')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="article" onclick="selectAcademicMode('article')">
             📝 Makale Asistanı
         </button>
 
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="lesson"
-            onclick="selectAcademicMode('lesson')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="lesson" onclick="selectAcademicMode('lesson')">
             🎓 Ders Asistanı
         </button>
 
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="quiz"
-            onclick="selectAcademicMode('quiz')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="quiz" onclick="selectAcademicMode('quiz')">
             🧪 Sınav / Quiz
         </button>
 
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="presentation"
-            onclick="selectAcademicMode('presentation')"
-        >
+        <button class="menu-item academic-menu-item" data-mode="presentation" onclick="selectAcademicMode('presentation')">
             📊 Sunum Hazırlama
         </button>
-
     </div>
-
 </div>
 
+<div id="profileModal" class="modal">
+    <h2>Profil Değiştir</h2>
 
-<!-- ===================================================
-     PROFILE MODAL
-=================================================== -->
-
-<div
-    id="profileModal"
-    class="modal"
->
-
-    <h2>
-        Profil Değiştir
-    </h2>
-
-    <input
-        id="usernameInput"
-        placeholder="Kullanıcı adı"
-        autocomplete="username"
-    >
+    <input id="usernameInput" placeholder="Kullanıcı adı" autocomplete="username">
 
     <input
         id="passwordInput"
@@ -1132,92 +157,42 @@ body.fun-mode .status {
         onkeydown="handleLoginKey(event)"
     >
 
-    <button
-        class="modal-button"
-        onclick="login()"
-    >
-        Giriş Yap
-    </button>
+    <button class="modal-button" onclick="login()">Giriş Yap</button>
 
-    <button
-        class="modal-button secondary-button"
-        onclick="closeModals()"
-    >
+    <button class="modal-button secondary-button" onclick="closeModals()">
         Vazgeç
     </button>
-
 </div>
 
+<div id="errorModal" class="modal">
+    <h2>Hatalar</h2>
 
-<!-- ===================================================
-     ERROR MODAL
-=================================================== -->
-
-<div
-    id="errorModal"
-    class="modal"
->
-
-    <h2>
-        Hatalar
-    </h2>
-
-    <div
-        id="errorContent"
-        class="error-list"
-    >
+    <div id="errorContent" class="error-list">
         Yükleniyor...
     </div>
 
-    <button
-        class="modal-button secondary-button"
-        onclick="closeModals()"
-    >
+    <button class="modal-button secondary-button" onclick="closeModals()">
         Kapat
     </button>
-
 </div>
 
-
-<!-- ===================================================
-     MAIN
-=================================================== -->
-
 <div class="main">
-
     <div class="hud">
 
         <div class="hud-core">
-
             <div class="ring one"></div>
-
             <div class="ring two"></div>
-
             <div class="ring three"></div>
-
-            <div class="core">
-                K
-            </div>
-
+            <div class="core">K</div>
         </div>
 
-
-        <div
-            id="status"
-            class="status"
-        >
+        <div id="status" class="status">
             K.A.R.V.I.S. HAZIR
         </div>
 
-
-        <div
-            id="chat"
-            class="chat"
-        ></div>
-
+        <div id="chat" class="chat"></div>
 
         <div class="input-area">
-
             <input
                 id="messageInput"
                 class="input"
@@ -1226,100 +201,48 @@ body.fun-mode .status {
                 onkeydown="handleKey(event)"
             >
 
-            <button
-                id="sendButton"
-                class="send"
-                onclick="sendMessage()"
-            >
+            <button id="sendButton" class="send" onclick="sendMessage()">
                 ➤
             </button>
-
         </div>
 
     </div>
-
 </div>
 
-
 <script>
-
-/* =====================================================
-   CONFIG
-===================================================== */
 
 const API = "";
 
 let currentUser = "karahan";
-
 let currentMode = "normal";
-
 let funMode = false;
-
 let sending = false;
-
 let presentationPolling = null;
-
 let dotsTimer = null;
 
-
-/* =====================================================
-   WAIT MESSAGES
-===================================================== */
-
 const waitMessages = [
-
     "Bir saniye efendim...",
-
     "Tamam, bir bakıyorum...",
-
-    "Dur, bunu birlikte çözelim...",
-
-    "Bir dakika, düşünüyorum...",
-
-    "Tamam, hemen ilgileniyorum..."
-
+    "Bir dakika, değerlendiriyorum...",
+    "Yanıt hazırlanıyor...",
+    "K.A.R.V.I.S. analiz ediyor..."
 ];
 
-
-/* =====================================================
-   HELPER
-===================================================== */
-
 function $(id) {
-
     return document.getElementById(id);
-
 }
-
-
-/* =====================================================
-   ESCAPE
-===================================================== */
 
 function escapeHTML(text) {
-
     return String(text)
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
-
-/* =====================================================
-   FORMAT
-===================================================== */
-
 function formatText(text) {
-
-    let safe =
-        escapeHTML(text);
+    let safe = escapeHTML(text);
 
     safe = safe.replace(
         /(https?:\/\/[^\s<]+)/g,
@@ -1329,196 +252,100 @@ function formatText(text) {
     return safe;
 }
 
+function addMessage(text,type="ai") {
+    const chat = $("chat");
+    const div = document.createElement("div");
 
-/* =====================================================
-   MESSAGE
-===================================================== */
+    div.className = "message " + type;
+    div.innerHTML = formatText(text);
 
-function addMessage(
-    text,
-    type = "ai"
-) {
-
-    const chat =
-        $("chat");
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.className =
-        "message " + type;
-
-    div.innerHTML =
-        formatText(text);
-
-    chat.appendChild(
-        div
-    );
-
-    chat.scrollTop =
-        chat.scrollHeight;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 
     return div;
 }
 
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
 function openSidebar() {
-
-    $("sidebar")
-        .classList.add("open");
-
-    $("overlay")
-        .classList.add("show");
+    $("sidebar").classList.add("open");
+    $("overlay").classList.add("show");
 }
-
 
 function closeSidebar() {
-
-    $("sidebar")
-        .classList.remove("open");
-
-    $("overlay")
-        .classList.remove("show");
+    $("sidebar").classList.remove("open");
+    $("overlay").classList.remove("show");
 }
-
-
-/* =====================================================
-   MODALS
-===================================================== */
 
 function closeModals() {
-
-    document
-        .querySelectorAll(".modal")
-        .forEach(
-            function(modal) {
-
-                modal.classList.remove(
-                    "show"
-                );
-
-            }
-        );
-}
-
-
-function openProfile() {
-
-    closeSidebar();
-
-    $("profileModal")
-        .classList.add("show");
-
-    setTimeout(
-        function() {
-
-            $("usernameInput")
-                .focus();
-
-        },
-        100
+    document.querySelectorAll(".modal").forEach(
+        modal => modal.classList.remove("show")
     );
 }
 
+function openProfile() {
+    closeSidebar();
+
+    $("profileModal").classList.add("show");
+
+    setTimeout(() => {
+        $("usernameInput").focus();
+    },100);
+}
 
 function handleLoginKey(event) {
-
-    if (
-        event.key === "Enter"
-    ) {
-
+    if(event.key === "Enter"){
         event.preventDefault();
-
         login();
     }
 }
 
-
 /* =====================================================
    LOGIN
+   ÖNEMLİ:
+   Güncel main.py -> POST /login
 ===================================================== */
 
 async function login() {
 
-    const username =
-        $("usernameInput")
-            .value
-            .trim()
-            .toLowerCase();
+    const username = $("usernameInput")
+        .value
+        .trim()
+        .toLowerCase();
 
-    const password =
-        $("passwordInput")
-            .value;
+    const password = $("passwordInput").value;
 
-    if (!username) {
-
-        alert(
-            "Kullanıcı adı girin."
-        );
-
-        $("usernameInput")
-            .focus();
-
+    if(!username){
+        alert("Kullanıcı adı girin.");
+        $("usernameInput").focus();
         return;
     }
 
-
     try {
 
-        const response =
-            await fetch(
-                API +
-                "/profile-login",
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            username:
-                                username,
-
-                            password:
-                                password
-
-                        })
-
-                }
-            );
-
+        const response = await fetch(
+            API + "/login",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    username:username,
+                    password:password
+                })
+            }
+        );
 
         let data;
 
         try {
-
-            data =
-                await response.json();
-
+            data = await response.json();
         } catch {
-
             throw new Error(
                 "Sunucudan geçersiz yanıt geldi."
             );
         }
 
-
-        if (
-            !response.ok ||
-            data.success !== true
-        ) {
+        if(!response.ok || data.success !== true){
 
             alert(
                 data.detail ||
@@ -1529,32 +356,47 @@ async function login() {
             return;
         }
 
+        /*
+         * Güncel main.py:
+         *
+         * data.username
+         *
+         * Bazı sürümlerde:
+         *
+         * data.user.username
+         *
+         * İkisini de destekliyoruz.
+         */
 
-        currentUser =
-            String(
-                data.username ||
-                username
-            )
-            .trim()
-            .toLowerCase();
+        currentUser = String(
+            (data.user && data.user.username) ||
+            data.username ||
+            username
+        )
+        .trim()
+        .toLowerCase();
 
-
-        if (
-            currentUser === "ilknur"
-        ) {
-
-            currentMode =
-                localStorage.getItem(
-                    "karvis_mode"
-                ) ||
-                "lesson";
-
-        } else {
-
-            currentMode =
-                "normal";
+        if(
+            ![
+                "karahan",
+                "betul",
+                "sinem",
+                "ilknur"
+            ].includes(currentUser)
+        ){
+            currentUser = username;
         }
 
+        if(currentUser === "ilknur"){
+
+            currentMode =
+                localStorage.getItem("karvis_mode") ||
+                "lesson";
+
+        }else{
+
+            currentMode = "normal";
+        }
 
         localStorage.setItem(
             "karvis_user",
@@ -1566,26 +408,20 @@ async function login() {
             currentMode
         );
 
-
-        $("usernameInput")
-            .value = "";
-
-        $("passwordInput")
-            .value = "";
-
+        $("usernameInput").value = "";
+        $("passwordInput").value = "";
 
         closeModals();
 
+        funMode = false;
+        document.body.classList.remove("fun-mode");
+
         applyUserTheme();
-
         updateSidebar();
-
         showGreeting();
-
         updateStatus();
 
-
-    } catch (error) {
+    } catch(error){
 
         console.error(
             "Profil giriş hatası:",
@@ -1593,228 +429,144 @@ async function login() {
         );
 
         alert(
-            "Sunucuya bağlanılamadı.\n\n" +
+            "Profil değiştirilemedi.\n\n" +
             error.message
         );
     }
 }
 
+function applyUserTheme(){
 
-/* =====================================================
-   USER THEME
-===================================================== */
+    document.body.classList.remove("sinem-mode");
 
-function applyUserTheme() {
-
-    document.body.classList.remove(
-        "sinem-mode"
-    );
-
-    if (
-        currentUser === "sinem"
-    ) {
-
-        document.body.classList.add(
-            "sinem-mode"
-        );
+    if(currentUser === "sinem"){
+        document.body.classList.add("sinem-mode");
     }
 }
 
+function updateStatus(){
 
-/* =====================================================
-   STATUS
-===================================================== */
+    if(funMode){
 
-function updateStatus() {
-
-    if (funMode) {
-
-        $("status")
-            .textContent =
+        $("status").textContent =
             "EĞLENCE MODU";
 
         return;
     }
 
+    if(currentUser === "ilknur"){
 
-    if (
-        currentUser === "ilknur"
-    ) {
-
-        $("status")
-            .textContent =
+        $("status").textContent =
             "AKADEMİK ASİSTAN HAZIR";
 
-    } else {
+    }else{
 
-        $("status")
-            .textContent =
+        $("status").textContent =
             "K.A.R.V.I.S. HAZIR";
     }
 }
 
+function updateSidebar(){
 
-/* =====================================================
-   SIDEBAR UPDATE
-===================================================== */
+    const teacherMenu = $("teacherMenu");
+    const funButton = $("funButton");
 
-function updateSidebar() {
+    if(currentUser === "ilknur"){
 
-    const teacherMenu =
-        $("teacherMenu");
+        teacherMenu.style.display = "block";
+        funButton.style.display = "none";
 
-    const funButton =
-        $("funButton");
+    }else{
 
-
-    if (
-        currentUser === "ilknur"
-    ) {
-
-        teacherMenu.style.display =
-            "block";
-
-        funButton.style.display =
-            "none";
-
-    } else {
-
-        teacherMenu.style.display =
-            "none";
-
-        funButton.style.display =
-            "block";
+        teacherMenu.style.display = "none";
+        funButton.style.display = "block";
     }
 
-
     document
-        .querySelectorAll(
-            ".academic-menu-item"
-        )
-        .forEach(
-            function(button) {
+        .querySelectorAll(".academic-menu-item")
+        .forEach(button => {
 
-                button.classList.toggle(
-                    "active",
-                    button.dataset.mode ===
-                    currentMode
-                );
-
-            }
-        );
+            button.classList.toggle(
+                "active",
+                button.dataset.mode === currentMode
+            );
+        });
 }
 
+function selectAcademicMode(mode){
 
-/* =====================================================
-   ACADEMIC MODE
-===================================================== */
-
-function selectAcademicMode(
-    mode
-) {
-
-    if (
-        currentUser !== "ilknur"
-    ) {
-
+    if(currentUser !== "ilknur"){
         return;
     }
 
-
-    currentMode =
-        mode;
-
+    currentMode = mode;
 
     localStorage.setItem(
         "karvis_mode",
         currentMode
     );
 
-
     updateSidebar();
-
     closeSidebar();
-
 
     const names = {
 
         research:
-            "🔬 Araştırma Modu aktif. Hocam, güncel araştırmalara hazırım.",
+            "Araştırma Modu aktif. Hocam, akademik araştırma ve değerlendirme çalışmalarınıza hazırım.",
 
         academic:
-            "📚 Akademik Mod aktif. Hocam, akademik çalışmalarınıza hazırım.",
+            "Akademik Mod aktif. Hocam, akademik çalışmalarınızda yardımcı olmaya hazırım.",
 
         article:
-            "📝 Makale Asistanı aktif. Hocam, makalenizi birlikte hazırlayabiliriz.",
+            "Makale Asistanı aktif. Hocam, makale hazırlama, düzenleme ve akademik yazım süreçlerinde yardımcı olabilirim.",
 
         lesson:
-            "🎓 Ders Asistanı aktif. Hocam, ders materyalinizi hazırlamaya hazırım.",
+            "Ders Asistanı aktif. Hocam, ders içeriklerini sistematik ve akademik biçimde hazırlamaya hazırım.",
 
         quiz:
-            "🧪 Sınav / Quiz modu aktif. Hocam, soru ve sınav hazırlayabilirim.",
+            "Sınav / Quiz modu aktif. Hocam, sınav ve ölçme-değerlendirme materyalleri hazırlayabilirim.",
 
         presentation:
-            "📊 Sunum Hazırlama modu aktif. Sunum isteğinizi yazmanız yeterli."
-
+            "Sunum Hazırlama modu aktif. Hocam, sunum talebinizi iletebilirsiniz."
     };
 
-
     addMessage(
-        names[mode] ||
-        "Akademik mod aktif.",
+        names[mode] || "Akademik mod aktif.",
         "ai"
     );
-
 
     updateStatus();
 }
 
-
-/* =====================================================
-   GREETING
-===================================================== */
-
-function showGreeting() {
+function showGreeting(){
 
     $("chat").innerHTML = "";
 
-
-    if (
-        currentUser === "karahan"
-    ) {
+    if(currentUser === "karahan"){
 
         addMessage(
             "Merhaba efendim. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-
-    } else if (
-        currentUser === "betul"
-    ) {
+    }else if(currentUser === "betul"){
 
         addMessage(
-            "Merhaba Betül. 😏 K.A.R.V.I.S. hazır.",
+            "Merhaba Betül. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-
-    } else if (
-        currentUser === "sinem"
-    ) {
+    }else if(currentUser === "sinem"){
 
         addMessage(
-            "Hoş geldiniz prenses. 💗 K.A.R.V.I.S. hazır.",
+            "Hoş geldiniz prenses. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-
-    } else if (
-        currentUser === "ilknur"
-    ) {
+    }else if(currentUser === "ilknur"){
 
         addMessage(
-            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır. 🎓",
+            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır.",
             "ai"
         );
 
@@ -1825,96 +577,60 @@ function showGreeting() {
     }
 }
 
+function getWaitingMessage(){
 
-/* =====================================================
-   WAITING MESSAGE
-===================================================== */
-
-function getWaitingMessage() {
-
-    if (
-        currentUser === "ilknur"
-    ) {
+    if(currentUser === "ilknur"){
 
         const messages = {
 
             research:
-                "Hocam, güncel araştırmaları inceliyorum...",
+                "Hocam, konuyu akademik açıdan inceliyorum...",
 
             academic:
-                "Hocam, akademik açıdan değerlendiriyorum...",
+                "Hocam, akademik değerlendirme yapıyorum...",
 
             article:
-                "Hocam, makalenin yapısını hazırlıyorum...",
+                "Hocam, akademik metnin yapısını hazırlıyorum...",
 
             lesson:
                 "Hocam, ders içeriğini hazırlıyorum...",
 
             quiz:
-                "Hocam, soruları hazırlıyorum...",
+                "Hocam, ölçme-değerlendirme içeriğini hazırlıyorum...",
 
             presentation:
-                "Hocam, isteğinizi değerlendiriyorum..."
+                "Hocam, sunum içeriğini hazırlıyorum..."
         };
 
-
-        return (
-            messages[currentMode] ||
-            "Hocam, hemen ilgileniyorum..."
-        );
+        return messages[currentMode] ||
+            "Hocam, talebinizi değerlendiriyorum...";
     }
-
 
     return waitMessages[
         Math.floor(
-            Math.random() *
-            waitMessages.length
+            Math.random() * waitMessages.length
         )
     ];
 }
 
+function setBusy(value){
 
-/* =====================================================
-   BUSY
-===================================================== */
+    $("status").classList.toggle(
+        "busy",
+        value
+    );
 
-function setBusy(
-    value
-) {
-
-    $("status")
-        .classList.toggle(
-            "busy",
-            value
-        );
-
-    $("sendButton")
-        .disabled =
-        value;
-
-    $("messageInput")
-        .disabled =
-        value;
+    $("sendButton").disabled = value;
+    $("messageInput").disabled = value;
 }
 
+function isPresentationRequest(message){
 
-/* =====================================================
-   PRESENTATION INTENT
-===================================================== */
+    const text = String(message)
+        .toLocaleLowerCase("tr-TR")
+        .trim();
 
-function isPresentationRequest(
-    message
-) {
-
-    const text =
-        String(message)
-            .toLocaleLowerCase(
-                "tr-TR"
-            )
-            .trim();
-
-
-    const presentationWords = [
+    const words = [
 
         "sunum hazırla",
         "sunum hazırlar",
@@ -1938,167 +654,80 @@ function isPresentationRequest(
         "sunum istiyorum"
     ];
 
+    for(const word of words){
 
-    for (
-        const word of presentationWords
-    ) {
-
-        if (
-            text.includes(word)
-        ) {
-
+        if(text.includes(word)){
             return true;
         }
     }
 
-
-    if (
-        /\b\d+\s*slayt\b/i.test(text)
-    ) {
-
-        return true;
-    }
-
-
-    return false;
+    return /\b\d+\s*slayt\b/i.test(text);
 }
 
+async function sendMessage(){
 
-/* =====================================================
-   SEND MESSAGE
-===================================================== */
-
-async function sendMessage() {
-
-    if (sending) {
+    if(sending){
         return;
     }
 
+    const input = $("messageInput");
+    const message = input.value.trim();
 
-    const input =
-        $("messageInput");
-
-    const message =
-        input.value.trim();
-
-
-    if (!message) {
+    if(!message){
         return;
     }
-
 
     sending = true;
-
     setBusy(true);
-
     input.value = "";
 
+    addMessage(message,"user");
 
-    addMessage(
-        message,
-        "user"
-    );
+    const waiting = document.createElement("div");
 
+    waiting.className = "message ai";
+    waiting.textContent = getWaitingMessage();
 
-    const waiting =
-        document.createElement(
-            "div"
-        );
+    $("chat").appendChild(waiting);
+    $("chat").scrollTop = $("chat").scrollHeight;
 
-    waiting.className =
-        "message ai";
+    try{
 
-    waiting.textContent =
-        getWaitingMessage();
-
-    $("chat").appendChild(
-        waiting
-    );
-
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
-
-
-    try {
-
-        /*
-         * SADECE GERÇEKTEN SUNUM İSTENDİĞİNDE
-         * PRESENTATION ENDPOINTİ ÇALIŞIR.
-         *
-         * Merhaba -> /chat
-         * Devlet nedir -> /chat
-         * Atatürk kimdir -> /chat
-         * Sunum hazırla -> /presentation
-         */
-
-        const presentationRequested =
-            isPresentationRequest(
-                message
-            );
-
-
-        if (
-            presentationRequested
-        ) {
+        if(isPresentationRequest(message)){
 
             await createPresentation(
                 message,
                 waiting
             );
 
+        }else{
 
-        } else {
-
-            const response =
-                await fetch(
-                    API +
-                    "/chat",
-                    {
-
-                        method:
-                            "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify({
-
-                                message:
-                                    message,
-
-                                username:
-                                    currentUser,
-
-                                mode:
-                                    currentMode
-
-                            })
-
-                    }
-                );
-
+            const response = await fetch(
+                API + "/chat",
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({
+                        message:message,
+                        username:currentUser,
+                        mode:currentMode
+                    })
+                }
+            );
 
             let data;
 
-            try {
-
-                data =
-                    await response.json();
-
-            } catch {
-
+            try{
+                data = await response.json();
+            }catch{
                 throw new Error(
                     "Sunucudan geçersiz JSON yanıtı geldi."
                 );
             }
 
-
-            if (
-                !response.ok
-            ) {
+            if(!response.ok){
 
                 throw new Error(
                     data.detail ||
@@ -2108,21 +737,7 @@ async function sendMessage() {
                 );
             }
 
-
             waiting.remove();
-
-
-            /*
-             * Yeni main.py:
-             *
-             * response
-             *
-             * Eski sürümler:
-             *
-             * reply
-             * answer
-             * message
-             */
 
             const answer =
                 data.response ||
@@ -2131,24 +746,17 @@ async function sendMessage() {
                 data.message ||
                 "K.A.R.V.I.S. yanıt oluşturamadı.";
 
-
-            addMessage(
-                answer,
-                "ai"
-            );
+            addMessage(answer,"ai");
         }
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "Mesaj gönderme hatası:",
             error
         );
 
-
         waiting.remove();
-
 
         addMessage(
             "Bir sorun oluştu:\n" +
@@ -2156,133 +764,74 @@ async function sendMessage() {
             "ai"
         );
 
-
-    } finally {
+    }finally{
 
         sending = false;
-
         setBusy(false);
-
         input.focus();
     }
 }
 
-
-/* =====================================================
-   CREATE PRESENTATION
-===================================================== */
-
-async function createPresentation(
-    topic,
-    waiting
-) {
+async function createPresentation(topic,waiting){
 
     stopPresentationAnimation();
 
-
     const progressMessage =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     progressMessage.className =
         "message ai waiting-message";
 
-
     progressMessage.innerHTML = `
-
-        <div
-            id="presentationStage"
-            class="waiting-title"
-        >
+        <div id="presentationStage" class="waiting-title">
             Sunum hazırlanıyor
             <span id="presentationDots"></span>
         </div>
 
-        <div
-            id="presentationDetail"
-            class="waiting-detail"
-        >
+        <div id="presentationDetail" class="waiting-detail">
             K.A.R.V.I.S. sunum içeriğini hazırlıyor...
         </div>
 
         <div class="progress-bar">
-
-            <div
-                class="progress-bar-inner"
-            ></div>
-
+            <div class="progress-bar-inner"></div>
         </div>
     `;
 
-
     waiting.remove();
 
-
-    $("chat").appendChild(
-        progressMessage
-    );
-
-
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
-
+    $("chat").appendChild(progressMessage);
+    $("chat").scrollTop = $("chat").scrollHeight;
 
     startPresentationAnimation();
 
+    try{
 
-    try {
-
-        const response =
-            await fetch(
-                API +
-                "/presentation",
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            topic:
-                                topic,
-
-                            username:
-                                currentUser,
-
-                            slide_count:
-                                7
-
-                        })
-
-                }
-            );
-
+        const response = await fetch(
+            API + "/presentation",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    topic:topic,
+                    username:currentUser,
+                    slide_count:7
+                })
+            }
+        );
 
         let data;
 
-        try {
-
-            data =
-                await response.json();
-
-        } catch {
-
+        try{
+            data = await response.json();
+        }catch{
             throw new Error(
                 "Sunum sunucusundan geçersiz yanıt geldi."
             );
         }
 
-
-        if (
-            !response.ok
-        ) {
+        if(!response.ok){
 
             throw new Error(
                 data.detail ||
@@ -2292,75 +841,55 @@ async function createPresentation(
             );
         }
 
-
-        if (
-            !data.job_id
-        ) {
+        if(!data.job_id){
 
             throw new Error(
                 "Sunum işi başlatıldı fakat job_id alınamadı."
             );
         }
 
-
         await pollPresentation(
             data.job_id,
             progressMessage
         );
 
-
-    } catch (error) {
+    }catch(error){
 
         stopPresentationAnimation();
-
         progressMessage.remove();
 
-
         addMessage(
-            "❌ Sunum oluşturulurken bir sorun oluştu:\n" +
+            "Sunum oluşturulurken bir sorun oluştu:\n" +
             error.message,
             "ai"
         );
     }
 }
 
-
-/* =====================================================
-   POLL PRESENTATION
-===================================================== */
-
 async function pollPresentation(
     jobId,
     progressElement
-) {
+){
 
     return new Promise(
-        function(resolve, reject) {
+        function(resolve,reject){
 
             let attempts = 0;
-
-            const maxAttempts =
-                600;
-
+            const maxAttempts = 600;
 
             presentationPolling =
                 setInterval(
-                    async function() {
+                    async function(){
 
                         attempts++;
 
-
-                        if (
-                            attempts >
-                            maxAttempts
-                        ) {
+                        if(attempts > maxAttempts){
 
                             clearInterval(
                                 presentationPolling
                             );
 
-                            presentationPolling =
-                                null;
+                            presentationPolling = null;
 
                             reject(
                                 new Error(
@@ -2371,63 +900,42 @@ async function pollPresentation(
                             return;
                         }
 
-
-                        try {
+                        try{
 
                             const response =
                                 await fetch(
                                     API +
                                     "/presentation-status/" +
-                                    encodeURIComponent(
-                                        jobId
-                                    )
+                                    encodeURIComponent(jobId)
                                 );
 
-
-                            if (
-                                !response.ok
-                            ) {
+                            if(!response.ok){
 
                                 throw new Error(
                                     "Sunum durumu alınamadı."
                                 );
                             }
 
-
                             const data =
                                 await response.json();
-
 
                             updatePresentationUI(
                                 data,
                                 progressElement
                             );
 
-
-                            /*
-                             * YENİ BACKEND:
-                             *
-                             * queued
-                             * working
-                             * completed
-                             * error
-                             */
-
-                            if (
+                            if(
                                 data.status ===
                                 "completed"
-                            ) {
+                            ){
 
                                 clearInterval(
                                     presentationPolling
                                 );
 
-                                presentationPolling =
-                                    null;
-
+                                presentationPolling = null;
 
                                 stopPresentationAnimation();
-
 
                                 const fileUrl =
                                     data.download_url ||
@@ -2439,57 +947,45 @@ async function pollPresentation(
                                             : null
                                     );
 
-
-                                if (
-                                    fileUrl
-                                ) {
+                                if(fileUrl){
 
                                     progressElement.remove();
-
 
                                     showPresentationResult(
                                         fileUrl
                                     );
 
-
                                     resolve();
 
-                                } else {
+                                }else{
 
                                     progressElement.remove();
-
 
                                     reject(
                                         new Error(
                                             data.error ||
-                                            "Sunum tamamlandı fakat PDF dosyası bulunamadı."
+                                            "Sunum tamamlandı fakat PDF bulunamadı."
                                         )
                                     );
                                 }
 
-
                                 return;
                             }
 
-
-                            if (
+                            if(
                                 data.status ===
                                 "error"
-                            ) {
+                            ){
 
                                 clearInterval(
                                     presentationPolling
                                 );
 
-                                presentationPolling =
-                                    null;
-
+                                presentationPolling = null;
 
                                 stopPresentationAnimation();
 
-
                                 progressElement.remove();
-
 
                                 reject(
                                     new Error(
@@ -2499,241 +995,137 @@ async function pollPresentation(
                                     )
                                 );
 
-
                                 return;
                             }
 
-
-                        } catch (error) {
+                        }catch(error){
 
                             clearInterval(
                                 presentationPolling
                             );
 
-                            presentationPolling =
-                                null;
+                            presentationPolling = null;
 
                             reject(error);
                         }
 
-
                     },
                     600
                 );
-
         }
     );
 }
 
-
-/* =====================================================
-   PRESENTATION UI
-===================================================== */
-
 function updatePresentationUI(
     data,
     progressElement
-) {
+){
 
-    if (!progressElement) {
+    if(!progressElement){
         return;
     }
-
 
     const stage =
         progressElement.querySelector(
             "#presentationStage"
         );
 
-
     const detail =
         progressElement.querySelector(
             "#presentationDetail"
         );
 
-
-    if (!stage) {
+    if(!stage){
         return;
     }
 
-
-    let title =
-        "Sunum hazırlanıyor";
-
-
+    let title = "Sunum hazırlanıyor";
     let detailText =
         "K.A.R.V.I.S. sunumu hazırlıyor...";
 
+    if(data.status === "queued"){
 
-    if (
-        data.status === "queued"
-    ) {
-
-        title =
-            "Sunum sıraya alındı";
+        title = "Sunum sıraya alındı";
 
         detailText =
-            "K.A.R.V.I.S. sunum oluşturma işlemini başlatıyor...";
+            "Sunum oluşturma işlemi başlatılıyor...";
 
-    }
+    }else if(data.stage === "content"){
 
-
-    else if (
-        data.stage === "content"
-    ) {
-
-        title =
-            "İçerik hazırlanıyor";
-
+        title = "İçerik hazırlanıyor";
         detailText =
             "Sunum içeriği hazırlanıyor...";
 
-    }
+    }else if(data.stage === "visuals"){
 
+        title = "Görseller aranıyor";
 
-    else if (
-        data.stage === "visuals"
-    ) {
+        detailText =
+            "Sunuma uygun görseller aranıyor...";
 
-        title =
-            "Görseller aranıyor";
+    }else if(data.stage === "pdf"){
 
+        title = "PDF oluşturuluyor";
 
-        if (
-            data.total
-        ) {
+        detailText =
+            "PDF dosyası hazırlanıyor...";
 
-            detailText =
-                "Görseller aranıyor " +
-                data.progress +
-                " / " +
-                data.total;
+    }else if(
+        data.status === "completed"
+    ){
 
-        } else {
-
-            detailText =
-                "Sunuma uygun görseller aranıyor...";
-        }
-
-    }
-
-
-    else if (
-        data.stage === "pdf"
-    ) {
-
-        title =
-            "PDF oluşturuluyor";
-
-
-        if (
-            data.total
-        ) {
-
-            detailText =
-                "PDF sayfaları hazırlanıyor " +
-                data.progress +
-                " / " +
-                data.total;
-
-        } else {
-
-            detailText =
-                "PDF dosyası hazırlanıyor...";
-        }
-
-    }
-
-
-    else if (
-        data.status === "completed" ||
-        data.stage === "completed"
-    ) {
-
-        title =
-            "Sunum hazır";
-
+        title = "Sunum hazır";
         detailText =
             "PDF başarıyla oluşturuldu.";
 
-    }
+    }else if(
+        data.status === "error"
+    ){
 
-
-    else if (
-        data.status === "error" ||
-        data.stage === "error"
-    ) {
-
-        title =
-            "Sunum oluşturulamadı";
-
+        title = "Sunum oluşturulamadı";
         detailText =
             data.error ||
             "Bilinmeyen bir hata oluştu.";
     }
 
-
     stage.innerHTML =
         escapeHTML(title) +
         ' <span id="presentationDots"></span>';
 
-
-    if (
-        detail
-    ) {
-
+    if(detail){
         detail.textContent =
             detailText;
     }
 }
 
-
-/* =====================================================
-   DOTS
-===================================================== */
-
-function startPresentationAnimation() {
+function startPresentationAnimation(){
 
     stopPresentationAnimation();
 
-
     let dotState = 0;
 
+    function updateDots(){
 
-    const updateDots =
-        function() {
+        const dots =
+            document.getElementById(
+                "presentationDots"
+            );
 
-            const dots =
-                document.getElementById(
-                    "presentationDots"
-                );
+        if(!dots){
+            return;
+        }
 
+        dotState++;
 
-            if (!dots) {
-                return;
-            }
+        if(dotState > 3){
+            dotState = 1;
+        }
 
-
-            dotState++;
-
-
-            if (
-                dotState > 3
-            ) {
-
-                dotState = 1;
-            }
-
-
-            dots.textContent =
-                ".".repeat(
-                    dotState
-                );
-        };
-
+        dots.textContent =
+            ".".repeat(dotState);
+    }
 
     updateDots();
-
 
     dotsTimer =
         setInterval(
@@ -2742,84 +1134,56 @@ function startPresentationAnimation() {
         );
 }
 
+function stopPresentationAnimation(){
 
-/* =====================================================
-   STOP PRESENTATION
-===================================================== */
-
-function stopPresentationAnimation() {
-
-    if (
-        dotsTimer
-    ) {
+    if(dotsTimer){
 
         clearInterval(
             dotsTimer
         );
 
-        dotsTimer =
-            null;
+        dotsTimer = null;
     }
 }
 
-
-/* =====================================================
-   PRESENTATION RESULT
-===================================================== */
-
-function showPresentationResult(
-    fileUrl
-) {
+function showPresentationResult(fileUrl){
 
     const div =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     div.className =
         "message ai";
 
-
     const fullUrl =
-        API +
-        fileUrl;
-
+        API + fileUrl;
 
     div.innerHTML = `
 
-        <div
-            style="
-                color:#00e5ff;
-                font-weight:800;
-                font-size:15px;
-                margin-bottom:8px;
-            "
-        >
+        <div style="
+            color:#00e5ff;
+            font-weight:800;
+            font-size:15px;
+            margin-bottom:8px;
+        ">
             📊 Sunum hazır.
         </div>
 
-
-        <div
-            style="
-                color:rgba(255,255,255,.65);
-                font-size:12px;
-                line-height:1.5;
-                margin-bottom:14px;
-            "
-        >
+        <div style="
+            color:rgba(255,255,255,.65);
+            font-size:12px;
+            line-height:1.5;
+            margin-bottom:14px;
+        ">
             K.A.R.V.I.S. sunumu başarıyla oluşturdu.
-            PDF dosyasını aşağıdaki butondan indirebilirsiniz.
+            PDF dosyasını aşağıdaki butonlardan açabilir
+            veya indirebilirsiniz.
         </div>
 
-
-        <div
-            style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-            "
-        >
+        <div style="
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+        ">
 
             <a
                 href="${escapeHTML(fullUrl)}"
@@ -2834,14 +1198,10 @@ function showPresentationResult(
                     color:#001014;
                     font-weight:800;
                     text-decoration:none;
-                    box-shadow:
-                        0 0 16px
-                        rgba(0,229,255,.25);
                 "
             >
                 📥 PDF'Yİ İNDİR
             </a>
-
 
             <a
                 href="${escapeHTML(fullUrl)}"
@@ -2853,11 +1213,8 @@ function showPresentationResult(
                     justify-content:center;
                     padding:11px 15px;
                     border-radius:12px;
-                    background:
-                        rgba(0,229,255,.07);
-                    border:
-                        1px solid
-                        rgba(0,229,255,.25);
+                    background:rgba(0,229,255,.07);
+                    border:1px solid rgba(0,229,255,.25);
                     color:#00e5ff;
                     font-weight:700;
                     text-decoration:none;
@@ -2869,86 +1226,54 @@ function showPresentationResult(
         </div>
     `;
 
-
-    $("chat").appendChild(
-        div
-    );
-
-
+    $("chat").appendChild(div);
     $("chat").scrollTop =
         $("chat").scrollHeight;
 }
 
-
-/* =====================================================
-   NEW CHAT
-===================================================== */
-
-async function newChat() {
+async function newChat(){
 
     closeSidebar();
 
-
-    try {
+    try{
 
         await fetch(
             API +
-            "/new-chat?username=" +
-            encodeURIComponent(
-                currentUser
-            ),
+            "/new-chat",
             {
-                method:
-                    "POST"
+                method:"POST"
             }
         );
 
-    } catch {
-
-    }
-
+    }catch{}
 
     showGreeting();
 }
 
-
-/* =====================================================
-   ERRORS
-===================================================== */
-
-async function openErrors() {
+async function openErrors(){
 
     closeSidebar();
-
 
     $("errorModal")
         .classList.add("show");
 
-
     $("errorContent").textContent =
         "Yükleniyor...";
 
-
-    try {
+    try{
 
         const response =
             await fetch(
-                API +
-                "/errors"
+                API + "/errors"
             );
-
 
         const data =
             await response.json();
 
-
         const errors =
             data.errors || [];
 
-
-        if (
-            !errors.length
-        ) {
+        if(!errors.length){
 
             $("errorContent").textContent =
                 "Kayıtlı hata bulunmuyor.";
@@ -2956,65 +1281,42 @@ async function openErrors() {
             return;
         }
 
-
         const wrapper =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         wrapper.className =
             "error-list";
 
-
         errors
             .slice()
             .reverse()
-            .forEach(
-                function(item) {
+            .forEach(item => {
 
-                    const div =
-                        document.createElement(
-                            "div"
-                        );
+                const div =
+                    document.createElement("div");
 
+                div.className =
+                    "error-item";
 
-                    div.className =
-                        "error-item";
-
-
-                    div.textContent =
-                        (
-                            item.time
-                                ? item.time +
-                                  "\n"
-                                : ""
-                        ) +
-                        (
-                            item.error ||
-                            item.message ||
-                            "Bilinmeyen hata."
-                        );
-
-
-                    wrapper.appendChild(
-                        div
+                div.textContent =
+                    (
+                        item.time
+                            ? item.time + "\n"
+                            : ""
+                    ) +
+                    (
+                        item.error ||
+                        item.message ||
+                        "Bilinmeyen hata."
                     );
-                }
-            );
 
+                wrapper.appendChild(div);
+            });
 
-        $("errorContent")
-            .innerHTML = "";
+        $("errorContent").innerHTML = "";
+        $("errorContent").appendChild(wrapper);
 
-
-        $("errorContent")
-            .appendChild(
-                wrapper
-            );
-
-
-    } catch (error) {
+    }catch(error){
 
         $("errorContent").textContent =
             "Hatalar alınamadı:\n" +
@@ -3022,36 +1324,25 @@ async function openErrors() {
     }
 }
 
+function toggleFunMode(){
 
-/* =====================================================
-   FUN MODE
-===================================================== */
-
-function toggleFunMode() {
-
-    funMode =
-        !funMode;
-
+    funMode = !funMode;
 
     document.body.classList.toggle(
         "fun-mode",
         funMode
     );
 
-
     closeSidebar();
 
-
-    if (
-        funMode
-    ) {
+    if(funMode){
 
         addMessage(
             "Eğlence Modu aktif. 😈",
             "ai"
         );
 
-    } else {
+    }else{
 
         addMessage(
             "Profesyonel Moda geri döndüm.",
@@ -3059,55 +1350,39 @@ function toggleFunMode() {
         );
     }
 
-
     updateStatus();
 }
 
+function handleKey(event){
 
-/* =====================================================
-   KEYBOARD
-===================================================== */
-
-function handleKey(event) {
-
-    if (
-        event.key === "Enter"
-    ) {
+    if(event.key === "Enter"){
 
         event.preventDefault();
-
         sendMessage();
     }
 }
 
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-function initialize() {
+function initialize(){
 
     const savedUser =
         localStorage.getItem(
             "karvis_user"
         );
 
-
-    if (
-        savedUser === "karahan" ||
-        savedUser === "betul" ||
-        savedUser === "sinem" ||
-        savedUser === "ilknur"
-    ) {
+    if(
+        [
+            "karahan",
+            "betul",
+            "sinem",
+            "ilknur"
+        ].includes(savedUser)
+    ){
 
         currentUser =
             savedUser;
     }
 
-
-    if (
-        currentUser === "ilknur"
-    ) {
+    if(currentUser === "ilknur"){
 
         currentMode =
             localStorage.getItem(
@@ -3115,37 +1390,24 @@ function initialize() {
             ) ||
             "lesson";
 
-    } else {
+    }else{
 
         currentMode =
             "normal";
     }
 
-
     applyUserTheme();
-
     updateSidebar();
-
     showGreeting();
-
     updateStatus();
 
-
     setTimeout(
-        function() {
-
-            $("messageInput")
-                .focus();
-
+        () => {
+            $("messageInput").focus();
         },
         150
     );
 }
-
-
-/* =====================================================
-   START
-===================================================== */
 
 initialize();
 
