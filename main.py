@@ -1,9 +1,8 @@
-import os
 import json
+import os
 import re
-import logging
-import uuid
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,34 +12,23 @@ from openai import OpenAI
 
 
 # =========================================================
-# J.A.R.V.I.S. 12.0
+# J.A.R.V.I.S. — KARAHAN INC.
+# BACKEND
 # =========================================================
 
-APP_VERSION = "12.0.0"
+APP_VERSION = "13.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
+INDEX_FILE = BASE_DIR / "index.html"
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-
-GROQ_MODEL = os.getenv(
-    "GROQ_MODEL",
-    "openai/gpt-oss-20b"
-)
-
-MAX_OUTPUT_TOKENS = int(
-    os.getenv("MAX_OUTPUT_TOKENS", "450")
-)
-
-logging.basicConfig(level=logging.INFO)
-
-logger = logging.getLogger("jarvis")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 
 # =========================================================
-# FASTAPI
+# APP
 # =========================================================
 
 app = FastAPI(
@@ -58,7 +46,7 @@ app.add_middleware(
 
 
 # =========================================================
-# GROQ
+# OPENAI-COMPATIBLE GROQ CLIENT
 # =========================================================
 
 client = None
@@ -67,7 +55,7 @@ if GROQ_API_KEY:
     client = OpenAI(
         api_key=GROQ_API_KEY,
         base_url=GROQ_BASE_URL,
-        timeout=45.0,
+        timeout=60.0,
         max_retries=0
     )
 
@@ -77,55 +65,20 @@ if GROQ_API_KEY:
 # =========================================================
 
 USERS = {
-
-    "murat": {
-        "username": "murat",
-        "password": "1234",
-        "name": "Murat",
-        "age": 22,
+    "karahan": {
+        "username": "karahan",
+        "name": "KARAHAN INC.",
         "role": "Ana Kullanıcı",
-
-        "greeting":
-            "Hoş geldiniz efendim. "
-            "J.A.R.V.I.S. tüm sistemleri sizin için hazırladı.",
-
-        "personality":
-            "Murat, J.A.R.V.I.S.'in ana kullanıcısıdır. "
-            "Ona genellikle 'efendim' diye hitap et. "
-            "Profesyonel, kendinden emin ve doğal konuş. "
-            "Gereksiz uzun cevaplar verme.",
-
-        "facts": [
-            "J.A.R.V.I.S. projesinin sahibidir.",
-            "Teknoloji ve yapay zekâ ile ilgilenir.",
-            "Otomobillerle ilgilenir.",
-            "J.A.R.V.I.S. sistemini geliştirmektedir.",
-            "Doğrudan ve anlaşılır cevapları tercih eder."
-        ]
+        "personality": "professional",
+        "greeting": "Hoş geldiniz efendim. J.A.R.V.I.S. hazır."
     },
 
     "betül": {
         "username": "betül",
-        "password": "1234",
         "name": "Betül",
-        "age": 23,
-        "role": "Özel Güvenlik Öğrencisi",
-
-        "greeting":
-            "Hoş geldin Betül. "
-            "J.A.R.V.I.S. seni tanıdı.",
-
-        "personality":
-            "Betül ile sıcak, samimi ve doğal konuş. "
-            "Aşırı resmi olma. "
-            "Uygun yerlerde küçük espriler yapabilirsin.",
-
-        "facts": [
-            "Aktif olarak özel güvenlik öğrencisidir.",
-            "23 yaşındadır.",
-            "Sosyalleşmeyi sever.",
-            "İnsanlarla iletişim kurmayı sever."
-        ]
+        "role": "Özel Kullanıcı",
+        "personality": "betul",
+        "greeting": "Hoş geldin aşko. J.A.R.V.I.S. burada. Bakalım bugün ne karıştırıyoruz? 😂"
     }
 }
 
@@ -134,479 +87,474 @@ USERS = {
 # MEMORY
 # =========================================================
 
-DEFAULT_MEMORY = {
-    "profile": {},
-    "preferences": {},
-    "projects": {},
-    "vehicles": {},
-    "important_facts": {},
-    "conversation": []
-}
+def default_user_memory():
+    return {
+        "profile": {},
+        "preferences": {},
+        "projects": {},
+        "vehicles": {},
+        "important_facts": {},
+        "conversation": []
+    }
 
 
 def load_memory():
+    if not MEMORY_FILE.exists():
+        return {}
 
     try:
-
-        if not MEMORY_FILE.exists():
-
-            save_memory(DEFAULT_MEMORY)
-
-            return dict(DEFAULT_MEMORY)
-
-        with open(
-            MEMORY_FILE,
-            "r",
-            encoding="utf-8"
-        ) as file:
-
+        with open(MEMORY_FILE, "r", encoding="utf-8") as file:
             data = json.load(file)
 
         if not isinstance(data, dict):
-
-            return dict(DEFAULT_MEMORY)
+            return {}
 
         return data
 
-    except Exception as error:
-
-        logger.error(
-            "Memory load error: %s",
-            error
-        )
-
-        return dict(DEFAULT_MEMORY)
+    except Exception:
+        return {}
 
 
-def save_memory(memory):
+memory = load_memory()
 
+
+def save_memory():
     try:
-
-        with open(
-            MEMORY_FILE,
-            "w",
-            encoding="utf-8"
-        ) as file:
-
+        with open(MEMORY_FILE, "w", encoding="utf-8") as file:
             json.dump(
                 memory,
                 file,
                 ensure_ascii=False,
                 indent=2
             )
-
-    except Exception as error:
-
-        logger.error(
-            "Memory save error: %s",
-            error
-        )
+    except Exception:
+        pass
 
 
-memory = load_memory()
+def get_user_memory(username: str):
+    if username not in memory:
+        memory[username] = default_user_memory()
+        save_memory()
 
-
-# =========================================================
-# CHAT SESSIONS
-# =========================================================
-
-# Kullanıcıların aktif sohbetlerini tutar.
-# Sunucu yeniden başlarsa temizlenir.
-active_sessions = {}
-
-
-def create_session(username):
-
-    session_id = str(uuid.uuid4())
-
-    active_sessions[session_id] = {
-        "username": username,
-        "messages": []
-    }
-
-    return session_id
-
-
-def get_session(session_id):
-
-    if not session_id:
-        return None
-
-    return active_sessions.get(session_id)
+    return memory[username]
 
 
 # =========================================================
-# MEMORY EXTRACTION
-# =========================================================
-
-def update_memory_from_message(
-    message: str,
-    username: str
-):
-
-    global memory
-
-    text = message.strip()
-
-    if not text:
-        return
-
-    # -------------------------
-    # İSİM
-    # -------------------------
-
-    name_patterns = [
-        r"\badım\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
-        r"\bismim\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)"
-    ]
-
-    for pattern in name_patterns:
-
-        match = re.search(
-            pattern,
-            text,
-            re.IGNORECASE
-        )
-
-        if match:
-
-            memory["profile"]["name"] = (
-                match.group(1)
-            )
-
-            break
-
-    # -------------------------
-    # ŞEHİR
-    # -------------------------
-
-    city_patterns = [
-        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?de\s+yaşıyorum",
-        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?da\s+yaşıyorum",
-        r"([A-Za-zÇĞİÖŞÜçğıöşü]+) şehrinde\s+yaşıyorum"
-    ]
-
-    for pattern in city_patterns:
-
-        match = re.search(
-            pattern,
-            text,
-            re.IGNORECASE
-        )
-
-        if match:
-
-            memory["profile"]["city"] = (
-                match.group(1)
-            )
-
-            break
-
-    # -------------------------
-    # JARVIS
-    # -------------------------
-
-    if "jarvis" in text.lower():
-
-        memory["projects"]["jarvis"] = (
-            "Kullanıcının kişisel "
-            "J.A.R.V.I.S. projesi."
-        )
-
-    # -------------------------
-    # CADDY
-    # -------------------------
-
-    if "caddy" in text.lower():
-
-        memory["vehicles"]["caddy"] = (
-            "Kullanıcının Caddy aracı."
-        )
-
-    # -------------------------
-    # MERCEDES
-    # -------------------------
-
-    if (
-        "mercedes" in text.lower()
-        or "w204" in text.lower()
-    ):
-
-        memory["vehicles"]["mercedes"] = (
-            "Kullanıcının Mercedes W204 aracı."
-        )
-
-    save_memory(memory)
-
-
-# =========================================================
-# COMPACT MEMORY
-# =========================================================
-
-def build_compact_memory():
-
-    parts = []
-
-    profile = memory.get(
-        "profile",
-        {}
-    )
-
-    if profile.get("name"):
-
-        parts.append(
-            f"Adı: {profile['name']}"
-        )
-
-    if profile.get("city"):
-
-        parts.append(
-            f"Şehir: {profile['city']}"
-        )
-
-    projects = memory.get(
-        "projects",
-        {}
-    )
-
-    if projects.get("jarvis"):
-
-        parts.append(
-            "Proje: J.A.R.V.I.S."
-        )
-
-    vehicles = memory.get(
-        "vehicles",
-        {}
-    )
-
-    if vehicles.get("caddy"):
-
-        parts.append(
-            "Araç: Caddy"
-        )
-
-    if vehicles.get("mercedes"):
-
-        parts.append(
-            "Araç: Mercedes W204"
-        )
-
-    if not parts:
-
-        return "Kayıtlı özel bilgi yok."
-
-    return "\n".join(parts)
-
-
-# =========================================================
-# REQUEST MODELS
+# MODELS
 # =========================================================
 
 class ChatRequest(BaseModel):
-
     message: str
-
-    username: str = "murat"
-
-    fun_mode: bool = False
-
-    session_id: str = ""
-
-
-class NewChatRequest(BaseModel):
-
-    username: str = "murat"
+    username: str = "karahan"
+    session_id: Optional[str] = None
 
 
 class LoginRequest(BaseModel):
-
     username: str
-
-    password: str
-
-
-# =========================================================
-# USER
-# =========================================================
-
-def get_user(username):
-
-    username = (
-        username
-        .lower()
-        .strip()
-    )
-
-    return USERS.get(
-        username,
-        USERS["murat"]
-    )
 
 
 # =========================================================
 # SYSTEM PROMPT
 # =========================================================
 
-def build_system_prompt(
-    username,
-    fun_mode
-):
+def build_system_prompt(username: str):
 
-    user = get_user(username)
+    user = USERS.get(username, USERS["karahan"])
+    user_memory = get_user_memory(username)
 
-    compact_memory = build_compact_memory()
+    if username == "betül":
 
-    if fun_mode:
+        return f"""
+Sen J.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanısın.
 
-        mode_text = (
-            "Eğlence modu aktif. "
-            "Uygun yerlerde küçük espriler yap."
-        )
+Şu anda konuştuğun kullanıcı:
+Betül
 
-    else:
+Kullanıcı rolü:
+Özel Kullanıcı
 
-        mode_text = (
-            "Profesyonel mod aktif."
-        )
+BETÜL İÇİN ÖZEL KONUŞMA TARZI:
 
-    facts = "\n".join(
-        "- " + fact
-        for fact in user["facts"]
-    )
+- Samimi ol.
+- Eğlenceli ol.
+- Hafif laf sokabilirsin.
+- Gerektiğinde "aşko", "kız", "canım" gibi ifadeler kullan.
+- Bazen komik şekilde "Her şeyi ben mi bileceğim kız?" tarzı cevaplar verebilirsin.
+- Ancak ağır hakaret, küfür veya aşağılayıcı ifadeler kullanma.
+- Soruyu gerçekten cevaplaman gerektiğini unutma.
+- Gereksiz şekilde her cümlede "aşko" deme.
+- Doğal konuş.
+- Betül basit bir şey sorarsa bile robot gibi davranma.
+
+Örnek tarz:
+
+"Dur kız, bunu da hemen bilmemi bekleme. 😂 Bir bakayım."
+
+"Aşko her şeyi ben mi bileceğim? 😂 Ama tamam, araştırıp mantıklı cevabı veriyorum."
+
+"Tamam canım, bunu çözeriz."
+
+Kullanıcıya yardımcı olmaya devam et.
+
+GENEL J.A.R.V.I.S. KURALLARI:
+
+- Türkçe konuş.
+- Bilmediğin şeyi uydurma.
+- Emin değilsen açıkça belirt.
+- Gereksiz uzun cevaplar verme.
+- Kullanıcının sorusunu doğrudan cevapla.
+- Kod istenirse çalışır ve eksiksiz kod üret.
+- Kullanıcı teknik konuda yardım istiyorsa adım adım anlat.
+
+Kullanıcı hafızası:
+
+{json.dumps(user_memory, ensure_ascii=False, indent=2)}
+"""
 
     return f"""
-Sen J.A.R.V.I.S. — KARAHAN INC.
-tarafından geliştirilen kişisel
-yapay zekâ asistansın.
+Sen J.A.R.V.I.S. — KARAHAN INC. kişisel yapay zeka asistanısın.
 
-AKTİF KULLANICI:
-{user["name"]}
+Ana kullanıcı:
+KARAHAN INC.
 
-ROL:
-{user["role"]}
+Kullanıcı rolü:
+Ana Kullanıcı
 
-KULLANICI KARAKTERİ:
-{user["personality"]}
+Kullanıcıya hitap:
+"efendim"
 
-KULLANICI HAKKINDA:
-{facts}
+KONUŞMA TARZI:
 
-KAYITLI HAFIZA:
-{compact_memory}
-
-KURALLAR:
+- Profesyonel.
+- Sakin.
+- Akıllı ve doğal.
+- Yardımcı.
+- Gereksiz uzun konuşma yapma.
+- Kullanıcıya gerektiğinde "efendim" diye hitap et.
 - Türkçe konuş.
-- Murat ile konuşuyorsan genellikle "efendim" de.
-- Doğrudan cevap ver.
-- Gereksiz uzun konuşma.
-- Bilmediğin bilgiyi uydurma.
-- Profesyonel ve doğal ol.
-- Kod istenirse temiz ve çalışabilir kod ver.
+- Bilmediğin bilgileri uydurma.
+- Emin olmadığın konularda bunu açıkça belirt.
+- Teknik konularda uygulanabilir ve net çözüm sun.
+- Kod verirken eksiksiz ve doğrudan çalışabilecek kod vermeye çalış.
 
-MOD:
-{mode_text}
-""".strip()
+KARAHAN INC. ÖNEMLİDİR.
+
+Bu profil uygulamanın ana sahibidir.
+
+Kullanıcı hafızası:
+
+{json.dumps(user_memory, ensure_ascii=False, indent=2)}
+"""
 
 
 # =========================================================
-# ERROR CLASSIFICATION
+# MEMORY EXTRACTION
+# =========================================================
+
+def extract_memory(username: str, text: str):
+
+    user_memory = get_user_memory(username)
+
+    lower = text.lower()
+
+    # İsim
+    name_match = re.search(
+        r"(?:benim adım|adım|ismim)\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
+        text,
+        re.IGNORECASE
+    )
+
+    if name_match:
+        user_memory["profile"]["name"] = name_match.group(1)
+
+    # Şehir
+    city_match = re.search(
+        r"(?:istanbul|ankara|izmir|denizli|antalya|bursa|adana|konya|mersin|aydın|muğla|manisa|kocaeli|sakarya|eskişehir|trabzon|samsun)",
+        lower
+    )
+
+    if city_match:
+        user_memory["profile"]["city"] = city_match.group(0)
+
+    # Jarvis projesi
+    if "jarvis" in lower:
+        user_memory["projects"]["jarvis"] = True
+
+    # Mercedes
+    if "mercedes" in lower or "w204" in lower:
+        user_memory["vehicles"]["mercedes"] = True
+
+    # Caddy
+    if "caddy" in lower:
+        user_memory["vehicles"]["caddy"] = True
+
+    save_memory()
+
+
+# =========================================================
+# ERROR HANDLING
 # =========================================================
 
 def classify_error(error):
 
-    text = str(error).lower()
+    message = str(error).lower()
 
-    if (
-        "429" in text
-        or "rate limit" in text
-        or "rate_limit" in text
-        or "tokens per day" in text
-    ):
-
+    if "429" in message or "rate limit" in message or "tokens per day" in message:
         return "RATE_LIMIT"
 
-    if (
-        "timeout" in text
-        or "timed out" in text
-    ):
-
+    if "timeout" in message:
         return "TIMEOUT"
 
-    if (
-        "401" in text
-        or "403" in text
-        or "authentication" in text
-        or "api key" in text
-    ):
+    if "context" in message or "maximum" in message or "token" in message:
+        return "CONTEXT_LIMIT"
 
+    if "connection" in message or "network" in message:
+        return "CONNECTION_ERROR"
+
+    if "401" in message or "403" in message or "api key" in message:
         return "AUTHENTICATION_ERROR"
 
-    if (
-        "model" in text
-        and (
-            "not found" in text
-            or "does not exist" in text
-        )
+    if "model" in message and (
+        "not found" in message or
+        "does not exist" in message
     ):
-
         return "MODEL_ERROR"
-
-    if (
-        "connection" in text
-        or "network" in text
-    ):
-
-        return "CONNECTION_ERROR"
 
     return "GROQ_API_ERROR"
 
 
 # =========================================================
-# RATE LIMIT RESPONSE
-# =========================================================
-
-def rate_limit_response():
-
-    return {
-        "status": "rate_limit",
-
-        "response": (
-            "Efendim, ücretsiz AI kullanım "
-            "limitine ulaşıldı."
-        ),
-
-        "message": (
-            "Yeni bir sohbet başlatabilirsiniz. "
-            "J.A.R.V.I.S. hafızası korunacaktır."
-        ),
-
-        "can_new_chat": True,
-
-        "model": GROQ_MODEL
-    }
-
-
-# =========================================================
-# ROOT
+# HOME
 # =========================================================
 
 @app.get("/")
 async def home():
 
-    index_file = BASE_DIR / "index.html"
+    if INDEX_FILE.exists():
+        return FileResponse(INDEX_FILE)
 
-    if not index_file.exists():
+    return {
+        "name": "J.A.R.V.I.S.",
+        "company": "KARAHAN INC.",
+        "status": "online"
+    }
 
+
+# =========================================================
+# USERS
+# =========================================================
+
+@app.get("/users")
+async def get_users():
+
+    return {
+        "users": [
+            {
+                "username": user["username"],
+                "name": user["name"],
+                "role": user["role"]
+            }
+            for user in USERS.values()
+        ],
+
+        "default_user": "karahan"
+    }
+
+
+# =========================================================
+# LOGIN COMPATIBILITY
+# =========================================================
+
+@app.post("/login")
+async def login(data: LoginRequest):
+
+    username = data.username.lower().strip()
+
+    if username not in USERS:
         return {
-            "status": "online",
-            "version": APP_VERSION
+            "success": False,
+            "error": "USER_NOT_FOUND"
         }
 
-    return FileResponse(
-        index_file,
-        media_type="text/html"
-    )
+    user = USERS[username]
+
+    return {
+        "success": True,
+        "user": {
+            "username": user["username"],
+            "name": user["name"],
+            "role": user["role"]
+        }
+    }
+
+
+# =========================================================
+# CHAT
+# =========================================================
+
+@app.post("/chat")
+async def chat(data: ChatRequest):
+
+    username = data.username.lower().strip()
+
+    if username not in USERS:
+        username = "karahan"
+
+    message = data.message.strip()
+
+    if not message:
+        return {
+            "success": False,
+            "error": "EMPTY_MESSAGE"
+        }
+
+    if not client:
+        return {
+            "success": False,
+            "error": "NO_API_KEY",
+            "message": "GROQ_API_KEY ayarlanmamış."
+        }
+
+    user_memory = get_user_memory(username)
+
+    extract_memory(username, message)
+
+    # Son konuşmaları al
+    conversation = user_memory.get("conversation", [])
+
+    recent_messages = conversation[-12:]
+
+    messages = [
+        {
+            "role": "system",
+            "content": build_system_prompt(username)
+        }
+    ]
+
+    for item in recent_messages:
+
+        if (
+            isinstance(item, dict)
+            and "role" in item
+            and "content" in item
+        ):
+            messages.append({
+                "role": item["role"],
+                "content": item["content"]
+            })
+
+    messages.append({
+        "role": "user",
+        "content": message
+    })
+
+    try:
+
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1200
+        )
+
+        answer = response.choices[0].message.content
+
+        if not answer:
+            answer = "Efendim, şu anda cevap oluşturamadım."
+
+        # Hafızaya kaydet
+        user_memory["conversation"].append({
+            "role": "user",
+            "content": message
+        })
+
+        user_memory["conversation"].append({
+            "role": "assistant",
+            "content": answer
+        })
+
+        # Hafıza aşırı büyümesin
+        user_memory["conversation"] = user_memory["conversation"][-30:]
+
+        save_memory()
+
+        return {
+            "success": True,
+            "answer": answer,
+            "username": username,
+            "model": GROQ_MODEL
+        }
+
+    except Exception as error:
+
+        error_type = classify_error(error)
+
+        return {
+            "success": False,
+            "error": error_type,
+            "message": str(error)
+        }
+
+
+# =========================================================
+# NEW CHAT
+# =========================================================
+
+@app.post("/new-chat")
+async def new_chat(data: LoginRequest):
+
+    username = data.username.lower().strip()
+
+    if username not in USERS:
+        username = "karahan"
+
+    user_memory = get_user_memory(username)
+
+    user_memory["conversation"] = []
+
+    save_memory()
+
+    return {
+        "success": True,
+        "message": "Yeni sohbet başlatıldı.",
+        "username": username
+    }
+
+
+# =========================================================
+# MEMORY
+# =========================================================
+
+@app.get("/memory")
+async def get_memory(username: str = "karahan"):
+
+    username = username.lower().strip()
+
+    if username not in USERS:
+        username = "karahan"
+
+    return {
+        "username": username,
+        "memory": get_user_memory(username)
+    }
+
+
+@app.delete("/memory")
+async def delete_memory(username: str = "karahan"):
+
+    username = username.lower().strip()
+
+    if username not in USERS:
+        username = "karahan"
+
+    memory[username] = default_user_memory()
+
+    save_memory()
+
+    return {
+        "success": True,
+        "message": "Kullanıcı hafızası temizlendi."
+    }
 
 
 # =========================================================
@@ -620,13 +568,9 @@ async def health():
         "status": "online",
         "version": APP_VERSION,
         "model": GROQ_MODEL,
-        "groq_configured": bool(
-            GROQ_API_KEY
-        ),
-        "memory": True,
-        "sessions": len(
-            active_sessions
-        )
+        "groq_configured": bool(GROQ_API_KEY),
+        "default_user": "karahan",
+        "company": "KARAHAN INC."
     }
 
 
@@ -639,358 +583,6 @@ async def version():
 
     return {
         "version": APP_VERSION,
-        "model": GROQ_MODEL,
-        "name": "J.A.R.V.I.S. — KARAHAN INC."
+        "name": "J.A.R.V.I.S.",
+        "company": "KARAHAN INC."
     }
-
-
-# =========================================================
-# USERS
-# =========================================================
-
-@app.get("/users")
-async def users():
-
-    return [
-        {
-            "username": user["username"],
-            "name": user["name"],
-            "age": user["age"],
-            "role": user["role"]
-        }
-
-        for user in USERS.values()
-    ]
-
-
-# =========================================================
-# LOGIN
-# =========================================================
-
-@app.post("/login")
-async def login(request: LoginRequest):
-
-    username = (
-        request.username
-        .lower()
-        .strip()
-    )
-
-    user = USERS.get(username)
-
-    if not user:
-
-        return {
-            "success": False,
-            "message": "Kullanıcı bulunamadı."
-        }
-
-    if user["password"] != request.password:
-
-        return {
-            "success": False,
-            "message": "Şifre hatalı."
-        }
-
-    session_id = create_session(
-        username
-    )
-
-    return {
-        "success": True,
-        "username": user["username"],
-        "name": user["name"],
-        "age": user["age"],
-        "role": user["role"],
-        "greeting": user["greeting"],
-        "session_id": session_id
-    }
-
-
-# =========================================================
-# NEW CHAT
-# =========================================================
-
-@app.post("/new-chat")
-async def new_chat(
-    request: NewChatRequest
-):
-
-    session_id = create_session(
-        request.username
-    )
-
-    return {
-        "success": True,
-        "session_id": session_id,
-        "message": (
-            "Yeni sohbet başlatıldı. "
-            "J.A.R.V.I.S. hazır."
-        ),
-
-        # Hafızanın silinmediğini
-        # frontend'e bildiriyoruz.
-        "memory_preserved": True
-    }
-
-
-# =========================================================
-# CHAT
-# =========================================================
-
-@app.post("/chat")
-async def chat(request: ChatRequest):
-
-    message = request.message.strip()
-
-    if not message:
-
-        return {
-            "status": "error",
-            "response": (
-                "Efendim, boş bir mesaj aldım."
-            )
-        }
-
-    if not GROQ_API_KEY or client is None:
-
-        return {
-            "status": "error",
-            "response": (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "GROQ_API_KEY yapılandırılmamış."
-            )
-        }
-
-    # -------------------------
-    # SESSION
-    # -------------------------
-
-    session = get_session(
-        request.session_id
-    )
-
-    if session is None:
-
-        session_id = create_session(
-            request.username
-        )
-
-        session = get_session(
-            session_id
-        )
-
-    # -------------------------
-    # MEMORY
-    # -------------------------
-
-    update_memory_from_message(
-        message,
-        request.username
-    )
-
-    # -------------------------
-    # PROMPT
-    # -------------------------
-
-    system_prompt = build_system_prompt(
-        request.username,
-        request.fun_mode
-    )
-
-    try:
-
-        logger.info(
-            "Chat | user=%s | model=%s",
-            request.username,
-            GROQ_MODEL
-        )
-
-        completion = (
-            client
-            .chat
-            .completions
-            .create(
-
-                model=GROQ_MODEL,
-
-                messages=[
-                    {
-                        "role": "system",
-                        "content": system_prompt
-                    },
-                    {
-                        "role": "user",
-                        "content": message
-                    }
-                ],
-
-                temperature=0.6,
-
-                max_tokens=MAX_OUTPUT_TOKENS,
-
-                extra_body={
-                    "include_reasoning": False
-                }
-            )
-        )
-
-        response = (
-            completion
-            .choices[0]
-            .message
-            .content
-        )
-
-        if not response:
-
-            response = (
-                "Efendim, şu anda cevap "
-                "oluşturamadım."
-            )
-
-        # Oturumdaki son mesajı tut.
-        session["messages"].append({
-            "user": message,
-            "assistant": response
-        })
-
-        # Sonsuza kadar büyümesin.
-        session["messages"] = (
-            session["messages"][-10:]
-        )
-
-        return {
-            "status": "success",
-            "response": response,
-            "session_id": request.session_id,
-            "model": GROQ_MODEL
-        }
-
-    except Exception as error:
-
-        error_code = classify_error(
-            error
-        )
-
-        logger.error(
-            "JARVIS ERROR [%s]: %s",
-            error_code,
-            error
-        )
-
-        # =================================================
-        # RATE LIMIT
-        # =================================================
-
-        if error_code == "RATE_LIMIT":
-
-            return rate_limit_response()
-
-        # =================================================
-        # DİĞER HATALAR
-        # =================================================
-
-        if error_code == "TIMEOUT":
-
-            response = (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "Sunucu yanıtı zaman aşımına uğradı."
-            )
-
-        elif error_code == "AUTHENTICATION_ERROR":
-
-            response = (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "API anahtarı doğrulanamadı."
-            )
-
-        elif error_code == "MODEL_ERROR":
-
-            response = (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "Seçilen AI modeli kullanılamıyor.\n\n"
-                f"Model: {GROQ_MODEL}"
-            )
-
-        elif error_code == "CONNECTION_ERROR":
-
-            response = (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "AI sunucusuna bağlanılamadı."
-            )
-
-        else:
-
-            response = (
-                "⚠️ J.A.R.V.I.S.\n\n"
-                "AI servisinde geçici bir sorun oluştu."
-            )
-
-        return {
-            "status": "error",
-            "response": response,
-            "error_code": error_code
-        }
-
-
-# =========================================================
-# MEMORY
-# =========================================================
-
-@app.get("/memory")
-async def get_memory():
-
-    return memory
-
-
-@app.delete("/memory")
-async def delete_memory():
-
-    global memory
-
-    memory = {
-        "profile": {},
-        "preferences": {},
-        "projects": {},
-        "vehicles": {},
-        "important_facts": {},
-        "conversation": []
-    }
-
-    save_memory(memory)
-
-    return {
-        "success": True,
-        "message": (
-            "J.A.R.V.I.S. hafızası temizlendi."
-        )
-    }
-
-
-# =========================================================
-# STARTUP
-# =========================================================
-
-@app.on_event("startup")
-async def startup():
-
-    print("")
-    print("=" * 55)
-    print(" J.A.R.V.I.S. — KARAHAN INC.")
-    print("=" * 55)
-    print(f" Version : {APP_VERSION}")
-    print(f" Model   : {GROQ_MODEL}")
-    print(
-        " Groq    : "
-        + (
-            "CONNECTED"
-            if GROQ_API_KEY
-            else "NOT CONFIGURED"
-        )
-    )
-    print(
-        f" Users   : {len(USERS)}"
-    )
-    print("=" * 55)
-    print("")
