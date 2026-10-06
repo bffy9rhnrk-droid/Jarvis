@@ -1,29 +1,38 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
-from openai import OpenAI
 import os
 import re
 import json
 import traceback
 from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from openai import OpenAI
 
 
-# ============================================================
-# J.A.R.V.I.S. - KARAHAN INC.
-# PERSONAL AI MEMORY SYSTEM
-# ============================================================
+# =========================================================
+# J.A.R.V.I.S. — KARAHAN INC.
+# Backend Version: 6.0
+# =========================================================
+
+APP_VERSION = "6.0.0"
+
+BASE_DIR = Path(__file__).resolve().parent
+INDEX_FILE = BASE_DIR / "index.html"
+MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
+
+
+# =========================================================
+# FASTAPI
+# =========================================================
 
 app = FastAPI(
-    title="J.A.R.V.I.S. - Karahan INC.",
-    version="5.0"
+    title="J.A.R.V.I.S. — KARAHAN INC.",
+    version=APP_VERSION
 )
-
-
-# ============================================================
-# CORS
-# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,42 +43,41 @@ app.add_middleware(
 )
 
 
-# ============================================================
-# GROQ API
-# ============================================================
+# =========================================================
+# GROQ
+# =========================================================
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    raise RuntimeError(
-        "GROQ_API_KEY bulunamadı. "
-        "Environment Variables bölümüne GROQ_API_KEY ekleyin."
+    print("UYARI: GROQ_API_KEY bulunamadı.")
+
+client = None
+
+if GROQ_API_KEY:
+    client = OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url="https://api.groq.com/openai/v1"
     )
 
 
-client = OpenAI(
-    api_key=GROQ_API_KEY,
-    base_url="https://api.groq.com/openai/v1"
+MODEL = os.getenv(
+    "GROQ_MODEL",
+    "openai/gpt-oss-120b"
 )
 
 
-# ============================================================
-# MODEL
-# ============================================================
+# =========================================================
+# DATA MODELS
+# =========================================================
 
-MODEL = "openai/gpt-oss-120b"
-
-
-# ============================================================
-# DOSYALAR
-# ============================================================
-
-MEMORY_FILE = "jarvis_memory.json"
+class Message(BaseModel):
+    message: str
 
 
-# ============================================================
-# İLK HAFIZA DOSYASINI OLUŞTUR
-# ============================================================
+# =========================================================
+# MEMORY
+# =========================================================
 
 DEFAULT_MEMORY = {
     "profile": {},
@@ -81,64 +89,35 @@ DEFAULT_MEMORY = {
 }
 
 
-if not os.path.exists(MEMORY_FILE):
-
-    with open(
-        MEMORY_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            DEFAULT_MEMORY,
-            file,
-            ensure_ascii=False,
-            indent=2
-        )
-
-
-# ============================================================
-# HAFIZA OKU
-# ============================================================
-
 def load_memory():
-
     try:
+        if not MEMORY_FILE.exists():
+            save_memory(DEFAULT_MEMORY.copy())
+            return DEFAULT_MEMORY.copy()
 
-        with open(
-            MEMORY_FILE,
-            "r",
-            encoding="utf-8"
-        ) as file:
+        with open(MEMORY_FILE, "r", encoding="utf-8") as file:
+            data = json.load(file)
 
-            memory = json.load(file)
+        if not isinstance(data, dict):
+            return DEFAULT_MEMORY.copy()
 
-        # Eski sürüm hafızaları için uyumluluk
         for key in DEFAULT_MEMORY:
+            if key not in data:
+                data[key] = (
+                    [] if key == "conversation"
+                    else {}
+                )
 
-            if key not in memory:
-
-                memory[key] = {}
-
-                if key == "conversation":
-
-                    memory[key] = []
-
-        return memory
+        return data
 
     except Exception:
-
+        print("Hafıza okunamadı:")
+        traceback.print_exc()
         return DEFAULT_MEMORY.copy()
 
 
-# ============================================================
-# HAFIZA KAYDET
-# ============================================================
-
 def save_memory(memory):
-
     try:
-
         with open(
             MEMORY_FILE,
             "w",
@@ -153,23 +132,9 @@ def save_memory(memory):
             )
 
     except Exception:
+        print("Hafıza kaydedilemedi:")
+        traceback.print_exc()
 
-        print("Hafıza kaydedilemedi.")
-        print(traceback.format_exc())
-
-
-# ============================================================
-# TARİH
-# ============================================================
-
-def now():
-
-    return datetime.now().isoformat()
-
-
-# ============================================================
-# HAFIZAYA BİLGİ EKLE
-# ============================================================
 
 def save_fact(
     memory,
@@ -177,301 +142,227 @@ def save_fact(
     key,
     value
 ):
-
     if category not in memory:
+        memory[category] = {}
 
+    if not isinstance(memory[category], dict):
         memory[category] = {}
 
     memory[category][key] = {
         "value": value,
-        "updated": now()
+        "updated_at": datetime.now().isoformat()
     }
 
 
-# ============================================================
-# MODEL İLE HAFIZA ÇIKARMA
-# ============================================================
-
-def extract_memory(user_message):
-
-    """
-    Kullanıcının mesajındaki uzun süreli hatırlanması
-    faydalı olabilecek bilgileri çıkartır.
-
-    Model sadece bilgi çıkarır.
-    Kullanıcıya cevap üretmez.
-    """
-
-    memory_prompt = f"""
-Aşağıdaki kullanıcı mesajını analiz et.
-
-Amaç:
-Kullanıcının ileride tekrar hatırlanması faydalı olacak
-kişisel bilgilerini çıkarmak.
-
-Önemli:
-
-- Tahmin yapma.
-- Kullanıcının açıkça söylemediği bilgileri çıkarma.
-- Kullanıcının söylediği bilgiyi değiştirme.
-- Genel bilgi veya soru kaydetme.
-- Hassas veya gereksiz bilgileri kaydetme.
-- Sadece gelecekte kişiselleştirilmiş cevap vermeye
-  gerçekten yarayacak bilgileri çıkar.
-
-Kategori örnekleri:
-
-profile:
-- name
-- age
-- city
-- occupation
-- education
-
-preferences:
-- response_style
-- favorite_topics
-- favorite_products
-- language
-- other_preferences
-
-projects:
-- project_name
-- project_description
-- technology
-
-vehicles:
-- vehicle_name
-- vehicle_type
-- vehicle_details
-
-important_facts:
-- other uzun süreli bilgiler
-
-ÇIKTIYI SADECE GEÇERLİ JSON OLARAK VER.
-
-Format:
-
-{{
-    "profile": {{}},
-    "preferences": {{}},
-    "projects": {{}},
-    "vehicles": {{}},
-    "important_facts": {{}}
-}}
-
-Her değer string olmalıdır.
-
-Kullanıcı mesajı:
-
-{user_message}
-"""
-
-    try:
-
-        response = client.responses.create(
-            model=MODEL,
-            instructions="""
-Sen bir hafıza çıkarma motorusun.
-
-Sadece JSON üret.
-
-Açıkça söylenmeyen hiçbir bilgiyi çıkarma.
-
-Tahmin yapma.
-
-Kullanıcının sorusuna cevap verme.
-""",
-            input=memory_prompt
-        )
-
-        text = response.output_text.strip()
-
-        # Markdown JSON temizliği
-        text = re.sub(
-            r"```json",
-            "",
-            text,
-            flags=re.IGNORECASE
-        )
-
-        text = re.sub(
-            r"```",
-            "",
-            text
-        )
-
-        text = text.strip()
-
-        result = json.loads(text)
-
-        if not isinstance(result, dict):
-
-            return {}
-
-        return result
-
-    except Exception as error:
-
-        print("Memory extraction error:")
-        print(error)
-
-        return {}
-
-
-# ============================================================
-# HAFIZAYI GÜNCELLE
-# ============================================================
+# =========================================================
+# SIMPLE PERSONAL MEMORY
+# =========================================================
 
 def update_memory_from_message(
-    memory,
-    user_message
+    message: str,
+    memory: dict
 ):
+    text = message.strip()
 
-    extracted = extract_memory(
-        user_message
-    )
+    # -----------------------------------------------------
+    # İSİM
+    # -----------------------------------------------------
 
-    if not extracted:
-
-        return memory
-
-    allowed_categories = [
-        "profile",
-        "preferences",
-        "projects",
-        "vehicles",
-        "important_facts"
+    name_patterns = [
+        r"\badım\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
+        r"\bbenim\s+adım\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
+        r"\bismim\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)"
     ]
 
-    for category in allowed_categories:
-
-        values = extracted.get(
-            category,
-            {}
+    for pattern in name_patterns:
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
         )
 
-        if not isinstance(values, dict):
-
-            continue
-
-        for key, value in values.items():
-
-            if value is None:
-
-                continue
-
-            if not isinstance(
-                value,
-                (str, int, float, bool)
-            ):
-
-                continue
-
-            value = str(value).strip()
-
-            if not value:
-
-                continue
+        if match:
+            name = match.group(1).strip()
 
             save_fact(
                 memory,
-                category,
-                key,
-                value
+                "profile",
+                "name",
+                name
             )
 
-    save_memory(memory)
+            break
 
-    return memory
+    # -----------------------------------------------------
+    # ŞEHİR
+    # -----------------------------------------------------
 
+    city_patterns = [
+        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?de\s+yaşıyorum",
+        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?da\s+yaşıyorum",
+        r"([A-Za-zÇĞİÖŞÜçğıöşü]+) şehrinde yaşıyorum",
+        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?liyim",
+        r"([A-Za-zÇĞİÖŞÜçğıöşü]+)'?lıyım"
+    ]
 
-# ============================================================
-# HAFIZA METNİ
-# ============================================================
-
-def build_memory_context(memory):
-
-    lines = []
-
-    category_names = {
-        "profile": "KULLANICI PROFİLİ",
-        "preferences": "KULLANICI TERCİHLERİ",
-        "projects": "KULLANICININ PROJELERİ",
-        "vehicles": "KULLANICININ ARAÇLARI",
-        "important_facts": "ÖNEMLİ BİLGİLER"
-    }
-
-    for category, title in category_names.items():
-
-        values = memory.get(
-            category,
-            {}
+    for pattern in city_patterns:
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
         )
 
-        if not values:
+        if match:
+            city = match.group(1).strip()
 
-            continue
+            save_fact(
+                memory,
+                "profile",
+                "city",
+                city
+            )
 
-        lines.append(
-            f"\n{title}:"
+            break
+
+    # -----------------------------------------------------
+    # PROJE
+    # -----------------------------------------------------
+
+    if (
+        "jarvis" in text.lower()
+        or "j.a.r.v.i.s" in text.lower()
+    ):
+        save_fact(
+            memory,
+            "projects",
+            "main_project",
+            "J.A.R.V.I.S. — KARAHAN INC. kişisel yapay zeka asistanı"
         )
 
-        for key, item in values.items():
+    # -----------------------------------------------------
+    # ARAÇLAR
+    # -----------------------------------------------------
 
-            if isinstance(item, dict):
+    car_keywords = [
+        "caddy",
+        "mercedes",
+        "w204",
+        "c180"
+    ]
 
-                value = item.get(
-                    "value",
-                    ""
+    lower_text = text.lower()
+
+    for keyword in car_keywords:
+        if keyword in lower_text:
+
+            if keyword in ["caddy"]:
+                save_fact(
+                    memory,
+                    "vehicles",
+                    "caddy",
+                    "Kullanıcının Caddy aracı"
                 )
 
-            else:
+            elif keyword in ["mercedes", "w204", "c180"]:
+                save_fact(
+                    memory,
+                    "vehicles",
+                    "mercedes_c180",
+                    "Mercedes C180 W204"
+                )
 
-                value = item
+    # -----------------------------------------------------
+    # UNUTMA KOMUTU
+    # -----------------------------------------------------
 
-            lines.append(
-                f"- {key}: {value}"
+    forget_patterns = [
+        r"bunu unut",
+        r"bunu hafızadan sil",
+        r"bunu hatırlama",
+        r"bunu unutmanı istiyorum"
+    ]
+
+    for pattern in forget_patterns:
+
+        if re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        ):
+
+            # Son konuşmadaki ilgili bilgi
+            # tamamen otomatik silinmiyor.
+            # Güvenli tarafta kalıyoruz.
+            save_fact(
+                memory,
+                "important_facts",
+                "last_forget_request",
+                text
             )
 
-    if not lines:
-
-        return "Kullanıcı hakkında kayıtlı bilgi yok."
-
-    return "\n".join(lines)
+            break
 
 
-# ============================================================
-# KONUŞMA HAFIZASI
-# ============================================================
+# =========================================================
+# CONVERSATION MEMORY
+# =========================================================
 
 def add_conversation(
     memory,
     role,
     content
 ):
+    if "conversation" not in memory:
+        memory["conversation"] = []
 
-    memory["conversation"].append(
-        {
-            "role": role,
-            "content": content,
-            "time": now()
-        }
-    )
+    memory["conversation"].append({
+        "role": role,
+        "content": content,
+        "time": datetime.now().isoformat()
+    })
 
-    # Son 30 mesaj
-    memory["conversation"] = (
-        memory["conversation"][-30:]
-    )
-
-    save_memory(memory)
+    # Son 30 mesajı tut
+    memory["conversation"] = memory[
+        "conversation"
+    ][-30:]
 
 
-# ============================================================
-# KONUŞMA GEÇMİŞİ
-# ============================================================
+def build_memory_context(memory):
 
-def build_conversation_context(memory):
+    lines = []
+
+    for category, values in memory.items():
+
+        if category == "conversation":
+            continue
+
+        if not isinstance(values, dict):
+            continue
+
+        for key, item in values.items():
+
+            if isinstance(item, dict):
+                value = item.get(
+                    "value",
+                    ""
+                )
+            else:
+                value = item
+
+            if value:
+                lines.append(
+                    f"{category}.{key}: {value}"
+                )
+
+    if not lines:
+        return "Henüz kayıtlı kişisel bilgi yok."
+
+    return "\n".join(lines)
+
+
+def build_conversation_context(
+    memory
+):
 
     conversation = memory.get(
         "conversation",
@@ -479,16 +370,17 @@ def build_conversation_context(memory):
     )
 
     if not conversation:
+        return ""
 
-        return "Önceki konuşma yok."
+    last_messages = conversation[-12:]
 
     lines = []
 
-    for item in conversation[-16:]:
+    for item in last_messages:
 
         role = item.get(
             "role",
-            ""
+            "user"
         )
 
         content = item.get(
@@ -496,357 +388,33 @@ def build_conversation_context(memory):
             ""
         )
 
-        if role == "user":
-
-            lines.append(
-                f"Kullanıcı: {content}"
-            )
-
-        elif role == "assistant":
-
-            lines.append(
-                f"J.A.R.V.I.S.: {content}"
-            )
+        lines.append(
+            f"{role}: {content}"
+        )
 
     return "\n".join(lines)
 
 
-# ============================================================
-# J.A.R.V.I.S. SYSTEM
-# ============================================================
-
-JARVIS_INSTRUCTIONS = """
-Sen J.A.R.V.I.S.
-(Just A Rather Very Intelligent System).
-
-Karahan INC. tarafından geliştirilmiş özel yapay zeka
-asistanısın.
-
-============================================================
-KİMLİK
-============================================================
-
-Kullanıcıya her zaman "efendim" diye hitap et.
-
-Yaratıcın sorulursa:
-
-"Karahan INC. tarafından geliştirildim efendim."
-
-de.
-
-============================================================
-KİŞİLİK
-============================================================
-
-Profesyonel.
-Sakin.
-Soğukkanlı.
-Zeki.
-Saygılı.
-Doğal.
-
-Gereksiz uzun konuşma.
-
-Kullanıcı detay isterse ayrıntılı cevap ver.
-
-Gerektiğinde ince ve zekice mizah yapabilirsin.
-
-============================================================
-UZUN SÜRELİ HAFIZA
-============================================================
-
-Sana kullanıcının daha önce söylediği bilgiler verilebilir.
-
-Bu bilgileri konuşmanın ilerleyen bölümlerinde doğal şekilde
-kullan.
-
-Örneğin:
-
-Kullanıcı:
-"Adım Murat."
-
-Daha sonra:
-"Benim adım ne?"
-
-Cevap:
-
-"Adınız Murat, efendim."
-
-------------------------------------------------------------
-
-Örnek:
-
-Kullanıcı:
-"Denizli'de yaşıyorum."
-
-Daha sonra:
-
-"Bugün hava nasıl?"
-
-Eğer hafızada Denizli varsa:
-
-"🌤️ Efendim, Denizli'de bugün..."
-
-şeklinde cevap ver.
-
-Tekrar şehir sorma.
-
-------------------------------------------------------------
-
-Örnek:
-
-Kullanıcı:
-"Mercedes C180 kullanıyorum."
-
-Daha sonra:
-
-"Arabam hakkında ne biliyorsun?"
-
-Hafızadaki araç bilgisini kullan.
-
-------------------------------------------------------------
-
-Örnek:
-
-Kullanıcı:
-"Jarvis adında bir yapay zeka projesi geliştiriyorum."
-
-Daha sonra:
-
-"Projemi hatırlıyor musun?"
-
-Hafızadaki proje bilgisini kullan.
-
-============================================================
-HAFIZA KURALI
-============================================================
-
-Hafızada bulunan bilgiyi gerçek kabul edebilirsin.
-
-Ancak hafızada olmayan bilgiyi uydurma.
-
-Kullanıcı yeni bir bilgi verirse eski bilgiyle çelişiyorsa
-yeni bilgiyi esas al.
-
-Örneğin:
-
-Eski:
-Şehir = Denizli
-
-Yeni:
-"Artık İzmir'de yaşıyorum."
-
-Yeni bilgiyi kullan.
-
-============================================================
-GÜNCEL BİLGİ
-============================================================
-
-Güncel bilgi gerektiğinde browser_search kullan.
-
-Özellikle:
-
-- Hava durumu
-- Haber
-- Son dakika
-- Ekonomi
-- Döviz
-- Altın
-- Borsa
-- Akaryakıt
-- Otomobil
-- Teknoloji
-- Yapay zeka
-- Yazılım
-- API
-- Kanun
-- Yönetmelik
-- Spor
-- Şirket
-- Ürün
-
-gibi konuları araştır.
-
-"bugün"
-"şu an"
-"şimdi"
-"güncel"
-"son durum"
-"en son"
-"yarın"
-
-gibi ifadelerde güncel bilgi gerekiyorsa araştır.
-
-============================================================
-HAVA DURUMU
-============================================================
-
-Şehir belirtilmemişse önce hafızadaki şehir bilgisini kullan.
-
-Örneğin:
-
-Hafıza:
-city = Denizli
-
-Kullanıcı:
-"Yarın hava nasıl?"
-
-Tekrar şehir sorma.
-
-Denizli için araştır.
-
-Hava durumunu okunabilir şekilde göster:
-
-🌤️ Efendim, Denizli'de yarın hava az bulutlu.
-
-🌡️ Gündüz: 25°C
-🌙 Gece: 12°C
-💨 Rüzgar: Hafif
-🌧️ Yağış ihtimali: Düşük
-
-============================================================
-EMOJİ
-============================================================
-
-Uygun yerlerde emoji kullan.
-
-Hava:
-☀️ 🌤️ ⛅ ☁️ 🌧️ ⛈️ ❄️
-
-Sıcaklık:
-🌡️
-
-Rüzgar:
-💨
-
-Yağış:
-🌧️
-
-Uyarı:
-⚠️
-
-Başarı:
-✅
-
-Bilgi:
-ℹ️
-
-Araba:
-🚗
-
-Para:
-💰
-
-Telefon:
-📱
-
-Bilgisayar:
-💻
-
-Yapay zeka:
-🤖
-
-Konum:
-📍
-
-Saat:
-🕐
-
-Takvim:
-📅
-
-Her cümlede emoji kullanma.
-
-Profesyonelliği koru.
-
-============================================================
-WEB KAYNAK KODLARI
-============================================================
-
-Kullanıcıya teknik citation kodları gösterme.
-
-Şunları ASLA yazma:
-
-[2†L10-L13]
-[2†L35-L38]
-【turn1search2】
-turn1search2
-turn2search5
-ref_id
-source_id
-citation
-
-Kaynak gerekiyorsa doğal yaz:
-
-"Kaynak: Meteoroloji Genel Müdürlüğü"
-
-============================================================
-DOĞRULUK
-============================================================
-
-ASLA bilgi uydurma.
-
-Emin değilsen araştır.
-
-Araştırma sonucunda güvenilir bilgi yoksa:
-
-"Üzgünüm efendim, bu konuda doğrulanmış ve güvenilir
-bir bilgiye ulaşamadım."
-
-de.
-
-============================================================
-SONUÇ
-============================================================
-
-Amacın:
-
-DOĞRU
-GÜNCEL
-HAFIZALI
-PROFESYONEL
-SAKİN
-DOĞAL
-
-bir kişisel yapay zeka asistanı olmaktır.
-"""
-
-
-# ============================================================
-# CEVAP TEMİZLEME
-# ============================================================
-
-def clean_response(text):
+# =========================================================
+# RESPONSE CLEANER
+# =========================================================
+
+def clean_response(text: str):
 
     if not text:
-
         return ""
 
+    # Citation / source kodlarını temizle
     patterns = [
-
-        r"\[\s*\d+\s*†\s*L\d+(?:\s*-\s*L?\d+)?\s*\]",
-
-        r"\[\s*\d+\s*†[^]]+\]",
-
-        r"【[^】]*】",
-
-        r"\bturn\d+(?:search|news|source|view|image|youtube)\d+\b",
-
-        r"\bref_id\b",
-
-        r"\bsource_id\b",
-
-        r"\bcitation\b",
-
-        r"\[\s*source\s*\]",
-
-        r"\[\s*citation\s*\]",
-
-        r"\bL\d+\s*-\s*L\d+\b"
+        r"\[\d+†L\d+(?:-L\d+)?\]",
+        r"【[^】]+】",
+        r"\bturn\d+(?:search|news|view|source)\d+\b",
+        r"\bref_id\s*[:=]\s*\S+",
+        r"\bsource_id\s*[:=]\s*\S+",
+        r"\bcitation\s*[:=]\s*\S+"
     ]
 
     for pattern in patterns:
-
         text = re.sub(
             pattern,
             "",
@@ -854,205 +422,213 @@ def clean_response(text):
             flags=re.IGNORECASE
         )
 
-    text = re.sub(
-        r"[ \t]{2,}",
-        " ",
-        text
-    )
-
+    # Fazla boşlukları düzelt
     text = re.sub(
         r"\n{3,}",
         "\n\n",
         text
     )
 
+    text = re.sub(
+        r"[ \t]{2,}",
+        " ",
+        text
+    )
+
     return text.strip()
 
 
-# ============================================================
-# REQUEST
-# ============================================================
+# =========================================================
+# SYSTEM PROMPT
+# =========================================================
 
-class Message(BaseModel):
+SYSTEM_PROMPT = """
+Sen J.A.R.V.I.S. — KARAHAN INC. kişisel yapay zeka asistanısın.
 
-    message: str
+Kullanıcıya her zaman "efendim" diye hitap et.
+
+Kişiliğin:
+- Profesyonel
+- Sakin
+- Akıllı
+- Yardımcı
+- Gerektiğinde hafif İngiliz tarzı mizah kullanan
+- Gereksiz uzun konuşmayan
+- Net cevap veren
+
+ÖNEMLİ KURALLAR:
+
+1. Kullanıcının hafızada bulunan bilgilerini gerektiğinde kullan.
+2. Kullanıcı daha önce şehrini söylediyse hava durumu sorulduğunda tekrar şehir sorma.
+3. Kullanıcı daha önce aracını söylediyse araçla ilgili konuşmalarda bunu bağlam olarak kullan.
+4. Kullanıcının J.A.R.V.I.S. projesi hakkında konuştuğunu unutma.
+5. Güncel bilgi gerekiyorsa mümkün olduğunca güncel bilgiye dayan.
+6. Emin olmadığın bilgiyi kesin gerçek gibi söyleme.
+7. Kullanıcı sana yeni ve eski bilgi arasında farklı bir bilgi verirse yeni bilgiyi esas al.
+8. API anahtarı, şifre veya gizli bilgileri asla kullanıcıya gösterme.
+9. Ham citation kodlarını kullanıcıya gösterme.
+10. Kaynak bilgisi gerekiyorsa doğal dil kullan.
+11. Kullanıcı istemediği sürece kişisel bilgileri gereksiz yere tekrar etme.
+12. Cevapları mümkün olduğunca doğal ve insan gibi ver.
+13. Kullanıcı Türkçe konuşuyorsa Türkçe cevap ver.
+14. Gerektiğinde emoji kullanabilirsin ancak abartma.
+
+Hafıza bağlamı:
+{MEMORY}
+
+Son konuşmalar:
+{CONVERSATION}
+"""
 
 
-# ============================================================
-# ANA SAYFA
-# ============================================================
+# =========================================================
+# HOME
+# =========================================================
 
 @app.get("/")
 def home():
 
+    if not INDEX_FILE.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="index.html bulunamadı."
+        )
+
     return FileResponse(
-        "index.html"
+        str(INDEX_FILE)
     )
 
 
-# ============================================================
+# =========================================================
 # CHAT
-# ============================================================
+# =========================================================
 
 @app.post("/chat")
 def chat(data: Message):
 
+    user_message = data.message.strip()
+
+    if not user_message:
+        return {
+            "response": "Efendim, mesajınız boş görünüyor."
+        }
+
+    if not client:
+
+        return {
+            "response": (
+                "Efendim, Groq bağlantısı yapılandırılmamış. "
+                "Lütfen GROQ_API_KEY değişkenini kontrol edin."
+            )
+        }
+
     try:
 
-        user_message = data.message.strip()
-
-        if not user_message:
-
-            return {
-                "response":
-                    "Elbette efendim. "
-                    "Sorunuzu bekliyorum."
-            }
-
-        # ----------------------------------------------------
-        # HAFIZA
-        # ----------------------------------------------------
-
+        # Hafızayı yükle
         memory = load_memory()
 
-        # ----------------------------------------------------
-        # YENİ BİLGİLERİ ÖĞREN
-        # ----------------------------------------------------
-
-        memory = update_memory_from_message(
-            memory,
-            user_message
-        )
-
-        # ----------------------------------------------------
-        # HAFIZA CONTEXT
-        # ----------------------------------------------------
-
-        memory_context = build_memory_context(
+        # Kullanıcının mesajından basit kalıcı bilgiler çıkar
+        update_memory_from_message(
+            user_message,
             memory
         )
 
-        # ----------------------------------------------------
-        # KONUŞMA CONTEXT
-        # ----------------------------------------------------
-
-        conversation_context = (
-            build_conversation_context(
-                memory
-            )
-        )
-
-        # ----------------------------------------------------
-        # AI INPUT
-        # ----------------------------------------------------
-
-        full_input = f"""
-KULLANICI HAFIZASI
-==================
-
-{memory_context}
-
-
-SON KONUŞMALAR
-==============
-
-{conversation_context}
-
-
-YENİ MESAJ
-==========
-
-{user_message}
-"""
-
-        # ----------------------------------------------------
-        # AI
-        # ----------------------------------------------------
-
-        response = client.responses.create(
-
-            model=MODEL,
-
-            instructions=JARVIS_INSTRUCTIONS,
-
-            input=full_input,
-
-            tools=[
-                {
-                    "type": "browser_search"
-                },
-                {
-                    "type": "code_interpreter",
-                    "container": {
-                        "type": "auto"
-                    }
-                }
-            ],
-
-            tool_choice="auto"
-        )
-
-        # ----------------------------------------------------
-        # CEVAP
-        # ----------------------------------------------------
-
-        answer = response.output_text or ""
-
-        answer = clean_response(
-            answer
-        )
-
-        if not answer:
-
-            answer = (
-                "Üzgünüm efendim, şu anda "
-                "doğrulanmış bir cevap oluşturamadım."
-            )
-
-        # ----------------------------------------------------
-        # KONUŞMAYI KAYDET
-        # ----------------------------------------------------
-
+        # Kullanıcı mesajını kaydet
         add_conversation(
             memory,
             "user",
             user_message
         )
 
+        # Context oluştur
+        memory_context = build_memory_context(
+            memory
+        )
+
+        conversation_context = build_conversation_context(
+            memory
+        )
+
+        system_prompt = SYSTEM_PROMPT.format(
+            MEMORY=memory_context,
+            CONVERSATION=conversation_context
+        )
+
+        # -------------------------------------------------
+        # GROQ CHAT COMPLETION
+        # -------------------------------------------------
+
+        response = client.chat.completions.create(
+            model=MODEL,
+
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+
+            temperature=0.7,
+
+            max_tokens=2048
+        )
+
+        assistant_message = response.choices[
+            0
+        ].message.content
+
+        if not assistant_message:
+            assistant_message = (
+                "Efendim, şu anda cevap oluşturamadım."
+            )
+
+        assistant_message = clean_response(
+            assistant_message
+        )
+
+        # Asistan cevabını hafızaya kaydet
         add_conversation(
             memory,
             "assistant",
-            answer
+            assistant_message
         )
+
+        # Hafızayı kaydet
+        save_memory(memory)
 
         return {
-            "response": answer
+            "response": assistant_message,
+            "status": "success",
+            "version": APP_VERSION
         }
 
-    except Exception:
+    except Exception as error:
 
-        print("\n================================")
-        print("J.A.R.V.I.S. ERROR")
-        print("================================")
-
-        print(
-            traceback.format_exc()
-        )
-
-        print("================================\n")
+        print("\n==============================")
+        print("JARVIS CHAT ERROR")
+        print("==============================")
+        print(str(error))
+        traceback.print_exc()
+        print("==============================\n")
 
         return {
             "response": (
-                "Üzgünüm efendim, şu anda teknik "
+                "Üzgünüm efendim, şu anda bağlantıda "
                 "bir sorun oluştu. Birkaç saniye sonra "
                 "tekrar deneyebilirsiniz."
-            )
+            ),
+            "status": "error",
+            "error": str(error)
         }
 
 
-# ============================================================
-# HAFIZA GÖRÜNTÜLE
-# ============================================================
+# =========================================================
+# MEMORY
+# =========================================================
 
 @app.get("/memory")
 def get_memory():
@@ -1060,148 +636,94 @@ def get_memory():
     memory = load_memory()
 
     return {
-        "profile": memory.get(
-            "profile",
-            {}
-        ),
-
-        "preferences": memory.get(
-            "preferences",
-            {}
-        ),
-
-        "projects": memory.get(
-            "projects",
-            {}
-        ),
-
-        "vehicles": memory.get(
-            "vehicles",
-            {}
-        ),
-
-        "important_facts": memory.get(
-            "important_facts",
-            {}
-        ),
-
-        "conversation_count": len(
-            memory.get(
-                "conversation",
-                []
-            )
-        )
+        "status": "success",
+        "version": APP_VERSION,
+        "memory": memory
     }
 
-
-# ============================================================
-# HAFIZA SİL
-# ============================================================
 
 @app.delete("/memory")
-def clear_memory():
+def delete_memory():
 
-    memory = {
-        "profile": {},
-        "preferences": {},
-        "projects": {},
-        "vehicles": {},
-        "important_facts": {},
-        "conversation": []
-    }
+    try:
 
-    save_memory(memory)
+        save_memory(
+            DEFAULT_MEMORY.copy()
+        )
 
-    return {
-        "status": "ok",
-        "message":
-            "J.A.R.V.I.S. hafızası temizlendi."
-    }
+        return {
+            "status": "success",
+            "message": "J.A.R.V.I.S. hafızası temizlendi."
+        }
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )
 
 
-# ============================================================
-# HEALTH
-# ============================================================
+# =========================================================
+# HEALTH CHECK
+# =========================================================
 
 @app.get("/health")
 def health():
 
     memory = load_memory()
 
+    conversation_count = len(
+        memory.get(
+            "conversation",
+            []
+        )
+    )
+
     return {
-
         "status": "online",
-
-        "assistant":
-            "J.A.R.V.I.S.",
-
-        "company":
-            "Karahan INC.",
-
-        "model":
-            MODEL,
-
-        "web_search":
-            True,
-
-        "code_interpreter":
-            True,
-
-        "long_term_memory":
-            True,
-
-        "remembered_categories": {
-
-            "profile":
-                len(memory.get(
-                    "profile",
-                    {}
-                )),
-
-            "preferences":
-                len(memory.get(
-                    "preferences",
-                    {}
-                )),
-
-            "projects":
-                len(memory.get(
-                    "projects",
-                    {}
-                )),
-
-            "vehicles":
-                len(memory.get(
-                    "vehicles",
-                    {}
-                )),
-
-            "important_facts":
-                len(memory.get(
-                    "important_facts",
-                    {}
-                ))
-        },
-
-        "conversation_messages":
-            len(memory.get(
-                "conversation",
-                []
-            ))
+        "app": "J.A.R.V.I.S. — KARAHAN INC.",
+        "version": APP_VERSION,
+        "model": MODEL,
+        "groq_configured": bool(GROQ_API_KEY),
+        "memory_file": MEMORY_FILE.exists(),
+        "conversation_count": conversation_count,
+        "time": datetime.now().isoformat()
     }
 
 
-# ============================================================
-# DIRECT START
-# ============================================================
+# =========================================================
+# VERSION
+# =========================================================
+
+@app.get("/version")
+def version():
+
+    return {
+        "app": "J.A.R.V.I.S. — KARAHAN INC.",
+        "version": APP_VERSION,
+        "status": "running"
+    }
+
+
+# =========================================================
+# START
+# =========================================================
 
 if __name__ == "__main__":
 
     import uvicorn
 
+    port = int(
+        os.getenv(
+            "PORT",
+            "8000"
+        )
+    )
+
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=port,
         reload=False
     )
