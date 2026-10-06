@@ -2,7 +2,11 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
 <title>K.A.R.V.I.S. - KARAHAN INC.</title>
 
@@ -20,7 +24,13 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
     background: #02070a;
     color: white;
 }
@@ -29,10 +39,18 @@ body {
     background:
         radial-gradient(
             circle at center,
-            rgba(0, 229, 255, 0.08),
+            rgba(0, 229, 255, 0.09),
             transparent 38%
         ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(0, 229, 255, 0.035),
+            transparent 45%
+        ),
         #02070a;
+
+    transition:
+        background 0.3s ease;
 }
 
 button,
@@ -42,15 +60,35 @@ input {
 
 button {
     cursor: pointer;
+    -webkit-appearance: none;
 }
+
+button:active {
+    transform: scale(0.97);
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .header {
     height: 72px;
+
     display: flex;
     align-items: center;
+
     padding: 0 16px;
-    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
-    background: rgba(2, 7, 10, 0.92);
+
+    border-bottom:
+        1px solid rgba(0, 229, 255, 0.15);
+
+    background:
+        rgba(2, 7, 10, 0.92);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
     position: relative;
     z-index: 10;
 }
@@ -58,17 +96,27 @@ button {
 .logo-small {
     width: 44px;
     height: 44px;
+
     border-radius: 50%;
-    border: 2px solid #00e5ff;
+
+    border:
+        2px solid #00e5ff;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     color: #00e5ff;
+
     font-size: 21px;
     font-weight: 800;
+
     box-shadow:
         0 0 12px rgba(0, 229, 255, 0.5),
         inset 0 0 12px rgba(0, 229, 255, 0.12);
+
+    animation:
+        logoPulse 3s ease-in-out infinite;
 }
 
 .brand {
@@ -78,54 +126,100 @@ button {
 .brand-title {
     font-size: 18px;
     font-weight: 800;
+
     letter-spacing: 2px;
 }
 
 .brand-subtitle {
-    color: rgba(255,255,255,0.5);
+    color:
+        rgba(255, 255, 255, 0.5);
+
     font-size: 9px;
+
     letter-spacing: 3px;
+
     margin-top: 2px;
 }
 
 .online {
     margin-left: 10px;
+
     font-size: 9px;
+
     color: #00e5ff;
+
+    letter-spacing: 0.5px;
 }
 
 .menu-button {
     margin-left: auto;
+
     width: 44px;
     height: 44px;
-    border: 1px solid rgba(0,229,255,0.25);
+
+    border:
+        1px solid rgba(0, 229, 255, 0.25);
+
     border-radius: 14px;
-    background: rgba(0,229,255,0.05);
+
+    background:
+        rgba(0, 229, 255, 0.05);
+
     color: #00e5ff;
+
     font-size: 22px;
+
+    transition:
+        0.2s ease;
 }
 
+.menu-button:hover {
+    background:
+        rgba(0, 229, 255, 0.12);
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
 .main {
-    height: calc(100vh - 72px);
+    height:
+        calc(100vh - 72px);
+
     display: flex;
     flex-direction: column;
+
     position: relative;
 }
 
 .hud {
     flex: 1;
+
     position: relative;
+
     overflow: hidden;
 }
 
+
+/* =====================================================
+   HUD CORE
+===================================================== */
+
 .hud-core {
     position: absolute;
+
     left: 50%;
     top: 38%;
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%, -50%);
+
     width: 210px;
     height: 210px;
+
     border-radius: 50%;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,9 +227,14 @@ button {
 
 .ring {
     position: absolute;
+
     border-radius: 50%;
-    border: 1px solid rgba(0,229,255,0.35);
-    animation: spin 9s linear infinite;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.35);
+
+    animation:
+        spin 9s linear infinite;
 }
 
 .ring.one {
@@ -146,7 +245,9 @@ button {
 .ring.two {
     width: 170px;
     height: 170px;
+
     border-style: dashed;
+
     animation-duration: 6s;
     animation-direction: reverse;
 }
@@ -154,179 +255,412 @@ button {
 .ring.three {
     width: 130px;
     height: 130px;
-    border-color: rgba(0,229,255,0.7);
+
+    border-color:
+        rgba(0, 229, 255, 0.7);
+
     animation-duration: 4s;
 }
 
 .core {
     width: 82px;
     height: 82px;
+
     border-radius: 50%;
-    border: 2px solid #00e5ff;
+
+    border:
+        2px solid #00e5ff;
+
     color: #00e5ff;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     font-size: 38px;
     font-weight: 900;
+
     box-shadow:
-        0 0 25px rgba(0,229,255,0.7),
-        inset 0 0 20px rgba(0,229,255,0.2);
+        0 0 25px rgba(0, 229, 255, 0.7),
+        inset 0 0 20px rgba(0, 229, 255, 0.2);
+
     z-index: 2;
+
+    transition:
+        0.3s ease;
 }
 
 .status {
     position: absolute;
-    top: calc(38% + 120px);
+
+    top:
+        calc(38% + 120px);
+
     left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.5);
+
+    transform:
+        translateX(-50%);
+
+    color:
+        rgba(255, 255, 255, 0.5);
+
     font-size: 10px;
+
     letter-spacing: 2px;
+
     white-space: nowrap;
+
+    text-align: center;
+
+    transition:
+        0.2s ease;
 }
+
+.status.busy {
+    color: #00e5ff;
+
+    text-shadow:
+        0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+
+/* =====================================================
+   CHAT
+===================================================== */
 
 .chat {
     position: absolute;
+
     left: 12px;
     right: 12px;
+
     bottom: 100px;
+
     max-height: 38%;
+
     overflow-y: auto;
+
     display: flex;
     flex-direction: column;
+
     gap: 8px;
+
+    padding-bottom: 4px;
+
+    scrollbar-width: none;
+}
+
+.chat::-webkit-scrollbar {
+    display: none;
 }
 
 .message {
     max-width: 86%;
-    padding: 11px 14px;
+
+    padding:
+        11px 14px;
+
     border-radius: 15px;
+
     font-size: 14px;
+
     line-height: 1.45;
+
     white-space: pre-wrap;
+
+    word-break: break-word;
+
+    animation:
+        messageIn 0.2s ease;
 }
 
 .message.ai {
     align-self: flex-start;
-    background: rgba(0,229,255,0.08);
-    border: 1px solid rgba(0,229,255,0.16);
+
+    background:
+        rgba(0, 229, 255, 0.08);
+
+    border:
+        1px solid rgba(0, 229, 255, 0.16);
 }
 
 .message.user {
     align-self: flex-end;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
 }
 
 .message a {
     color: #00e5ff;
+    text-decoration: none;
 }
+
+.message a:hover {
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   WAITING MESSAGE
+===================================================== */
+
+.waiting-message {
+    min-width: 170px;
+}
+
+.waiting-title {
+    color: #00e5ff;
+
+    font-weight: 700;
+
+    margin-bottom: 4px;
+}
+
+.waiting-detail {
+    color:
+        rgba(255, 255, 255, 0.55);
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
 
 .input-area {
     position: absolute;
+
     left: 12px;
     right: 12px;
+
     bottom: 15px;
+
     height: 58px;
+
     display: flex;
+
     gap: 8px;
 }
 
 .input {
     min-width: 0;
+
     flex: 1;
-    border: 1px solid rgba(0,229,255,0.22);
+
+    border:
+        1px solid rgba(0, 229, 255, 0.22);
+
     border-radius: 18px;
-    background: rgba(5,15,20,0.95);
+
+    background:
+        rgba(5, 15, 20, 0.95);
+
     color: white;
-    padding: 0 17px;
+
+    padding:
+        0 17px;
+
     outline: none;
+
+    /*
+    16px özellikle iPhone'da
+    otomatik zoom'u engeller.
+    */
     font-size: 16px;
+
+    box-shadow:
+        inset 0 0 12px
+        rgba(0, 229, 255, 0.025);
+}
+
+.input::placeholder {
+    color:
+        rgba(255, 255, 255, 0.38);
 }
 
 .input:focus {
-    border-color: rgba(0,229,255,0.65);
+    border-color:
+        rgba(0, 229, 255, 0.65);
+
+    box-shadow:
+        0 0 14px
+        rgba(0, 229, 255, 0.08);
 }
 
 .send {
     width: 58px;
+
     border: 0;
+
     border-radius: 18px;
+
     background: #00e5ff;
+
     color: #001014;
+
     font-size: 22px;
+
     font-weight: 900;
+
+    box-shadow:
+        0 0 15px
+        rgba(0, 229, 255, 0.25);
+
+    transition:
+        0.2s ease;
 }
+
+.send:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
 .sidebar {
     position: fixed;
+
     left: 0;
     top: 0;
     bottom: 0;
-    width: min(330px, 88vw);
-    background: rgba(2,7,10,0.98);
-    border-right: 1px solid rgba(0,229,255,0.2);
+
+    width:
+        min(330px, 88vw);
+
+    background:
+        rgba(2, 7, 10, 0.98);
+
+    border-right:
+        1px solid rgba(0, 229, 255, 0.2);
+
     z-index: 100;
-    transform: translateX(-105%);
-    transition: transform 0.25s ease;
-    padding: 22px 15px;
+
+    transform:
+        translateX(-105%);
+
+    transition:
+        transform 0.25s ease;
+
+    padding:
+        22px 15px;
+
     overflow-y: auto;
+
+    box-shadow:
+        10px 0 40px
+        rgba(0, 0, 0, 0.35);
 }
 
 .sidebar.open {
-    transform: translateX(0);
+    transform:
+        translateX(0);
 }
 
 .sidebar-title {
     color: #00e5ff;
+
     font-size: 16px;
+
     font-weight: 800;
+
     letter-spacing: 2px;
+
     margin-bottom: 20px;
 }
 
 .menu-item {
     width: 100%;
+
     min-height: 48px;
-    border: 1px solid rgba(255,255,255,0.08);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
     border-radius: 14px;
-    background: rgba(255,255,255,0.035);
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
     color: white;
+
     text-align: left;
-    padding: 12px 14px;
+
+    padding:
+        12px 14px;
+
     margin-bottom: 8px;
+
+    transition:
+        0.2s ease;
 }
 
 .menu-item:hover,
 .menu-item.active {
-    border-color: rgba(0,229,255,0.45);
-    background: rgba(0,229,255,0.08);
+    border-color:
+        rgba(0, 229, 255, 0.45);
+
+    background:
+        rgba(0, 229, 255, 0.08);
+
     color: #00e5ff;
 }
 
 .academic-title {
-    margin: 22px 5px 10px;
+    margin:
+        22px 5px 10px;
+
     font-size: 10px;
+
     letter-spacing: 2px;
-    color: rgba(255,255,255,0.4);
+
+    color:
+        rgba(255, 255, 255, 0.4);
 }
 
 .close-sidebar {
     position: absolute;
+
     right: 14px;
     top: 15px;
+
     border: 0;
+
     background: transparent;
+
     color: #00e5ff;
+
     font-size: 24px;
 }
 
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
 .overlay {
     position: fixed;
+
     inset: 0;
-    background: rgba(0,0,0,0.5);
+
+    background:
+        rgba(0, 0, 0, 0.5);
+
+    backdrop-filter:
+        blur(2px);
+
+    -webkit-backdrop-filter:
+        blur(2px);
+
     z-index: 90;
+
     display: none;
 }
 
@@ -334,20 +668,44 @@ button {
     display: block;
 }
 
+
+/* =====================================================
+   MODAL
+===================================================== */
+
 .modal {
     position: fixed;
+
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(92vw, 440px);
+
+    transform:
+        translate(-50%, -50%);
+
+    width:
+        min(92vw, 440px);
+
     max-height: 85vh;
+
     overflow-y: auto;
-    background: #071116;
-    border: 1px solid rgba(0,229,255,0.25);
+
+    background:
+        #071116;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.25);
+
     border-radius: 22px;
+
     z-index: 200;
+
     padding: 22px;
+
     display: none;
+
+    box-shadow:
+        0 20px 80px
+        rgba(0, 0, 0, 0.55);
 }
 
 .modal.show {
@@ -356,86 +714,275 @@ button {
 
 .modal h2 {
     margin-top: 0;
+
     color: #00e5ff;
 }
 
 .modal input {
     width: 100%;
+
     height: 48px;
+
     margin-bottom: 10px;
+
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.05);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
     color: white;
-    padding: 0 12px;
+
+    padding:
+        0 12px;
+
     font-size: 16px;
+
     outline: none;
 }
 
 .modal input:focus {
-    border-color: rgba(0,229,255,0.6);
+    border-color:
+        rgba(0, 229, 255, 0.6);
 }
 
 .modal-button {
     width: 100%;
+
     height: 46px;
+
     border: 0;
+
     border-radius: 12px;
+
     background: #00e5ff;
+
     color: #001014;
+
     font-weight: 800;
 }
 
 .secondary-button {
     margin-top: 8px;
-    background: rgba(255,255,255,0.08);
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
     color: white;
 }
 
-.presentation-result {
-    margin-top: 12px;
+
+/* =====================================================
+   PRESENTATION PROGRESS
+===================================================== */
+
+.presentation-progress {
+    margin-top: 2px;
+
     padding: 12px;
-    border: 1px solid rgba(0,229,255,0.2);
-    border-radius: 12px;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.16);
+
+    border-radius: 13px;
+
+    background:
+        rgba(0, 229, 255, 0.035);
 }
 
-.presentation-result a {
+.presentation-stage {
     color: #00e5ff;
+
     font-weight: 700;
+
+    font-size: 13px;
 }
+
+.presentation-sub {
+    margin-top: 5px;
+
+    color:
+        rgba(255, 255, 255, 0.5);
+
+    font-size: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+
+    height: 3px;
+
+    margin-top: 10px;
+
+    overflow: hidden;
+
+    border-radius: 99px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+}
+
+.progress-bar-inner {
+    width: 20%;
+
+    height: 100%;
+
+    background:
+        #00e5ff;
+
+    border-radius: 99px;
+
+    animation:
+        progressMove 1.1s ease-in-out infinite;
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.error-list {
+    max-height: 50vh;
+
+    overflow-y: auto;
+}
+
+.error-item {
+    padding: 10px;
+
+    margin-bottom: 8px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 70, 70, 0.06);
+
+    border:
+        1px solid rgba(255, 70, 70, 0.12);
+
+    color:
+        rgba(255, 255, 255, 0.8);
+
+    font-size: 12px;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+
+/* =====================================================
+   FUN / SINEM
+===================================================== */
 
 body.sinem-mode .ring {
-    border-color: rgba(255,80,180,0.45);
+    border-color:
+        rgba(255, 80, 180, 0.45);
 }
 
 body.sinem-mode .core {
     color: #ff5ab4;
+
     border-color: #ff5ab4;
+
+    box-shadow:
+        0 0 25px rgba(255, 90, 180, 0.55),
+        inset 0 0 20px rgba(255, 90, 180, 0.15);
 }
 
 body.fun-mode .ring {
-    border-color: rgba(255,50,50,0.6);
+    border-color:
+        rgba(255, 50, 50, 0.6);
 }
 
 body.fun-mode .core {
     color: #ff4444;
+
     border-color: #ff4444;
+
+    box-shadow:
+        0 0 25px rgba(255, 50, 50, 0.6),
+        inset 0 0 20px rgba(255, 50, 50, 0.15);
 }
 
+body.fun-mode .status {
+    color: #ff4444;
+}
+
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
 @keyframes spin {
+
     from {
-        transform: rotate(0deg);
+        transform:
+            rotate(0deg);
     }
 
     to {
-        transform: rotate(360deg);
+        transform:
+            rotate(360deg);
+    }
+}
+
+@keyframes logoPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(0, 229, 255, 0.5),
+            inset 0 0 12px rgba(0, 229, 255, 0.12);
+    }
+
+    50% {
+        box-shadow:
+            0 0 22px rgba(0, 229, 255, 0.75),
+            inset 0 0 16px rgba(0, 229, 255, 0.18);
+    }
+}
+
+@keyframes messageIn {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes progressMove {
+
+    0% {
+        transform:
+            translateX(-130%);
+    }
+
+    100% {
+        transform:
+            translateX(550%);
     }
 }
 
 </style>
 </head>
 
+
 <body>
+
+
+<!-- ===================================================
+     HEADER
+=================================================== -->
 
 <div class="header">
 
@@ -444,6 +991,7 @@ body.fun-mode .core {
     </div>
 
     <div class="brand">
+
         <div class="brand-title">
             K.A.R.V.I.S.
         </div>
@@ -451,26 +999,41 @@ body.fun-mode .core {
         <div class="brand-subtitle">
             KARAHAN INC.
         </div>
+
     </div>
 
-    <div class="online">
+    <div
+        id="onlineStatus"
+        class="online"
+    >
         ● ONLINE
     </div>
 
     <button
         class="menu-button"
         onclick="openSidebar()"
+        aria-label="Menüyü aç"
     >
         ☰
     </button>
 
 </div>
 
+
+<!-- ===================================================
+     OVERLAY
+=================================================== -->
+
 <div
     id="overlay"
     class="overlay"
     onclick="closeSidebar()"
 ></div>
+
+
+<!-- ===================================================
+     SIDEBAR
+=================================================== -->
 
 <div
     id="sidebar"
@@ -488,12 +1051,14 @@ body.fun-mode .core {
         K.A.R.V.I.S.
     </div>
 
+
     <button
         class="menu-item"
         onclick="newChat()"
     >
         ＋ Yeni Sohbet
     </button>
+
 
     <button
         class="menu-item"
@@ -502,12 +1067,14 @@ body.fun-mode .core {
         ⚠ Hatalar
     </button>
 
+
     <button
         class="menu-item"
         onclick="openProfile()"
     >
         ◉ Profil Değiştir
     </button>
+
 
     <button
         id="funButton"
@@ -516,6 +1083,9 @@ body.fun-mode .core {
     >
         ◈ Eğlence Modu
     </button>
+
+
+    <!-- AKADEMİK MENÜ -->
 
     <div
         id="teacherMenu"
@@ -526,6 +1096,7 @@ body.fun-mode .core {
             AKADEMİK ASİSTAN
         </div>
 
+
         <button
             class="menu-item academic-menu-item"
             data-mode="research"
@@ -533,6 +1104,7 @@ body.fun-mode .core {
         >
             🔬 Araştırma Modu
         </button>
+
 
         <button
             class="menu-item academic-menu-item"
@@ -542,6 +1114,7 @@ body.fun-mode .core {
             📚 Akademik Mod
         </button>
 
+
         <button
             class="menu-item academic-menu-item"
             data-mode="article"
@@ -549,6 +1122,7 @@ body.fun-mode .core {
         >
             📝 Makale Asistanı
         </button>
+
 
         <button
             class="menu-item academic-menu-item"
@@ -558,6 +1132,7 @@ body.fun-mode .core {
             🎓 Ders Asistanı
         </button>
 
+
         <button
             class="menu-item academic-menu-item"
             data-mode="quiz"
@@ -565,6 +1140,7 @@ body.fun-mode .core {
         >
             🧪 Sınav / Quiz
         </button>
+
 
         <button
             class="menu-item academic-menu-item"
@@ -577,6 +1153,11 @@ body.fun-mode .core {
     </div>
 
 </div>
+
+
+<!-- ===================================================
+     PROFILE MODAL
+=================================================== -->
 
 <div
     id="profileModal"
@@ -617,6 +1198,11 @@ body.fun-mode .core {
 
 </div>
 
+
+<!-- ===================================================
+     ERROR MODAL
+=================================================== -->
+
 <div
     id="errorModal"
     class="modal"
@@ -626,7 +1212,10 @@ body.fun-mode .core {
         Hatalar
     </h2>
 
-    <div id="errorContent">
+    <div
+        id="errorContent"
+        class="error-list"
+    >
         Yükleniyor...
     </div>
 
@@ -639,14 +1228,24 @@ body.fun-mode .core {
 
 </div>
 
+
+<!-- ===================================================
+     MAIN
+=================================================== -->
+
 <div class="main">
 
     <div class="hud">
 
+
+        <!-- CORE -->
+
         <div class="hud-core">
 
             <div class="ring one"></div>
+
             <div class="ring two"></div>
+
             <div class="ring three"></div>
 
             <div class="core">
@@ -655,6 +1254,9 @@ body.fun-mode .core {
 
         </div>
 
+
+        <!-- STATUS -->
+
         <div
             id="status"
             class="status"
@@ -662,10 +1264,16 @@ body.fun-mode .core {
             K.A.R.V.I.S. HAZIR
         </div>
 
+
+        <!-- CHAT -->
+
         <div
             id="chat"
             class="chat"
         ></div>
+
+
+        <!-- INPUT -->
 
         <div class="input-area">
 
@@ -678,6 +1286,7 @@ body.fun-mode .core {
             >
 
             <button
+                id="sendButton"
                 class="send"
                 onclick="sendMessage()"
             >
@@ -690,78 +1299,191 @@ body.fun-mode .core {
 
 </div>
 
+
 <script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
 
 const API = "";
 
 let currentUser = "karahan";
+
 let currentMode = "normal";
+
 let funMode = false;
+
 let sending = false;
 
+let presentationPolling = null;
+
+let dotsTimer = null;
+
+let progressTimer = null;
+
+
+/* =====================================================
+   WAIT MESSAGES
+===================================================== */
+
 const waitMessages = [
+
     "Bir saniye efendim...",
+
     "Tamam, bir bakıyorum...",
+
     "Dur, bunu birlikte çözelim...",
+
     "Bir dakika, düşünüyorum...",
+
     "Tamam, hemen ilgileniyorum..."
+
 ];
 
+
+/* =====================================================
+   HELPER
+===================================================== */
+
 function $(id) {
+
     return document.getElementById(id);
+
 }
 
-function addMessage(text, type = "ai") {
 
-    const chat = $("chat");
+/* =====================================================
+   SAFE TEXT
+===================================================== */
 
-    const div = document.createElement("div");
+function escapeHTML(text) {
 
-    div.className =
-        "message " + type;
+    return String(text)
 
-    div.innerHTML = formatText(text);
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-    chat.appendChild(div);
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-    chat.scrollTop = chat.scrollHeight;
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
+
+
+/* =====================================================
+   FORMAT MESSAGE
+===================================================== */
 
 function formatText(text) {
 
-    let safe = String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+    let safe =
+        escapeHTML(text);
 
     safe = safe.replace(
-        /(https?:\/\/[^\s]+)/g,
+        /(https?:\/\/[^\s<]+)/g,
         '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
     );
 
     return safe;
 }
 
+
+/* =====================================================
+   CHAT MESSAGE
+===================================================== */
+
+function addMessage(
+    text,
+    type = "ai"
+) {
+
+    const chat =
+        $("chat");
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "message " + type;
+
+    div.innerHTML =
+        formatText(text);
+
+    chat.appendChild(
+        div
+    );
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+    return div;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
 function openSidebar() {
 
-    $("sidebar").classList.add("open");
-    $("overlay").classList.add("show");
+    $("sidebar")
+        .classList.add("open");
+
+    $("overlay")
+        .classList.add("show");
 }
+
 
 function closeSidebar() {
 
-    $("sidebar").classList.remove("open");
-    $("overlay").classList.remove("show");
+    $("sidebar")
+        .classList.remove("open");
+
+    $("overlay")
+        .classList.remove("show");
 }
+
+
+/* =====================================================
+   MODALS
+===================================================== */
 
 function closeModals() {
 
     document
         .querySelectorAll(".modal")
-        .forEach(function(modal) {
-            modal.classList.remove("show");
-        });
+        .forEach(
+            function(modal) {
+
+                modal.classList.remove(
+                    "show"
+                );
+
+            }
+        );
+
 }
+
 
 function openProfile() {
 
@@ -770,102 +1492,105 @@ function openProfile() {
     $("profileModal")
         .classList.add("show");
 
-    setTimeout(function() {
+    setTimeout(
+        function() {
 
-        $("usernameInput").focus();
+            $("usernameInput")
+                .focus();
 
-    }, 100);
+        },
+        100
+    );
 }
+
 
 function handleLoginKey(event) {
 
-    if (event.key === "Enter") {
+    if (
+        event.key === "Enter"
+    ) {
 
         event.preventDefault();
 
         login();
+
     }
+
 }
 
-/*
-====================================================
-PROFİL GİRİŞ SİSTEMİ
-====================================================
-*/
+
+/* =====================================================
+   LOGIN
+===================================================== */
 
 async function login() {
 
     const username =
-        $("usernameInput").value
+        $("usernameInput")
+            .value
             .trim()
             .toLowerCase();
 
     const password =
-        $("passwordInput").value;
+        $("passwordInput")
+            .value;
 
     if (!username) {
 
-        alert("Kullanıcı adı girin.");
+        alert(
+            "Kullanıcı adı girin."
+        );
 
-        $("usernameInput").focus();
+        $("usernameInput")
+            .focus();
 
         return;
     }
 
+
     try {
 
-        const response = await fetch(
-            API + "/profile-login",
-            {
-                method: "POST",
+        const response =
+            await fetch(
+                API +
+                "/profile-login",
+                {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    method:
+                        "POST",
 
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                })
-            }
-        );
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            username:
+                                username,
+                            password:
+                                password
+                        })
+
+                }
+            );
+
 
         let data;
 
         try {
 
-            data = await response.json();
+            data =
+                await response.json();
 
-        } catch (jsonError) {
+        } catch {
 
             throw new Error(
                 "Sunucudan geçersiz yanıt geldi."
             );
+
         }
 
-        console.log(
-            "K.A.R.V.I.S. profil giriş cevabı:",
-            data
-        );
-
-        /*
-        Backend başarısız girişte:
-        {
-            success: false,
-            message: "..."
-        }
-
-        Başarılı girişte:
-        {
-            success: true,
-            user: {
-                username: "...",
-                name: "...",
-                role: "...",
-                personality: "..."
-            }
-        }
-        */
 
         if (
             !response.ok ||
@@ -873,54 +1598,41 @@ async function login() {
         ) {
 
             alert(
-                data.message ||
                 data.detail ||
+                data.message ||
                 "Kullanıcı adı veya şifre hatalı."
             );
 
             return;
         }
 
-        /*
-        Backend'den gelen kullanıcıyı alıyoruz.
-        */
 
-        let loggedUser = username;
+        currentUser =
+            String(
+                data.username ||
+                username
+            )
+            .trim()
+            .toLowerCase();
 
-        if (
-            data.user &&
-            data.user.username
-        ) {
-
-            loggedUser =
-                String(
-                    data.user.username
-                )
-                .trim()
-                .toLowerCase();
-        }
-
-        currentUser = loggedUser;
-
-        /*
-        Öğretmen hesabı:
-        Ders Asistanı ile başlar.
-        */
 
         if (
             currentUser === "ilknur"
         ) {
 
-            currentMode = "lesson";
+            currentMode =
+                localStorage.getItem(
+                    "karvis_mode"
+                ) ||
+                "lesson";
 
         } else {
 
-            currentMode = "normal";
+            currentMode =
+                "normal";
+
         }
 
-        /*
-        Profil bilgisini telefonda sakla.
-        */
 
         localStorage.setItem(
             "karvis_user",
@@ -932,23 +1644,15 @@ async function login() {
             currentMode
         );
 
-        /*
-        Giriş kutularını temizle.
-        */
 
-        $("usernameInput").value = "";
+        $("usernameInput")
+            .value = "";
 
-        $("passwordInput").value = "";
+        $("passwordInput")
+            .value = "";
 
-        /*
-        Profil penceresini kapat.
-        */
 
         closeModals();
-
-        /*
-        Kullanıcı arayüzünü güncelle.
-        */
 
         applyUserTheme();
 
@@ -956,22 +1660,23 @@ async function login() {
 
         showGreeting();
 
-        /*
-        Durum yazısını güncelle.
-        */
 
         if (
             currentUser === "ilknur"
         ) {
 
-            $("status").textContent =
+            $("status")
+                .textContent =
                 "AKADEMİK ASİSTAN HAZIR";
 
         } else {
 
-            $("status").textContent =
+            $("status")
+                .textContent =
                 "K.A.R.V.I.S. HAZIR";
+
         }
+
 
     } catch (error) {
 
@@ -984,8 +1689,15 @@ async function login() {
             "Sunucuya bağlanılamadı.\n\n" +
             error.message
         );
+
     }
+
 }
+
+
+/* =====================================================
+   USER THEME
+===================================================== */
 
 function applyUserTheme() {
 
@@ -1000,8 +1712,15 @@ function applyUserTheme() {
         document.body.classList.add(
             "sinem-mode"
         );
+
     }
+
 }
+
+
+/* =====================================================
+   SIDEBAR UPDATE
+===================================================== */
 
 function updateSidebar() {
 
@@ -1010,6 +1729,7 @@ function updateSidebar() {
 
     const funButton =
         $("funButton");
+
 
     if (
         currentUser === "ilknur"
@@ -1028,24 +1748,36 @@ function updateSidebar() {
 
         funButton.style.display =
             "block";
+
     }
+
 
     document
         .querySelectorAll(
             ".academic-menu-item"
         )
-        .forEach(function(button) {
+        .forEach(
+            function(button) {
 
-            button.classList.toggle(
-                "active",
-                button.dataset.mode ===
-                currentMode
-            );
+                button.classList.toggle(
+                    "active",
+                    button.dataset.mode ===
+                    currentMode
+                );
 
-        });
+            }
+        );
+
 }
 
-function selectAcademicMode(mode) {
+
+/* =====================================================
+   ACADEMIC MODE
+===================================================== */
+
+function selectAcademicMode(
+    mode
+) {
 
     if (
         currentUser !== "ilknur"
@@ -1054,16 +1786,21 @@ function selectAcademicMode(mode) {
         return;
     }
 
-    currentMode = mode;
+
+    currentMode =
+        mode;
+
 
     localStorage.setItem(
         "karvis_mode",
         currentMode
     );
 
+
     updateSidebar();
 
     closeSidebar();
+
 
     const names = {
 
@@ -1084,18 +1821,27 @@ function selectAcademicMode(mode) {
 
         presentation:
             "📊 Sunum Hazırlama aktif. Hocam, konu yazmanız yeterli."
+
     };
+
 
     addMessage(
         names[mode] ||
         "Akademik mod aktif.",
         "ai"
     );
+
 }
+
+
+/* =====================================================
+   GREETING
+===================================================== */
 
 function showGreeting() {
 
     $("chat").innerHTML = "";
+
 
     if (
         currentUser === "karahan"
@@ -1106,6 +1852,7 @@ function showGreeting() {
             "ai"
         );
 
+
     } else if (
         currentUser === "betul"
     ) {
@@ -1115,6 +1862,7 @@ function showGreeting() {
             "ai"
         );
 
+
     } else if (
         currentUser === "sinem"
     ) {
@@ -1123,6 +1871,7 @@ function showGreeting() {
             "Hoş geldiniz prenses. 💗 K.A.R.V.I.S. hazır.",
             "ai"
         );
+
 
     } else if (
         currentUser === "ilknur"
@@ -1137,8 +1886,15 @@ function showGreeting() {
             "Varsayılan olarak Ders Asistanı aktif.",
             "ai"
         );
+
     }
+
 }
+
+
+/* =====================================================
+   WAITING MESSAGE
+===================================================== */
 
 function getWaitingMessage() {
 
@@ -1164,12 +1920,18 @@ function getWaitingMessage() {
                 "Hocam, soruları hazırlıyorum...",
 
             presentation:
-                "Hocam, sunumu hazırlıyorum. Birkaç saniye sürebilir..."
+                "Hocam, sunumu hazırlıyorum..."
+
         };
 
-        return messages[currentMode] ||
-            "Hocam, hemen ilgileniyorum...";
+
+        return (
+            messages[currentMode] ||
+            "Hocam, hemen ilgileniyorum..."
+        );
+
     }
+
 
     return waitMessages[
         Math.floor(
@@ -1177,14 +1939,45 @@ function getWaitingMessage() {
             waitMessages.length
         )
     ];
+
 }
+
+
+/* =====================================================
+   BUSY STATUS
+===================================================== */
+
+function setBusy(
+    value
+) {
+
+    $("status")
+        .classList.toggle(
+            "busy",
+            value
+        );
+
+    $("sendButton")
+        .disabled =
+        value;
+
+    $("messageInput")
+        .disabled =
+        value;
+
+}
+
+
+/* =====================================================
+   NORMAL CHAT
+===================================================== */
 
 async function sendMessage() {
 
     if (sending) {
-
         return;
     }
+
 
     const input =
         $("messageInput");
@@ -1192,19 +1985,24 @@ async function sendMessage() {
     const message =
         input.value.trim();
 
-    if (!message) {
 
+    if (!message) {
         return;
     }
 
+
     sending = true;
 
+    setBusy(true);
+
     input.value = "";
+
 
     addMessage(
         message,
         "user"
     );
+
 
     const waiting =
         document.createElement(
@@ -1221,8 +2019,10 @@ async function sendMessage() {
         waiting
     );
 
+
     $("chat").scrollTop =
         $("chat").scrollHeight;
+
 
     try {
 
@@ -1242,7 +2042,9 @@ async function sendMessage() {
                 await fetch(
                     API + "/chat",
                     {
-                        method: "POST",
+
+                        method:
+                            "POST",
 
                         headers: {
                             "Content-Type":
@@ -1260,12 +2062,16 @@ async function sendMessage() {
 
                                 mode:
                                     currentMode
+
                             })
+
                     }
                 );
 
+
             const data =
                 await response.json();
+
 
             if (!response.ok) {
 
@@ -1274,15 +2080,22 @@ async function sendMessage() {
                     data.message ||
                     "Yanıt alınamadı."
                 );
+
             }
+
 
             waiting.remove();
 
+
             addMessage(
-                data.answer,
+                data.reply ||
+                data.answer ||
+                "Yanıt alınamadı.",
                 "ai"
             );
+
         }
+
 
     } catch (error) {
 
@@ -1294,61 +2107,570 @@ async function sendMessage() {
             "ai"
         );
 
+
     } finally {
 
         sending = false;
 
+        setBusy(false);
+
         input.focus();
+
     }
+
 }
+
+
+/* =====================================================
+   PRESENTATION
+===================================================== */
 
 async function createPresentation(
     topic,
     waiting
 ) {
 
-    const response =
-        await fetch(
-            API + "/presentation",
-            {
-                method: "POST",
+    stopPresentationAnimation();
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
 
-                body:
-                    JSON.stringify({
+    /*
+    İlk mesaj:
+    İçerik hazırlanıyor
+    */
 
-                        topic:
-                            topic,
-
-                        username:
-                            currentUser,
-
-                        slide_count:
-                            10,
-
-                        include_visuals:
-                            true
-                    })
-            }
+    const progressMessage =
+        document.createElement(
+            "div"
         );
 
-    const data =
-        await response.json();
+    progressMessage.className =
+        "message ai waiting-message";
 
-    if (!response.ok) {
 
-        throw new Error(
-            data.detail ||
-            data.message ||
-            "Sunum oluşturulamadı."
-        );
-    }
+    progressMessage.innerHTML = `
+
+        <div
+            id="presentationStage"
+            class="waiting-title"
+        >
+            İçerik hazırlanıyor
+            <span id="presentationDots"></span>
+        </div>
+
+        <div
+            id="presentationDetail"
+            class="waiting-detail"
+        >
+            K.A.R.V.I.S. sunum içeriğini hazırlıyor...
+        </div>
+
+        <div class="progress-bar">
+
+            <div
+                class="progress-bar-inner"
+            ></div>
+
+        </div>
+    `;
+
 
     waiting.remove();
+
+
+    $("chat").appendChild(
+        progressMessage
+    );
+
+
+    $("chat").scrollTop =
+        $("chat").scrollHeight;
+
+
+    startPresentationAnimation();
+
+
+    try {
+
+        /*
+        YENİ MAIN.PY
+        hemen job_id döndürüyor.
+        */
+
+        const response =
+            await fetch(
+                API + "/presentation",
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            topic:
+                                topic,
+
+                            username:
+                                currentUser,
+
+                            slide_count:
+                                7
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Sunum başlatılamadı."
+            );
+
+        }
+
+
+        if (
+            !data.job_id
+        ) {
+
+            throw new Error(
+                "Sunum işi başlatıldı fakat job_id alınamadı."
+            );
+
+        }
+
+
+        await pollPresentation(
+            data.job_id,
+            progressMessage
+        );
+
+
+    } catch (error) {
+
+        stopPresentationAnimation();
+
+        progressMessage.remove();
+
+        addMessage(
+            "❌ Sunum oluşturulurken bir sorun oluştu:\n" +
+            error.message,
+            "ai"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   PRESENTATION POLLING
+===================================================== */
+
+async function pollPresentation(
+    jobId,
+    progressElement
+) {
+
+    return new Promise(
+        function(resolve, reject) {
+
+            let attempts = 0;
+
+            const maxAttempts =
+                600;
+
+
+            presentationPolling =
+                setInterval(
+                    async function() {
+
+                        attempts++;
+
+
+                        if (
+                            attempts >
+                            maxAttempts
+                        ) {
+
+                            clearInterval(
+                                presentationPolling
+                            );
+
+                            presentationPolling =
+                                null;
+
+                            reject(
+                                new Error(
+                                    "Sunum oluşturma zaman aşımına uğradı."
+                                )
+                            );
+
+                            return;
+                        }
+
+
+                        try {
+
+                            const response =
+                                await fetch(
+                                    API +
+                                    "/presentation-status/" +
+                                    encodeURIComponent(
+                                        jobId
+                                    )
+                                );
+
+
+                            if (
+                                !response.ok
+                            ) {
+
+                                throw new Error(
+                                    "Sunum durumu alınamadı."
+                                );
+
+                            }
+
+
+                            const data =
+                                await response.json();
+
+
+                            updatePresentationUI(
+                                data,
+                                progressElement
+                            );
+
+
+                            if (
+                                data.completed
+                            ) {
+
+                                clearInterval(
+                                    presentationPolling
+                                );
+
+                                presentationPolling =
+                                    null;
+
+
+                                stopPresentationAnimation();
+
+
+                                if (
+                                    data.success &&
+                                    data.file_url
+                                ) {
+
+                                    progressElement.remove();
+
+                                    showPresentationResult(
+                                        data.file_url
+                                    );
+
+                                    resolve();
+
+                                } else {
+
+                                    progressElement.remove();
+
+                                    reject(
+                                        new Error(
+                                            data.error ||
+                                            "Sunum oluşturulamadı."
+                                        )
+                                    );
+
+                                }
+
+                            }
+
+
+                        } catch (error) {
+
+                            clearInterval(
+                                presentationPolling
+                            );
+
+                            presentationPolling =
+                                null;
+
+                            reject(error);
+
+                        }
+
+                    },
+                    600
+                );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   PRESENTATION UI
+===================================================== */
+
+function updatePresentationUI(
+    data,
+    progressElement
+) {
+
+    if (!progressElement) {
+        return;
+    }
+
+
+    const stage =
+        progressElement.querySelector(
+            "#presentationStage"
+        );
+
+    const detail =
+        progressElement.querySelector(
+            "#presentationDetail"
+        );
+
+
+    if (!stage) {
+        return;
+    }
+
+
+    let title =
+        "İçerik hazırlanıyor";
+
+
+    let detailText =
+        "K.A.R.V.I.S. sunum içeriğini hazırlıyor...";
+
+
+    if (
+        data.stage === "content"
+    ) {
+
+        title =
+            "İçerik hazırlanıyor";
+
+        detailText =
+            "Sunum içeriği hazırlanıyor...";
+
+    }
+
+
+    else if (
+        data.stage === "visuals"
+    ) {
+
+        title =
+            "Görseller aranıyor";
+
+        if (
+            data.total
+        ) {
+
+            detailText =
+                "Görseller aranıyor " +
+                data.progress +
+                " / " +
+                data.total;
+
+        } else {
+
+            detailText =
+                "Sunuma uygun görseller aranıyor...";
+
+        }
+
+    }
+
+
+    else if (
+        data.stage === "pdf"
+    ) {
+
+        title =
+            "PDF oluşturuluyor";
+
+        if (
+            data.total
+        ) {
+
+            detailText =
+                "PDF sayfaları hazırlanıyor " +
+                data.progress +
+                " / " +
+                data.total;
+
+        } else {
+
+            detailText =
+                "PDF dosyası hazırlanıyor...";
+
+        }
+
+    }
+
+
+    else if (
+        data.stage === "completed"
+    ) {
+
+        title =
+            "Sunum hazır";
+
+        detailText =
+            "PDF başarıyla oluşturuldu.";
+
+    }
+
+
+    else if (
+        data.stage === "error"
+    ) {
+
+        title =
+            "Sunum oluşturulamadı";
+
+        detailText =
+            data.error ||
+            "Bilinmeyen bir hata oluştu.";
+
+    }
+
+
+    stage.innerHTML =
+        escapeHTML(title) +
+        ' <span id="presentationDots"></span>';
+
+
+    if (detail) {
+
+        detail.textContent =
+            detailText;
+
+    }
+
+}
+
+
+/* =====================================================
+   DOT ANIMATION
+===================================================== */
+
+function startPresentationAnimation() {
+
+    stopPresentationAnimation();
+
+
+    let dotState = 0;
+
+
+    const updateDots =
+        function() {
+
+            const dots =
+                document.getElementById(
+                    "presentationDots"
+                );
+
+
+            if (!dots) {
+                return;
+            }
+
+
+            dotState++;
+
+
+            if (
+                dotState > 3
+            ) {
+
+                dotState = 1;
+
+            }
+
+
+            dots.textContent =
+                ".".repeat(
+                    dotState
+                );
+
+        };
+
+
+    updateDots();
+
+
+    dotsTimer =
+        setInterval(
+            updateDots,
+            450
+        );
+
+}
+
+
+/* =====================================================
+   STOP DOT ANIMATION
+===================================================== */
+
+function stopPresentationAnimation() {
+
+    if (
+        dotsTimer
+    ) {
+
+        clearInterval(
+            dotsTimer
+        );
+
+        dotsTimer =
+            null;
+
+    }
+
+
+    if (
+        presentationPolling
+    ) {
+
+        clearInterval(
+            presentationPolling
+        );
+
+        presentationPolling =
+            null;
+
+    }
+
+}
+
+
+/* =====================================================
+   PRESENTATION RESULT
+===================================================== */
+
+function showPresentationResult(
+    fileUrl
+) {
 
     const div =
         document.createElement(
@@ -1358,44 +2680,68 @@ async function createPresentation(
     div.className =
         "message ai";
 
-    div.innerHTML =
-        "📊 <b>Sunum hazır Hocam.</b><br><br>" +
-        "Konu: " +
-        formatText(data.title) +
-        "<br>" +
-        "Slayt sayısı: " +
-        data.slides +
-        "<br><br>" +
-        '<a href="' +
-        API +
-        data.file_url +
-        '" target="_blank" rel="noopener noreferrer">' +
-        "📥 Profesyonel PDF Sunumu Aç" +
-        "</a>";
+
+    div.innerHTML = `
+
+        <div
+            style="
+                color:#00e5ff;
+                font-weight:800;
+                margin-bottom:8px;
+            "
+        >
+            📊 Sunum hazır Hocam.
+        </div>
+
+        <div
+            style="
+                color:rgba(255,255,255,.65);
+                font-size:12px;
+                margin-bottom:12px;
+            "
+        >
+            K.A.R.V.I.S. sunumu başarıyla oluşturdu.
+        </div>
+
+        <a
+            href="${escapeHTML(
+                API + fileUrl
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="
+                display:inline-block;
+                padding:10px 13px;
+                border-radius:11px;
+                background:rgba(0,229,255,.08);
+                border:1px solid rgba(0,229,255,.25);
+            "
+        >
+            📥 PDF Sunumunu Aç
+        </a>
+
+    `;
+
 
     $("chat").appendChild(
         div
     );
 
+
     $("chat").scrollTop =
         $("chat").scrollHeight;
+
 }
 
-function handleKey(event) {
 
-    if (
-        event.key === "Enter"
-    ) {
-
-        event.preventDefault();
-
-        sendMessage();
-    }
-}
+/* =====================================================
+   NEW CHAT
+===================================================== */
 
 async function newChat() {
 
     closeSidebar();
+
 
     try {
 
@@ -1406,25 +2752,37 @@ async function newChat() {
                 currentUser
             ),
             {
-                method: "POST"
+                method:
+                    "POST"
             }
         );
 
-    } catch (error) {
+    } catch {
+
     }
 
+
     showGreeting();
+
 }
+
+
+/* =====================================================
+   ERRORS
+===================================================== */
 
 async function openErrors() {
 
     closeSidebar();
 
+
     $("errorModal")
         .classList.add("show");
 
+
     $("errorContent").textContent =
         "Yükleniyor...";
+
 
     try {
 
@@ -1433,53 +2791,124 @@ async function openErrors() {
                 API + "/errors"
             );
 
+
         const data =
             await response.json();
+
 
         const errors =
             data.errors || [];
 
-        if (!errors.length) {
+
+        if (
+            !errors.length
+        ) {
 
             $("errorContent").textContent =
                 "Kayıtlı hata bulunmuyor.";
 
             return;
+
         }
 
-        $("errorContent").textContent =
-            errors
-                .map(function(item) {
 
-                    return item.message;
+        const wrapper =
+            document.createElement(
+                "div"
+            );
 
-                })
-                .join("\n\n");
+        wrapper.className =
+            "error-list";
+
+
+        errors
+            .slice()
+            .reverse()
+            .forEach(
+                function(item) {
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+                    div.className =
+                        "error-item";
+
+
+                    div.textContent =
+                        (
+                            item.time
+                                ? item.time +
+                                  "\n"
+                                : ""
+                        ) +
+                        (
+                            item.error ||
+                            item.message ||
+                            "Bilinmeyen hata."
+                        );
+
+
+                    wrapper.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+
+        $("errorContent")
+            .innerHTML = "";
+
+        $("errorContent")
+            .appendChild(
+                wrapper
+            );
+
 
     } catch (error) {
 
         $("errorContent").textContent =
-            "Hatalar alınamadı.";
+            "Hatalar alınamadı:\n" +
+            error.message;
+
     }
+
 }
+
+
+/* =====================================================
+   FUN MODE
+===================================================== */
 
 function toggleFunMode() {
 
-    funMode = !funMode;
+    funMode =
+        !funMode;
+
 
     document.body.classList.toggle(
         "fun-mode",
         funMode
     );
 
+
     closeSidebar();
 
-    if (funMode) {
+
+    if (
+        funMode
+    ) {
 
         addMessage(
             "Eğlence Modu aktif. 😈",
             "ai"
         );
+
+        $("status")
+            .textContent =
+            "EĞLENCE MODU";
 
     } else {
 
@@ -1487,8 +2916,40 @@ function toggleFunMode() {
             "Profesyonel Moda geri döndüm.",
             "ai"
         );
+
+        $("status")
+            .textContent =
+            currentUser === "ilknur"
+                ? "AKADEMİK ASİSTAN HAZIR"
+                : "K.A.R.V.I.S. HAZIR";
+
     }
+
 }
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+function handleKey(event) {
+
+    if (
+        event.key === "Enter"
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 function initialize() {
 
@@ -1496,6 +2957,7 @@ function initialize() {
         localStorage.getItem(
             "karvis_user"
         );
+
 
     if (
         savedUser === "karahan" ||
@@ -1506,30 +2968,27 @@ function initialize() {
 
         currentUser =
             savedUser;
+
     }
 
-    /*
-    Öğretmen hesabı için
-    kayıtlı mod kullanılabilir.
-    */
 
     if (
         currentUser === "ilknur"
     ) {
 
-        const savedMode =
+        currentMode =
             localStorage.getItem(
                 "karvis_mode"
-            );
-
-        currentMode =
-            savedMode ||
+            ) ||
             "lesson";
 
     } else {
 
-        currentMode = "normal";
+        currentMode =
+            "normal";
+
     }
+
 
     applyUserTheme();
 
@@ -1537,8 +2996,23 @@ function initialize() {
 
     showGreeting();
 
-    $("messageInput").focus();
+
+    setTimeout(
+        function() {
+
+            $("messageInput")
+                .focus();
+
+        },
+        150
+    );
+
 }
+
+
+/* =====================================================
+   START
+===================================================== */
 
 initialize();
 
