@@ -25,12 +25,14 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "SF Pro Display",
         "Segoe UI",
         sans-serif;
+
     background: #020609;
     color: #eaffff;
 }
@@ -40,7 +42,7 @@ body {
 }
 
 button,
-input {
+textarea {
     font-family: inherit;
 }
 
@@ -57,6 +59,7 @@ button {
 .background {
     position: fixed;
     inset: 0;
+
     background:
         radial-gradient(
             circle at 50% 30%,
@@ -69,6 +72,7 @@ button {
             transparent 30%
         ),
         #020609;
+
     z-index: -5;
 }
 
@@ -127,7 +131,8 @@ button {
 
     padding: 0 18px;
 
-    border-bottom: 1px solid rgba(0, 255, 255, 0.12);
+    border-bottom:
+        1px solid rgba(0, 255, 255, 0.12);
 
     background:
         rgba(2, 9, 12, 0.82);
@@ -148,7 +153,8 @@ button {
     background:
         rgba(0, 255, 255, 0.06);
 
-    border: 1px solid rgba(0, 255, 255, 0.14);
+    border:
+        1px solid rgba(0, 255, 255, 0.14);
 
     font-size: 22px;
 
@@ -168,6 +174,7 @@ button {
 .brand-main {
     font-size: 19px;
     font-weight: 700;
+
     letter-spacing: 2.5px;
 
     color: #ecffff;
@@ -189,9 +196,11 @@ button {
 
     border-radius: 12px;
 
-    background: rgba(0, 255, 255, 0.05);
+    background:
+        rgba(0, 255, 255, 0.05);
 
-    border: 1px solid rgba(0, 255, 255, 0.12);
+    border:
+        1px solid rgba(0, 255, 255, 0.12);
 
     font-size: 9px;
     letter-spacing: 1.4px;
@@ -210,7 +219,8 @@ button {
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 25px 17px 130px;
+    padding:
+        25px 17px 130px;
 
     scroll-behavior: smooth;
 }
@@ -229,6 +239,7 @@ button {
 
     display: flex;
     flex-direction: column;
+
     align-items: center;
     justify-content: center;
 
@@ -255,16 +266,17 @@ button {
     content: "";
 
     position: absolute;
-
     inset: 0;
 
     border-radius: 50%;
 
-    border: 1px solid rgba(0, 238, 255, .3);
+    border:
+        1px solid rgba(0, 238, 255, .3);
 }
 
 .logo::before {
-    animation: rotate 8s linear infinite;
+    animation:
+        rotate 8s linear infinite;
 }
 
 .logo::after {
@@ -272,7 +284,8 @@ button {
 
     border-style: dashed;
 
-    animation: rotateReverse 5s linear infinite;
+    animation:
+        rotateReverse 5s linear infinite;
 }
 
 .logo-core {
@@ -292,7 +305,8 @@ button {
             rgba(0, 20, 28, .8)
         );
 
-    border: 1px solid rgba(0, 238, 255, .45);
+    border:
+        1px solid rgba(0, 238, 255, .45);
 
     box-shadow:
         0 0 25px rgba(0, 238, 255, .16),
@@ -339,7 +353,7 @@ button {
 
 
 /* =====================================================
-   MESSAGES
+   MESSAGE
 ===================================================== */
 
 .message {
@@ -380,7 +394,8 @@ button {
             rgba(0, 130, 180, .08)
         );
 
-    border: 1px solid rgba(0, 220, 255, .18);
+    border:
+        1px solid rgba(0, 220, 255, .18);
 
     border-bottom-right-radius: 5px;
 }
@@ -389,7 +404,8 @@ button {
     background:
         rgba(255, 255, 255, .035);
 
-    border: 1px solid rgba(255, 255, 255, .07);
+    border:
+        1px solid rgba(255, 255, 255, .07);
 
     border-bottom-left-radius: 5px;
 }
@@ -426,9 +442,11 @@ button {
 
     border-radius: 15px;
 
-    background: rgba(255, 255, 255, .035);
+    background:
+        rgba(255, 255, 255, .035);
 
-    border: 1px solid rgba(255, 255, 255, .07);
+    border:
+        1px solid rgba(255, 255, 255, .07);
 
     color: #79aeb5;
 
@@ -451,7 +469,8 @@ button {
 
     background: #00eaff;
 
-    animation: dot 1.2s infinite;
+    animation:
+        dot 1.2s infinite;
 }
 
 .typing-dots span:nth-child(2) {
@@ -475,8 +494,7 @@ button {
     bottom: 0;
 
     padding:
-        10px
-        13px
+        10px 13px
         calc(10px + env(safe-area-inset-bottom));
 
     background:
@@ -502,10 +520,8 @@ button {
     background:
         rgba(7, 18, 22, .94);
 
-    border: 1px solid rgba(0, 238, 255, .16);
-
-    box-shadow:
-        0 -5px 25px rgba(0, 0, 0, .3);
+    border:
+        1px solid rgba(0, 238, 255, .16);
 }
 
 textarea {
@@ -551,7 +567,8 @@ textarea::placeholder {
             rgba(0, 130, 180, .2)
         );
 
-    border: 1px solid rgba(0, 238, 255, .3);
+    border:
+        1px solid rgba(0, 238, 255, .3);
 
     color: #bfffff;
 
@@ -572,11 +589,13 @@ textarea::placeholder {
 
     inset: 0;
 
-    background: rgba(0, 0, 0, .6);
+    background:
+        rgba(0, 0, 0, .62);
 
     backdrop-filter: blur(4px);
 
     opacity: 0;
+
     pointer-events: none;
 
     transition: .25s;
@@ -586,6 +605,7 @@ textarea::placeholder {
 
 .overlay.show {
     opacity: 1;
+
     pointer-events: auto;
 }
 
@@ -605,9 +625,11 @@ textarea::placeholder {
             #03090c
         );
 
-    border-right: 1px solid rgba(0, 238, 255, .15);
+    border-right:
+        1px solid rgba(0, 238, 255, .15);
 
-    transform: translateX(-105%);
+    transform:
+        translateX(-105%);
 
     transition:
         transform .3s ease;
@@ -623,7 +645,8 @@ textarea::placeholder {
 }
 
 .sidebar.open {
-    transform: translateX(0);
+    transform:
+        translateX(0);
 }
 
 .sidebar-header {
@@ -635,7 +658,8 @@ textarea::placeholder {
 
     padding-bottom: 18px;
 
-    border-bottom: 1px solid rgba(255,255,255,.07);
+    border-bottom:
+        1px solid rgba(255,255,255,.07);
 
     margin-bottom: 18px;
 }
@@ -654,7 +678,8 @@ textarea::placeholder {
 
     border-radius: 12px;
 
-    background: rgba(255,255,255,.04);
+    background:
+        rgba(255,255,255,.04);
 
     color: #9bc6cb;
 
@@ -663,7 +688,7 @@ textarea::placeholder {
 
 
 /* =====================================================
-   ACTIVE PROFILE
+   ACTIVE USER
 ===================================================== */
 
 .active-profile {
@@ -680,7 +705,8 @@ textarea::placeholder {
             rgba(0,238,255,.025)
         );
 
-    border: 1px solid rgba(0,238,255,.16);
+    border:
+        1px solid rgba(0,238,255,.16);
 }
 
 .active-label {
@@ -711,7 +737,7 @@ textarea::placeholder {
 
 
 /* =====================================================
-   SIDEBAR BUTTONS
+   SIDEBAR BUTTON
 ===================================================== */
 
 .section-title {
@@ -722,15 +748,13 @@ textarea::placeholder {
     color: #426d73;
 
     margin:
-        20px
-        5px
-        8px;
+        20px 5px 8px;
 }
 
 .side-button {
     width: 100%;
 
-    min-height: 49px;
+    min-height: 52px;
 
     display: flex;
 
@@ -744,9 +768,11 @@ textarea::placeholder {
 
     border-radius: 14px;
 
-    background: rgba(255,255,255,.025);
+    background:
+        rgba(255,255,255,.025);
 
-    border: 1px solid rgba(255,255,255,.045);
+    border:
+        1px solid rgba(255,255,255,.045);
 
     color: #b8dadd;
 
@@ -785,93 +811,178 @@ textarea::placeholder {
     margin-top: 2px;
 }
 
-.profile-button.active {
-    border-color: rgba(0,238,255,.35);
-
-    background:
-        rgba(0,238,255,.07);
-
-    color: #eaffff;
-}
-
-.profile-button.betul.active {
-    border-color: rgba(255,90,170,.35);
-
-    background:
-        rgba(255,90,170,.06);
-}
-
 
 /* =====================================================
-   SETTINGS PANEL
+   PROFILE CHANGE MODAL
 ===================================================== */
 
-.settings-panel {
+.profile-modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
     display: none;
 
-    padding: 5px;
-}
-
-.settings-panel.show {
-    display: block;
-}
-
-.setting-row {
-    display: flex;
-
     align-items: center;
+    justify-content: center;
 
-    justify-content: space-between;
+    padding: 20px;
 
-    padding: 13px 4px;
+    background:
+        rgba(0, 0, 0, .72);
 
-    border-bottom: 1px solid rgba(255,255,255,.05);
+    backdrop-filter: blur(12px);
+
+    z-index: 100;
 }
 
-.setting-name {
-    font-size: 12px;
+.profile-modal-overlay.show {
+    display: flex;
 }
 
-.setting-desc {
-    color: #54757b;
+.profile-modal {
+    width: 100%;
+    max-width: 350px;
 
-    font-size: 9px;
+    padding: 24px;
 
-    margin-top: 3px;
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0a181d,
+            #03090c
+        );
+
+    border:
+        1px solid rgba(0,238,255,.2);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.55);
 }
 
-.switch {
-    width: 45px;
-    height: 25px;
+.profile-modal-logo {
+    width: 65px;
+    height: 65px;
 
-    border-radius: 20px;
-
-    background: #17272b;
-
-    padding: 3px;
-
-    transition: .2s;
-}
-
-.switch.on {
-    background: rgba(0,220,255,.35);
-}
-
-.switch-dot {
-    width: 19px;
-    height: 19px;
+    margin: 0 auto 18px;
 
     border-radius: 50%;
 
-    background: #66868a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    transition: .2s;
+    color: #00eaff;
+
+    font-size: 24px;
+
+    border:
+        1px solid rgba(0,238,255,.3);
+
+    background:
+        rgba(0,238,255,.06);
 }
 
-.switch.on .switch-dot {
-    transform: translateX(20px);
+.profile-modal-title {
+    text-align: center;
 
-    background: #00eaff;
+    font-size: 17px;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 6px;
+}
+
+.profile-modal-subtitle {
+    text-align: center;
+
+    color: #5d858b;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+}
+
+.profile-input {
+    width: 100%;
+
+    height: 48px;
+
+    margin-bottom: 10px;
+
+    padding: 0 14px;
+
+    border-radius: 13px;
+
+    outline: none;
+
+    color: #eaffff;
+
+    background:
+        rgba(255,255,255,.04);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    font-size: 16px;
+}
+
+.profile-input:focus {
+    border-color:
+        rgba(0,238,255,.35);
+}
+
+.profile-login-button {
+    width: 100%;
+
+    height: 48px;
+
+    margin-top: 6px;
+
+    border-radius: 13px;
+
+    color: #dfffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,238,255,.18),
+            rgba(0,130,180,.12)
+        );
+
+    border:
+        1px solid rgba(0,238,255,.25);
+}
+
+.profile-cancel-button {
+    width: 100%;
+
+    height: 43px;
+
+    margin-top: 8px;
+
+    border-radius: 13px;
+
+    color: #6f959a;
+
+    background:
+        transparent;
+}
+
+.profile-error {
+    min-height: 18px;
+
+    margin-top: 10px;
+
+    text-align: center;
+
+    color: #ff8f8f;
+
+    font-size: 10px;
 }
 
 
@@ -888,9 +999,11 @@ textarea::placeholder {
 
     border-radius: 16px;
 
-    background: rgba(255,130,60,.07);
+    background:
+        rgba(255,130,60,.07);
 
-    border: 1px solid rgba(255,130,60,.18);
+    border:
+        1px solid rgba(255,130,60,.18);
 
     text-align: center;
 }
@@ -922,9 +1035,11 @@ textarea::placeholder {
 
     border-radius: 12px;
 
-    background: rgba(255,150,80,.1);
+    background:
+        rgba(255,150,80,.1);
 
-    border: 1px solid rgba(255,150,80,.2);
+    border:
+        1px solid rgba(255,150,80,.2);
 
     color: #ffc39d;
 
@@ -933,12 +1048,11 @@ textarea::placeholder {
 
 
 /* =====================================================
-   LIGHT THEME
+   LIGHT MODE
 ===================================================== */
 
 body.light {
     background: #eef8fa;
-
     color: #102326;
 }
 
@@ -953,24 +1067,24 @@ body.light .background {
 }
 
 body.light .header {
-    background: rgba(240,250,252,.85);
+    background:
+        rgba(240,250,252,.85);
 }
 
 body.light .brand-main {
     color: #102326;
 }
 
-body.light .chat {
-    color: #102326;
-}
-
 body.light .message.jarvis .bubble {
-    background: rgba(0,0,0,.04);
+    background:
+        rgba(0,0,0,.04);
+
     color: #20383c;
 }
 
 body.light .input-box {
-    background: rgba(255,255,255,.92);
+    background:
+        rgba(255,255,255,.92);
 }
 
 body.light textarea {
@@ -982,7 +1096,84 @@ body.light .sidebar {
 }
 
 body.light .side-button {
-    background: rgba(0,0,0,.03);
+    background:
+        rgba(0,0,0,.03);
+}
+
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+.settings-panel {
+    display: none;
+
+    padding: 5px;
+}
+
+.settings-panel.show {
+    display: block;
+}
+
+.setting-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 13px 4px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.05);
+}
+
+.setting-name {
+    font-size: 12px;
+}
+
+.setting-desc {
+    color: #54757b;
+
+    font-size: 9px;
+
+    margin-top: 3px;
+}
+
+.switch {
+    width: 45px;
+    height: 25px;
+
+    border-radius: 20px;
+
+    background: #17272b;
+
+    padding: 3px;
+
+    transition: .2s;
+}
+
+.switch.on {
+    background:
+        rgba(0,220,255,.35);
+}
+
+.switch-dot {
+    width: 19px;
+    height: 19px;
+
+    border-radius: 50%;
+
+    background: #66868a;
+
+    transition: .2s;
+}
+
+.switch.on .switch-dot {
+    transform:
+        translateX(20px);
+
+    background: #00eaff;
 }
 
 
@@ -991,6 +1182,7 @@ body.light .side-button {
 ===================================================== */
 
 @keyframes rotate {
+
     from {
         transform: rotate(0deg);
     }
@@ -998,9 +1190,11 @@ body.light .side-button {
     to {
         transform: rotate(360deg);
     }
+
 }
 
 @keyframes rotateReverse {
+
     from {
         transform: rotate(360deg);
     }
@@ -1008,9 +1202,11 @@ body.light .side-button {
     to {
         transform: rotate(0deg);
     }
+
 }
 
 @keyframes dot {
+
     0%,
     80%,
     100% {
@@ -1022,6 +1218,7 @@ body.light .side-button {
         transform: scale(1);
         opacity: 1;
     }
+
 }
 
 </style>
@@ -1031,8 +1228,10 @@ body.light .side-button {
 
 <body>
 
+
 <div class="background"></div>
 <div class="grid"></div>
+
 
 <div
     id="overlay"
@@ -1090,39 +1289,15 @@ body.light .side-button {
 
 
     <div class="section-title">
-        KULLANICI PROFİLLERİ
+        KULLANICI
     </div>
 
 
-    <button
-        id="profileKarahan"
-        class="side-button profile-button active"
-        onclick="switchProfile('karahan')"
-    >
-
-        <div class="side-icon">
-            👑
-        </div>
-
-        <div class="side-text">
-
-            <span class="side-main">
-                KARAHAN INC.
-            </span>
-
-            <span class="side-sub">
-                Ana Kullanıcı
-            </span>
-
-        </div>
-
-    </button>
-
+    <!-- ARTIK BETÜL BURADA GÖRÜNMÜYOR -->
 
     <button
-        id="profileBetul"
-        class="side-button profile-button betul"
-        onclick="switchProfile('betül')"
+        class="side-button"
+        onclick="openProfileModal()"
     >
 
         <div class="side-icon">
@@ -1132,11 +1307,11 @@ body.light .side-button {
         <div class="side-text">
 
             <span class="side-main">
-                Betül
+                Kullanıcı / Profil Değiştir
             </span>
 
             <span class="side-sub">
-                Özel Kullanıcı
+                Başka bir kullanıcıya geç
             </span>
 
         </div>
@@ -1291,7 +1466,7 @@ body.light .side-button {
                 </div>
 
                 <div class="setting-desc">
-                    J.A.R.V.I.S. daha eğlenceli konuşur
+                    Daha eğlenceli cevaplar
                 </div>
 
             </div>
@@ -1337,8 +1512,79 @@ body.light .side-button {
 
     </div>
 
-
 </aside>
+
+
+<!-- =====================================================
+     PROFILE MODAL
+===================================================== -->
+
+<div
+    id="profileModal"
+    class="profile-modal-overlay"
+>
+
+    <div class="profile-modal">
+
+        <div class="profile-modal-logo">
+            👤
+        </div>
+
+
+        <div class="profile-modal-title">
+            PROFİL DEĞİŞTİR
+        </div>
+
+
+        <div class="profile-modal-subtitle">
+            J.A.R.V.I.S. başka bir kullanıcıya
+            geçmek için bilgileri bekliyor.
+        </div>
+
+
+        <input
+            id="profileUsername"
+            class="profile-input"
+            type="text"
+            placeholder="Kullanıcı adı"
+            autocomplete="off"
+            autocapitalize="none"
+        >
+
+
+        <input
+            id="profilePassword"
+            class="profile-input"
+            type="password"
+            placeholder="Şifre"
+            autocomplete="off"
+        >
+
+
+        <button
+            class="profile-login-button"
+            onclick="loginProfile()"
+        >
+            GİRİŞ YAP
+        </button>
+
+
+        <button
+            class="profile-cancel-button"
+            onclick="closeProfileModal()"
+        >
+            Vazgeç
+        </button>
+
+
+        <div
+            id="profileError"
+            class="profile-error"
+        ></div>
+
+    </div>
+
+</div>
 
 
 <!-- =====================================================
@@ -1408,9 +1654,11 @@ body.light .side-button {
                 J.A.R.V.I.S.
             </div>
 
+
             <div class="welcome-company">
                 KARAHAN INC.
             </div>
+
 
             <div
                 id="welcomeText"
@@ -1453,20 +1701,19 @@ body.light .side-button {
         >
 
             <div class="limit-title">
-                ⚠️ J.A.R.V.I.S. bağlantı sınırına ulaştı
+                ⚠️ Servis sınırına ulaşıldı
             </div>
 
             <div class="limit-text">
-                Yapay zeka servisinin kullanım limiti şu anda dolu.
-                Yeni sohbet oluşturabilirsiniz ancak servis limiti
-                yenilenmeden yeni istek gönderilemeyebilir.
+                Yapay zeka servisinin kullanım limiti
+                şu anda dolu.
             </div>
 
             <button
                 class="new-chat-limit"
                 onclick="newChat()"
             >
-                ＋ YENİ SOHBET BAŞLAT
+                ＋ YENİ SOHBET
             </button>
 
         </div>
@@ -1504,7 +1751,7 @@ body.light .side-button {
 <script>
 
 /* =====================================================
-   STATE
+   CURRENT USER
 ===================================================== */
 
 let currentUser = {
@@ -1513,61 +1760,89 @@ let currentUser = {
     role: "Ana Kullanıcı"
 };
 
+
 let sessionId =
     Date.now().toString(36) +
     Math.random().toString(36).slice(2);
 
+
 let funMode = false;
 let animationsEnabled = true;
 
+let typingTimer = null;
+
 let betulWaitingMessages = [
+
     "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
+
     "Dur kız, bunu da hemen bilmemi bekleme. 😂",
+
     "Bir dakika aşko, işlemcim dedikodu modundan çıkıyor...",
+
     "Tamam tamam, düşünüyorum kız. Sabırsızlanma. 😂",
+
     "Aşko bekle, J.A.R.V.I.S. şu an beyninin son kalan hücresini kullanıyor...",
+
     "Bir saniye canım, NASA'ya bağlanıp geliyorum. 😂",
+
     "Dur kız, her şeyi ben mi bileceğim? 😭",
+
     "Aşko bu soruyu beklemiyordum. Bir toparlanayım. 😂",
+
     "Düşünüyorum kız, üstüme gelme. 😂",
+
     "Tamam aşko, beynimin fanları şu an son hız dönüyor..."
+
 ];
 
 let betulMessageIndex = 0;
-let typingTimer = null;
 
 
 /* =====================================================
    ELEMENTS
 ===================================================== */
 
-const chat = document.getElementById("chat");
-const welcome = document.getElementById("welcome");
-const typing = document.getElementById("typing");
-const typingText = document.getElementById("typingText");
-const messageInput = document.getElementById("messageInput");
-const limitPanel = document.getElementById("limitPanel");
+const chat =
+    document.getElementById("chat");
+
+const welcome =
+    document.getElementById("welcome");
+
+const typing =
+    document.getElementById("typing");
+
+const typingText =
+    document.getElementById("typingText");
+
+const messageInput =
+    document.getElementById("messageInput");
+
+const limitPanel =
+    document.getElementById("limitPanel");
 
 
 /* =====================================================
-   STARTUP
+   START
 ===================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    setCurrentUserUI();
+        setCurrentUserUI();
 
-    messageInput.addEventListener(
-        "keydown",
-        handleInputKey
-    );
+        messageInput.addEventListener(
+            "keydown",
+            handleInputKey
+        );
 
-    messageInput.addEventListener(
-        "input",
-        autoResize
-    );
+        messageInput.addEventListener(
+            "input",
+            autoResize
+        );
 
-});
+    }
+);
 
 
 /* =====================================================
@@ -1599,84 +1874,182 @@ function closeSidebar() {
 
 
 /* =====================================================
-   PROFILE
+   PROFILE MODAL
 ===================================================== */
 
-function switchProfile(username) {
-
-    if (username === currentUser.username) {
-        closeSidebar();
-        return;
-    }
-
-    if (username === "betül") {
-
-        currentUser = {
-            username: "betül",
-            name: "Betül",
-            role: "Özel Kullanıcı"
-        };
-
-    } else {
-
-        currentUser = {
-            username: "karahan",
-            name: "KARAHAN INC.",
-            role: "Ana Kullanıcı"
-        };
-
-    }
-
-    sessionId =
-        Date.now().toString(36) +
-        Math.random().toString(36).slice(2);
-
-    clearChat();
-
-    setCurrentUserUI();
+function openProfileModal() {
 
     closeSidebar();
 
-    showProfileWelcome();
+    document
+        .getElementById("profileModal")
+        .classList.add("show");
+
+    document
+        .getElementById("profileUsername")
+        .value = "";
+
+    document
+        .getElementById("profilePassword")
+        .value = "";
+
+    document
+        .getElementById("profileError")
+        .textContent = "";
+
+    setTimeout(
+        () => {
+
+            document
+                .getElementById("profileUsername")
+                .focus();
+
+        },
+        150
+    );
 }
 
 
+function closeProfileModal() {
+
+    document
+        .getElementById("profileModal")
+        .classList.remove("show");
+}
+
+
+async function loginProfile() {
+
+    const username =
+        document
+            .getElementById("profileUsername")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("profilePassword")
+            .value;
+
+
+    const errorElement =
+        document.getElementById(
+            "profileError"
+        );
+
+
+    if (!username || !password) {
+
+        errorElement.textContent =
+            "Kullanıcı adı ve şifre gerekli.";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/profile-login",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            errorElement.textContent =
+                data.message ||
+                "Kullanıcı adı veya şifre hatalı.";
+
+            return;
+        }
+
+
+        currentUser =
+            data.user;
+
+
+        sessionId =
+            Date.now().toString(36) +
+            Math.random().toString(36).slice(2);
+
+
+        clearChat();
+
+        setCurrentUserUI();
+
+        closeProfileModal();
+
+        showProfileWelcome();
+
+
+    } catch (error) {
+
+        errorElement.textContent =
+            "Sunucuya bağlanılamadı.";
+
+    }
+
+}
+
+
+/* =====================================================
+   USER UI
+===================================================== */
+
 function setCurrentUserUI() {
 
-    document.getElementById("headerUser").textContent =
+    document
+        .getElementById("headerUser")
+        .textContent =
         currentUser.name;
 
-    document.getElementById("activeProfileName").textContent =
+
+    document
+        .getElementById("activeProfileName")
+        .textContent =
         currentUser.name;
 
-    document.getElementById("activeProfileRole").textContent =
+
+    document
+        .getElementById("activeProfileRole")
+        .textContent =
         currentUser.role;
 
 
-    document
-        .getElementById("profileKarahan")
-        .classList.toggle(
-            "active",
-            currentUser.username === "karahan"
-        );
+    if (
+        currentUser.username === "betül"
+    ) {
 
-
-    document
-        .getElementById("profileBetul")
-        .classList.toggle(
-            "active",
-            currentUser.username === "betül"
-        );
-
-
-    if (currentUser.username === "betül") {
-
-        document.getElementById("welcomeText").textContent =
+        document
+            .getElementById("welcomeText")
+            .textContent =
             "Hoş geldin aşko. J.A.R.V.I.S. burada. Bakalım bugün ne karıştırıyoruz? 😂";
 
     } else {
 
-        document.getElementById("welcomeText").textContent =
+        document
+            .getElementById("welcomeText")
+            .textContent =
             "Hoş geldiniz efendim. J.A.R.V.I.S. hazır.";
 
     }
@@ -1685,23 +2058,27 @@ function setCurrentUserUI() {
 
 function showProfileWelcome() {
 
-    welcome.style.display = "flex";
+    welcome.style.display =
+        "flex";
 
-    const welcomeText =
-        document.getElementById("welcomeText");
 
-    if (currentUser.username === "betül") {
+    if (
+        currentUser.username === "betül"
+    ) {
 
-        welcomeText.textContent =
+        document
+            .getElementById("welcomeText")
+            .textContent =
             "Hoş geldin aşko. J.A.R.V.I.S. burada. Bakalım bugün ne karıştırıyoruz? 😂";
 
     } else {
 
-        welcomeText.textContent =
+        document
+            .getElementById("welcomeText")
+            .textContent =
             "Hoş geldiniz efendim. J.A.R.V.I.S. hazır.";
 
     }
-
 }
 
 
@@ -1712,40 +2089,64 @@ function showProfileWelcome() {
 function clearChat() {
 
     const messages =
-        chat.querySelectorAll(".message");
+        chat.querySelectorAll(
+            ".message"
+        );
+
 
     messages.forEach(
-        element => element.remove()
+        element =>
+            element.remove()
     );
 
-    welcome.style.display = "flex";
 
-    limitPanel.classList.remove("show");
+    welcome.style.display =
+        "flex";
+
+
+    limitPanel.classList.remove(
+        "show"
+    );
+
 
     hideTyping();
 }
 
 
-function addMessage(role, text) {
+function addMessage(
+    role,
+    text
+) {
 
-    welcome.style.display = "none";
+    welcome.style.display =
+        "none";
+
 
     const wrapper =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     wrapper.className =
         "message " + role;
 
 
     const inner =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     const label =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     label.className =
         "message-label";
+
 
     label.textContent =
         role === "user"
@@ -1754,23 +2155,31 @@ function addMessage(role, text) {
 
 
     const bubble =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     bubble.className =
         "bubble";
 
-    bubble.textContent = text;
+
+    bubble.textContent =
+        text;
 
 
     inner.appendChild(label);
+
     inner.appendChild(bubble);
 
     wrapper.appendChild(inner);
+
 
     chat.insertBefore(
         wrapper,
         typing
     );
+
 
     scrollChat();
 }
@@ -1778,12 +2187,15 @@ function addMessage(role, text) {
 
 function scrollChat() {
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        chat.scrollTop =
-            chat.scrollHeight;
+            chat.scrollTop =
+                chat.scrollHeight;
 
-    }, 50);
+        },
+        50
+    );
 }
 
 
@@ -1793,34 +2205,54 @@ function scrollChat() {
 
 function showTyping() {
 
-    typing.classList.add("show");
+    typing.classList.add(
+        "show"
+    );
 
-    if (currentUser.username === "betül") {
+
+    if (
+        currentUser.username === "betül"
+    ) {
 
         typingText.textContent =
             betulWaitingMessages[
                 betulMessageIndex
             ];
 
-        betulMessageIndex =
-            (betulMessageIndex + 1)
-            % betulWaitingMessages.length;
 
-        clearInterval(typingTimer);
+        betulMessageIndex =
+            (
+                betulMessageIndex + 1
+            )
+            %
+            betulWaitingMessages.length;
+
+
+        clearInterval(
+            typingTimer
+        );
+
 
         typingTimer =
-            setInterval(() => {
+            setInterval(
+                () => {
 
-                typingText.textContent =
-                    betulWaitingMessages[
-                        betulMessageIndex
-                    ];
+                    typingText.textContent =
+                        betulWaitingMessages[
+                            betulMessageIndex
+                        ];
 
-                betulMessageIndex =
-                    (betulMessageIndex + 1)
-                    % betulWaitingMessages.length;
 
-            }, 2600);
+                    betulMessageIndex =
+                        (
+                            betulMessageIndex + 1
+                        )
+                        %
+                        betulWaitingMessages.length;
+
+                },
+                2600
+            );
 
     } else {
 
@@ -1831,15 +2263,20 @@ function showTyping() {
 
     }
 
+
     scrollChat();
 }
 
 
 function hideTyping() {
 
-    typing.classList.remove("show");
+    typing.classList.remove(
+        "show"
+    );
 
-    clearInterval(typingTimer);
+    clearInterval(
+        typingTimer
+    );
 
     typingTimer = null;
 }
@@ -1854,14 +2291,17 @@ async function sendMessage() {
     const message =
         messageInput.value.trim();
 
+
     if (!message) {
         return;
     }
+
 
     addMessage(
         "user",
         message
     );
+
 
     messageInput.value = "";
 
@@ -1869,34 +2309,39 @@ async function sendMessage() {
 
     showTyping();
 
-    limitPanel.classList.remove("show");
+    limitPanel.classList.remove(
+        "show"
+    );
 
 
     try {
 
         const response =
-            await fetch("/chat", {
+            await fetch(
+                "/chat",
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
+                    body: JSON.stringify({
 
-                    message: message,
+                        message: message,
 
-                    username:
-                        currentUser.username,
+                        username:
+                            currentUser.username,
 
-                    session_id:
-                        sessionId
+                        session_id:
+                            sessionId
 
-                })
+                    })
 
-            });
+                }
+            );
 
 
         const data =
@@ -1908,31 +2353,37 @@ async function sendMessage() {
 
         if (!data.success) {
 
+
             if (
-                data.error === "RATE_LIMIT"
+                data.error ===
+                "RATE_LIMIT"
             ) {
 
-                limitPanel.classList.add("show");
+                limitPanel.classList.add(
+                    "show"
+                );
+
 
                 addMessage(
                     "jarvis",
-                    "Efendim, yapay zeka servisinin kullanım sınırına ulaşıldı. Yeni sohbet açabilirsiniz; fakat servis sağlayıcının günlük limiti yenilenene kadar istekler yine engellenebilir."
+                    "Efendim, yapay zeka servisinin kullanım sınırına ulaşıldı. Servis sağlayıcının limiti yenilenene kadar yeni istekler çalışmayabilir."
                 );
 
-                scrollChat();
 
                 return;
             }
 
 
             if (
-                data.error === "NO_API_KEY"
+                data.error ===
+                "NO_API_KEY"
             ) {
 
                 addMessage(
                     "jarvis",
-                    "Efendim, GROQ_API_KEY yapılandırılmamış. Sunucu ayarlarını kontrol etmemiz gerekiyor."
+                    "Efendim, GROQ_API_KEY yapılandırılmamış."
                 );
+
 
                 return;
             }
@@ -1940,9 +2391,13 @@ async function sendMessage() {
 
             addMessage(
                 "jarvis",
-                "Efendim, şu anda bir bağlantı sorunu oluştu.\n\n" +
-                (data.message || "Bilinmeyen hata.")
+                "Efendim, bir sorun oluştu.\n\n" +
+                (
+                    data.message ||
+                    "Bilinmeyen hata."
+                )
             );
+
 
             return;
         }
@@ -1957,6 +2412,7 @@ async function sendMessage() {
     } catch (error) {
 
         hideTyping();
+
 
         addMessage(
             "jarvis",
@@ -1977,6 +2433,7 @@ async function newChat() {
     closeSidebar();
 
     clearChat();
+
 
     sessionId =
         Date.now().toString(36) +
@@ -2007,8 +2464,9 @@ async function newChat() {
         );
 
     } catch (error) {
-        // Yerel sohbet yine de temizlenir.
+        // Sohbet yine de temizlenir.
     }
+
 
     showProfileWelcome();
 
@@ -2024,6 +2482,7 @@ async function showMemory() {
 
     closeSidebar();
 
+
     try {
 
         const response =
@@ -2034,34 +2493,29 @@ async function showMemory() {
                 )
             );
 
+
         const data =
             await response.json();
 
-        const memory =
+
+        const mem =
             data.memory || {};
 
-        const profile =
-            memory.profile || {};
 
-        const projects =
-            memory.projects || {};
-
-        const vehicles =
-            memory.vehicles || {};
-
-
-        let text =
+        let output =
             "J.A.R.V.I.S. HAFIZASI\n\n";
 
 
         if (
-            Object.keys(profile).length
+            Object.keys(
+                mem.profile || {}
+            ).length
         ) {
 
-            text +=
+            output +=
                 "PROFİL:\n" +
                 JSON.stringify(
-                    profile,
+                    mem.profile,
                     null,
                     2
                 ) +
@@ -2071,13 +2525,15 @@ async function showMemory() {
 
 
         if (
-            Object.keys(projects).length
+            Object.keys(
+                mem.projects || {}
+            ).length
         ) {
 
-            text +=
+            output +=
                 "PROJELER:\n" +
                 JSON.stringify(
-                    projects,
+                    mem.projects,
                     null,
                     2
                 ) +
@@ -2087,13 +2543,15 @@ async function showMemory() {
 
 
         if (
-            Object.keys(vehicles).length
+            Object.keys(
+                mem.vehicles || {}
+            ).length
         ) {
 
-            text +=
+            output +=
                 "ARAÇLAR:\n" +
                 JSON.stringify(
-                    vehicles,
+                    mem.vehicles,
                     null,
                     2
                 );
@@ -2102,20 +2560,19 @@ async function showMemory() {
 
 
         if (
-            !Object.keys(profile).length &&
-            !Object.keys(projects).length &&
-            !Object.keys(vehicles).length
+            output ===
+            "J.A.R.V.I.S. HAFIZASI\n\n"
         ) {
 
-            text +=
-                "Bu kullanıcı için henüz kayıtlı önemli bir bilgi bulunmuyor.";
+            output +=
+                "Henüz kayıtlı önemli bilgi bulunmuyor.";
 
         }
 
 
         addMessage(
             "jarvis",
-            text
+            output
         );
 
 
@@ -2123,7 +2580,7 @@ async function showMemory() {
 
         addMessage(
             "jarvis",
-            "Efendim, hafıza bilgisine ulaşılamadı."
+            "Efendim, hafızaya ulaşılamadı."
         );
 
     }
@@ -2132,17 +2589,21 @@ async function showMemory() {
 
 
 /* =====================================================
-   SYSTEM HEALTH
+   HEALTH
 ===================================================== */
 
 async function showHealth() {
 
     closeSidebar();
 
+
     try {
 
         const response =
-            await fetch("/health");
+            await fetch(
+                "/health"
+            );
+
 
         const data =
             await response.json();
@@ -2190,12 +2651,13 @@ async function showHealth() {
 
 function toggleSettings() {
 
-    const panel =
-        document.getElementById(
+    document
+        .getElementById(
             "settingsPanel"
+        )
+        .classList.toggle(
+            "show"
         );
-
-    panel.classList.toggle("show");
 }
 
 
@@ -2205,13 +2667,17 @@ function toggleTheme() {
         "light"
     );
 
+
     const isLight =
         document.body.classList.contains(
             "light"
         );
 
+
     document
-        .getElementById("themeSwitch")
+        .getElementById(
+            "themeSwitch"
+        )
         .classList.toggle(
             "on",
             !isLight
@@ -2221,22 +2687,30 @@ function toggleTheme() {
 
 function toggleFunMode() {
 
-    funMode = !funMode;
+    funMode =
+        !funMode;
+
 
     document
-        .getElementById("funSwitch")
+        .getElementById(
+            "funSwitch"
+        )
         .classList.toggle(
             "on",
             funMode
         );
 
+
     if (funMode) {
 
         addMessage(
             "jarvis",
+
             currentUser.username === "betül"
+
                 ? "Aşko zaten yeterince eğlenceliyiz, bir de modu açtın. 😂"
-                : "Eğlence modu aktif efendim. J.A.R.V.I.S. biraz daha rahat konuşacak."
+
+                : "Eğlence modu aktif efendim."
         );
 
     }
@@ -2249,19 +2723,15 @@ function toggleAnimations() {
     animationsEnabled =
         !animationsEnabled;
 
+
     document
-        .getElementById("animationSwitch")
+        .getElementById(
+            "animationSwitch"
+        )
         .classList.toggle(
             "on",
             animationsEnabled
         );
-
-    document.body.style.setProperty(
-        "--animation-speed",
-        animationsEnabled
-            ? "1"
-            : "0"
-    );
 }
 
 
@@ -2290,6 +2760,7 @@ function autoResize() {
     messageInput.style.height =
         "auto";
 
+
     messageInput.style.height =
         Math.min(
             messageInput.scrollHeight,
@@ -2299,7 +2770,7 @@ function autoResize() {
 
 
 /* =====================================================
-   GLOBAL SHORTCUT
+   ESC
 ===================================================== */
 
 document.addEventListener(
@@ -2311,6 +2782,8 @@ document.addEventListener(
         ) {
 
             closeSidebar();
+
+            closeProfileModal();
 
         }
 
