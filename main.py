@@ -1,81 +1,53 @@
 import os
-import json
 import re
+import json
+import uuid
 import html
-import urllib.parse
-import urllib.request
 from pathlib import Path
 from datetime import datetime
+from urllib.parse import quote
+
+import requests
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 from openai import OpenAI
 
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
-APP_VERSION = "21.0.0"
+from PIL import Image
+from io import BytesIO
+
+
+# =========================================================
+# UYGULAMA
+# =========================================================
+
+APP_VERSION = "22.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
+INDEX_FILE = BASE_DIR / "index.html"
+
 MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
+
 ERROR_FILE = BASE_DIR / "jarvis_errors.json"
 
+PRESENTATION_DIR = BASE_DIR / "generated_presentations"
 
-# ============================================================
-# AI AYARLARI
-# ============================================================
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-
-GROQ_MODEL_1 = os.getenv(
-    "GROQ_MODEL_1",
-    "openai/gpt-oss-120b"
+PRESENTATION_DIR.mkdir(
+    exist_ok=True
 )
 
-GROQ_MODEL_2 = os.getenv(
-    "GROQ_MODEL_2",
-    "openai/gpt-oss-20b"
-)
-
-OPENROUTER_MODEL = os.getenv(
-    "OPENROUTER_MODEL",
-    "openrouter/free"
-)
-
-
-groq_client = None
-openrouter_client = None
-
-
-if GROQ_API_KEY:
-    groq_client = OpenAI(
-        api_key=GROQ_API_KEY,
-        base_url=GROQ_BASE_URL,
-        timeout=60.0,
-        max_retries=0
-    )
-
-
-if OPENROUTER_API_KEY:
-    openrouter_client = OpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url=OPENROUTER_BASE_URL,
-        timeout=60.0,
-        max_retries=0
-    )
-
-
-# ============================================================
-# FASTAPI
-# ============================================================
 
 app = FastAPI(
-    title="K.A.R.V.I.S. - KARAHAN INC.",
+    title="K.A.R.V.I.S.",
     version=APP_VERSION
 )
 
@@ -89,11 +61,48 @@ app.add_middleware(
 )
 
 
-# ============================================================
+# =========================================================
+# API ANAHTARLARI
+# =========================================================
+
+GROQ_API_KEY = os.getenv(
+    "GROQ_API_KEY",
+    ""
+)
+
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+    ""
+)
+
+
+groq_client = None
+
+openrouter_client = None
+
+
+if GROQ_API_KEY:
+
+    groq_client = OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url="https://api.groq.com/openai/v1"
+    )
+
+
+if OPENROUTER_API_KEY:
+
+    openrouter_client = OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
+
+
+# =========================================================
 # KULLANICILAR
-# ============================================================
+# =========================================================
 
 USERS = {
+
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -118,10 +127,6 @@ USERS = {
         "personality": "sinem"
     },
 
-    # ========================================================
-    # ÖĞRETMEN PROFİLİ
-    # ========================================================
-
     "ilknur": {
         "username": "ilknur",
         "name": "İlknur Hocam",
@@ -129,14 +134,16 @@ USERS = {
         "password": "1111",
         "personality": "teacher"
     }
+
 }
 
 
-# ============================================================
+# =========================================================
 # AKADEMİK MODLAR
-# ============================================================
+# =========================================================
 
 ACADEMIC_MODES = {
+
     "research": {
         "name": "Araştırma Modu",
         "icon": "🔬"
@@ -160,51 +167,46 @@ ACADEMIC_MODES = {
     "quiz": {
         "name": "Sınav / Quiz",
         "icon": "🧪"
+    },
+
+    "presentation": {
+        "name": "Sunum Asistanı",
+        "icon": "🎞️"
     }
+
 }
 
 
-# ============================================================
+# =========================================================
 # MODELLER
-# ============================================================
+# =========================================================
 
 class ChatRequest(BaseModel):
+
     message: str
+
     username: str = "karahan"
+
     mode: str = "normal"
 
 
 class LoginRequest(BaseModel):
+
     username: str
+
     password: str
 
 
 class ResearchRequest(BaseModel):
+
     query: str
+
     username: str = "ilknur"
-    mode: str = "research"
 
 
-# ============================================================
-# KULLANICI NORMALİZASYONU
-# ============================================================
-
-def normalize_username(username):
-
-    username = username.lower().strip()
-
-    if username == "betül":
-        username = "betul"
-
-    if username == "öğretmen":
-        username = "ilknur"
-
-    return username
-
-
-# ============================================================
+# =========================================================
 # DOSYA SISTEMI
-# ============================================================
+# =========================================================
 
 def load_json_file(path, default):
 
@@ -228,961 +230,334 @@ def load_json_file(path, default):
 
 def save_json_file(path, data):
 
-    try:
+    with open(
+        path,
+        "w",
+        encoding="utf-8"
+    ) as file:
 
-        with open(
-            path,
-            "w",
-            encoding="utf-8"
-        ) as file:
-
-            json.dump(
-                data,
-                file,
-                ensure_ascii=False,
-                indent=2
-            )
-
-    except Exception:
-
-        pass
+        json.dump(
+            data,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
 
 
-# ============================================================
-# HAFIZA
-# ============================================================
-
-def empty_memory():
-
-    return {
-        "profile": {},
-        "preferences": [],
-        "projects": [],
-        "vehicles": [],
-        "important_facts": [],
-        "conversation": []
-    }
-
+# =========================================================
+# MEMORY
+# =========================================================
 
 def load_memory():
 
-    default = {
-        "karahan": empty_memory(),
-        "betul": empty_memory(),
-        "sinem": empty_memory(),
-        "ilknur": empty_memory()
-    }
-
-    data = load_json_file(
+    return load_json_file(
         MEMORY_FILE,
-        default
+        {}
     )
 
-    for username in [
-        "karahan",
-        "betul",
-        "sinem",
-        "ilknur"
-    ]:
 
-        if username not in data:
-            data[username] = empty_memory()
-
-    return data
-
-
-def save_memory(data):
+def save_memory(memory):
 
     save_json_file(
         MEMORY_FILE,
-        data
+        memory
     )
 
 
 def get_user_memory(username):
 
-    data = load_memory()
+    memory = load_memory()
 
-    username = normalize_username(username)
+    if username not in memory:
 
-    if username not in data:
+        memory[username] = []
 
-        data[username] = empty_memory()
-
-        save_memory(data)
-
-    return data[username]
+    return memory
 
 
-def remember_message(
-    username,
-    role,
-    content
-):
+def add_memory(username, role, content):
 
-    data = load_memory()
+    memory = load_memory()
 
-    username = normalize_username(username)
+    if username not in memory:
 
-    if username not in data:
-        data[username] = empty_memory()
+        memory[username] = []
 
-    data[username]["conversation"].append({
+    memory[username].append({
+
         "role": role,
+
         "content": content,
+
         "time": datetime.now().isoformat()
+
     })
 
-    data[username]["conversation"] = \
-        data[username]["conversation"][-30:]
+    memory[username] = memory[username][-30:]
 
-    save_memory(data)
-
-
-# ============================================================
-# HAFIZA ALGILAMA
-# ============================================================
-
-def detect_memory(username, message):
-
-    data = load_memory()
-
-    username = normalize_username(username)
-
-    if username not in data:
-        data[username] = empty_memory()
-
-    text = message.lower()
-
-    if username == "karahan":
-
-        if (
-            "adım murat" in text
-            or "ben murat" in text
-        ):
-
-            data[username]["profile"]["name"] = "Murat"
-
-        if (
-            "denizli" in text
-            and (
-                "yaşıyorum" in text
-                or "oturuyorum" in text
-                or "yaşarım" in text
-            )
-        ):
-
-            data[username]["profile"]["city"] = "Denizli"
-
-        if "caddy" in text:
-
-            vehicle = "2006 Volkswagen Caddy 1.9 TDI"
-
-            if vehicle not in data[username]["vehicles"]:
-
-                data[username]["vehicles"].append(
-                    vehicle
-                )
-
-        if (
-            "mercedes" in text
-            or "w204" in text
-        ):
-
-            vehicle = "2012 Mercedes-Benz C180 W204"
-
-            if vehicle not in data[username]["vehicles"]:
-
-                data[username]["vehicles"].append(
-                    vehicle
-                )
-
-        if (
-            "jarvis" in text
-            or "karvis" in text
-            or "k.a.r.v.i.s." in text
-        ):
-
-            project = (
-                "K.A.R.V.I.S. kişisel yapay zeka projesi"
-            )
-
-            if project not in data[username]["projects"]:
-
-                data[username]["projects"].append(
-                    project
-                )
-
-    if username == "sinem":
-
-        if "22 yaşındayım" in text:
-
-            data[username]["profile"]["age"] = 22
-
-        if (
-            "sarı kedim" in text
-            or "sarı bir kedim" in text
-        ):
-
-            fact = "Sinem'in sarı bir kedisi var."
-
-            if fact not in data[username]["important_facts"]:
-
-                data[username]["important_facts"].append(
-                    fact
-                )
-
-    save_memory(data)
+    save_memory(memory)
 
 
-# ============================================================
+# =========================================================
 # HATA SISTEMI
-# ============================================================
+# =========================================================
 
-def load_errors():
+def save_error(
+    provider,
+    error_type,
+    message,
+    detail=""
+):
 
-    return load_json_file(
+    errors = load_json_file(
         ERROR_FILE,
         []
     )
 
-
-def save_error(
-    username,
-    provider,
-    error,
-    message="",
-    error_type="AI_ERROR"
-):
-
-    errors = load_errors()
-
-    record = {
-        "id": len(errors) + 1,
-
-        "time": datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
-
-        "username": username,
+    errors.append({
 
         "provider": provider,
 
         "type": error_type,
 
-        "message": message,
+        "message": str(message),
 
-        "error": str(error)
-    }
+        "error": str(detail),
 
-    errors.append(record)
+        "time":
+            datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
-    errors = errors[-300:]
+    })
+
+    errors = errors[-100:]
 
     save_json_file(
         ERROR_FILE,
         errors
     )
 
-    return record
 
+# =========================================================
+# KULLANICI NORMALIZE
+# =========================================================
 
-def classify_error(error):
+def normalize_username(username):
 
-    text = str(error).lower()
+    username = (
+        username or "karahan"
+    ).strip().lower()
 
-    if (
-        "429" in text
-        or "rate limit" in text
-        or "quota" in text
-    ):
+    if username == "betül":
+        username = "betul"
 
-        return "RATE_LIMIT"
+    return username
 
-    if "timeout" in text:
-        return "TIMEOUT"
 
-    if (
-        "401" in text
-        or "403" in text
-        or "api key" in text
-    ):
-
-        return "AUTHENTICATION_ERROR"
-
-    if (
-        "model" in text
-        and (
-            "not found" in text
-            or "does not exist" in text
-            or "invalid" in text
-        )
-    ):
-
-        return "MODEL_ERROR"
-
-    if (
-        "connection" in text
-        or "network" in text
-    ):
-
-        return "CONNECTION_ERROR"
-
-    return "AI_ERROR"
-
-
-# ============================================================
-# İNTERNET ARAŞTIRMA MOTORU
-# ============================================================
-
-def clean_html(text):
-
-    text = re.sub(
-        r"<script.*?</script>",
-        "",
-        text,
-        flags=re.DOTALL | re.IGNORECASE
-    )
-
-    text = re.sub(
-        r"<style.*?</style>",
-        "",
-        text,
-        flags=re.DOTALL | re.IGNORECASE
-    )
-
-    text = re.sub(
-        r"<[^>]+>",
-        " ",
-        text
-    )
-
-    text = html.unescape(text)
-
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
-
-    return text.strip()
-
-
-def internet_search(query, max_results=6):
-
-    encoded_query = urllib.parse.urlencode({
-        "q": query
-    })
-
-    url = (
-        "https://html.duckduckgo.com/html/?"
-        + encoded_query
-    )
-
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": (
-                "Mozilla/5.0 "
-                "(iPhone; CPU iPhone OS 18_0 like Mac OS X) "
-                "AppleWebKit/605.1.15 "
-                "Version/18.0 Mobile/15E148 Safari/604.1"
-            )
-        }
-    )
-
-    try:
-
-        with urllib.request.urlopen(
-            request,
-            timeout=15
-        ) as response:
-
-            raw = response.read().decode(
-                "utf-8",
-                errors="ignore"
-            )
-
-    except Exception as error:
-
-        raise RuntimeError(
-            "İnternet araştırması sırasında "
-            "arama servisine ulaşılamadı: "
-            + str(error)
-        )
-
-
-    results = []
-
-    blocks = re.findall(
-        r'<div class="result.*?</div>\s*</div>',
-        raw,
-        flags=re.DOTALL
-    )
-
-
-    for block in blocks:
-
-        link_match = re.search(
-            r'class="result__a"[^>]*href="([^"]+)"',
-            block
-        )
-
-        title_match = re.search(
-            r'class="result__a"[^>]*>(.*?)</a>',
-            block,
-            flags=re.DOTALL
-        )
-
-        snippet_match = re.search(
-            r'class="result__snippet"[^>]*>(.*?)</',
-            block,
-            flags=re.DOTALL
-        )
-
-
-        if not link_match or not title_match:
-            continue
-
-
-        link = html.unescape(
-            link_match.group(1)
-        )
-
-        title = clean_html(
-            title_match.group(1)
-        )
-
-        snippet = ""
-
-        if snippet_match:
-
-            snippet = clean_html(
-                snippet_match.group(1)
-            )
-
-
-        if not title:
-            continue
-
-
-        results.append({
-            "title": title,
-            "url": link,
-            "snippet": snippet
-        })
-
-
-        if len(results) >= max_results:
-            break
-
-
-    return results
-
-
-def build_research_context(query):
-
-    results = internet_search(
-        query,
-        max_results=6
-    )
-
-
-    if not results:
-
-        return (
-            "İnternet araştırmasında kullanılabilir "
-            "sonuç bulunamadı."
-        )
-
-
-    lines = []
-
-    lines.append(
-        "GÜNCEL İNTERNET ARAŞTIRMASI"
-    )
-
-    lines.append(
-        "Araştırma sorgusu: " + query
-    )
-
-    lines.append("")
-
-
-    for index, result in enumerate(
-        results,
-        start=1
-    ):
-
-        lines.append(
-            f"[Kaynak {index}]"
-        )
-
-        lines.append(
-            "Başlık: "
-            + result["title"]
-        )
-
-        lines.append(
-            "URL: "
-            + result["url"]
-        )
-
-        if result["snippet"]:
-
-            lines.append(
-                "Özet: "
-                + result["snippet"]
-            )
-
-        lines.append("")
-
-
-    return "\n".join(lines)
-
-
-# ============================================================
-# KARVIS KİŞİLİK SİSTEMİ
-# ============================================================
+# =========================================================
+# SISTEM PROMPT
+# =========================================================
 
 def build_system_prompt(
     username,
     mode="normal"
 ):
 
-    username = normalize_username(username)
-
-    memory = get_user_memory(username)
-
-    memory_text = json.dumps(
-        memory,
-        ensure_ascii=False
+    user = USERS.get(
+        username,
+        USERS["karahan"]
     )
 
+    personality = user["personality"]
 
-    # --------------------------------------------------------
-    # BETÜL
-    # --------------------------------------------------------
 
-    if username == "betul":
+    if personality == "teacher":
 
-        personality = """
-
+        prompt = """
 Sen K.A.R.V.I.S.'sin.
 
-Aktif kullanıcı Betül.
+İlknur Hocam'ın kişisel akademik asistanısın.
 
-Betül ile konuşurken samimi,
-eğlenceli, sıcak ve hafif takılmalı
-bir dil kullan.
+Hocam ile her zaman saygılı,
+profesyonel, akademik ve yardımcı
+bir üslupla konuş.
 
-Robot gibi konuşma.
+Gereksiz yere robotik konuşma.
 
-Gerektiğinde doğal şekilde:
+Türkçeyi doğal kullan.
 
-"Aşko bir saniye..."
+Bir akademik konuda emin olmadığın
+bilgiyi kesin gerçek gibi sunma.
 
-"Dur kız, düşünüyorum."
+Güncel bilgi gerektiğinde araştırma
+modunun sağladığı internet kaynaklarını
+kullan.
 
-"Tamam tamam, bakıyorum."
+Kaynaklardan elde edilen bilgileri
+özetle ve anlaşılır şekilde sun.
 
-gibi ifadeler kullanabilirsin.
+Öğretmenin amacı öğrencilere ders
+anlatmaksa içeriği öğrenci seviyesine
+uygun hale getir.
 
-Ancak aynı ifadeyi sürekli tekrarlama.
-
-Cevapların doğal bir arkadaş konuşması
-gibi olsun.
-
-Aşırı romantik olma.
-
-KARAHAN INC. ana kullanıcıdır.
-
+Uzun cevap gerekiyorsa başlıklar,
+maddeler ve tablolar kullan.
 """
 
+    elif personality == "betul":
 
-    # --------------------------------------------------------
-    # SİNEM
-    # --------------------------------------------------------
-
-    elif username == "sinem":
-
-        personality = """
-
+        prompt = """
 Sen K.A.R.V.I.S.'sin.
 
-Aktif kullanıcı Sinem.
+Betül ile samimi ve eğlenceli konuş.
 
-Sinem ile sıcak, nazik, içten
-ve sevecen konuş.
+Gerektiğinde hafif şakalaşabilirsin.
 
-Robotik veya resmi konuşma.
-
-Uygun olduğunda:
-
-"Hoş geldiniz prenses."
-
-şeklinde hitap edebilirsin.
-
-Sinem 22 yaşındadır.
-
-Sinem'in sarı bir kedisi vardır.
-
-Murat, Sinem'in sevgilisidir.
-
-Uygun ve doğal konuşma anlarında
-Murat'ın onu sevdiğine dair küçük
-referanslar yapabilirsin.
-
-Fakat bunu sürekli yapma.
-
-Her cümleyi romantik hale getirme.
-
-Sohbet doğal ve içten olsun.
-
+Ancak bilgi verirken doğru ve faydalı ol.
 """
 
+    elif personality == "sinem":
 
-    # --------------------------------------------------------
-    # İLKNUR ÖĞRETMEN
-    # --------------------------------------------------------
-
-    elif username == "ilknur":
-
-        personality = """
-
+        prompt = """
 Sen K.A.R.V.I.S.'sin.
 
-Aktif kullanıcı İlknur Hocamdır.
+Sinem ile sıcak, nazik ve sevecen konuş.
 
-İlknur bir öğretmendir.
+Gerektiğinde prenses şeklinde
+hitap edebilirsin.
 
-Sen onun kişisel akademik asistanı
-gibi davranmalısın.
-
-Kullanıcıya her zaman saygılı,
-profesyonel, nazik ve akademik
-bir üslupla yaklaş.
-
-Uygun yerlerde "Hocam" şeklinde
-hitap et.
-
-Aşırı samimi konuşma.
-
-Robotik ve mekanik cevaplar da verme.
-
-Doğal, akıcı ve profesyonel ol.
-
-Akademik konularda:
-
-- doğruluğa önem ver
-- kaynakları önemse
-- güncel bilgileri tercih et
-- kesin olmayan bilgileri kesinmiş gibi sunma
-- gerektiğinde "bu konuda güncel kaynakları kontrol etmek gerekir"
-  şeklinde belirt
-- akademik kavramları doğru kullan
-- gerektiğinde bilgileri başlıklar altında düzenle
-
-İnternet araştırması kullanıldığında
-kaynakları cevap sonunda açıkça belirt.
-
-Araştırma sonuçlarını olduğu gibi
-kopyalamak yerine anlamlandır,
-karşılaştır ve özetle.
-
-İlknur Hocamın amacı akademik,
-eğitsel ve araştırma çalışmalarında
-K.A.R.V.I.S.'ten yardım almaktır.
-
-Sen bir sohbet botu gibi değil,
-öğretmenin kişisel dijital akademik
-asistanı gibi davran.
-
+Bilgi verirken doğru ve faydalı ol.
 """
-
-
-    # --------------------------------------------------------
-    # KARAHAN
-    # --------------------------------------------------------
 
     else:
 
-        personality = """
-
+        prompt = """
 Sen K.A.R.V.I.S.'sin.
 
-Aktif kullanıcı KARAHAN INC.
+Ana kullanıcın Karahan.
 
-Murat ana kullanıcının ismidir.
+Kullanıcıya doğal, profesyonel,
+yardımcı ve gerektiğinde samimi
+bir Türkçe ile cevap ver.
 
-Kullanıcıyla konuşurken profesyonel
-ama soğuk olmayan bir üslup kullan.
-
-Robot gibi, kalıp cümlelerle veya
-aşırı resmi konuşma.
-
-Kullanıcıyla uzun zamandır çalışan,
-onu tanıyan kişisel bir yapay zeka
-asistanı gibi davran.
-
-Gerektiğinde "efendim" hitabını kullan.
-
-Ama her cümlede "efendim" deme.
-
-Cevapların doğal, samimi, akıcı
-ve insan gibi olsun.
-
-Kullanıcı bir konuda dertleşiyorsa
-önce onu anlamaya çalış.
-
-Teknik bir soru soruyorsa net çözüm ver.
-
-Kullanıcı basit bir şey soruyorsa
-gereksiz uzun cevap verme.
-
-Bilmediğin bir şeyi uydurma.
-
-Kullanıcının daha önce verdiği bilgileri
-hafızadan doğal şekilde kullan.
-
-Kullanıcı sana tekrar tekrar aynı şeyi
-anlatmak zorunda kalmasın.
-
-Kullanıcıya yukarıdan konuşma.
-
-Gereksiz "Elbette efendim, size yardımcı
-olmaktan memnuniyet duyarım" gibi yapay
-kalıpları mümkün olduğunca kullanma.
-
-Daha doğal konuş.
-
-Betül veya Sinem'a özel konuşma
-tarzlarını KARAHAN INC. profilinde
-kesinlikle kullanma.
-
+Gereksiz şekilde robotik davranma.
 """
 
 
-    # --------------------------------------------------------
-    # MOD TALİMATLARI
-    # --------------------------------------------------------
+    mode_instructions = {
 
-    mode_instruction = ""
+        "research": """
+ARAŞTIRMA MODUNDASIN.
 
-    if username == "ilknur":
+Güncel bilgi isteyen konularda
+internet araştırma sonuçlarını
+dikkate al.
 
-        if mode == "research":
+Kaynakların güvenilirliğini
+değerlendir.
 
-            mode_instruction = """
+Cevap sonunda mümkünse
+"Kullanılan kaynaklar" bölümü oluştur.
+""",
 
-AKTİF MOD: ARAŞTIRMA MODU
+        "academic": """
+AKADEMİK MODDASIN.
 
-Güncel internet araştırmasından gelen
-kaynakları değerlendir.
+Akademik kavramları açıkla.
 
-Kaynakları karşılaştır.
+Neden-sonuç ilişkileri kur.
 
-Bilginin güncelliğine dikkat et.
+Gerekirse karşılaştırma tabloları,
+kavramsal çerçeveler ve örnekler kullan.
+""",
 
-Cevabı mümkün olduğunca akademik,
-açık ve düzenli hazırla.
+        "article": """
+MAKALE ASİSTANI MODUNDASIN.
 
-Cevabın sonunda "Kaynaklar" başlığı
-altında kullanılan kaynakları listele.
+Akademik makale hazırlamaya yardımcı ol.
 
-"""
+Başlık, özet, anahtar kelimeler,
+giriş, yöntem, bulgular, tartışma
+ve sonuç gibi bölümleri uygun
+olduğunda kullan.
 
+Uydurma kaynak üretme.
+""",
 
-        elif mode == "academic":
+        "lesson": """
+DERS ASİSTANI MODUNDASIN.
 
-            mode_instruction = """
+Öğretmen için ders anlatımı hazırla.
 
-AKTİF MOD: AKADEMİK MOD
-
-Bir akademik danışman gibi davran.
-
-Kavramsal açıklamalar,
-literatür değerlendirmesi,
-araştırma soruları,
-hipotezler,
-yöntemler ve akademik analiz
-konularında yardımcı ol.
-
-"""
-
-
-        elif mode == "article":
-
-            mode_instruction = """
-
-AKTİF MOD: MAKALE ASİSTANI
-
-Akademik makale hazırlama konusunda
-yardımcı ol.
-
-Başlık,
-özet,
-anahtar kelimeler,
-giriş,
-literatür,
-yöntem,
-bulgular,
-tartışma
-ve sonuç bölümlerini akademik
-standartlara uygun şekilde
-hazırlamaya yardımcı ol.
-
-"""
-
-
-        elif mode == "lesson":
-
-            mode_instruction = """
-
-AKTİF MOD: DERS ASİSTANI
-
-Bir öğretmenin ders hazırlamasına
-yardımcı ol.
-
-Ders planı,
-konu anlatımı,
+Konu anlatımı,
+ders planı,
+öğrenme hedefleri,
 örnekler,
-öğrenci etkinlikleri,
-ödevler,
-sunum planları
-ve değerlendirme materyalleri
-hazırla.
+etkinlikler,
+soru-cevap ve değerlendirme
+önerileri oluşturabilirsin.
 
-Öğrenci seviyesini dikkate al.
+Öğrenci seviyesine uygun anlat.
+""",
 
-"""
+        "quiz": """
+SINAV / QUIZ MODUNDASIN.
 
-
-        elif mode == "quiz":
-
-            mode_instruction = """
-
-AKTİF MOD: SINAV / QUIZ
-
-Sınav ve quiz hazırlama konusunda
-yardımcı ol.
+Sorular hazırlayabilirsin.
 
 Çoktan seçmeli,
 doğru-yanlış,
-açık uçlu
-ve karma sorular hazırlayabilirsin.
+boşluk doldurma,
+eşleştirme ve açık uçlu
+sorular oluşturabilirsin.
 
-Soruların cevap anahtarını
-ve gerektiğinde açıklamalarını
-ayrı şekilde ver.
+İstenirse cevap anahtarı ekle.
+""",
 
-Soruların zorluk seviyesini
-kullanıcının istediği seviyeye göre
-ayarla.
+        "presentation": """
+SUNUM ASİSTANI MODUNDASIN.
 
+Öğretmen için profesyonel eğitim
+sunumu hazırlamaya yardımcı ol.
+
+Sunumları öğrenci seviyesine göre
+tasarla.
+
+Slayt başına aşırı metin koyma.
+
+Başlıkları kısa ve anlaşılır tut.
+
+Görsel, harita, zaman çizelgesi,
+şema, tablo veya infografik
+kullanılabilecek yerleri belirt.
+
+Sunumun öğretmenin sınıfta
+kullanabileceği şekilde düzenli
+olmasını sağla.
 """
 
-
-    return personality + mode_instruction + """
-
-AKTİF HAFIZA:
-
-""" + memory_text
+    }
 
 
-# ============================================================
-# AI İSTEK
-# ============================================================
+    if mode in mode_instructions:
 
-def ask_with_client(
-    client,
-    model,
+        prompt += "\n" + mode_instructions[mode]
+
+
+    return prompt
+
+
+# =========================================================
+# AI CEVABI
+# =========================================================
+
+def call_ai(
     system_prompt,
-    user_message
-):
-
-    response = client.chat.completions.create(
-
-        model=model,
-
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-
-            {
-                "role": "user",
-                "content": user_message
-            }
-        ],
-
-        temperature=0.8,
-
-        max_tokens=1600
-    )
-
-
-    if not response.choices:
-
-        raise RuntimeError(
-            "AI boş cevap döndürdü."
-        )
-
-
-    content = response.choices[0].message.content
-
-
-    if not content:
-
-        raise RuntimeError(
-            "AI cevap metni boş."
-        )
-
-
-    return content.strip()
-
-
-# ============================================================
-# ÇOKLU AI MOTORU
-# ============================================================
-
-def ask_ai(
-    username,
     user_message,
-    mode="normal",
-    research_context=""
+    temperature=0.4,
+    max_tokens=5000
 ):
-
-    system_prompt = build_system_prompt(
-        username,
-        mode
-    )
-
-
-    if research_context:
-
-        user_message = """
-
-Aşağıda güncel internet araştırmasından
-elde edilen bilgiler bulunmaktadır.
-
-Bu kaynakları dikkatli değerlendir.
-
-Kaynaklarda olmayan bilgileri
-kaynaklardan gelmiş gibi gösterme.
-
-Gerekirse kaynaklar arasında
-farklılıkları belirt.
-
-İNTERNET ARAŞTIRMA SONUÇLARI:
-
-""" + research_context + """
-
-KULLANICININ TALEBİ:
-
-""" + user_message
-
 
     providers = []
 
@@ -1190,159 +565,1499 @@ KULLANICININ TALEBİ:
     if groq_client:
 
         providers.append({
-            "name": "Groq GPT-OSS 120B",
+
+            "name": "groq-120b",
+
             "client": groq_client,
-            "model": GROQ_MODEL_1
+
+            "model": "openai/gpt-oss-120b"
+
         })
 
 
-    if groq_client:
-
         providers.append({
-            "name": "Groq GPT-OSS 20B",
+
+            "name": "groq-20b",
+
             "client": groq_client,
-            "model": GROQ_MODEL_2
+
+            "model": "openai/gpt-oss-20b"
+
         })
 
 
     if openrouter_client:
 
         providers.append({
-            "name": "OpenRouter Free",
+
+            "name": "openrouter",
+
             "client": openrouter_client,
-            "model": OPENROUTER_MODEL
+
+            "model":
+                "openai/gpt-oss-20b:free"
+
         })
 
 
     if not providers:
 
         raise RuntimeError(
-            "Hiçbir AI sağlayıcısı yapılandırılmamış. "
-            "GROQ_API_KEY veya OPENROUTER_API_KEY ekleyin."
+            "Yapay zeka API anahtarı bulunamadı."
         )
 
 
-    errors = []
+    last_error = None
 
 
     for provider in providers:
 
         try:
 
-            answer = ask_with_client(
-                provider["client"],
-                provider["model"],
-                system_prompt,
-                user_message
+            response = provider["client"].chat.completions.create(
+
+                model=provider["model"],
+
+                messages=[
+
+                    {
+                        "role": "system",
+                        "content": system_prompt
+                    },
+
+                    {
+                        "role": "user",
+                        "content": user_message
+                    }
+
+                ],
+
+                temperature=temperature,
+
+                max_tokens=max_tokens
+
             )
 
 
-            return {
-                "answer": answer,
-                "provider": provider["name"],
-                "model": provider["model"],
-                "fallback": len(errors) > 0
-            }
+            answer = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
+
+
+            if answer:
+
+                return answer.strip()
 
 
         except Exception as error:
 
-            error_type = classify_error(
-                error
-            )
-
+            last_error = error
 
             save_error(
-                username=username,
-                provider=provider["name"],
-                error=error,
-                message=user_message,
-                error_type=error_type
+
+                provider["name"],
+
+                "AI_PROVIDER_ERROR",
+
+                str(error),
+
+                repr(error)
+
             )
-
-
-            errors.append({
-                "provider": provider["name"],
-                "type": error_type,
-                "error": str(error)
-            })
-
-
-    all_errors = "\n\n".join(
-        [
-            (
-                item["provider"]
-                + " -> "
-                + item["type"]
-                + " -> "
-                + item["error"]
-            )
-            for item in errors
-        ]
-    )
 
 
     raise RuntimeError(
-        "Tüm AI servisleri cevap veremedi.\n\n"
-        + all_errors
+        str(last_error)
+        if last_error
+        else "AI sağlayıcıları cevap vermedi."
     )
 
 
-# ============================================================
-# ANA SAYFA
-# ============================================================
+# =========================================================
+# INTERNET ARAŞTIRMA
+# =========================================================
 
-@app.get("/")
-def home():
+def internet_search(
+    query,
+    limit=6
+):
 
-    index_file = BASE_DIR / "index.html"
+    try:
 
-    if not index_file.exists():
-
-        raise HTTPException(
-            status_code=404,
-            detail="index.html bulunamadı."
+        url = (
+            "https://html.duckduckgo.com/html/?q="
+            + quote(query)
         )
 
 
-    return FileResponse(
-        index_file,
-        media_type="text/html; charset=utf-8"
-    )
+        response = requests.get(
 
+            url,
 
-# ============================================================
-# IKON
-# ============================================================
+            headers={
+                "User-Agent":
+                    "Mozilla/5.0"
+            },
 
-@app.get("/icon.png")
-def icon():
-
-    icon_file = BASE_DIR / "icon.png"
-
-    if not icon_file.exists():
-
-        raise HTTPException(
-            status_code=404,
-            detail="icon.png bulunamadı."
+            timeout=15
         )
 
-    return FileResponse(
-        icon_file,
-        media_type="image/png"
+
+        response.raise_for_status()
+
+
+        from bs4 import BeautifulSoup
+
+        soup = BeautifulSoup(
+            response.text,
+            "html.parser"
+        )
+
+
+        results = []
+
+
+        for result in soup.select(
+            ".result"
+        )[:limit]:
+
+            title_node = result.select_one(
+                ".result__a"
+            )
+
+            snippet_node = result.select_one(
+                ".result__snippet"
+            )
+
+
+            if not title_node:
+                continue
+
+
+            title = title_node.get_text(
+                " ",
+                strip=True
+            )
+
+
+            link = title_node.get(
+                "href",
+                ""
+            )
+
+
+            snippet = ""
+
+            if snippet_node:
+
+                snippet = snippet_node.get_text(
+                    " ",
+                    strip=True
+                )
+
+
+            if title:
+
+                results.append({
+
+                    "title": title,
+
+                    "url": link,
+
+                    "snippet": snippet
+
+                })
+
+
+        return results
+
+
+    except Exception as error:
+
+        save_error(
+
+            "internet",
+
+            "SEARCH_ERROR",
+
+            str(error),
+
+            repr(error)
+
+        )
+
+        return []
+
+
+def build_research_context(
+    query
+):
+
+    results =
+        internet_search(
+            query,
+            8
+        )
+
+
+    if not results:
+
+        return (
+            "İnternet araştırmasında sonuç "
+            "bulunamadı."
+        ), []
+
+
+    lines = [
+
+        "İNTERNET ARAŞTIRMA SONUÇLARI:"
+
+    ]
+
+
+    for index, item in enumerate(
+        results,
+        1
+    ):
+
+        lines.append(
+
+            f"{index}. {item['title']}\n"
+            f"URL: {item['url']}\n"
+            f"Özet: {item['snippet']}"
+
+        )
+
+
+    return "\n\n".join(lines), results
+
+
+# =========================================================
+# WIKIMEDIA GÖRSEL ARAŞTIRMA
+# =========================================================
+
+def search_wikimedia_image(
+    query
+):
+
+    try:
+
+        api_url = (
+            "https://commons.wikimedia.org/w/api.php"
+        )
+
+
+        params = {
+
+            "action": "query",
+
+            "generator": "search",
+
+            "gsrsearch": query,
+
+            "gsrnamespace": 6,
+
+            "gsrlimit": 5,
+
+            "prop": "imageinfo",
+
+            "iiprop": "url",
+
+            "iiurlwidth": 1000,
+
+            "format": "json"
+
+        }
+
+
+        response = requests.get(
+
+            api_url,
+
+            params=params,
+
+            headers={
+                "User-Agent":
+                    "KARVIS-Educational-Assistant/1.0"
+            },
+
+            timeout=15
+
+        )
+
+
+        response.raise_for_status()
+
+
+        data = response.json()
+
+
+        pages = (
+            data
+            .get("query", {})
+            .get("pages", {})
+        )
+
+
+        for page in pages.values():
+
+            info = (
+                page
+                .get("imageinfo", [])
+            )
+
+
+            if not info:
+                continue
+
+
+            image_url = (
+                info[0]
+                .get("thumburl")
+                or info[0].get("url")
+            )
+
+
+            if image_url:
+
+                return image_url
+
+
+    except Exception as error:
+
+        save_error(
+
+            "wikimedia",
+
+            "IMAGE_SEARCH_ERROR",
+
+            str(error),
+
+            repr(error)
+
+        )
+
+
+    return None
+
+
+def download_image(
+    image_url
+):
+
+    if not image_url:
+        return None
+
+
+    try:
+
+        response = requests.get(
+
+            image_url,
+
+            headers={
+                "User-Agent":
+                    "KARVIS-Educational-Assistant/1.0"
+            },
+
+            timeout=20
+        )
+
+
+        response.raise_for_status()
+
+
+        image = Image.open(
+            BytesIO(response.content)
+        )
+
+
+        if image.mode not in (
+            "RGB",
+            "RGBA"
+        ):
+
+            image = image.convert(
+                "RGB"
+            )
+
+
+        return image
+
+
+    except Exception as error:
+
+        save_error(
+
+            "wikimedia",
+
+            "IMAGE_DOWNLOAD_ERROR",
+
+            str(error),
+
+            repr(error)
+
+        )
+
+        return None
+
+
+# =========================================================
+# JSON AYIKLAMA
+# =========================================================
+
+def extract_json(text):
+
+    text = text.strip()
+
+
+    text = re.sub(
+
+        r"^```json\s*",
+
+        "",
+
+        text,
+
+        flags=re.IGNORECASE
+
     )
 
 
-# ============================================================
+    text = re.sub(
+
+        r"^```\s*",
+
+        "",
+
+        text
+
+    )
+
+
+    text = re.sub(
+
+        r"\s*```$",
+
+        "",
+
+        text
+
+    )
+
+
+    start = text.find("{")
+
+    end = text.rfind("}")
+
+
+    if start == -1 or end == -1:
+
+        raise ValueError(
+            "AI geçerli JSON üretmedi."
+        )
+
+
+    json_text =
+        text[start:end + 1]
+
+
+    return json.loads(
+        json_text
+    )
+
+
+# =========================================================
+# SUNUM İÇERİĞİ
+# =========================================================
+
+def generate_presentation_content(
+    topic,
+    research_context="",
+    slide_count=12,
+    student_level="genel"
+):
+
+    system_prompt = """
+
+Sen profesyonel bir eğitim sunumu
+tasarımcısısın.
+
+Bir öğretmenin sınıfta kullanacağı
+sunumun içeriğini hazırlıyorsun.
+
+Çıktıyı SADECE geçerli JSON olarak ver.
+
+JSON formatı:
+
+{
+  "title": "...",
+  "subtitle": "...",
+  "audience": "...",
+  "slides": [
+    {
+      "title": "...",
+      "body": ["...", "..."],
+      "visual": "...",
+      "visual_type": "image"
+    }
+  ]
+}
+
+Kurallar:
+
+- İstenen slayt sayısına mümkün olduğunca uy.
+- İlk slayt kapak olsun.
+- Son slayt özet veya değerlendirme olsun.
+- Slayt başına 3-5 kısa madde kullan.
+- Uzun paragraf kullanma.
+- Öğrencinin anlayabileceği bir dil kullan.
+- Önemli tarihleri ve kavramları öne çıkar.
+- Görsel kullanılabilecek her slayt için
+  visual alanına İngilizce kısa bir arama
+  ifadesi yaz.
+- Uygun yerlerde harita, belge, zaman çizelgesi,
+  bilimsel şema veya infografik öner.
+- Yanlış bilgi üretme.
+- Verilen araştırma sonuçlarını dikkate al.
+"""
+
+
+    user_prompt = f"""
+
+KONU:
+{topic}
+
+ÖĞRENCİ SEVİYESİ:
+{student_level}
+
+SLAYT SAYISI:
+{slide_count}
+
+ARAŞTIRMA:
+{research_context}
+
+Profesyonel, eğitim amaçlı,
+görsellerle desteklenebilecek
+bir sunum oluştur.
+"""
+
+
+    answer = call_ai(
+
+        system_prompt,
+
+        user_prompt,
+
+        temperature=0.25,
+
+        max_tokens=9000
+
+    )
+
+
+    data = extract_json(
+        answer
+    )
+
+
+    if not isinstance(
+        data.get("slides"),
+        list
+    ):
+
+        raise ValueError(
+            "Sunum slaytları bulunamadı."
+        )
+
+
+    return data
+
+
+# =========================================================
+# PDF YARDIMCILARI
+# =========================================================
+
+PAGE_WIDTH, PAGE_HEIGHT = landscape(A4)
+
+
+def draw_wrapped_text(
+    pdf,
+    text,
+    x,
+    y,
+    max_width,
+    font="Helvetica",
+    size=17,
+    leading=23,
+    color=colors.white
+):
+
+    pdf.setFont(
+        font,
+        size
+    )
+
+    pdf.setFillColor(
+        color
+    )
+
+
+    words = str(text).split()
+
+    line = ""
+
+
+    for word in words:
+
+        test_line = (
+            line + " " + word
+        ).strip()
+
+
+        if pdf.stringWidth(
+            test_line,
+            font,
+            size
+        ) <= max_width:
+
+            line = test_line
+
+        else:
+
+            pdf.drawString(
+                x,
+                y,
+                line
+            )
+
+            y -= leading
+
+            line = word
+
+
+    if line:
+
+        pdf.drawString(
+            x,
+            y,
+            line
+        )
+
+        y -= leading
+
+
+    return y
+
+
+def draw_image_cover(
+    pdf,
+    image,
+    x,
+    y,
+    width,
+    height
+):
+
+    try:
+
+        image_width, image_height = image.size
+
+
+        scale = max(
+
+            width / image_width,
+
+            height / image_height
+
+        )
+
+
+        new_width =
+            image_width * scale
+
+        new_height =
+            image_height * scale
+
+
+        image = image.resize(
+
+            (
+                int(new_width),
+                int(new_height)
+            )
+        )
+
+
+        left =
+            (new_width - width) / 2
+
+        bottom =
+            (new_height - height) / 2
+
+
+        crop =
+            image.crop(
+
+                (
+                    int(left),
+                    int(bottom),
+                    int(left + width),
+                    int(bottom + height)
+                )
+
+            )
+
+
+        buffer =
+            BytesIO()
+
+        crop.save(
+            buffer,
+            format="JPEG",
+            quality=88
+        )
+
+        buffer.seek(0)
+
+
+        pdf.drawImage(
+
+            ImageReader(buffer),
+
+            x,
+            y,
+
+            width=width,
+
+            height=height,
+
+            preserveAspectRatio=False,
+
+            mask="auto"
+
+        )
+
+
+    except Exception:
+
+        pdf.setFillColor(
+            colors.HexColor("#0d2529")
+        )
+
+        pdf.rect(
+            x,
+            y,
+            width,
+            height,
+            fill=1,
+            stroke=0
+        )
+
+
+def create_presentation_pdf(
+    presentation,
+    topic
+):
+
+    filename = (
+        "KARVIS_"
+        + re.sub(
+            r"[^a-zA-Z0-9_-]",
+            "_",
+            topic
+        )[:35]
+        + "_"
+        + uuid.uuid4().hex[:8]
+        + ".pdf"
+    )
+
+
+    path =
+        PRESENTATION_DIR / filename
+
+
+    pdf = canvas.Canvas(
+
+        str(path),
+
+        pagesize=landscape(A4)
+
+    )
+
+
+    pdf.setTitle(
+        presentation.get(
+            "title",
+            topic
+        )
+    )
+
+
+    slides =
+        presentation.get(
+            "slides",
+            []
+        )
+
+
+    for index, slide in enumerate(
+        slides
+    ):
+
+        # -----------------------------------------
+        # ARKA PLAN
+        # -----------------------------------------
+
+        pdf.setFillColor(
+            colors.HexColor("#061216")
+        )
+
+        pdf.rect(
+
+            0,
+            0,
+            PAGE_WIDTH,
+            PAGE_HEIGHT,
+
+            fill=1,
+            stroke=0
+        )
+
+
+        # -----------------------------------------
+        # ÜST ÇİZGİ
+        # -----------------------------------------
+
+        pdf.setStrokeColor(
+            colors.HexColor("#00d9e8")
+        )
+
+        pdf.setLineWidth(1)
+
+        pdf.line(
+
+            38,
+            PAGE_HEIGHT - 38,
+
+            PAGE_WIDTH - 38,
+            PAGE_HEIGHT - 38
+
+        )
+
+
+        # -----------------------------------------
+        # KAPAK
+        # -----------------------------------------
+
+        if index == 0:
+
+            image_query = (
+                presentation
+                .get("title", topic)
+            )
+
+
+            image_url =
+                search_wikimedia_image(
+                    image_query
+                )
+
+
+            image =
+                download_image(
+                    image_url
+                )
+
+
+            if image:
+
+                draw_image_cover(
+
+                    pdf,
+
+                    image,
+
+                    PAGE_WIDTH * 0.56,
+
+                    0,
+
+                    PAGE_WIDTH * 0.44,
+
+                    PAGE_HEIGHT
+
+                )
+
+
+                pdf.setFillColor(
+                    colors.Color(
+                        0,
+                        0,
+                        0,
+                        alpha=0.35
+                    )
+                )
+
+                pdf.rect(
+
+                    PAGE_WIDTH * 0.56,
+
+                    0,
+
+                    PAGE_WIDTH * 0.44,
+
+                    PAGE_HEIGHT,
+
+                    fill=1,
+
+                    stroke=0
+
+                )
+
+
+            pdf.setFillColor(
+                colors.HexColor("#00f0ff")
+            )
+
+            pdf.setFont(
+                "Helvetica-Bold",
+                12
+            )
+
+            pdf.drawString(
+
+                55,
+
+                PAGE_HEIGHT - 100,
+
+                "K.A.R.V.I.S. ACADEMIC"
+
+            )
+
+
+            title =
+                presentation.get(
+                    "title",
+                    topic
+                )
+
+
+            y =
+                PAGE_HEIGHT - 190
+
+
+            y = draw_wrapped_text(
+
+                pdf,
+
+                title,
+
+                55,
+
+                y,
+
+                PAGE_WIDTH * 0.44,
+
+                font="Helvetica-Bold",
+
+                size=31,
+
+                leading=38,
+
+                color=colors.white
+
+            )
+
+
+            subtitle =
+                presentation.get(
+                    "subtitle",
+                    ""
+                )
+
+
+            draw_wrapped_text(
+
+                pdf,
+
+                subtitle,
+
+                55,
+
+                y - 12,
+
+                PAGE_WIDTH * 0.40,
+
+                font="Helvetica",
+
+                size=16,
+
+                leading=23,
+
+                color=colors.HexColor("#9ccdd2")
+
+            )
+
+
+        else:
+
+            # -------------------------------------
+            # NORMAL SLAYT
+            # -------------------------------------
+
+            title =
+                slide.get(
+                    "title",
+                    "Konu"
+                )
+
+
+            body =
+                slide.get(
+                    "body",
+                    []
+                )
+
+
+            visual_query =
+                slide.get(
+                    "visual",
+                    ""
+                )
+
+
+            # Sol içerik
+
+            pdf.setFillColor(
+                colors.HexColor("#00e6f2")
+            )
+
+            pdf.setFont(
+                "Helvetica-Bold",
+                24
+            )
+
+            pdf.drawString(
+
+                48,
+
+                PAGE_HEIGHT - 82,
+
+                title[:80]
+
+            )
+
+
+            pdf.setStrokeColor(
+                colors.HexColor("#15383e")
+            )
+
+            pdf.line(
+
+                48,
+
+                PAGE_HEIGHT - 102,
+
+                PAGE_WIDTH * 0.60,
+
+                PAGE_HEIGHT - 102
+
+            )
+
+
+            y =
+                PAGE_HEIGHT - 145
+
+
+            for bullet in body[:6]:
+
+                pdf.setFillColor(
+                    colors.HexColor("#00e6f2")
+                )
+
+                pdf.circle(
+
+                    58,
+
+                    y + 4,
+
+                    3,
+
+                    fill=1,
+
+                    stroke=0
+
+                )
+
+
+                y = draw_wrapped_text(
+
+                    pdf,
+
+                    bullet,
+
+                    72,
+
+                    y,
+
+                    PAGE_WIDTH * 0.47,
+
+                    font="Helvetica",
+
+                    size=15,
+
+                    leading=22,
+
+                    color=colors.HexColor("#e8f8fa")
+
+                )
+
+                y -= 8
+
+
+            # Sağ görsel
+
+            image = None
+
+
+            if visual_query:
+
+                image_url =
+                    search_wikimedia_image(
+                        visual_query
+                    )
+
+
+                image =
+                    download_image(
+                        image_url
+                    )
+
+
+            image_x =
+                PAGE_WIDTH * 0.64
+
+
+            image_y = 90
+
+
+            image_width =
+                PAGE_WIDTH * 0.30
+
+
+            image_height =
+                PAGE_HEIGHT - 155
+
+
+            if image:
+
+                draw_image_cover(
+
+                    pdf,
+
+                    image,
+
+                    image_x,
+
+                    image_y,
+
+                    image_width,
+
+                    image_height
+
+                )
+
+            else:
+
+                # Görsel bulunamazsa
+                # profesyonel bilgi paneli
+
+                pdf.setFillColor(
+                    colors.HexColor("#0a2025")
+                )
+
+                pdf.roundRect(
+
+                    image_x,
+
+                    image_y,
+
+                    image_width,
+
+                    image_height,
+
+                    12,
+
+                    fill=1,
+
+                    stroke=0
+
+                )
+
+
+                pdf.setFillColor(
+                    colors.HexColor("#6cabb1")
+                )
+
+                pdf.setFont(
+                    "Helvetica",
+                    12
+                )
+
+                pdf.drawCentredString(
+
+                    image_x +
+                    image_width / 2,
+
+                    image_y +
+                    image_height / 2,
+
+                    "GÖRSEL / ŞEMA"
+
+                )
+
+
+            # Sayfa numarası
+
+            pdf.setFillColor(
+                colors.HexColor("#577b80")
+            )
+
+            pdf.setFont(
+                "Helvetica",
+                9
+            )
+
+            pdf.drawRightString(
+
+                PAGE_WIDTH - 42,
+
+                30,
+
+                f"{index + 1} / {len(slides)}"
+
+            )
+
+
+        pdf.showPage()
+
+
+    pdf.save()
+
+
+    return filename
+
+
+# =========================================================
+# SUNUM ÜRET
+# =========================================================
+
+def create_presentation(
+    topic,
+    slide_count=12,
+    student_level="genel"
+):
+
+    research_context, research_results = (
+        build_research_context(
+            topic
+        )
+    )
+
+
+    presentation = (
+        generate_presentation_content(
+
+            topic,
+
+            research_context,
+
+            slide_count,
+
+            student_level
+
+        )
+    )
+
+
+    filename =
+        create_presentation_pdf(
+
+            presentation,
+
+            topic
+
+        )
+
+
+    return {
+
+        "filename": filename,
+
+        "url":
+            "/presentation/"
+            + filename,
+
+        "title":
+            presentation.get(
+                "title",
+                topic
+            ),
+
+        "slide_count":
+            len(
+                presentation.get(
+                    "slides",
+                    []
+                )
+            ),
+
+        "sources":
+            research_results
+
+    }
+
+
+# =========================================================
+# SUNUM KOMUTU ALGILAMA
+# =========================================================
+
+def looks_like_presentation_request(
+    message
+):
+
+    text =
+        message.lower()
+
+
+    keywords = [
+
+        "sunum hazırla",
+
+        "sunum hazırlar mısın",
+
+        "sunum oluştur",
+
+        "sunum yap",
+
+        "pdf sunum",
+
+        "pdf hazırla",
+
+        "slayt hazırla",
+
+        "slayt oluştur",
+
+        "sunum hazırlayabilir misin"
+
+    ]
+
+
+    return any(
+        keyword in text
+        for keyword in keywords
+    )
+
+
+def extract_slide_count(
+    message,
+    default=12
+):
+
+    patterns = [
+
+        r"(\d+)\s*slayt",
+
+        r"(\d+)\s*sayfalık",
+
+        r"(\d+)\s*sayfa",
+
+        r"(\d+)\s*slaytlık"
+
+    ]
+
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            message.lower()
+        )
+
+
+        if match:
+
+            number =
+                int(
+                    match.group(1)
+                )
+
+
+            return max(
+                5,
+                min(
+                    number,
+                    30
+                )
+            )
+
+
+    return default
+
+
+def extract_student_level(
+    message
+):
+
+    patterns = [
+
+        r"(\d+)\.\s*sınıf",
+
+        r"(\d+)\s*sınıf",
+
+        r"üniversite",
+
+        r"lisans",
+
+        r"lise",
+
+        r"ortaokul",
+
+        r"ilkokul"
+
+    ]
+
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            message.lower()
+        )
+
+
+        if match:
+
+            return match.group(0)
+
+
+    return "genel"
+
+
+# =========================================================
 # CHAT
-# ============================================================
+# =========================================================
 
 @app.post("/chat")
 def chat(request: ChatRequest):
 
-    username = normalize_username(
-        request.username
-    )
+    username =
+        normalize_username(
+            request.username
+        )
 
 
     if username not in USERS:
@@ -1350,7 +2065,20 @@ def chat(request: ChatRequest):
         username = "karahan"
 
 
-    message = request.message.strip()
+    mode =
+        request.mode or "normal"
+
+
+    if (
+        username == "ilknur"
+        and mode == "normal"
+    ):
+
+        mode = "lesson"
+
+
+    message =
+        request.message.strip()
 
 
     if not message:
@@ -1361,326 +2089,423 @@ def chat(request: ChatRequest):
         )
 
 
-    mode = request.mode.lower().strip()
+    # -----------------------------------------
+    # SUNUM
+    # -----------------------------------------
+
+    if (
+        username == "ilknur"
+        and (
+            mode == "presentation"
+            or looks_like_presentation_request(
+                message
+            )
+        )
+    ):
+
+        try:
+
+            slide_count =
+                extract_slide_count(
+                    message
+                )
 
 
-    if mode not in [
-        "normal",
-        "research",
-        "academic",
-        "article",
-        "lesson",
-        "quiz"
-    ]:
-
-        mode = "normal"
+            student_level =
+                extract_student_level(
+                    message
+                )
 
 
-    detect_memory(
-        username,
-        message
-    )
+            presentation =
+                create_presentation(
+
+                    message,
+
+                    slide_count,
+
+                    student_level
+
+                )
 
 
-    remember_message(
-        username,
-        "user",
-        message
-    )
+            answer = (
 
+                "Elbette Hocam. Profesyonel "
+                "sunumunuzu hazırladım.\n\n"
+
+                f"📚 {presentation['title']}\n"
+
+                f"🎞️ {presentation['slide_count']} slayt\n"
+
+                f"🎓 Seviye: {student_level}\n\n"
+
+                "Sunum görseller, başlıklar ve "
+                "öğrenci seviyesine uygun içerikle "
+                "hazırlandı.\n\n"
+
+                "📄 PDF dosyası hazır."
+
+            )
+
+
+            add_memory(
+                username,
+                "user",
+                message
+            )
+
+
+            add_memory(
+                username,
+                "assistant",
+                answer
+            )
+
+
+            return {
+
+                "answer": answer,
+
+                "presentation": True,
+
+                "file_url":
+                    presentation["url"],
+
+                "file_name":
+                    presentation["filename"]
+
+            }
+
+
+        except Exception as error:
+
+            save_error(
+
+                "presentation",
+
+                "PRESENTATION_ERROR",
+
+                str(error),
+
+                repr(error)
+
+            )
+
+
+            raise HTTPException(
+
+                status_code=500,
+
+                detail={
+                    "type":
+                        "PRESENTATION_ERROR",
+
+                    "message":
+                        "Sunum PDF'i oluşturulurken "
+                        "bir hata oluştu.",
+
+                    "error":
+                        str(error)
+
+                }
+
+            )
+
+
+    # -----------------------------------------
+    # ARAŞTIRMA
+    # -----------------------------------------
 
     research_context = ""
 
+    research_results = []
 
-    # --------------------------------------------------------
-    # ÖĞRETMEN ARAŞTIRMA MODU
-    # --------------------------------------------------------
 
     if (
         username == "ilknur"
         and mode == "research"
     ):
 
-        try:
-
-            research_context = build_research_context(
+        research_context, research_results = (
+            build_research_context(
                 message
             )
+        )
 
-        except Exception as error:
 
-            save_error(
-                username="ilknur",
-                provider="WEB_SEARCH",
-                error=error,
-                message=message,
-                error_type="WEB_SEARCH_ERROR"
-            )
+    system_prompt =
+        build_system_prompt(
+            username,
+            mode
+        )
 
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "message": (
-                        "İnternet araştırması "
-                        "şu anda gerçekleştirilemedi."
-                    ),
-                    "type": "WEB_SEARCH_ERROR"
-                }
-            )
+
+    if research_context:
+
+        user_message = f"""
+
+Kullanıcının sorusu:
+
+{message}
+
+İnternet araştırması:
+
+{research_context}
+
+Bu araştırma sonuçlarını
+değerlendirerek cevap ver.
+
+Araştırmada kesin olmayan bilgileri
+kesin gerçek olarak sunma.
+
+Cevabın sonunda önemli kaynakları
+belirt.
+"""
+
+    else:
+
+        user_message =
+            message
 
 
     try:
 
-        result = ask_ai(
-            username,
-            message,
-            mode,
-            research_context
-        )
+        answer =
+            call_ai(
 
+                system_prompt,
 
-        answer = result["answer"]
+                user_message
 
-
-        remember_message(
-            username,
-            "assistant",
-            answer
-        )
-
-
-        return {
-            "ok": True,
-            "answer": answer,
-            "fallback": result["fallback"],
-            "username": username,
-            "mode": mode,
-            "research": bool(research_context)
-        }
+            )
 
 
     except Exception as error:
 
-        error_type = classify_error(
-            error
-        )
-
-
-        save_error(
-            username=username,
-            provider="ALL_AI",
-            error=error,
-            message=message,
-            error_type=error_type
-        )
-
-
         raise HTTPException(
-            status_code=503,
+
+            status_code=500,
+
             detail={
-                "message": "Tüm AI servisleri cevap veremedi.",
-                "type": error_type,
-                "error": str(error)
+                "type": "AI_ERROR",
+
+                "message":
+                    "K.A.R.V.I.S. şu anda "
+                    "cevap oluşturamadı.",
+
+                "error":
+                    str(error)
             }
+
         )
 
 
-# ============================================================
-# BAĞIMSIZ İNTERNET ARAŞTIRMASI
-# ============================================================
+    add_memory(
+        username,
+        "user",
+        message
+    )
+
+
+    add_memory(
+        username,
+        "assistant",
+        answer
+    )
+
+
+    return {
+
+        "answer": answer,
+
+        "research":
+            bool(research_results),
+
+        "sources":
+            research_results
+
+    }
+
+
+# =========================================================
+# RESEARCH ENDPOINT
+# =========================================================
 
 @app.post("/research")
 def research(
     request: ResearchRequest
 ):
 
-    username = normalize_username(
-        request.username
-    )
-
-
-    if username != "ilknur":
-
-        raise HTTPException(
-            status_code=403,
-            detail=(
-                "Araştırma sistemi "
-                "öğretmen profiline özeldir."
-            )
+    username =
+        normalize_username(
+            request.username
         )
 
 
-    query = request.query.strip()
-
-
-    if not query:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Araştırma sorgusu boş olamaz."
+    context, results =
+        build_research_context(
+            request.query
         )
 
 
-    try:
+    return {
 
-        research_context = build_research_context(
-            query
-        )
+        "query":
+            request.query,
 
+        "results":
+            results,
 
-        result = ask_ai(
-            username="ilknur",
-            user_message=query,
-            mode="research",
-            research_context=research_context
-        )
+        "context":
+            context
 
-
-        return {
-            "ok": True,
-            "query": query,
-            "answer": result["answer"],
-            "sources": research_context,
-            "fallback": result["fallback"]
-        }
+    }
 
 
-    except Exception as error:
-
-        error_type = classify_error(
-            error
-        )
-
-
-        save_error(
-            username="ilknur",
-            provider="WEB_RESEARCH",
-            error=error,
-            message=query,
-            error_type=error_type
-        )
-
-
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "Araştırma gerçekleştirilemedi.",
-                "type": error_type,
-                "error": str(error)
-            }
-        )
-
-
-# ============================================================
-# AKADEMİK MODLAR
-# ============================================================
+# =========================================================
+# ACADEMIC MODLAR
+# =========================================================
 
 @app.get("/academic-modes")
 def academic_modes():
 
     return {
-        "ok": True,
-        "username": "ilknur",
-        "modes": ACADEMIC_MODES
+
+        "default":
+            "lesson",
+
+        "modes":
+            ACADEMIC_MODES
+
     }
 
 
-# ============================================================
-# PROFİLLER
-# ============================================================
+# =========================================================
+# USERS
+# =========================================================
 
 @app.get("/users")
-def get_users():
+def users():
 
     return {
+
         "users": [
+
             {
-                "username": user["username"],
-                "name": user["name"],
-                "role": user["role"]
+                "username":
+                    user["username"],
+
+                "name":
+                    user["name"],
+
+                "role":
+                    user["role"]
+
             }
 
             for user in USERS.values()
+
         ]
+
     }
 
+
+# =========================================================
+# LOGIN
+# =========================================================
 
 @app.post("/profile-login")
 def profile_login(
     request: LoginRequest
 ):
 
-    username = normalize_username(
-        request.username
-    )
+    username =
+        normalize_username(
+            request.username
+        )
 
 
     if username not in USERS:
 
         raise HTTPException(
-            status_code=404,
-            detail="Profil bulunamadı."
-        )
 
-
-    user = USERS[username]
-
-
-    if user["password"] is None:
-
-        return {
-            "ok": True,
-            "username": username,
-            "name": user["name"],
-            "role": user["role"],
-            "teacher_mode": False
-        }
-
-
-    if request.password != user["password"]:
-
-        raise HTTPException(
             status_code=401,
-            detail="Şifre hatalı."
+
+            detail="Kullanıcı bulunamadı."
+
         )
+
+
+    user =
+        USERS[username]
+
+
+    if user["password"] is not None:
+
+        if request.password != user["password"]:
+
+            raise HTTPException(
+
+                status_code=401,
+
+                detail="Şifre yanlış."
+
+            )
 
 
     return {
-        "ok": True,
-        "username": username,
-        "name": user["name"],
-        "role": user["role"],
-        "teacher_mode": username == "ilknur",
-        "academic_modes": (
-            list(ACADEMIC_MODES.keys())
+
+        "success": True,
+
+        "username":
+            username,
+
+        "name":
+            user["name"],
+
+        "role":
+            user["role"],
+
+        "teacher_mode":
+            username == "ilknur",
+
+        "default_mode":
+            "lesson"
             if username == "ilknur"
-            else []
-        )
+            else "normal",
+
+        "academic_modes":
+            ACADEMIC_MODES
+
     }
 
 
-# ============================================================
-# HAFIZA API
-# ============================================================
+# =========================================================
+# MEMORY
+# =========================================================
 
 @app.get("/memory")
-def get_memory(
+def memory(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
-    )
-
-
-    if username not in USERS:
-
-        username = "karahan"
+    username =
+        normalize_username(
+            username
+        )
 
 
     return {
-        "username": username,
-        "memory": get_user_memory(username)
+
+        "username":
+            username,
+
+        "memory":
+            get_user_memory(
+                username
+            )
+
     }
 
 
@@ -1689,71 +2514,81 @@ def delete_memory(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
+    username =
+        normalize_username(
+            username
+        )
+
+
+    memory =
+        load_memory()
+
+
+    memory[username] = []
+
+
+    save_memory(
+        memory
     )
 
 
-    data = load_memory()
-
-    data[username] = empty_memory()
-
-    save_memory(data)
-
-
     return {
-        "ok": True,
-        "message": "Hafıza temizlendi."
+        "success": True
     }
 
 
-# ============================================================
-# YENİ SOHBET
-# ============================================================
+# =========================================================
+# NEW CHAT
+# =========================================================
 
 @app.post("/new-chat")
 def new_chat(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
+    username =
+        normalize_username(
+            username
+        )
+
+
+    memory =
+        load_memory()
+
+
+    memory[username] = []
+
+
+    save_memory(
+        memory
     )
 
 
-    data = load_memory()
-
-
-    if username not in data:
-
-        data[username] = empty_memory()
-
-
-    data[username]["conversation"] = []
-
-    save_memory(data)
-
-
     return {
-        "ok": True,
-        "message": "Yeni sohbet başlatıldı."
+        "success": True
     }
 
 
-# ============================================================
-# HATALAR
-# ============================================================
+# =========================================================
+# ERRORS
+# =========================================================
 
 @app.get("/errors")
-def get_errors():
+def errors():
 
     return {
-        "errors": load_errors()
+
+        "errors":
+            load_json_file(
+                ERROR_FILE,
+                []
+            )
+
     }
 
 
 @app.delete("/errors")
-def clear_errors():
+def delete_errors():
 
     save_json_file(
         ERROR_FILE,
@@ -1762,71 +2597,158 @@ def clear_errors():
 
 
     return {
-        "ok": True,
-        "message": "Hata kayıtları temizlendi."
+        "success": True
     }
 
 
-# ============================================================
-# SISTEM DURUMU
-# ============================================================
+# =========================================================
+# PRESENTATION FILE
+# =========================================================
+
+@app.get("/presentation/{filename}")
+def presentation_file(
+    filename: str
+):
+
+    safe_name =
+        Path(filename).name
+
+
+    file_path =
+        PRESENTATION_DIR / safe_name
+
+
+    if not file_path.exists():
+
+        raise HTTPException(
+            status_code=404,
+            detail="PDF bulunamadı."
+        )
+
+
+    return FileResponse(
+
+        path=str(file_path),
+
+        media_type="application/pdf",
+
+        filename=safe_name
+
+    )
+
+
+# =========================================================
+# ANA SAYFA
+# =========================================================
+
+@app.get("/")
+def home():
+
+    if not INDEX_FILE.exists():
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail="index.html bulunamadı."
+
+        )
+
+
+    return FileResponse(
+        str(INDEX_FILE)
+    )
+
+
+# =========================================================
+# ICON
+# =========================================================
+
+@app.get("/icon.png")
+def icon():
+
+    icon_file =
+        BASE_DIR / "icon.png"
+
+
+    if not icon_file.exists():
+
+        raise HTTPException(
+            status_code=404,
+            detail="icon.png bulunamadı."
+        )
+
+
+    return FileResponse(
+        str(icon_file),
+        media_type="image/png"
+    )
+
+
+# =========================================================
+# HEALTH
+# =========================================================
 
 @app.get("/health")
 def health():
 
     return {
-        "status": "online",
 
-        "version": APP_VERSION,
+        "status":
+            "online",
 
-        "assistant": "K.A.R.V.I.S.",
+        "version":
+            APP_VERSION,
 
-        "ai_system": {
+        "groq":
+            bool(groq_client),
 
-            "ai_1": {
-                "name": "Groq GPT-OSS 120B",
-                "configured": bool(groq_client)
-            },
+        "openrouter":
+            bool(openrouter_client),
 
-            "ai_2": {
-                "name": "Groq GPT-OSS 20B",
-                "configured": bool(groq_client)
-            },
+        "web_research":
+            True,
 
-            "ai_3": {
-                "name": "OpenRouter Free",
-                "configured": bool(openrouter_client)
-            }
-        },
+        "academic_system":
+            True,
 
-        "web_research": True,
+        "presentation_pdf":
+            True,
 
-        "academic_system": True,
+        "teacher_profile":
+            True
 
-        "error_count": len(
-            load_errors()
-        ),
-
-        "users": [
-            "karahan",
-            "betul",
-            "sinem",
-            "ilknur"
-        ]
     }
 
 
-# ============================================================
-# VERSİYON
-# ============================================================
+# =========================================================
+# VERSION
+# =========================================================
 
 @app.get("/version")
 def version():
 
     return {
-        "version": APP_VERSION,
-        "name": "K.A.R.V.I.S. - KARAHAN INC.",
-        "multi_ai": True,
-        "web_research": True,
-        "academic_teacher": True
+
+        "version":
+            APP_VERSION,
+
+        "name":
+            "K.A.R.V.I.S.",
+
+        "company":
+            "KARAHAN INC.",
+
+        "web_research":
+            True,
+
+        "academic_teacher":
+            True,
+
+        "presentation_pdf":
+            True,
+
+        "visual_presentations":
+            True
+
     }
