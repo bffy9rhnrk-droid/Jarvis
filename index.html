@@ -1,2506 +1,3006 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <title>J.A.R.V.I.S. — KARAHAN INC.</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "SF Pro Display",
-                "Segoe UI",
-                sans-serif;
-            background: #02070b;
-            color: #dffcff;
-        }
-
-        body {
-            position: relative;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            border: 0;
-            outline: none;
-        }
-
-        /* =====================================================
-           BACKGROUND
-        ===================================================== */
-
-        .background {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            background:
-                radial-gradient(
-                    circle at 50% 42%,
-                    rgba(0, 221, 255, 0.09),
-                    transparent 32%
-                ),
-                radial-gradient(
-                    circle at 50% 100%,
-                    rgba(0, 140, 255, 0.05),
-                    transparent 40%
-                ),
-                #02070b;
-        }
-
-        .grid {
-            position: absolute;
-            inset: -100px;
-            opacity: 0.12;
-
-            background-image:
-                linear-gradient(
-                    rgba(0, 220, 255, 0.18) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(0, 220, 255, 0.18) 1px,
-                    transparent 1px
-                );
-
-            background-size: 45px 45px;
-
-            transform:
-                perspective(700px)
-                rotateX(58deg)
-                scale(1.5);
-
-            transform-origin: center bottom;
-        }
-
-        .scanline {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(0, 238, 255, 0.4),
-                    transparent
-                );
-
-            animation: scan 7s linear infinite;
-            opacity: 0.5;
-        }
-
-        @keyframes scan {
-            0% {
-                top: -5%;
-            }
-
-            100% {
-                top: 105%;
-            }
-        }
-
-        /* =====================================================
-           APP
-        ===================================================== */
-
-        .app {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            z-index: 2;
-        }
-
-        /* =====================================================
-           TOP BAR
-        ===================================================== */
-
-        .topbar {
-            height: 78px;
-            min-height: 78px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            padding:
-                env(safe-area-inset-top)
-                18px
-                0
-                18px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(2, 12, 18, 0.94),
-                    rgba(2, 8, 12, 0.65)
-                );
-
-            border-bottom:
-                1px solid rgba(0, 221, 255, 0.13);
-
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: #00eaff;
-
-            font-size: 17px;
-            font-weight: 800;
-
-            border:
-                1px solid rgba(0, 234, 255, 0.65);
-
-            box-shadow:
-                0 0 12px rgba(0, 234, 255, 0.2),
-                inset 0 0 10px rgba(0, 234, 255, 0.08);
-        }
-
-        .brand-title {
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: 3px;
-        }
-
-        .brand-subtitle {
-            margin-top: 2px;
-            font-size: 8px;
-            letter-spacing: 3px;
-            color: rgba(210, 248, 255, 0.42);
-        }
-
-        .menu-button {
-            width: 44px;
-            height: 44px;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-
-            background: rgba(0, 225, 255, 0.04);
-            border:
-                1px solid rgba(0, 225, 255, 0.15);
-            border-radius: 14px;
-
-            cursor: pointer;
-        }
-
-        .menu-button span {
-            width: 18px;
-            height: 1px;
-            background: #70efff;
-            box-shadow: 0 0 5px rgba(0, 225, 255, 0.5);
-        }
-
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
-        .main {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* =====================================================
-           HERO
-        ===================================================== */
-
-        .hero {
-            flex: 1;
-            min-height: 0;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-
-            position: relative;
-        }
-
-        .status {
-            position: absolute;
-            top: 24px;
-
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            padding: 7px 12px;
-
-            border:
-                1px solid rgba(0, 225, 255, 0.14);
-
-            border-radius: 30px;
-
-            background:
-                rgba(0, 20, 28, 0.45);
-
-            backdrop-filter: blur(10px);
-
-            color: rgba(216, 250, 255, 0.58);
-
-            font-size: 9px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #00eaff;
-
-            box-shadow:
-                0 0 8px #00eaff;
-
-            animation: statusPulse 2s infinite;
-        }
-
-        @keyframes statusPulse {
-            0%,
-            100% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.25);
-            }
-        }
-
-        /* =====================================================
-           K CORE
-        ===================================================== */
-
-        .core-wrapper {
-            position: relative;
-
-            width: 260px;
-            height: 260px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            margin-top: 10px;
-        }
-
-        .core-glow {
-            position: absolute;
-
-            width: 130px;
-            height: 130px;
-
-            border-radius: 50%;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(0, 235, 255, 0.18),
-                    rgba(0, 235, 255, 0.02) 60%,
-                    transparent 70%
-                );
-
-            filter: blur(7px);
-
-            animation: coreGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes coreGlow {
-            0%,
-            100% {
-                transform: scale(0.9);
-                opacity: 0.55;
-            }
-
-            50% {
-                transform: scale(1.18);
-                opacity: 1;
-            }
-        }
-
-        /* Outer rotating ring */
-
-        .ring {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .ring-one {
-            width: 230px;
-            height: 230px;
-
-            border:
-                1px solid rgba(0, 224, 255, 0.18);
-
-            border-top-color: #00eaff;
-            border-bottom-color: rgba(0, 234, 255, 0.04);
-
-            animation:
-                rotateClockwise 8s linear infinite;
-        }
-
-        .ring-two {
-            width: 205px;
-            height: 205px;
-
-            border:
-                1px dashed rgba(0, 224, 255, 0.3);
-
-            border-left-color: #00eaff;
-
-            animation:
-                rotateCounter 12s linear infinite;
-        }
-
-        .ring-three {
-            width: 178px;
-            height: 178px;
-
-            border:
-                2px solid transparent;
-
-            border-top-color: rgba(0, 234, 255, 0.8);
-            border-right-color: rgba(0, 234, 255, 0.2);
-
-            animation:
-                rotateClockwise 5s linear infinite;
-        }
-
-        @keyframes rotateClockwise {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes rotateCounter {
-            from {
-                transform: rotate(360deg);
-            }
-
-            to {
-                transform: rotate(0deg);
-            }
-        }
-
-        /* =====================================================
-           RING MARKERS
-        ===================================================== */
-
-        .marker {
-            position: absolute;
-
-            width: 5px;
-            height: 5px;
-
-            background: #00eaff;
-            border-radius: 50%;
-
-            box-shadow:
-                0 0 8px #00eaff;
-        }
-
-        .marker-one {
-            top: 15px;
-            left: 50%;
-        }
-
-        .marker-two {
-            right: 19px;
-            top: 50%;
-        }
-
-        .marker-three {
-            bottom: 15px;
-            left: 50%;
-        }
-
-        .marker-four {
-            left: 19px;
-            top: 50%;
-        }
-
-        /* =====================================================
-           K LOGO
-        ===================================================== */
-
-        .core {
-            position: relative;
-
-            width: 118px;
-            height: 118px;
-
-            border-radius: 50%;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+<meta charset="UTF-8">
 
-            border:
-                1px solid rgba(0, 235, 255, 0.65);
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+>
 
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(0, 55, 68, 0.7),
-                    rgba(2, 12, 18, 0.95)
-                );
+<meta
+    name="theme-color"
+    content="#05070d"
+>
 
-            box-shadow:
-                0 0 18px rgba(0, 234, 255, 0.3),
-                0 0 55px rgba(0, 234, 255, 0.11),
-                inset 0 0 25px rgba(0, 234, 255, 0.13);
+<title>J.A.R.V.I.S. — KARAHAN INC.</title>
 
-            animation:
-                coreFloat 4s ease-in-out infinite;
-        }
+<style>
 
-        .core::before {
-            content: "";
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
 
-            position: absolute;
-            inset: 7px;
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    font-family:-apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
+    background:#05070d;
+    color:#eafcff;
+}
 
-            border-radius: 50%;
+body{
+    overflow:hidden;
+}
 
-            border:
-                1px solid rgba(0, 234, 255, 0.22);
-        }
+button,
+input{
+    font-family:inherit;
+}
 
-        .core::after {
-            content: "";
+button{
+    cursor:pointer;
+}
 
-            position: absolute;
 
-            width: 3px;
-            height: 3px;
+/* =====================================================
+   THEME
+===================================================== */
 
-            background: #dfffff;
-            border-radius: 50%;
+:root{
 
-            box-shadow:
-                0 0 12px #00eaff,
-                0 0 30px #00eaff;
-        }
+    --bg:#05070d;
 
-        @keyframes coreFloat {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
+    --panel:rgba(9,15,25,.82);
 
-            50% {
-                transform: translateY(-4px);
-            }
-        }
+    --panel-2:rgba(12,20,32,.92);
 
-        .k-logo {
-            position: relative;
+    --border:rgba(0,220,255,.16);
 
-            font-size: 66px;
-            line-height: 1;
+    --cyan:#00eaff;
 
-            font-weight: 200;
+    --cyan-soft:#73f7ff;
 
-            color: #cfffff;
+    --text:#ecfdff;
 
-            text-shadow:
-                0 0 5px rgba(0, 238, 255, 0.9),
-                0 0 18px rgba(0, 238, 255, 0.65),
-                0 0 35px rgba(0, 238, 255, 0.35);
+    --muted:#7f9aa3;
 
-            z-index: 2;
-        }
+    --danger:#ff426d;
 
-        /* =====================================================
-           CORE LABEL
-        ===================================================== */
+    --success:#48ffae;
 
-        .hero-title {
-            margin-top: 18px;
+    --shadow:0 0 35px rgba(0,220,255,.12);
+}
 
-            font-size: 24px;
-            font-weight: 500;
 
-            letter-spacing: 7px;
+body.light{
 
-            text-shadow:
-                0 0 15px rgba(0, 225, 255, 0.25);
-        }
+    --bg:#eaf0f5;
 
-        .hero-subtitle {
-            margin-top: 7px;
+    --panel:rgba(255,255,255,.88);
 
-            font-size: 8px;
-            letter-spacing: 5px;
+    --panel-2:rgba(255,255,255,.97);
 
-            color: rgba(212, 249, 255, 0.38);
-        }
+    --border:rgba(0,130,160,.22);
 
-        .greeting {
-            margin-top: 22px;
+    --cyan:#008da5;
 
-            min-height: 20px;
+    --cyan-soft:#00aeca;
 
-            font-size: 13px;
+    --text:#102027;
 
-            color:
-                rgba(217, 250, 255, 0.66);
+    --muted:#60757d;
 
-            text-align: center;
-        }
+    --shadow:0 10px 35px rgba(20,60,70,.12);
+}
 
-        /* =====================================================
-           MINI DATA HUD
-        ===================================================== */
 
-        .data-hud {
-            position: absolute;
+body.fun{
 
-            left: 18px;
-            right: 18px;
-            bottom: 16px;
+    --cyan:#ff3d81;
 
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+    --cyan-soft:#ff77a8;
 
-            gap: 8px;
-        }
+    --border:rgba(255,61,129,.22);
 
-        .data-card {
-            min-height: 48px;
+    --shadow:0 0 40px rgba(255,61,129,.18);
+}
 
-            padding: 9px;
 
-            border:
-                1px solid rgba(0, 225, 255, 0.09);
+/* =====================================================
+   BACKGROUND
+===================================================== */
 
-            border-radius: 12px;
+.background{
 
-            background:
-                rgba(0, 18, 25, 0.38);
+    position:fixed;
+    inset:0;
 
-            backdrop-filter: blur(10px);
-        }
+    pointer-events:none;
 
-        .data-label {
-            font-size: 7px;
-            letter-spacing: 1.5px;
-            color: rgba(206, 248, 255, 0.35);
-        }
+    overflow:hidden;
 
-        .data-value {
-            margin-top: 5px;
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(0,234,255,.07),
+            transparent 35%
+        ),
+        var(--bg);
+}
 
-            font-size: 10px;
 
-            color:
-                rgba(215, 252, 255, 0.78);
-        }
+body.fun .background{
 
-        /* =====================================================
-           CHAT
-        ===================================================== */
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(255,61,129,.10),
+            transparent 35%
+        ),
+        var(--bg);
+}
 
-        .chat-panel {
-            position: absolute;
 
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
+.grid{
 
-            height: 0;
+    position:absolute;
+    inset:-50%;
 
-            display: flex;
-            flex-direction: column;
+    background-image:
+        linear-gradient(
+            rgba(0,234,255,.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0,234,255,.035) 1px,
+            transparent 1px
+        );
 
-            opacity: 0;
-            pointer-events: none;
+    background-size:40px 40px;
 
-            transform: translateY(20px);
+    transform:perspective(500px)
+        rotateX(60deg)
+        translateY(20%);
 
-            transition:
-                height 0.35s ease,
-                opacity 0.25s ease,
-                transform 0.35s ease;
+    animation:gridMove 18s linear infinite;
+}
 
-            border:
-                1px solid rgba(0, 225, 255, 0.12);
 
-            border-radius: 20px;
+@keyframes gridMove{
 
-            background:
-                rgba(2, 12, 17, 0.92);
+    from{
+        transform:
+            perspective(500px)
+            rotateX(60deg)
+            translateY(20%);
+    }
 
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+    to{
+        transform:
+            perspective(500px)
+            rotateX(60deg)
+            translateY(0%);
+    }
+}
 
-            overflow: hidden;
-        }
 
-        .chat-panel.active {
-            height: calc(100% - 24px);
+.scanline{
 
-            opacity: 1;
-            pointer-events: auto;
+    position:absolute;
 
-            transform: translateY(0);
-        }
+    left:0;
+    right:0;
 
-        .chat-header {
-            height: 48px;
-            min-height: 48px;
+    height:1px;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--cyan),
+            transparent
+        );
 
-            padding: 0 14px;
+    opacity:.15;
 
-            border-bottom:
-                1px solid rgba(0, 225, 255, 0.1);
-        }
+    animation:scan 5s linear infinite;
+}
 
-        .chat-header-title {
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: rgba(218, 250, 255, 0.7);
-        }
 
-        .close-chat {
-            width: 30px;
-            height: 30px;
+@keyframes scan{
 
-            border-radius: 50%;
+    from{
+        top:-5%;
+    }
 
-            background:
-                rgba(0, 225, 255, 0.06);
+    to{
+        top:105%;
+    }
+}
 
-            color: #7defff;
 
-            cursor: pointer;
-        }
+/* =====================================================
+   APP
+===================================================== */
 
-        .messages {
-            flex: 1;
-            min-height: 0;
+.app{
 
-            overflow-y: auto;
+    position:relative;
 
-            padding: 15px;
+    width:100%;
+    height:100vh;
 
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+    height:100dvh;
 
-            scrollbar-width: none;
-        }
+    display:flex;
 
-        .messages::-webkit-scrollbar {
-            display: none;
-        }
+    flex-direction:column;
 
-        .message {
-            max-width: 84%;
+    z-index:2;
+}
 
-            padding: 11px 13px;
 
-            border-radius: 14px;
+/* =====================================================
+   HEADER
+===================================================== */
 
-            font-size: 13px;
-            line-height: 1.5;
+.topbar{
 
-            white-space: pre-wrap;
+    height:74px;
 
-            animation:
-                messageIn 0.25s ease;
-        }
+    display:flex;
 
-        @keyframes messageIn {
-            from {
-                opacity: 0;
-                transform: translateY(7px);
-            }
+    align-items:center;
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    justify-content:space-between;
 
-        .message.jarvis {
-            align-self: flex-start;
+    padding:
+        env(safe-area-inset-top)
+        18px 0
+        18px;
 
-            background:
-                rgba(0, 225, 255, 0.06);
+    padding-top:
+        calc(
+            10px +
+            env(safe-area-inset-top)
+        );
 
-            border:
-                1px solid rgba(0, 225, 255, 0.1);
+    border-bottom:1px solid var(--border);
 
-            color:
-                rgba(223, 251, 255, 0.84);
-        }
+    background:var(--panel);
 
-        .message.user {
-            align-self: flex-end;
+    backdrop-filter:blur(20px);
 
-            background:
-                rgba(0, 110, 130, 0.22);
+    -webkit-backdrop-filter:blur(20px);
 
-            border:
-                1px solid rgba(0, 225, 255, 0.13);
+    z-index:20;
+}
 
-            color:
-                rgba(232, 253, 255, 0.9);
-        }
 
-        .typing {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            padding: 10px 13px;
-        }
+.brand{
 
-        .typing span {
-            width: 5px;
-            height: 5px;
+    display:flex;
 
-            background: #00eaff;
-            border-radius: 50%;
+    align-items:center;
 
-            animation:
-                typing 1.2s infinite;
-        }
+    gap:12px;
+}
 
-        .typing span:nth-child(2) {
-            animation-delay: 0.15s;
-        }
 
-        .typing span:nth-child(3) {
-            animation-delay: 0.3s;
-        }
+.brand-mark{
 
-        @keyframes typing {
-            0%,
-            60%,
-            100% {
-                opacity: 0.25;
-                transform: translateY(0);
-            }
+    width:42px;
+    height:42px;
 
-            30% {
-                opacity: 1;
-                transform: translateY(-3px);
-            }
-        }
+    border-radius:50%;
 
-        /* =====================================================
-           INPUT
-        ===================================================== */
+    border:1px solid var(--cyan);
 
-        .input-area {
-            padding: 10px;
+    display:flex;
 
-            border-top:
-                1px solid rgba(0, 225, 255, 0.1);
+    align-items:center;
+    justify-content:center;
 
-            display: flex;
-            gap: 8px;
-        }
+    color:var(--cyan);
 
-        .message-input {
-            flex: 1;
+    font-weight:800;
 
-            min-width: 0;
+    font-size:18px;
 
-            height: 44px;
+    box-shadow:
+        0 0 15px
+        color-mix(
+            in srgb,
+            var(--cyan) 25%,
+            transparent
+        );
 
-            padding: 0 14px;
+    position:relative;
+}
 
-            border-radius: 14px;
 
-            border:
-                1px solid rgba(0, 225, 255, 0.14);
+.brand-mark::before{
 
-            outline: none;
+    content:"";
 
-            background:
-                rgba(0, 225, 255, 0.035);
+    position:absolute;
 
-            color: #e7fcff;
+    inset:5px;
 
-            font-size: 16px;
-        }
+    border-radius:50%;
 
-        .message-input::placeholder {
-            color:
-                rgba(210, 247, 255, 0.27);
-        }
+    border:1px solid var(--cyan);
 
-        .send-button {
-            width: 44px;
-            height: 44px;
+    opacity:.35;
+}
 
-            border-radius: 14px;
 
-            background:
-                rgba(0, 225, 255, 0.1);
+.brand-title{
 
-            border:
-                1px solid rgba(0, 225, 255, 0.2);
+    line-height:1;
+}
 
-            color: #6fefff;
 
-            cursor: pointer;
+.brand-title strong{
 
-            box-shadow:
-                0 0 12px rgba(0, 225, 255, 0.08);
-        }
+    display:block;
 
-        .send-button:active {
-            transform: scale(0.94);
-        }
+    font-size:16px;
 
-        /* =====================================================
-           BOTTOM BUTTONS
-        ===================================================== */
+    letter-spacing:3px;
+}
 
-        .bottom-bar {
-            height: 68px;
-            min-height: 68px;
 
-            padding:
-                0
-                18px
-                env(safe-area-inset-bottom)
-                18px;
+.brand-title span{
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    display:block;
 
-        .talk-button {
-            width: 64px;
-            height: 42px;
+    margin-top:5px;
 
-            border-radius: 22px;
+    font-size:8px;
 
-            background:
-                rgba(0, 225, 255, 0.07);
+    letter-spacing:3px;
 
-            border:
-                1px solid rgba(0, 225, 255, 0.18);
+    color:var(--cyan);
 
-            color: #8af4ff;
+}
 
-            font-size: 10px;
-            letter-spacing: 1px;
 
-            box-shadow:
-                0 0 18px rgba(0, 225, 255, 0.07);
+.header-actions{
 
-            cursor: pointer;
+    display:flex;
 
-            transition:
-                transform 0.2s,
-                background 0.2s;
-        }
+    gap:8px;
+}
 
-        .talk-button:active {
-            transform: scale(0.94);
-        }
 
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
+.icon-btn{
 
-        .overlay {
-            position: fixed;
-            inset: 0;
+    width:40px;
+    height:40px;
 
-            background:
-                rgba(0, 0, 0, 0.5);
+    border-radius:12px;
 
-            opacity: 0;
-            pointer-events: none;
+    border:1px solid var(--border);
 
-            transition: opacity 0.3s;
+    background:rgba(255,255,255,.025);
 
-            z-index: 20;
-        }
+    color:var(--text);
 
-        .overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+    display:flex;
 
-        .sidebar {
-            position: fixed;
+    align-items:center;
+    justify-content:center;
 
-            top: 0;
-            left: 0;
-            bottom: 0;
+    font-size:18px;
+}
 
-            width: min(310px, 84vw);
 
-            padding:
-                calc(env(safe-area-inset-top) + 20px)
-                18px
-                20px;
+.icon-btn:active{
 
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(3, 14, 20, 0.98),
-                    rgba(1, 7, 11, 0.99)
-                );
+    transform:scale(.94);
+}
 
-            border-right:
-                1px solid rgba(0, 225, 255, 0.15);
 
-            box-shadow:
-                15px 0 60px rgba(0, 0, 0, 0.45);
+/* =====================================================
+   CONTENT
+===================================================== */
 
-            transform: translateX(-105%);
+.content{
 
-            transition:
-                transform 0.35s cubic-bezier(
-                    0.22,
-                    1,
-                    0.36,
-                    1
-                );
+    flex:1;
 
-            z-index: 30;
-        }
+    min-height:0;
 
-        .sidebar.active {
-            transform: translateX(0);
-        }
+    display:flex;
 
-        .sidebar-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    flex-direction:column;
 
-            margin-bottom: 28px;
-        }
+    overflow:hidden;
+}
 
-        .sidebar-title {
-            font-size: 13px;
-            letter-spacing: 3px;
-            color: #a8f7ff;
-        }
 
-        .sidebar-close {
-            width: 35px;
-            height: 35px;
+/* =====================================================
+   CORE
+===================================================== */
 
-            border-radius: 11px;
+.core-area{
 
-            background:
-                rgba(0, 225, 255, 0.05);
+    flex:0 0 265px;
 
-            color: #75efff;
+    display:flex;
 
-            cursor: pointer;
-        }
+    align-items:center;
 
-        .menu-section {
-            margin-bottom: 25px;
-        }
+    justify-content:center;
 
-        .section-title {
-            margin-bottom: 9px;
+    position:relative;
+}
 
-            font-size: 8px;
-            letter-spacing: 2px;
 
-            color:
-                rgba(211, 250, 255, 0.27);
-        }
+.core{
 
-        .side-item {
-            width: 100%;
+    width:170px;
+    height:170px;
 
-            display: flex;
-            align-items: center;
-            gap: 12px;
+    position:relative;
 
-            padding: 13px 12px;
+    display:flex;
 
-            margin-bottom: 5px;
+    align-items:center;
+    justify-content:center;
+}
 
-            border-radius: 12px;
 
-            background:
-                rgba(0, 225, 255, 0.025);
+.core-ring{
 
-            color:
-                rgba(218, 250, 255, 0.65);
+    position:absolute;
 
-            text-align: left;
+    border-radius:50%;
 
-            cursor: pointer;
-        }
+    border:1px solid var(--cyan);
 
-        .side-item:active {
-            background:
-                rgba(0, 225, 255, 0.09);
-        }
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--cyan) 35%,
+            transparent
+        );
+}
 
-        .side-icon {
-            width: 28px;
-            height: 28px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+.ring-one{
 
-            border-radius: 8px;
+    width:165px;
+    height:165px;
 
-            background:
-                rgba(0, 225, 255, 0.06);
+    border-style:dashed;
 
-            color: #67eafa;
+    animation:
+        rotateClockwise 15s linear infinite;
+}
 
-            font-size: 12px;
-        }
 
-        .side-text {
-            font-size: 11px;
-        }
+.ring-two{
 
-        /* =====================================================
-           SETTINGS MODAL
-        ===================================================== */
+    width:137px;
+    height:137px;
 
-        .modal {
-            position: fixed;
-            inset: 0;
+    border-style:dotted;
 
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
+    opacity:.65;
 
-            background:
-                rgba(0, 0, 0, 0.58);
+    animation:
+        rotateReverse 10s linear infinite;
+}
 
-            opacity: 0;
-            pointer-events: none;
 
-            transition: opacity 0.25s;
+.ring-three{
 
-            z-index: 40;
-        }
+    width:105px;
+    height:105px;
 
-        .modal.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+    opacity:.8;
 
-        .settings {
-            width: 100%;
-            max-width: 600px;
+    animation:
+        pulseRing 2s ease-in-out infinite;
+}
 
-            padding:
-                18px
-                18px
-                calc(18px + env(safe-area-inset-bottom));
 
-            border-radius:
-                24px
-                24px
-                0
-                0;
+@keyframes rotateClockwise{
 
-            background:
-                #061117;
+    from{
+        transform:rotate(0);
+    }
 
-            border-top:
-                1px solid rgba(0, 225, 255, 0.15);
+    to{
+        transform:rotate(360deg);
+    }
+}
 
-            transform: translateY(100%);
 
-            transition:
-                transform 0.35s cubic-bezier(
-                    0.22,
-                    1,
-                    0.36,
-                    1
-                );
-        }
+@keyframes rotateReverse{
 
-        .modal.active .settings {
-            transform: translateY(0);
-        }
+    from{
+        transform:rotate(360deg);
+    }
 
-        .settings-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    to{
+        transform:rotate(0);
+    }
+}
 
-            margin-bottom: 20px;
-        }
 
-        .settings-title {
-            font-size: 14px;
-            letter-spacing: 2px;
-        }
+@keyframes pulseRing{
 
-        .setting {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    0%,
+    100%{
+        transform:scale(.94);
+        opacity:.45;
+    }
 
-            padding: 14px 0;
+    50%{
+        transform:scale(1.04);
+        opacity:1;
+    }
+}
 
-            border-bottom:
-                1px solid rgba(0, 225, 255, 0.06);
-        }
 
-        .setting-name {
-            font-size: 12px;
-            color:
-                rgba(223, 250, 255, 0.7);
-        }
+.core-center{
 
-        .setting-desc {
-            margin-top: 3px;
+    width:78px;
+    height:78px;
 
-            font-size: 8px;
+    border-radius:50%;
 
-            color:
-                rgba(215, 247, 255, 0.28);
-        }
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.18),
+            rgba(0,0,0,.35)
+        );
 
-        .switch {
-            width: 42px;
-            height: 24px;
+    border:1px solid var(--cyan);
 
-            border-radius: 20px;
+    display:flex;
 
-            background:
-                rgba(255, 255, 255, 0.08);
+    align-items:center;
+    justify-content:center;
 
-            border:
-                1px solid rgba(0, 225, 255, 0.1);
+    color:var(--cyan);
 
-            position: relative;
+    font-size:31px;
 
-            cursor: pointer;
-        }
+    font-weight:800;
 
-        .switch::after {
-            content: "";
+    box-shadow:
+        0 0 25px
+        color-mix(
+            in srgb,
+            var(--cyan) 40%,
+            transparent
+        ),
+        inset 0 0 20px
+        color-mix(
+            in srgb,
+            var(--cyan) 15%,
+            transparent
+        );
 
-            position: absolute;
+    animation:corePulse 2.5s ease-in-out infinite;
+}
 
-            width: 18px;
-            height: 18px;
 
-            left: 2px;
-            top: 2px;
+@keyframes corePulse{
 
-            border-radius: 50%;
+    0%,
+    100%{
+        transform:scale(.97);
+    }
 
-            background:
-                rgba(220, 250, 255, 0.55);
+    50%{
+        transform:scale(1.04);
+    }
+}
 
-            transition:
-                transform 0.25s,
-                background 0.25s;
-        }
 
-        .switch.active {
-            background:
-                rgba(0, 225, 255, 0.15);
-        }
+.core-status{
 
-        .switch.active::after {
-            transform: translateX(18px);
+    position:absolute;
 
-            background:
-                #00eaff;
+    bottom:23px;
 
-            box-shadow:
-                0 0 8px rgba(0, 225, 255, 0.6);
-        }
+    font-size:10px;
 
-        /* =====================================================
-           LIGHT MODE
-        ===================================================== */
+    letter-spacing:2px;
 
-        body.light {
-            background: #eaf7fa;
-            color: #06222a;
-        }
+    color:var(--muted);
+}
 
-        body.light .background {
-            background:
-                radial-gradient(
-                    circle at 50% 42%,
-                    rgba(0, 180, 210, 0.13),
-                    transparent 35%
-                ),
-                #eaf7fa;
-        }
 
-        body.light .topbar {
-            background:
-                rgba(239, 251, 253, 0.85);
+.status-dot{
 
-            border-color:
-                rgba(0, 130, 155, 0.15);
-        }
+    display:inline-block;
 
-        body.light .hero-title,
-        body.light .brand-title {
-            color: #06343d;
-        }
+    width:6px;
+    height:6px;
 
-        body.light .hero-subtitle,
-        body.light .brand-subtitle {
-            color: rgba(0, 40, 50, 0.45);
-        }
+    border-radius:50%;
 
-        body.light .core {
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(0, 180, 210, 0.2),
-                    rgba(230, 250, 253, 0.95)
-                );
-        }
+    background:var(--success);
 
-        body.light .sidebar,
-        body.light .settings {
-            background: #effbfd;
-        }
+    box-shadow:
+        0 0 10px var(--success);
 
-        body.light .message.jarvis {
-            color: #07343c;
-            background: rgba(0, 170, 200, 0.07);
-        }
+    margin-right:6px;
+}
 
-        body.light .message.user {
-            color: #07343c;
-            background: rgba(0, 170, 200, 0.12);
-        }
 
-        /* =====================================================
-           MOBILE
-        ===================================================== */
+/* =====================================================
+   CHAT
+===================================================== */
 
-        @media (max-height: 700px) {
+.chat-shell{
 
-            .core-wrapper {
-                transform: scale(0.82);
-                margin-top: -15px;
-                margin-bottom: -15px;
-            }
+    flex:1;
 
-            .hero-title {
-                margin-top: 3px;
-            }
+    min-height:0;
 
-            .greeting {
-                margin-top: 10px;
-            }
+    margin:0 12px 12px;
 
-            .data-hud {
-                bottom: 5px;
-            }
-        }
+    border:1px solid var(--border);
 
-        @media (max-width: 360px) {
+    border-radius:22px;
 
-            .core-wrapper {
-                transform: scale(0.86);
-            }
+    background:var(--panel);
 
-            .data-card {
-                padding: 7px;
-            }
+    backdrop-filter:blur(20px);
 
-            .hero-title {
-                font-size: 21px;
-            }
-        }
+    -webkit-backdrop-filter:blur(20px);
 
-    </style>
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+}
+
+
+.chat-header{
+
+    padding:14px 16px;
+
+    border-bottom:1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+}
+
+
+.chat-title{
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    color:var(--cyan);
+
+    font-weight:700;
+}
+
+
+.user-badge{
+
+    font-size:10px;
+
+    color:var(--muted);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:6px 9px;
+}
+
+
+.messages{
+
+    flex:1;
+
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding:16px;
+
+    scroll-behavior:smooth;
+}
+
+
+.messages::-webkit-scrollbar{
+
+    width:3px;
+}
+
+
+.messages::-webkit-scrollbar-thumb{
+
+    background:var(--border);
+
+    border-radius:10px;
+}
+
+
+.message{
+
+    max-width:88%;
+
+    margin-bottom:14px;
+
+    padding:12px 14px;
+
+    border-radius:15px;
+
+    line-height:1.5;
+
+    font-size:14px;
+
+    white-space:pre-wrap;
+
+    animation:messageIn .25s ease;
+}
+
+
+@keyframes messageIn{
+
+    from{
+        opacity:0;
+        transform:translateY(6px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+
+.message.jarvis{
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,234,255,.08),
+            rgba(0,234,255,.025)
+        );
+
+    border:1px solid var(--border);
+
+    margin-right:auto;
+}
+
+
+.message.user{
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            color-mix(
+                in srgb,
+                var(--cyan) 65%,
+                #000
+            )
+        );
+
+    color:#001014;
+
+    margin-left:auto;
+
+    border-bottom-right-radius:4px;
+
+    font-weight:500;
+}
+
+
+.message-label{
+
+    display:block;
+
+    font-size:8px;
+
+    letter-spacing:2px;
+
+    opacity:.65;
+
+    margin-bottom:5px;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.input-area{
+
+    padding:10px;
+
+    border-top:1px solid var(--border);
+
+    display:flex;
+
+    gap:8px;
+
+    padding-bottom:
+        calc(
+            10px +
+            env(safe-area-inset-bottom)
+        );
+}
+
+
+.chat-input{
+
+    flex:1;
+
+    min-width:0;
+
+    height:46px;
+
+    border-radius:14px;
+
+    border:1px solid var(--border);
+
+    background:rgba(0,0,0,.15);
+
+    color:var(--text);
+
+    outline:none;
+
+    padding:0 14px;
+
+    font-size:16px;
+}
+
+
+body.light .chat-input{
+
+    background:rgba(0,0,0,.035);
+}
+
+
+.chat-input:focus{
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 15px
+        color-mix(
+            in srgb,
+            var(--cyan) 12%,
+            transparent
+        );
+}
+
+
+.send-btn{
+
+    width:48px;
+
+    border:1px solid var(--cyan);
+
+    border-radius:14px;
+
+    background:transparent;
+
+    color:var(--cyan);
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+
+.send-btn:active{
+
+    transform:scale(.93);
+}
+
+
+.send-btn.loading{
+
+    opacity:.5;
+
+    pointer-events:none;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    backdrop-filter:blur(4px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.25s;
+
+    z-index:40;
+}
+
+
+.overlay.open{
+
+    opacity:1;
+
+    pointer-events:auto;
+}
+
+
+.sidebar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:min(330px,88vw);
+
+    height:100%;
+
+    height:100dvh;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--panel-2),
+            var(--bg)
+        );
+
+    border-right:1px solid var(--border);
+
+    transform:translateX(-100%);
+
+    transition:.3s ease;
+
+    z-index:50;
+
+    padding:
+        calc(18px + env(safe-area-inset-top))
+        18px
+        calc(18px + env(safe-area-inset-bottom));
+}
+
+
+.sidebar.open{
+
+    transform:translateX(0);
+}
+
+
+.sidebar-head{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:25px;
+}
+
+
+.sidebar-brand{
+
+    color:var(--cyan);
+
+    letter-spacing:3px;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+
+.close-btn{
+
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+
+    background:transparent;
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+    font-size:20px;
+}
+
+
+.profile-card{
+
+    padding:15px;
+
+    border:1px solid var(--border);
+
+    border-radius:17px;
+
+    background:rgba(255,255,255,.025);
+
+    margin-bottom:18px;
+}
+
+
+.profile-name{
+
+    font-size:17px;
+
+    font-weight:700;
+}
+
+
+.profile-role{
+
+    font-size:10px;
+
+    color:var(--cyan);
+
+    letter-spacing:1px;
+
+    margin-top:5px;
+}
+
+
+.menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+}
+
+
+.menu button{
+
+    width:100%;
+
+    border:1px solid transparent;
+
+    background:transparent;
+
+    color:var(--text);
+
+    text-align:left;
+
+    padding:14px;
+
+    border-radius:13px;
+
+    font-size:14px;
+}
+
+
+.menu button:active{
+
+    background:rgba(255,255,255,.05);
+}
+
+
+.menu button:hover{
+
+    border-color:var(--border);
+}
+
+
+.menu-danger{
+
+    color:#ff6686 !important;
+}
+
+
+/* =====================================================
+   MODALS
+===================================================== */
+
+.modal-backdrop{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:100;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:rgba(0,0,0,.68);
+
+    backdrop-filter:blur(10px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.25s;
+}
+
+
+.modal-backdrop.show{
+
+    opacity:1;
+
+    pointer-events:auto;
+}
+
+
+.modal{
+
+    width:100%;
+
+    max-width:430px;
+
+    background:var(--panel-2);
+
+    border:1px solid var(--border);
+
+    border-radius:24px;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.45),
+        0 0 30px
+        color-mix(
+            in srgb,
+            var(--cyan) 10%,
+            transparent
+        );
+
+    padding:22px;
+
+    transform:translateY(20px) scale(.98);
+
+    transition:.25s;
+}
+
+
+.modal-backdrop.show .modal{
+
+    transform:translateY(0) scale(1);
+}
+
+
+.modal-title{
+
+    color:var(--cyan);
+
+    letter-spacing:2px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    margin-bottom:5px;
+}
+
+
+.modal-subtitle{
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    margin-bottom:20px;
+}
+
+
+.modal-row{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:14px 0;
+
+    border-bottom:1px solid var(--border);
+}
+
+
+.modal-row:last-child{
+
+    border-bottom:0;
+}
+
+
+.modal-label{
+
+    font-size:13px;
+}
+
+
+.modal-label small{
+
+    display:block;
+
+    color:var(--muted);
+
+    margin-top:3px;
+
+    font-size:10px;
+}
+
+
+/* =====================================================
+   SWITCH
+===================================================== */
+
+.switch{
+
+    width:48px;
+    height:27px;
+
+    border-radius:20px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.06);
+
+    position:relative;
+
+    padding:0;
+}
+
+
+.switch span{
+
+    position:absolute;
+
+    top:3px;
+    left:3px;
+
+    width:19px;
+    height:19px;
+
+    border-radius:50%;
+
+    background:var(--muted);
+
+    transition:.25s;
+}
+
+
+.switch.active{
+
+    background:
+        color-mix(
+            in srgb,
+            var(--cyan) 20%,
+            transparent
+        );
+
+    border-color:var(--cyan);
+}
+
+
+.switch.active span{
+
+    left:24px;
+
+    background:var(--cyan);
+
+    box-shadow:
+        0 0 10px var(--cyan);
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+.login-core{
+
+    width:86px;
+    height:86px;
+
+    margin:0 auto 20px;
+
+    border-radius:50%;
+
+    border:1px solid var(--cyan);
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    color:var(--cyan);
+
+    font-size:28px;
+
+    box-shadow:
+        0 0 30px
+        color-mix(
+            in srgb,
+            var(--cyan) 25%,
+            transparent
+        );
+
+    animation:corePulse 2s infinite;
+}
+
+
+.login-input{
+
+    width:100%;
+
+    height:48px;
+
+    border-radius:13px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.025);
+
+    color:var(--text);
+
+    padding:0 14px;
+
+    font-size:16px;
+
+    outline:none;
+
+    margin-bottom:10px;
+}
+
+
+.login-input:focus{
+
+    border-color:var(--cyan);
+}
+
+
+.login-btn{
+
+    width:100%;
+
+    height:48px;
+
+    border-radius:13px;
+
+    border:1px solid var(--cyan);
+
+    background:var(--cyan);
+
+    color:#001014;
+
+    font-weight:700;
+
+    margin-top:5px;
+}
+
+
+.login-error{
+
+    min-height:20px;
+
+    text-align:center;
+
+    color:#ff6686;
+
+    font-size:11px;
+
+    margin:6px 0;
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+.toast{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:
+        calc(
+            25px +
+            env(safe-area-inset-bottom)
+        );
+
+    transform:
+        translate(-50%,20px);
+
+    background:var(--panel-2);
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+    padding:11px 16px;
+
+    border-radius:14px;
+
+    font-size:12px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:200;
+
+    transition:.25s;
+
+    white-space:nowrap;
+}
+
+
+.toast.show{
+
+    opacity:1;
+
+    transform:
+        translate(-50%,0);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px){
+
+    .core-area{
+
+        flex-basis:225px;
+    }
+
+
+    .core{
+
+        width:145px;
+        height:145px;
+    }
+
+
+    .ring-one{
+
+        width:145px;
+        height:145px;
+    }
+
+
+    .ring-two{
+
+        width:120px;
+        height:120px;
+    }
+
+
+    .ring-three{
+
+        width:95px;
+        height:95px;
+    }
+
+
+    .core-center{
+
+        width:70px;
+        height:70px;
+
+        font-size:27px;
+    }
+
+
+    .chat-shell{
+
+        border-radius:19px;
+
+        margin:
+            0 8px 8px;
+    }
+
+
+    .message{
+
+        max-width:92%;
+    }
+}
+
+
+</style>
 </head>
+
 
 <body>
 
-    <div class="background">
-        <div class="grid"></div>
-        <div class="scanline"></div>
-    </div>
+<div class="background">
+    <div class="grid"></div>
+    <div class="scanline"></div>
+</div>
 
 
-    <div class="app">
+<div class="app">
 
-        <!-- =================================================
-             TOP BAR
-        ================================================== -->
 
-        <header class="topbar">
+    <!-- HEADER -->
 
-            <div class="brand">
+    <header class="topbar">
 
-                <div class="brand-mark">
+        <div class="brand">
+
+            <button
+                class="brand-mark"
+                id="menuButton"
+                aria-label="Menü"
+            >
+                K
+            </button>
+
+            <div class="brand-title">
+
+                <strong>J.A.R.V.I.S.</strong>
+
+                <span>KARAHAN INC.</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                class="icon-btn"
+                id="settingsButton"
+            >
+                ⚙
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <main class="content">
+
+
+        <!-- CORE -->
+
+        <section class="core-area">
+
+            <div class="core">
+
+                <div class="core-ring ring-one"></div>
+
+                <div class="core-ring ring-two"></div>
+
+                <div class="core-ring ring-three"></div>
+
+                <div class="core-center">
                     K
                 </div>
 
-                <div>
-                    <div class="brand-title">
-                        J.A.R.V.I.S.
-                    </div>
-
-                    <div class="brand-subtitle">
-                        KARAHAN INC.
-                    </div>
-                </div>
-
-            </div>
-
-
-            <button
-                class="menu-button"
-                onclick="openSidebar()"
-                aria-label="Menü"
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
-        </header>
-
-
-        <!-- =================================================
-             MAIN
-        ================================================== -->
-
-        <main class="main">
-
-            <section class="hero">
-
-                <div class="status">
-
+                <div class="core-status">
                     <span class="status-dot"></span>
-
-                    <span id="statusText">
+                    <span id="systemStatus">
                         SYSTEM ONLINE
                     </span>
-
                 </div>
 
+            </div>
 
-                <!-- CORE -->
-
-                <div class="core-wrapper">
-
-                    <div class="core-glow"></div>
-
-                    <div class="ring ring-one"></div>
-                    <div class="ring ring-two"></div>
-                    <div class="ring ring-three"></div>
-
-                    <div class="marker marker-one"></div>
-                    <div class="marker marker-two"></div>
-                    <div class="marker marker-three"></div>
-                    <div class="marker marker-four"></div>
+        </section>
 
 
-                    <div class="core">
+        <!-- CHAT -->
 
-                        <div class="k-logo">
-                            K
-                        </div>
-
-                    </div>
-
-                </div>
+        <section class="chat-shell">
 
 
-                <div class="hero-title">
-                    J.A.R.V.I.S.
-                </div>
+            <div class="chat-header">
 
-                <div class="hero-subtitle">
-                    KARAHAN INTELLIGENCE SYSTEM
+                <div class="chat-title">
+                    J.A.R.V.I.S. TERMINAL
                 </div>
 
                 <div
-                    class="greeting"
-                    id="greeting"
+                    class="user-badge"
+                    id="userBadge"
                 >
-                    Merhaba efendim
+                    MURAT
                 </div>
 
-
-                <!-- DATA HUD -->
-
-                <div class="data-hud">
-
-                    <div class="data-card">
-
-                        <div class="data-label">
-                            SYSTEM
-                        </div>
-
-                        <div
-                            class="data-value"
-                            id="systemStatus"
-                        >
-                            ONLINE
-                        </div>
-
-                    </div>
-
-
-                    <div class="data-card">
-
-                        <div class="data-label">
-                            MEMORY
-                        </div>
-
-                        <div
-                            class="data-value"
-                            id="memoryStatus"
-                        >
-                            READY
-                        </div>
-
-                    </div>
-
-
-                    <div class="data-card">
-
-                        <div class="data-label">
-                            AI CORE
-                        </div>
-
-                        <div
-                            class="data-value"
-                            id="modelStatus"
-                        >
-                            GPT-OSS
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 CHAT PANEL
-            ================================================== -->
-
-            <section
-                class="chat-panel"
-                id="chatPanel"
-            >
-
-                <div class="chat-header">
-
-                    <div class="chat-header-title">
-                        J.A.R.V.I.S. COMMUNICATION
-                    </div>
-
-                    <button
-                        class="close-chat"
-                        onclick="closeChat()"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div
-                    class="messages"
-                    id="messages"
-                >
-
-                    <div class="message jarvis">
-                        Merhaba efendim. Sistemler hazır.
-                    </div>
-
-                </div>
-
-
-                <div class="input-area">
-
-                    <input
-                        id="messageInput"
-                        class="message-input"
-                        type="text"
-                        placeholder="J.A.R.V.I.S.'e bir şey söyleyin..."
-                        autocomplete="off"
-                        enterkeyhint="send"
-                    >
-
-                    <button
-                        class="send-button"
-                        onclick="sendMessage()"
-                    >
-                        ➤
-                    </button>
-
-                </div>
-
-            </section>
-
-        </main>
-
-
-        <!-- =================================================
-             BOTTOM
-        ================================================== -->
-
-        <footer class="bottom-bar">
-
-            <button
-                class="talk-button"
-                onclick="openChat()"
-            >
-                CHAT
-            </button>
-
-        </footer>
-
-    </div>
-
-
-    <!-- =====================================================
-         SIDEBAR OVERLAY
-    ====================================================== -->
-
-    <div
-        class="overlay"
-        id="overlay"
-        onclick="closeSidebar()"
-    ></div>
-
-
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
-
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
-        <div class="sidebar-head">
-
-            <div class="sidebar-title">
-                J.A.R.V.I.S.
             </div>
 
-            <button
-                class="sidebar-close"
-                onclick="closeSidebar()"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="menu-section">
-
-            <div class="section-title">
-                SYSTEM
-            </div>
-
-
-            <button
-                class="side-item"
-                onclick="openChat(); closeSidebar();"
-            >
-
-                <div class="side-icon">
-                    ◉
-                </div>
-
-                <div class="side-text">
-                    J.A.R.V.I.S. ile konuş
-                </div>
-
-            </button>
-
-
-            <button
-                class="side-item"
-                onclick="checkHealth()"
-            >
-
-                <div class="side-icon">
-                    ◌
-                </div>
-
-                <div class="side-text">
-                    Sistem durumu
-                </div>
-
-            </button>
-
-
-            <button
-                class="side-item"
-                onclick="showMemory()"
-            >
-
-                <div class="side-icon">
-                    ◇
-                </div>
-
-                <div class="side-text">
-                    Hafıza
-                </div>
-
-            </button>
-
-        </div>
-
-
-        <div class="menu-section">
-
-            <div class="section-title">
-                AYARLAR
-            </div>
-
-
-            <button
-                class="side-item"
-                onclick="openSettings()"
-            >
-
-                <div class="side-icon">
-                    ⚙
-                </div>
-
-                <div class="side-text">
-                    Ayarlar
-                </div>
-
-            </button>
-
-
-            <button
-                class="side-item"
-                onclick="toggleTheme()"
-            >
-
-                <div class="side-icon">
-                    ☼
-                </div>
-
-                <div class="side-text">
-                    Tema değiştir
-                </div>
-
-            </button>
-
-        </div>
-
-
-        <div class="menu-section">
-
-            <div class="section-title">
-                KARAHAN INC.
-            </div>
 
             <div
-                style="
-                    font-size:9px;
-                    line-height:1.6;
-                    color:rgba(210,250,255,.28);
-                    padding:10px 3px;
-                "
-            >
-                Personal Intelligence System
-                <br>
-                J.A.R.V.I.S. Core
+                class="messages"
+                id="messages"
+            ></div>
+
+
+            <div class="input-area">
+
+                <input
+                    id="messageInput"
+                    class="chat-input"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    placeholder="J.A.R.V.I.S.'e bir şey söyle..."
+                >
+
+                <button
+                    id="sendButton"
+                    class="send-btn"
+                >
+                    ➤
+                </button>
+
             </div>
 
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<div
+    class="overlay"
+    id="overlay"
+></div>
+
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+    <div class="sidebar-head">
+
+        <div class="sidebar-brand">
+            KARAHAN SYSTEM
         </div>
 
-    </aside>
+        <button
+            class="close-btn"
+            id="closeSidebar"
+        >
+            ×
+        </button>
+
+    </div>
 
 
-    <!-- =====================================================
-         SETTINGS MODAL
-    ====================================================== -->
+    <div class="profile-card">
 
-    <div
-        class="modal"
-        id="settingsModal"
-        onclick="closeSettingsOutside(event)"
-    >
+        <div
+            class="profile-name"
+            id="sideProfileName"
+        >
+            Murat
+        </div>
 
-        <div class="settings">
-
-            <div class="settings-head">
-
-                <div class="settings-title">
-                    AYARLAR
-                </div>
-
-                <button
-                    class="sidebar-close"
-                    onclick="closeSettings()"
-                >
-                    ×
-                </button>
-
-            </div>
-
-
-            <div class="setting">
-
-                <div>
-
-                    <div class="setting-name">
-                        Gece modu
-                    </div>
-
-                    <div class="setting-desc">
-                        Koyu J.A.R.V.I.S. arayüzünü kullan
-                    </div>
-
-                </div>
-
-                <div
-                    class="switch active"
-                    id="themeSwitch"
-                    onclick="toggleTheme()"
-                ></div>
-
-            </div>
-
-
-            <div class="setting">
-
-                <div>
-
-                    <div class="setting-name">
-                        Animasyonlar
-                    </div>
-
-                    <div class="setting-desc">
-                        K çekirdeği ve HUD animasyonları
-                    </div>
-
-                </div>
-
-                <div
-                    class="switch active"
-                    id="animationSwitch"
-                    onclick="toggleAnimations()"
-                ></div>
-
-            </div>
-
-
-            <div class="setting">
-
-                <div>
-
-                    <div class="setting-name">
-                        Hafıza
-                    </div>
-
-                    <div class="setting-desc">
-                        Kayıtlı J.A.R.V.I.S. hafızasını temizle
-                    </div>
-
-                </div>
-
-                <button
-                    onclick="clearMemory()"
-                    style="
-                        padding:8px 12px;
-                        border-radius:10px;
-                        background:rgba(255,70,70,.08);
-                        border:1px solid rgba(255,90,90,.15);
-                        color:#ff9b9b;
-                        font-size:9px;
-                    "
-                >
-                    TEMİZLE
-                </button>
-
-            </div>
-
+        <div
+            class="profile-role"
+            id="sideProfileRole"
+        >
+            ANA KULLANICI
         </div>
 
     </div>
 
 
-    <script>
+    <nav class="menu">
 
-        /* =====================================================
-           ELEMENTS
-        ===================================================== */
+        <button id="openSettings">
+            ⚙️ &nbsp; Ayarlar
+        </button>
 
-        const chatPanel =
-            document.getElementById("chatPanel");
+        <button id="openLogin">
+            👤 &nbsp; Özel Giriş / Profil
+        </button>
 
-        const messages =
-            document.getElementById("messages");
+        <button id="clearMemory">
+            🧠 &nbsp; J.A.R.V.I.S. Belleğini Temizle
+        </button>
 
-        const input =
-            document.getElementById("messageInput");
+        <button id="healthCheck">
+            ◉ &nbsp; Sistem Durumunu Kontrol Et
+        </button>
 
-        const statusText =
-            document.getElementById("statusText");
+        <button
+            class="menu-danger"
+            id="logoutButton"
+        >
+            ⇥ &nbsp; Oturumu Kapat
+        </button>
 
-        const systemStatus =
-            document.getElementById("systemStatus");
+    </nav>
 
-        const memoryStatus =
-            document.getElementById("memoryStatus");
-
-        const modelStatus =
-            document.getElementById("modelStatus");
-
-        const greeting =
-            document.getElementById("greeting");
-
-        const sidebar =
-            document.getElementById("sidebar");
-
-        const overlay =
-            document.getElementById("overlay");
-
-        const settingsModal =
-            document.getElementById("settingsModal");
+</aside>
 
 
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
+<!-- =====================================================
+     SETTINGS
+===================================================== -->
 
-        function openSidebar() {
+<div
+    class="modal-backdrop"
+    id="settingsModal"
+>
 
-            sidebar.classList.add("active");
-            overlay.classList.add("active");
-        }
+    <div class="modal">
 
+        <div class="modal-title">
+            SİSTEM AYARLARI
+        </div>
 
-        function closeSidebar() {
-
-            sidebar.classList.remove("active");
-            overlay.classList.remove("active");
-        }
-
-
-        /* =====================================================
-           CHAT
-        ===================================================== */
-
-        function openChat() {
-
-            chatPanel.classList.add("active");
-
-            setTimeout(() => {
-                input.focus();
-            }, 350);
-        }
+        <div class="modal-subtitle">
+            J.A.R.V.I.S. görünüm ve çalışma tercihleri
+        </div>
 
 
-        function closeChat() {
+        <div class="modal-row">
 
-            chatPanel.classList.remove("active");
-        }
+            <div class="modal-label">
 
+                Gece Modu
 
-        function addMessage(
-            text,
-            type
-        ) {
+                <small>
+                    Karanlık teknoloji arayüzü
+                </small>
 
-            const element =
-                document.createElement("div");
+            </div>
 
-            element.className =
-                "message " + type;
+            <button
+                class="switch active"
+                id="nightSwitch"
+            >
+                <span></span>
+            </button>
 
-            element.textContent = text;
-
-            messages.appendChild(element);
-
-            messages.scrollTop =
-                messages.scrollHeight;
-
-            return element;
-        }
+        </div>
 
 
-        function showTyping() {
+        <div class="modal-row">
 
-            const element =
-                document.createElement("div");
+            <div class="modal-label">
 
-            element.className =
-                "message jarvis typing";
+                Eğlence Modu
 
-            element.id =
-                "typingIndicator";
+                <small>
+                    Daha samimi ve eğlenceli J.A.R.V.I.S.
+                </small>
 
-            element.innerHTML =
-                "<span></span><span></span><span></span>";
+            </div>
 
-            messages.appendChild(element);
+            <button
+                class="switch"
+                id="funSwitch"
+            >
+                <span></span>
+            </button>
 
-            messages.scrollTop =
-                messages.scrollHeight;
-        }
-
-
-        function removeTyping() {
-
-            const element =
-                document.getElementById(
-                    "typingIndicator"
-                );
-
-            if (element) {
-                element.remove();
-            }
-        }
+        </div>
 
 
-        /* =====================================================
-           SEND MESSAGE
-        ===================================================== */
+        <div class="modal-row">
 
-        async function sendMessage() {
+            <div class="modal-label">
 
-            const text =
-                input.value.trim();
+                Animasyonlar
 
-            if (!text) {
-                return;
-            }
+                <small>
+                    Arayüz hareketleri
+                </small>
+
+            </div>
+
+            <button
+                class="switch active"
+                id="animationSwitch"
+            >
+                <span></span>
+            </button>
+
+        </div>
 
 
-            openChat();
+        <div class="modal-row">
 
-            addMessage(
-                text,
-                "user"
+            <div class="modal-label">
+
+                Aktif Kullanıcı
+
+                <small id="settingsUser">
+                    Murat
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div style="margin-top:15px">
+
+            <button
+                class="login-btn"
+                id="settingsLogin"
+            >
+                ÖZEL GİRİŞ / PROFİL DEĞİŞTİR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
+<div
+    class="modal-backdrop"
+    id="loginModal"
+>
+
+    <div class="modal">
+
+        <div class="login-core">
+            K
+        </div>
+
+        <div class="modal-title"
+             style="text-align:center">
+
+            ÖZEL KULLANICI GİRİŞİ
+
+        </div>
+
+        <div
+            class="modal-subtitle"
+            style="text-align:center"
+        >
+            J.A.R.V.I.S. kişisel profil sistemi
+        </div>
+
+
+        <input
+            id="usernameInput"
+            class="login-input"
+            type="text"
+            autocomplete="username"
+            placeholder="Kullanıcı adı"
+        >
+
+
+        <input
+            id="passwordInput"
+            class="login-input"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Şifre"
+        >
+
+
+        <div
+            class="login-error"
+            id="loginError"
+        ></div>
+
+
+        <button
+            class="login-btn"
+            id="loginButton"
+        >
+            SİSTEME GİRİŞ
+        </button>
+
+    </div>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+
+// ======================================================
+// CONFIG
+// ======================================================
+
+const API = "";
+
+
+// ======================================================
+// STATE
+// ======================================================
+
+let currentUser = null;
+
+let funMode =
+    localStorage.getItem("jarvis_fun") === "true";
+
+let nightMode =
+    localStorage.getItem("jarvis_theme") !== "light";
+
+let animations =
+    localStorage.getItem("jarvis_animations") !== "false";
+
+
+// ======================================================
+// ELEMENTS
+// ======================================================
+
+const body =
+    document.body;
+
+const messages =
+    document.getElementById("messages");
+
+const input =
+    document.getElementById("messageInput");
+
+const sendButton =
+    document.getElementById("sendButton");
+
+const systemStatus =
+    document.getElementById("systemStatus");
+
+const userBadge =
+    document.getElementById("userBadge");
+
+const sidebar =
+    document.getElementById("sidebar");
+
+const overlay =
+    document.getElementById("overlay");
+
+const settingsModal =
+    document.getElementById("settingsModal");
+
+const loginModal =
+    document.getElementById("loginModal");
+
+const toast =
+    document.getElementById("toast");
+
+
+// ======================================================
+// TOAST
+// ======================================================
+
+let toastTimer;
+
+function showToast(text){
+
+    toast.textContent = text;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 2400);
+}
+
+
+// ======================================================
+// MODALS
+// ======================================================
+
+function openModal(modal){
+
+    modal.classList.add("show");
+}
+
+
+function closeModal(modal){
+
+    modal.classList.remove("show");
+}
+
+
+// ======================================================
+// SIDEBAR
+// ======================================================
+
+function openSidebar(){
+
+    sidebar.classList.add("open");
+
+    overlay.classList.add("open");
+}
+
+
+function closeSidebar(){
+
+    sidebar.classList.remove("open");
+
+    overlay.classList.remove("open");
+}
+
+
+document
+    .getElementById("menuButton")
+    .onclick = openSidebar;
+
+
+document
+    .getElementById("closeSidebar")
+    .onclick = closeSidebar;
+
+
+overlay.onclick = closeSidebar;
+
+
+// ======================================================
+// THEME
+// ======================================================
+
+function applyTheme(){
+
+    body.classList.toggle(
+        "light",
+        !nightMode
+    );
+
+    body.classList.toggle(
+        "fun",
+        funMode
+    );
+
+    const nightSwitch =
+        document.getElementById("nightSwitch");
+
+    const funSwitch =
+        document.getElementById("funSwitch");
+
+    const animationSwitch =
+        document.getElementById("animationSwitch");
+
+
+    nightSwitch.classList.toggle(
+        "active",
+        nightMode
+    );
+
+
+    funSwitch.classList.toggle(
+        "active",
+        funMode
+    );
+
+
+    animationSwitch.classList.toggle(
+        "active",
+        animations
+    );
+
+
+    if(!animations){
+
+        document
+            .querySelectorAll(
+                ".core-ring,.core-center,.grid,.scanline"
+            )
+            .forEach(el => {
+
+                el.style.animation =
+                    "none";
+
+            });
+
+    }else{
+
+        document
+            .querySelectorAll(
+                ".core-ring,.core-center,.grid,.scanline"
+            )
+            .forEach(el => {
+
+                el.style.animation = "";
+
+            });
+
+    }
+
+
+    localStorage.setItem(
+        "jarvis_theme",
+        nightMode ? "dark" : "light"
+    );
+
+    localStorage.setItem(
+        "jarvis_fun",
+        funMode
+    );
+
+    localStorage.setItem(
+        "jarvis_animations",
+        animations
+    );
+}
+
+
+document
+    .getElementById("nightSwitch")
+    .onclick = () => {
+
+        nightMode = !nightMode;
+
+        applyTheme();
+
+    };
+
+
+document
+    .getElementById("funSwitch")
+    .onclick = () => {
+
+        funMode = !funMode;
+
+        applyTheme();
+
+        showToast(
+            funMode
+                ? "Eğlence modu aktif."
+                : "Normal mod aktif."
+        );
+
+    };
+
+
+document
+    .getElementById("animationSwitch")
+    .onclick = () => {
+
+        animations = !animations;
+
+        applyTheme();
+
+    };
+
+
+// ======================================================
+// SETTINGS
+// ======================================================
+
+function updateProfileUI(){
+
+    if(!currentUser){
+        return;
+    }
+
+
+    userBadge.textContent =
+        currentUser.name.toUpperCase();
+
+
+    document
+        .getElementById("sideProfileName")
+        .textContent =
+        currentUser.name;
+
+
+    document
+        .getElementById("sideProfileRole")
+        .textContent =
+        currentUser.role ||
+        "KULLANICI";
+
+
+    document
+        .getElementById("settingsUser")
+        .textContent =
+        `${currentUser.name} • ${currentUser.role || "Kullanıcı"}`;
+}
+
+
+document
+    .getElementById("settingsButton")
+    .onclick = () => {
+
+        openModal(settingsModal);
+
+    };
+
+
+document
+    .getElementById("openSettings")
+    .onclick = () => {
+
+        closeSidebar();
+
+        openModal(settingsModal);
+
+    };
+
+
+document
+    .getElementById("settingsLogin")
+    .onclick = () => {
+
+        closeModal(settingsModal);
+
+        openModal(loginModal);
+
+    };
+
+
+// ======================================================
+// LOGIN
+// ======================================================
+
+async function login(){
+
+    const username =
+        document
+            .getElementById("usernameInput")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const password =
+        document
+            .getElementById("passwordInput")
+            .value;
+
+
+    const error =
+        document.getElementById("loginError");
+
+
+    error.textContent = "";
+
+
+    if(!username || !password){
+
+        error.textContent =
+            "Kullanıcı adı ve şifre gerekli.";
+
+        return;
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                `${API}/login`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        username,
+                        password
+                    })
+                }
             );
 
-            input.value = "";
 
-            showTyping();
-
-            statusText.textContent =
-                "PROCESSING";
-
-            systemStatus.textContent =
-                "BUSY";
+        const data =
+            await response.json();
 
 
-            try {
+        if(data.status !== "success"){
 
-                const response =
-                    await fetch(
-                        "/chat",
-                        {
-                            method: "POST",
+            error.textContent =
+                data.message ||
+                "Giriş başarısız.";
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                message: text
-                            })
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                removeTyping();
-
-
-                if (
-                    data.status === "error"
-                ) {
-
-                    addMessage(
-                        data.response ||
-                        "J.A.R.V.I.S. bir hata ile karşılaştı.",
-                        "jarvis"
-                    );
-
-                } else {
-
-                    addMessage(
-                        data.response ||
-                        "Cevap alınamadı.",
-                        "jarvis"
-                    );
-
-                }
-
-
-                if (data.model) {
-
-                    modelStatus.textContent =
-                        data.model
-                        .replace("openai/", "")
-                        .toUpperCase();
-                }
-
-
-            } catch (error) {
-
-                removeTyping();
-
-                addMessage(
-                    "Bağlantı hatası: " +
-                    error.message,
-                    "jarvis"
-                );
-
-            }
-
-
-            statusText.textContent =
-                "SYSTEM ONLINE";
-
-            systemStatus.textContent =
-                "ONLINE";
-
+            return;
         }
 
 
-        input.addEventListener(
-            "keydown",
-            function(event) {
+        currentUser =
+            data.user;
 
-                if (
-                    event.key === "Enter"
-                ) {
 
-                    event.preventDefault();
-
-                    sendMessage();
-                }
-
-            }
+        localStorage.setItem(
+            "jarvis_user",
+            currentUser.username
         );
 
 
-        /* =====================================================
-           HEALTH
-        ===================================================== */
-
-        async function checkHealth() {
-
-            closeSidebar();
-
-            try {
-
-                const response =
-                    await fetch("/health");
-
-                const data =
-                    await response.json();
+        updateProfileUI();
 
 
-                if (
-                    data.status === "online"
-                ) {
-
-                    statusText.textContent =
-                        "SYSTEM ONLINE";
-
-                    systemStatus.textContent =
-                        "ONLINE";
-
-                    modelStatus.textContent =
-                        data.model
-                        .replace("openai/", "")
-                        .toUpperCase();
-
-                    memoryStatus.textContent =
-                        data.memory
-                        ? "READY"
-                        : "OFFLINE";
-
-                    greeting.textContent =
-                        "Tüm sistemler çalışıyor efendim.";
-
-                } else {
-
-                    statusText.textContent =
-                        "SYSTEM ERROR";
-
-                    systemStatus.textContent =
-                        "ERROR";
-                }
+        closeModal(loginModal);
 
 
-            } catch (error) {
+        addMessage(
+            "jarvis",
+            currentUser.greeting ||
+            `Hoş geldin ${currentUser.name}.`
+        );
 
-                statusText.textContent =
-                    "OFFLINE";
 
-                systemStatus.textContent =
-                    "OFFLINE";
+        showToast(
+            `${currentUser.name} olarak giriş yapıldı.`
+        );
 
-                greeting.textContent =
-                    "Sunucuya ulaşılamıyor efendim.";
+
+        input.focus();
+
+
+    }catch(e){
+
+        error.textContent =
+            "Sunucuya bağlanılamadı.";
+
+    }
+
+}
+
+
+document
+    .getElementById("loginButton")
+    .onclick = login;
+
+
+document
+    .getElementById("passwordInput")
+    .addEventListener(
+        "keydown",
+        e => {
+
+            if(e.key === "Enter"){
+                login();
             }
+
         }
+    );
 
 
-        /* =====================================================
-           MEMORY
-        ===================================================== */
+// ======================================================
+// RESTORE SESSION
+// ======================================================
 
-        async function showMemory() {
+async function restoreSession(){
 
-            closeSidebar();
-
-            try {
-
-                const response =
-                    await fetch("/memory");
-
-                const data =
-                    await response.json();
+    const savedUser =
+        localStorage.getItem(
+            "jarvis_user"
+        );
 
 
-                const memory =
-                    data.memory || {};
+    if(!savedUser){
 
-                const profile =
-                    memory.profile || {};
+        currentUser = {
 
-                if (profile.name) {
+            username:"murat",
 
-                    greeting.textContent =
-                        "Hoş geldiniz "
-                        + profile.name
-                        + " efendim.";
+            name:"Murat",
 
-                } else {
+            age:22,
 
-                    greeting.textContent =
-                        "Hafıza sistemi aktif efendim.";
-                }
+            role:"Ana Kullanıcı"
 
+        };
 
-                memoryStatus.textContent =
-                    "ACTIVE";
+        updateProfileUI();
 
+        addMessage(
+            "jarvis",
+            "Hoş geldiniz efendim. J.A.R.V.I.S. sistemleri hazır."
+        );
 
-            } catch (error) {
-
-                memoryStatus.textContent =
-                    "ERROR";
-            }
-        }
+        return;
+    }
 
 
-        /* =====================================================
-           CLEAR MEMORY
-        ===================================================== */
+    try{
 
-        async function clearMemory() {
+        const response =
+            await fetch(
+                `${API}/users`
+            );
 
-            const confirmed =
-                confirm(
-                    "J.A.R.V.I.S. hafızası temizlensin mi?"
+
+        const data =
+            await response.json();
+
+
+        if(data.status === "success"){
+
+            const found =
+                data.users.find(
+                    user =>
+                        user.username === savedUser
                 );
 
-            if (!confirmed) {
+
+            if(found){
+
+                currentUser = found;
+
+                updateProfileUI();
+
+                addMessage(
+                    "jarvis",
+                    `Tekrar hoş geldiniz ${found.name}. J.A.R.V.I.S. çevrimiçi.`
+                );
+
                 return;
+
             }
 
+        }
 
-            try {
+    }catch(e){
 
-                await fetch(
-                    "/memory",
-                    {
-                        method: "DELETE"
-                    }
-                );
+        console.log(e);
 
-                memoryStatus.textContent =
-                    "CLEARED";
+    }
 
-                greeting.textContent =
-                    "Hafıza temizlendi efendim.";
 
-            } catch (error) {
+    currentUser = {
 
-                memoryStatus.textContent =
-                    "ERROR";
-            }
+        username:"murat",
+
+        name:"Murat",
+
+        age:22,
+
+        role:"Ana Kullanıcı"
+
+    };
+
+    updateProfileUI();
+
+
+    addMessage(
+        "jarvis",
+        "Hoş geldiniz efendim. J.A.R.V.I.S. çevrimiçi."
+    );
+
+}
+
+
+// ======================================================
+// CHAT MESSAGE
+// ======================================================
+
+function addMessage(
+    type,
+    text
+){
+
+    const div =
+        document.createElement("div");
+
+
+    div.className =
+        `message ${type}`;
+
+
+    const label =
+        document.createElement("span");
+
+
+    label.className =
+        "message-label";
+
+
+    label.textContent =
+        type === "jarvis"
+            ? "J.A.R.V.I.S."
+            : (
+                currentUser?.name ||
+                "KULLANICI"
+            );
+
+
+    const content =
+        document.createElement("div");
+
+
+    content.textContent =
+        text;
+
+
+    div.appendChild(label);
+
+    div.appendChild(content);
+
+    messages.appendChild(div);
+
+
+    messages.scrollTop =
+        messages.scrollHeight;
+}
+
+
+// ======================================================
+// SEND MESSAGE
+// ======================================================
+
+async function sendMessage(){
+
+    const text =
+        input.value.trim();
+
+
+    if(!text){
+        return;
+    }
+
+
+    if(!currentUser){
+
+        showToast(
+            "Önce kullanıcı girişi yapın."
+        );
+
+        return;
+    }
+
+
+    addMessage(
+        "user",
+        text
+    );
+
+
+    input.value = "";
+
+    input.disabled = true;
+
+    sendButton.classList.add(
+        "loading"
+    );
+
+
+    systemStatus.textContent =
+        "PROCESSING";
+
+
+    try{
+
+        const response =
+            await fetch(
+                `${API}/chat`,
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        message:text,
+
+                        username:
+                            currentUser.username,
+
+                        fun_mode:
+                            funMode
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(data.status === "success"){
+
+            addMessage(
+                "jarvis",
+                data.response
+            );
+
+        }else{
+
+            addMessage(
+                "jarvis",
+                data.response ||
+                "J.A.R.V.I.S. şu anda yanıt veremiyor."
+            );
+
         }
 
 
-        /* =====================================================
-           SETTINGS
-        ===================================================== */
+    }catch(error){
 
-        function openSettings() {
+        addMessage(
+            "jarvis",
+            "⚠️ J.A.R.V.I.S. sunucuya bağlanamadı."
+        );
+
+        systemStatus.textContent =
+            "CONNECTION ERROR";
+
+    }
+
+
+    input.disabled = false;
+
+    sendButton.classList.remove(
+        "loading"
+    );
+
+
+    systemStatus.textContent =
+        "SYSTEM ONLINE";
+
+
+    input.focus();
+
+}
+
+
+sendButton.onclick =
+    sendMessage;
+
+
+input.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.key === "Enter" &&
+            !event.shiftKey
+        ){
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+// ======================================================
+// CLEAR MEMORY
+// ======================================================
+
+document
+    .getElementById("clearMemory")
+    .onclick = async () => {
+
+        closeSidebar();
+
+
+        const confirmClear =
+            confirm(
+                "J.A.R.V.I.S. belleği tamamen temizlensin mi?"
+            );
+
+
+        if(!confirmClear){
+            return;
+        }
+
+
+        try{
+
+            const response =
+                await fetch(
+                    `${API}/memory`,
+                    {
+                        method:"DELETE"
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if(data.status === "success"){
+
+                messages.innerHTML = "";
+
+                addMessage(
+                    "jarvis",
+                    "Bellek temizlendi. Sistem yeniden hazır."
+                );
+
+                showToast(
+                    "Bellek temizlendi."
+                );
+
+            }
+
+        }catch(e){
+
+            showToast(
+                "Bellek temizlenemedi."
+            );
+
+        }
+
+    };
+
+
+// ======================================================
+// HEALTH
+// ======================================================
+
+document
+    .getElementById("healthCheck")
+    .onclick = async () => {
+
+        closeSidebar();
+
+        try{
+
+            const response =
+                await fetch(
+                    `${API}/health`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            addMessage(
+                "jarvis",
+                `Sistem durumu: ${data.status}
+Sürüm: ${data.version}
+Model: ${data.model}
+Groq: ${data.groq_configured ? "Bağlı" : "Bağlı değil"}
+Kullanıcı profilleri: ${data.users}`
+            );
+
+
+            showToast(
+                "Sistem kontrolü tamamlandı."
+            );
+
+        }catch(e){
+
+            showToast(
+                "Sunucuya ulaşılamadı."
+            );
+
+        }
+
+    };
+
+
+// ======================================================
+// LOGOUT
+// ======================================================
+
+document
+    .getElementById("logoutButton")
+    .onclick = () => {
+
+        closeSidebar();
+
+
+        localStorage.removeItem(
+            "jarvis_user"
+        );
+
+
+        currentUser = {
+
+            username:"murat",
+
+            name:"Murat",
+
+            age:22,
+
+            role:"Ana Kullanıcı"
+
+        };
+
+
+        updateProfileUI();
+
+
+        showToast(
+            "Oturum kapatıldı."
+        );
+
+    };
+
+
+document
+    .getElementById("openLogin")
+    .onclick = () => {
+
+        closeSidebar();
+
+        openModal(loginModal);
+
+    };
+
+
+// ======================================================
+// MODAL CLOSE BY BACKDROP
+// ======================================================
+
+settingsModal.addEventListener(
+    "click",
+    event => {
+
+        if(
+            event.target ===
+            settingsModal
+        ){
+
+            closeModal(
+                settingsModal
+            );
+
+        }
+
+    }
+);
+
+
+loginModal.addEventListener(
+    "click",
+    event => {
+
+        if(
+            event.target ===
+            loginModal
+        ){
+
+            closeModal(
+                loginModal
+            );
+
+        }
+
+    }
+);
+
+
+// ======================================================
+// INIT
+// ======================================================
+
+applyTheme();
+
+restoreSession();
+
+
+// ======================================================
+// CONNECTION CHECK
+// ======================================================
+
+async function checkConnection(){
+
+    try{
+
+        const response =
+            await fetch(
+                `${API}/health`
+            );
+
+
+        if(response.ok){
+
+            systemStatus.textContent =
+                "SYSTEM ONLINE";
+
+        }else{
+
+            systemStatus.textContent =
+                "SYSTEM WARNING";
+
+        }
+
+    }catch(e){
+
+        systemStatus.textContent =
+            "OFFLINE";
+
+    }
+
+}
+
+
+checkConnection();
+
+
+// ======================================================
+// KEYBOARD
+// ======================================================
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.key === "Escape"
+        ){
 
             closeSidebar();
 
-            settingsModal.classList.add(
-                "active"
-            );
-        }
-
-
-        function closeSettings() {
-
-            settingsModal.classList.remove(
-                "active"
-            );
-        }
-
-
-        function closeSettingsOutside(event) {
-
-            if (
-                event.target ===
+            closeModal(
                 settingsModal
-            ) {
-
-                closeSettings();
-            }
-        }
-
-
-        /* =====================================================
-           THEME
-        ===================================================== */
-
-        function toggleTheme() {
-
-            document.body.classList.toggle(
-                "light"
             );
 
-            const isLight =
-                document.body.classList.contains(
-                    "light"
-                );
-
-            const switchElement =
-                document.getElementById(
-                    "themeSwitch"
-                );
-
-            if (switchElement) {
-
-                switchElement.classList.toggle(
-                    "active",
-                    !isLight
-                );
-            }
-
-
-            localStorage.setItem(
-                "jarvis_theme",
-                isLight
-                    ? "light"
-                    : "dark"
+            closeModal(
+                loginModal
             );
+
         }
 
+    }
+);
 
-        /* =====================================================
-           ANIMATIONS
-        ===================================================== */
-
-        function toggleAnimations() {
-
-            const switchElement =
-                document.getElementById(
-                    "animationSwitch"
-                );
-
-            const enabled =
-                switchElement.classList.toggle(
-                    "active"
-                );
-
-
-            document.documentElement.style
-                .setProperty(
-                    "--animation-state",
-                    enabled
-                        ? "running"
-                        : "paused"
-                );
-
-
-            document
-                .querySelectorAll("*")
-                .forEach(
-                    element => {
-
-                        element.style.animationPlayState =
-                            enabled
-                                ? "running"
-                                : "paused";
-                    }
-                );
-
-
-            localStorage.setItem(
-                "jarvis_animations",
-                enabled
-                    ? "on"
-                    : "off"
-            );
-        }
-
-
-        /* =====================================================
-           LOAD SETTINGS
-        ===================================================== */
-
-        function loadSettings() {
-
-            const theme =
-                localStorage.getItem(
-                    "jarvis_theme"
-                );
-
-            if (theme === "light") {
-
-                document.body.classList.add(
-                    "light"
-                );
-
-                const themeSwitch =
-                    document.getElementById(
-                        "themeSwitch"
-                    );
-
-                if (themeSwitch) {
-                    themeSwitch.classList.remove(
-                        "active"
-                    );
-                }
-            }
-
-
-            const animations =
-                localStorage.getItem(
-                    "jarvis_animations"
-                );
-
-            if (animations === "off") {
-
-                const animationSwitch =
-                    document.getElementById(
-                        "animationSwitch"
-                    );
-
-                if (animationSwitch) {
-                    animationSwitch.classList.remove(
-                        "active"
-                    );
-                }
-
-                document
-                    .querySelectorAll("*")
-                    .forEach(
-                        element => {
-                            element.style.animationPlayState =
-                                "paused";
-                        }
-                    );
-            }
-        }
-
-
-        /* =====================================================
-           INITIALIZE
-        ===================================================== */
-
-        loadSettings();
-
-        checkHealth();
-
-    </script>
+</script>
 
 </body>
 </html>
