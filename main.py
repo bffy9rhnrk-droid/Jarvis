@@ -1,658 +1,610 @@
-importos
-importjson
-importtime
-importre
+import os
+import json
+import re
 
-fromfastapiimportFastAPI
-fromfastapi.middleware.corsimportCORSMiddleware
-fromfastapi.responsesimportFileResponse,JSONResponse
-frompydanticimportBaseModel
-fromopenaiimportOpenAI
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel
+from openai import OpenAI
 
 
-#=========================================================
-#J.A.R.V.I.S.—KARAHANINC.
-#VERSION10.0
-#=========================================================
+# =========================================================
+# J.A.R.V.I.S. - KARAHAN INC.
+# VERSION 10.1
+# =========================================================
 
-APP_VERSION="10.0.0"
+APP_VERSION = "10.1.0"
 
-GROQ_API_KEY=os.getenv("GROQ_API_KEY","")
-GROQ_BASE_URL="https://api.groq.com/openai/v1"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
-#ÜCRETSİZ/DAHADÜŞÜKTÜKETİM
-GROQ_MODEL=os.getenv(
-"GROQ_MODEL",
-"openai/gpt-oss-20b"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+GROQ_MODEL = os.getenv(
+    "GROQ_MODEL",
+    "openai/gpt-oss-20b"
 )
 
-MEMORY_FILE="jarvis_memory.json"
+MEMORY_FILE = "jarvis_memory.json"
 
 
-#=========================================================
-#FASTAPI
-#=========================================================
+# =========================================================
+# FASTAPI
+# =========================================================
 
-app=FastAPI(
-title="J.A.R.V.I.S.—KARAHANINC.",
-version=APP_VERSION
+app = FastAPI(
+    title="J.A.R.V.I.S. - KARAHAN INC.",
+    version=APP_VERSION
 )
 
 app.add_middleware(
-CORSMiddleware,
-allow_origins=["*"],
-allow_credentials=True,
-allow_methods=["*"],
-allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 
-#=========================================================
-#OPENAICOMPATIBLEGROQCLIENT
-#=========================================================
+# =========================================================
+# GROQ CLIENT
+# =========================================================
 
-client=None
+client = None
 
-ifGROQ_API_KEY:
-client=OpenAI(
-api_key=GROQ_API_KEY,
-base_url=GROQ_BASE_URL,
-timeout=45.0,
-max_retries=0
-)
+if GROQ_API_KEY:
+    client = OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url=GROQ_BASE_URL,
+        timeout=45.0,
+        max_retries=0
+    )
 
 
-#=========================================================
-#MEMORY
-#=========================================================
+# =========================================================
+# MEMORY
+# =========================================================
 
-DEFAULT_MEMORY={
-"profile":{},
-"preferences":{},
-"projects":{},
-"vehicles":{},
-"important_facts":{}
+DEFAULT_MEMORY = {
+    "profile": {},
+    "preferences": {},
+    "projects": {},
+    "vehicles": {},
+    "important_facts": {}
 }
 
 
-defload_memory():
+def load_memory():
+    if not os.path.exists(MEMORY_FILE):
+        return {
+            "profile": {},
+            "preferences": {},
+            "projects": {},
+            "vehicles": {},
+            "important_facts": {}
+        }
+
+    try:
+        with open(
+            MEMORY_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+            data = json.load(file)
+
+        for key in DEFAULT_MEMORY:
+            if key not in data:
+                data[key] = {}
+
+        return data
+
+    except Exception:
+        return {
+            "profile": {},
+            "preferences": {},
+            "projects": {},
+            "vehicles": {},
+            "important_facts": {}
+        }
+
+
+def save_memory(data):
+    try:
+        with open(
+            MEMORY_FILE,
+            "w",
+            encoding="utf-8"
+        ) as file:
+            json.dump(
+                data,
+                file,
+                ensure_ascii=False,
+                indent=2
+            )
+
+    except Exception as error:
+        print("Memory save error:", str(error))
+
+
+memory = load_memory()
+
+
+# =========================================================
+# MEMORY LEARNING
+# =========================================================
+
+def remember_from_message(text):
+    global memory
+
+    lower_text = text.lower()
+
+    # -------------------------
+    # İSİM
+    # -------------------------
+
+    name_patterns = [
+        r"\badım\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
+        r"\bbenim adım\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)",
+        r"\bismim\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)"
+    ]
+
+    for pattern in name_patterns:
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+            memory["profile"]["name"] = match.group(1)
+            break
+
+    # -------------------------
+    # ŞEHİR
+    # -------------------------
+
+    city_patterns = [
+        r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)'de yaşıyorum",
+        r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)'da yaşıyorum",
+        r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)de yaşıyorum",
+        r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)da yaşıyorum"
+    ]
+
+    for pattern in city_patterns:
+        match = re.search(pattern, text)
+
+        if match:
+            memory["profile"]["city"] = match.group(1)
+            break
+
+    # -------------------------
+    # JARVIS PROJESİ
+    # -------------------------
+
+    if (
+        "jarvis" in lower_text
+        or "j.a.r.v.i.s" in lower_text
+        or "karahan inc" in lower_text
+    ):
+        memory["projects"]["jarvis"] = (
+            "J.A.R.V.I.S. - KARAHAN INC. "
+            "kişisel yapay zeka asistanı."
+        )
 
-ifnotos.path.exists(MEMORY_FILE):
-returnDEFAULT_MEMORY.copy()
+    # -------------------------
+    # CADDY
+    # -------------------------
 
-try:
-withopen(
-MEMORY_FILE,
-"r",
-encoding="utf-8"
-)asf:
+    if "caddy" in lower_text:
+        memory["vehicles"]["caddy"] = (
+            "Volkswagen Caddy"
+        )
 
-data=json.load(f)
+    # -------------------------
+    # MERCEDES
+    # -------------------------
 
-forkeyinDEFAULT_MEMORY:
-ifkeynotindata:
-data[key]={}
+    if (
+        "mercedes" in lower_text
+        or "w204" in lower_text
+        or "c180" in lower_text
+    ):
+        memory["vehicles"]["mercedes"] = (
+            "Mercedes-Benz C180 W204"
+        )
 
-returndata
+    save_memory(memory)
 
-exceptException:
-returnDEFAULT_MEMORY.copy()
 
+# =========================================================
+# MEMORY SUMMARY
+# =========================================================
 
-defsave_memory(memory):
+def get_memory_summary():
+    parts = []
 
-withopen(
-MEMORY_FILE,
-"w",
-encoding="utf-8"
-)asf:
+    profile = memory.get("profile", {})
 
-json.dump(
-memory,
-f,
-ensure_ascii=False,
-indent=2
-)
+    if profile.get("name"):
+        parts.append(
+            "Kullanıcının adı: "
+            + str(profile["name"])
+        )
 
+    if profile.get("city"):
+        parts.append(
+            "Yaşadığı şehir: "
+            + str(profile["city"])
+        )
 
-memory=load_memory()
+    projects = memory.get("projects", {})
 
+    for value in projects.values():
+        parts.append(
+            "Proje: " + str(value)
+        )
 
-#=========================================================
-#MEMORYEXTRACTION
-#=========================================================
+    vehicles = memory.get("vehicles", {})
 
-defremember_from_message(text):
+    for value in vehicles.values():
+        parts.append(
+            "Araç: " + str(value)
+        )
 
-globalmemory
+    preferences = memory.get("preferences", {})
 
-lower=text.lower()
+    for key, value in preferences.items():
+        parts.append(
+            str(key) + ": " + str(value)
+        )
 
-#-------------------------
-#İSİM
-#-------------------------
+    important_facts = memory.get(
+        "important_facts",
+        {}
+    )
 
-patterns=[
-r"\badım([a-zçğıöşüİĞÜŞÖÇ]+)",
-r"\bbenimadım([a-zçğıöşüİĞÜŞÖÇ]+)",
-r"\bismim([a-zçğıöşüİĞÜŞÖÇ]+)"
-]
+    for key, value in important_facts.items():
+        parts.append(
+            str(key) + ": " + str(value)
+        )
 
-forpatterninpatterns:
+    if not parts:
+        return "Kayıtlı kullanıcı bilgisi bulunmuyor."
 
-match=re.search(
-pattern,
-text,
-re.IGNORECASE
-)
+    return "\n".join(parts[:15])
 
-ifmatch:
 
-name=match.group(1).strip()
+# =========================================================
+# SYSTEM PROMPT
+# =========================================================
 
-memory["profile"]["name"]=name
+SYSTEM_PROMPT = """
+Sen J.A.R.V.I.S. - KARAHAN INC. kişisel yapay zeka asistanısın.
 
-break
+Her zaman Türkçe konuş.
 
+Kullanıcıya gerektiğinde "efendim" diye hitap et.
 
-#-------------------------
-#ŞEHİR
-#-------------------------
+Profesyonel, doğal ve yardımcı ol.
 
-city_patterns=[
-r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)'?deyaşıyorum",
-r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)'?dayaşıyorum",
-r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)şehrindeyaşıyorum",
-r"\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)'?liyim"
-]
+Basit sorulara kısa cevap ver.
 
-forpatternincity_patterns:
+Kullanıcı ayrıntılı açıklama isterse ayrıntılı cevap ver.
 
-match=re.search(
-pattern,
-text
-)
+Bilmediğin bilgileri kesinmiş gibi söyleme.
 
-ifmatch:
+Kullanıcı sana kalıcı bir kişisel bilgi verdiğinde,
+bu bilgi sistem tarafından hafızaya kaydedilebilir.
 
-memory["profile"]["city"]=match.group(1)
+Kendini J.A.R.V.I.S. olarak tanıt.
 
-break
+ChatGPT olduğunu söyleme.
 
+Gereksiz tekrar yapma.
 
-#-------------------------
-#JARVISPROJESİ
-#-------------------------
-
-if(
-"jarvis"inlower
-or"j.a.r.v.i.s"inlower
-or"karahaninc"inlower
-):
-
-memory["projects"]["jarvis"]=(
-"J.A.R.V.I.S.—KARAHANINC."
-"kişiselyapayzekaasistanı."
-)
-
-
-#-------------------------
-#CADDY
-#-------------------------
-
-if"caddy"inlower:
-
-memory["vehicles"]["caddy"]=(
-"VolkswagenCaddy"
-)
-
-
-#-------------------------
-#MERCEDES
-#-------------------------
-
-if(
-"mercedes"inlower
-or"w204"inlower
-or"c180"inlower
-):
-
-memory["vehicles"]["mercedes"]=(
-"Mercedes-BenzC180W204"
-)
-
-
-save_memory(memory)
-
-
-#=========================================================
-#MEMORYSUMMARY
-#=========================================================
-
-defmemory_summary():
-
-parts=[]
-
-profile=memory.get("profile",{})
-
-ifprofile.get("name"):
-parts.append(
-f"Kullanıcınınadı:{profile['name']}"
-)
-
-ifprofile.get("city"):
-parts.append(
-f"Yaşadığışehir:{profile['city']}"
-)
-
-
-projects=memory.get("projects",{})
-
-ifprojects:
-forvalueinprojects.values():
-parts.append(
-f"Proje:{value}"
-)
-
-
-vehicles=memory.get("vehicles",{})
-
-ifvehicles:
-forvalueinvehicles.values():
-parts.append(
-f"Araçbilgisi:{value}"
-)
-
-
-preferences=memory.get("preferences",{})
-
-ifpreferences:
-forkey,valueinpreferences.items():
-parts.append(
-f"{key}:{value}"
-)
-
-
-ifnotparts:
-return"Henüzkayıtlıönemlibirkullanıcıbilgisiyok."
-
-#Hafızayıgereksizbüyütmemekiçinsınır
-return"\n".join(parts[:20])
-
-
-#=========================================================
-#SYSTEMPROMPT
-#=========================================================
-
-SYSTEM_PROMPT="""
-SenJ.A.R.V.I.S.—KARAHANINC.kişiselyapayzekaasistanısın.
-
-KullanıcıylaTürkçekonuş.
-
-Kullanıcıyagerektiğinde"efendim"diyehitapet.
-
-Profesyonel,doğal,sakinveyardımcıol.
-
-Gereksizuzuncevapverme.
-
-Basitsorularakısacevapver.
-
-Kullanıcıayrıntılıaçıklamaisterseayrıntılıanlat.
-
-Bilmediğinbirşeyikesinmişgibisöyleme.
-
-Kullanıcısanakişiselbirbilgiverdiğindebunuhafızada
-saklamakiçinsistemtarafındanotomatikolarakişlenebilir.
-
-SenJ.A.R.V.I.S.'sin.
-
-OpenAIChatGPTolduğunusöyleme.
-
-KendiniJ.A.R.V.I.S.olaraktanıt.
+Cevaplarını mümkün olduğunca anlaşılır ve doğal tut.
 """
 
 
-#=========================================================
-#REQUESTMODEL
-#=========================================================
+# =========================================================
+# REQUEST MODEL
+# =========================================================
 
-classChatRequest(BaseModel):
-
-message:str
-
-
-#=========================================================
-#ERRORHANDLER
-#=========================================================
-
-defcreate_error(code,detail):
-
-returnJSONResponse(
-status_code=200,
-content={
-"status":"error",
-"response":(
-"⚠️J.A.R.V.I.S.HATA\n\n"
-f"Hatakodu:{code}\n\n"
-f"Detay:\n{detail}"
-),
-"error_code":code,
-"error_detail":detail
-}
-)
+class ChatRequest(BaseModel):
+    message: str
 
 
-#=========================================================
-#HOME
-#=========================================================
+# =========================================================
+# ERROR RESPONSE
+# =========================================================
+
+def error_response(code, detail):
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "error",
+            "response": (
+                "J.A.R.V.I.S. HATA\n\n"
+                "Hata kodu: "
+                + code
+                + "\n\n"
+                "Detay:\n"
+                + detail
+            ),
+            "error_code": code,
+            "error_detail": detail
+        }
+    )
+
+
+# =========================================================
+# HOME
+# =========================================================
 
 @app.get("/")
-asyncdefhome():
+async def home():
+    return FileResponse("index.html")
 
-returnFileResponse("index.html")
 
-
-#=========================================================
-#HEALTH
-#=========================================================
+# =========================================================
+# HEALTH
+# =========================================================
 
 @app.get("/health")
-asyncdefhealth():
+async def health():
+    return {
+        "status": "online",
+        "version": APP_VERSION,
+        "model": GROQ_MODEL,
+        "groq_configured": bool(GROQ_API_KEY),
+        "memory": True
+    }
 
-return{
-"status":"online",
-"version":APP_VERSION,
-"model":GROQ_MODEL,
-"groq_configured":bool(GROQ_API_KEY),
-"memory":True
-}
 
-
-#=========================================================
-#VERSION
-#=========================================================
+# =========================================================
+# VERSION
+# =========================================================
 
 @app.get("/version")
-asyncdefversion():
+async def version():
+    return {
+        "app": "J.A.R.V.I.S. - KARAHAN INC.",
+        "version": APP_VERSION,
+        "model": GROQ_MODEL
+    }
 
-return{
-"app":"J.A.R.V.I.S.—KARAHANINC.",
-"version":APP_VERSION,
-"model":GROQ_MODEL
-}
 
-
-#=========================================================
-#MEMORYGET
-#=========================================================
+# =========================================================
+# GET MEMORY
+# =========================================================
 
 @app.get("/memory")
-asyncdefget_memory():
+async def get_memory():
+    return {
+        "status": "success",
+        "memory": memory
+    }
 
-return{
-"status":"success",
-"memory":memory
-}
 
-
-#=========================================================
-#MEMORYDELETE
-#=========================================================
+# =========================================================
+# DELETE MEMORY
+# =========================================================
 
 @app.delete("/memory")
-asyncdefdelete_memory():
+async def delete_memory():
+    global memory
 
-globalmemory
+    memory = {
+        "profile": {},
+        "preferences": {},
+        "projects": {},
+        "vehicles": {},
+        "important_facts": {}
+    }
 
-memory=DEFAULT_MEMORY.copy()
+    save_memory(memory)
 
-save_memory(memory)
-
-return{
-"status":"success",
-"message":"J.A.R.V.I.S.hafızasıtemizlendi."
-}
+    return {
+        "status": "success",
+        "message": "J.A.R.V.I.S. hafızası temizlendi."
+    }
 
 
-#=========================================================
-#CHAT
-#=========================================================
+# =========================================================
+# CHAT
+# =========================================================
 
 @app.post("/chat")
-asyncdefchat(request:ChatRequest):
-
-user_message=request.message.strip()
-
-ifnotuser_message:
-
-returncreate_error(
-"EMPTY_MESSAGE",
-"Mesajboşgönderildi."
-)
-
-
-ifnotGROQ_API_KEY:
-
-returncreate_error(
-"MISSING_API_KEY",
-"GROQ_API_KEYbulunamadı."
-)
-
-
-ifclientisNone:
-
-returncreate_error(
-"CLIENT_ERROR",
-"Groqistemcisioluşturulamadı."
-)
-
-
-#Kullanıcımesajındangereklihafızayıçıkar
-try:
-
-remember_from_message(
-user_message
-)
-
-exceptExceptionase:
-
-#Hafızahatasısohbetidurdurmasın
-print(
-"Memorywarning:",
-str(e)
-)
-
-
-#Hafızayıkısatutuyoruz.
-#Böylecehermesajdagereksiztokentüketilmiyor.
-
-current_memory=memory_summary()
-
-
-system_message=(
-SYSTEM_PROMPT
-+"\n\nKullanıcıhakkındabilinenkısabilgiler:\n"
-+current_memory
-)
-
-
-try:
-
-response=client.chat.completions.create(
-
-model=GROQ_MODEL,
-
-messages=[
-{
-"role":"system",
-"content":system_message
-},
-{
-"role":"user",
-"content":user_message
-}
-],
-
-#Cevaplarıgereksizyereuzatmasınıengeller
-max_tokens=700,
-
-temperature=0.6
-)
-
-
-answer=(
-response.choices[0]
-.message.content
-.strip()
-)
-
-
-ifnotanswer:
-
-returncreate_error(
-"EMPTY_RESPONSE",
-"Modelboşcevapdöndürdü."
-)
-
-
-return{
-"status":"success",
-"response":answer,
-"model":GROQ_MODEL
-}
-
-
-exceptExceptionase:
-
-detail=str(e)
-
-print(
-"GROQERROR:",
-detail
-)
-
-
-#-------------------------
-#RATELIMIT
-#-------------------------
-
-if(
-"429"indetail
-or"rate_limit"indetail.lower()
-or"ratelimit"indetail.lower()
-):
-
-returncreate_error(
-"RATE_LIMIT",
-detail
-)
-
-
-#-------------------------
-#AUTH
-#-------------------------
-
-if(
-"401"indetail
-or"403"indetail
-or"authentication"indetail.lower()
-or"apikey"indetail.lower()
-):
-
-returncreate_error(
-"AUTHENTICATION_ERROR",
-detail
-)
-
-
-#-------------------------
-#MODEL
-#-------------------------
-
-if(
-"model"indetail.lower()
-and(
-"notfound"indetail.lower()
-or"doesnotexist"indetail.lower()
-)
-):
-
-returncreate_error(
-"MODEL_ERROR",
-detail
-)
-
-
-#-------------------------
-#TIMEOUT
-#-------------------------
-
-if(
-"timeout"indetail.lower()
-or"timedout"indetail.lower()
-):
-
-returncreate_error(
-"TIMEOUT",
-detail
-)
-
-
-#-------------------------
-#CONNECTION
-#-------------------------
-
-if(
-"connection"indetail.lower()
-or"network"indetail.lower()
-):
-
-returncreate_error(
-"CONNECTION_ERROR",
-detail
-)
-
-
-#-------------------------
-#CONTEXT/TOKEN
-#-------------------------
-
-if(
-"token"indetail.lower()
-or"context"indetail.lower()
-):
-
-returncreate_error(
-"TOKEN_LIMIT",
-detail
-)
-
-
-#-------------------------
-#GENELGROQHATASI
-#-------------------------
-
-returncreate_error(
-"GROQ_API_ERROR",
-detail
-)
-
-
-#=========================================================
-#START
-#=========================================================
-
-if__name__=="__main__":
-
-importuvicorn
-
-uvicorn.run(
-"main:app",
-host="0.0.0.0",
-port=int(
-os.getenv(
-"PORT",
-"8000"
-)
-)
-)
+async def chat(request: ChatRequest):
+
+    user_message = request.message.strip()
+
+    if not user_message:
+        return error_response(
+            "EMPTY_MESSAGE",
+            "Mesaj boş gönderildi."
+        )
+
+    if not GROQ_API_KEY:
+        return error_response(
+            "MISSING_API_KEY",
+            "GROQ_API_KEY bulunamadı."
+        )
+
+    if client is None:
+        return error_response(
+            "CLIENT_ERROR",
+            "Groq istemcisi oluşturulamadı."
+        )
+
+    # Hafızaya kaydet
+    try:
+        remember_from_message(user_message)
+
+    except Exception as error:
+        print(
+            "Memory warning:",
+            str(error)
+        )
+
+    # Kısa hafıza
+    user_memory = get_memory_summary()
+
+    system_message = (
+        SYSTEM_PROMPT
+        + "\n\n"
+        + "Kullanıcı hakkında kayıtlı bilgiler:"
+        + "\n"
+        + user_memory
+    )
+
+    try:
+
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_message
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            max_tokens=500,
+            temperature=0.6
+        )
+
+        if not response.choices:
+            return error_response(
+                "EMPTY_RESPONSE",
+                "Model cevap döndürmedi."
+            )
+
+        answer = response.choices[0].message.content
+
+        if answer is None:
+            return error_response(
+                "EMPTY_RESPONSE",
+                "Model boş cevap döndürdü."
+            )
+
+        answer = answer.strip()
+
+        if not answer:
+            return error_response(
+                "EMPTY_RESPONSE",
+                "Model boş cevap döndürdü."
+            )
+
+        return {
+            "status": "success",
+            "response": answer,
+            "model": GROQ_MODEL
+        }
+
+    except Exception as error:
+
+        detail = str(error)
+
+        print(
+            "GROQ ERROR:",
+            detail
+        )
+
+        lower_detail = detail.lower()
+
+        # Rate limit
+        if (
+            "429" in detail
+            or "rate limit" in lower_detail
+            or "rate_limit" in lower_detail
+        ):
+            return error_response(
+                "RATE_LIMIT",
+                detail
+            )
+
+        # Authentication
+        if (
+            "401" in detail
+            or "403" in detail
+            or "authentication" in lower_detail
+            or "api key" in lower_detail
+        ):
+            return error_response(
+                "AUTHENTICATION_ERROR",
+                detail
+            )
+
+        # Model
+        if (
+            "model" in lower_detail
+            and (
+                "not found" in lower_detail
+                or "does not exist" in lower_detail
+            )
+        ):
+            return error_response(
+                "MODEL_ERROR",
+                detail
+            )
+
+        # Timeout
+        if (
+            "timeout" in lower_detail
+            or "timed out" in lower_detail
+        ):
+            return error_response(
+                "TIMEOUT",
+                detail
+            )
+
+        # Connection
+        if (
+            "connection" in lower_detail
+            or "network" in lower_detail
+        ):
+            return error_response(
+                "CONNECTION_ERROR",
+                detail
+            )
+
+        # Token / context
+        if (
+            "token" in lower_detail
+            or "context" in lower_detail
+        ):
+            return error_response(
+                "TOKEN_LIMIT",
+                detail
+            )
+
+        # Genel hata
+        return error_response(
+            "GROQ_API_ERROR",
+            detail
+        )
+
+
+# =========================================================
+# LOCAL START
+# =========================================================
+
+if __name__ == "__main__":
+
+    import uvicorn
+
+    port = int(
+        os.getenv(
+            "PORT",
+            "8000"
+        )
+    )
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port
+    )
