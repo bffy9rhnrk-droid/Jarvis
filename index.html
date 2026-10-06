@@ -10,10 +10,12 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<title>
-J.A.R.V.I.S. — KARAHAN INC.
-</title>
+<meta
+    name="theme-color"
+    content="#050b12"
+>
 
+<title>J.A.R.V.I.S. - KARAHAN INC.</title>
 
 <style>
 
@@ -22,1178 +24,1085 @@ J.A.R.V.I.S. — KARAHAN INC.
     -webkit-tap-highlight-color: transparent;
 }
 
-
 html,
 body {
-
     margin: 0;
-
+    padding: 0;
     width: 100%;
-
-    height: 100%;
-
-    overflow: hidden;
-
+    min-height: 100%;
+    background: #050b12;
+    color: #e9fbff;
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
+}
 
-    background: #02060a;
-
-    color: #ffffff;
+body {
+    overflow-x: hidden;
+    transition:
+        background 0.4s ease,
+        color 0.4s ease;
 }
 
 
-body.light {
+/* =========================================================
+   ANA ALAN
+   ========================================================= */
 
-    background: #eef5f8;
-
-    color: #111111;
+.app {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
 }
 
 
-button,
-input,
-textarea {
+/* =========================================================
+   ARKA PLAN
+   ========================================================= */
 
-    font-family: inherit;
+.background {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.grid {
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 229, 255, 0.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0, 229, 255, 0.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 42px 42px;
+}
+
+.glow {
+    position: absolute;
+
+    width: 320px;
+    height: 320px;
+
+    left: 50%;
+    top: 40%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0, 229, 255, 0.08),
+            transparent 70%
+        );
+
+    filter: blur(10px);
 }
 
 
-button {
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+
+    padding:
+        0 16px;
+
+    position: relative;
+    z-index: 10;
+
+    border-bottom:
+        1px solid rgba(0, 229, 255, 0.12);
+
+    background:
+        rgba(3, 10, 17, 0.76);
+
+    backdrop-filter: blur(20px);
+}
+
+.menu-button {
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid rgba(0, 229, 255, 0.22);
+
+    border-radius: 12px;
+
+    background:
+        rgba(0, 229, 255, 0.04);
+
+    color: #8fefff;
+
+    font-size: 23px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     cursor: pointer;
 }
 
-
-.app {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 100%;
-
-    overflow: hidden;
-}
-
-
-/* =====================================================
-BACKGROUND
-===================================================== */
-
-.background {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    overflow: hidden;
-}
-
-
-.grid {
-
-    position: absolute;
-
-    inset: -50%;
-
-    background-image:
-
-        linear-gradient(
-            rgba(0,220,255,.035) 1px,
-            transparent 1px
-        ),
-
-        linear-gradient(
-            90deg,
-            rgba(0,220,255,.035) 1px,
-            transparent 1px
-        );
-
-    background-size: 45px 45px;
-
-    transform:
-        perspective(500px)
-        rotateX(55deg);
-}
-
-
-.glow {
-
-    position: absolute;
-
-    width: 450px;
-
-    height: 450px;
-
-    left: 50%;
-
-    top: 40%;
-
-    transform:
-        translate(-50%,-50%);
-
-    border-radius: 50%;
-
-    background:
-        rgba(0,210,255,.08);
-
-    filter: blur(90px);
-}
-
-
-/* =====================================================
-HEADER
-===================================================== */
-
-.header {
-
-    position: absolute;
-
-    top: 0;
-
-    left: 0;
-
-    width: 100%;
-
-    height: 82px;
-
-    z-index: 20;
-
-    display: flex;
-
-    align-items: center;
-
-    padding: 15px 18px;
-
-    border-bottom:
-        1px solid
-        rgba(0,220,255,.12);
-
-    background:
-        rgba(2,7,11,.72);
-
-    backdrop-filter:
-        blur(18px);
-}
-
-
-body.light .header {
-
-    background:
-        rgba(240,248,250,.85);
-}
-
-
-.menu-btn {
-
-    width: 48px;
-
-    height: 48px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.28);
-
-    background:
-        rgba(0,220,255,.05);
-
-    color: #00d9ff;
-
-    border-radius: 15px;
-
-    font-size: 23px;
-}
-
-
 .brand {
-
-    margin-left: 14px;
-
-    line-height: 1;
+    margin-left: 12px;
 }
-
 
 .brand-title {
-
-    font-size: 22px;
-
-    font-weight: 700;
-
+    font-size: 18px;
+    font-weight: 800;
     letter-spacing: 2px;
 }
 
-
 .brand-subtitle {
-
-    margin-top: 6px;
+    margin-top: 2px;
 
     font-size: 9px;
 
-    letter-spacing: 3px;
+    color: #5acfe1;
 
-    color: #00d9ff;
+    letter-spacing: 3px;
 }
 
-
-.user-mini {
-
+.current-user {
     margin-left: auto;
 
     display: flex;
+    flex-direction: column;
 
-    align-items: center;
+    align-items: flex-end;
+}
 
-    gap: 8px;
+.current-user-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.current-user-role {
+    font-size: 9px;
+    color: #63808a;
 }
 
 
-.user-dot {
-
-    width: 9px;
-
-    height: 9px;
-
-    border-radius: 50%;
-
-    background: #00e5ff;
-
-    box-shadow:
-        0 0 12px #00e5ff;
-}
-
-
-.user-mini-name {
-
-    max-width: 115px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    font-size: 11px;
-
-    color: #8ca4ad;
-}
-
-
-/* =====================================================
-MAIN
-===================================================== */
+/* =========================================================
+   ANA İÇERİK
+   ========================================================= */
 
 .main {
-
     position: relative;
-
     z-index: 2;
 
     width: 100%;
-
-    height: 100%;
-
-    padding-top: 82px;
-
-    padding-bottom: 94px;
+    min-height:
+        calc(100vh - 70px);
 
     display: flex;
+    flex-direction: column;
+    align-items: center;
 
+    padding:
+        35px 16px 110px;
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.logo-area {
+    margin-top: 15px;
+
+    display: flex;
     flex-direction: column;
 
     align-items: center;
 }
 
+.logo {
+    width: 145px;
+    height: 145px;
 
-.logo-area {
+    position: relative;
 
-    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    margin-top: 42px;
+.logo-ring {
+    position: absolute;
+
+    inset: 0;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.34);
+
+    border-radius: 50%;
+
+    animation:
+        rotate 12s linear infinite;
+}
+
+.logo-ring:nth-child(2) {
+    inset: 13px;
+
+    border-color:
+        rgba(0, 229, 255, 0.20);
+
+    animation-direction: reverse;
+    animation-duration: 8s;
+}
+
+.logo-ring:nth-child(3) {
+    inset: 27px;
+
+    border-color:
+        rgba(0, 229, 255, 0.14);
+
+    animation-duration: 5s;
+}
+
+.logo-core {
+    width: 76px;
+    height: 76px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.55);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0, 229, 255, 0.16),
+            rgba(0, 229, 255, 0.02)
+        );
+
+    box-shadow:
+        0 0 30px rgba(0, 229, 255, 0.12);
+
+    color: #8fefff;
+
+    font-size: 35px;
+    font-weight: 900;
+
+    text-shadow:
+        0 0 18px rgba(0, 229, 255, 0.7);
+}
+
+.logo-status {
+    margin-top: 15px;
+
+    font-size: 10px;
+
+    color: #56cbdc;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   KARŞILAMA
+   ========================================================= */
+
+.greeting {
+    margin-top: 35px;
 
     text-align: center;
 }
 
+.greeting h1 {
+    margin: 0;
 
-.logo {
-
-    position: relative;
-
-    width: 145px;
-
-    height: 145px;
-
-    margin: auto;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-}
-
-
-.logo-core {
-
-    width: 76px;
-
-    height: 76px;
-
-    border:
-        2px solid #00ddff;
-
-    border-radius: 50%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    color: #00ddff;
-
-    font-size: 35px;
+    font-size:
+        clamp(25px, 7vw, 38px);
 
     font-weight: 700;
 
-    box-shadow:
-        0 0 15px rgba(0,220,255,.6),
-
-        inset 0 0 18px
-        rgba(0,220,255,.15);
-
-    animation:
-        pulse 2.6s infinite;
+    letter-spacing: -0.5px;
 }
 
-
-.ring {
-
-    position: absolute;
-
-    border:
-        1px solid
-        rgba(0,220,255,.35);
-
-    border-radius: 50%;
-}
-
-
-.ring1 {
-
-    inset: 18px;
-
-    animation:
-        spin 8s linear infinite;
-}
-
-
-.ring2 {
-
-    inset: 4px;
-
-    border-style: dashed;
-
-    animation:
-        spinReverse 12s linear infinite;
-}
-
-
-.ring3 {
-
-    inset: -10px;
-
-    border-color:
-        rgba(0,220,255,.12);
-}
-
-
-@keyframes pulse {
-
-    0%,
-    100% {
-
-        box-shadow:
-            0 0 15px
-            rgba(0,220,255,.45),
-
-            inset 0 0 18px
-            rgba(0,220,255,.1);
-    }
-
-    50% {
-
-        box-shadow:
-            0 0 35px
-            rgba(0,220,255,.8),
-
-            inset 0 0 25px
-            rgba(0,220,255,.2);
-    }
-}
-
-
-@keyframes spin {
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-
-@keyframes spinReverse {
-
-    to {
-        transform: rotate(-360deg);
-    }
-}
-
-
-.status {
-
-    margin-top: 23px;
-
-    font-size: 10px;
-
-    letter-spacing: 3px;
-
-    color: #00d9ff;
-}
-
-
-.greeting {
-
-    margin-top: 8px;
-
-    font-size: 18px;
-
-    font-weight: 500;
-}
-
-
-/* =====================================================
-CHAT
-===================================================== */
-
-.chat {
-
-    width: 100%;
-
-    max-width: 850px;
-
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding:
-        20px 18px;
-
-    scroll-behavior: smooth;
-}
-
-
-.chat::-webkit-scrollbar {
-
-    width: 3px;
-}
-
-
-.chat::-webkit-scrollbar-thumb {
-
-    background:
-        rgba(0,220,255,.3);
-}
-
-
-.message {
-
-    max-width: 86%;
-
-    margin-bottom: 14px;
-
-    padding:
-        13px 16px;
-
-    border-radius: 18px;
-
-    line-height: 1.5;
-
-    font-size: 14px;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-}
-
-
-.message.jarvis {
-
-    margin-right: auto;
-
-    border:
-        1px solid
-        rgba(0,220,255,.14);
-
-    background:
-        rgba(0,220,255,.055);
-
-    color: #d7faff;
-}
-
-
-.message.user {
-
-    margin-left: auto;
-
-    background:
-        rgba(0,220,255,.12);
-
-    border:
-        1px solid
-        rgba(0,220,255,.2);
-}
-
-
-/* =====================================================
-INPUT
-===================================================== */
-
-.input-area {
-
-    position: absolute;
-
-    bottom: 15px;
-
-    left: 12px;
-
-    right: 12px;
-
-    z-index: 10;
-
-    max-width: 850px;
-
-    margin: auto;
-}
-
-
-.input-box {
-
-    min-height: 62px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        8px 9px
-        8px 17px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.22);
-
-    border-radius: 22px;
-
-    background:
-        rgba(5,13,18,.88);
-
-    backdrop-filter:
-        blur(18px);
-}
-
-
-#messageInput {
-
-    flex: 1;
-
-    min-width: 0;
-
-    border: none;
-
-    outline: none;
-
-    resize: none;
-
-    background: transparent;
-
-    color: inherit;
-
-    font-size: 16px;
-
-    line-height: 1.4;
-
-    max-height: 100px;
-}
-
-
-#messageInput::placeholder {
-
-    color: #6d8088;
-}
-
-
-.send-btn {
-
-    width: 46px;
-
-    height: 46px;
-
-    flex-shrink: 0;
-
-    border: none;
-
-    border-radius: 15px;
-
-    background: #00d9ff;
-
-    color: #001015;
-
-    font-size: 20px;
-
-    font-weight: 700;
-}
-
-
-/* =====================================================
-SIDEBAR
-===================================================== */
-
-.overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 50;
-
-    background:
-        rgba(0,0,0,.55);
-
-    backdrop-filter:
-        blur(3px);
-
-    display: none;
-}
-
-
-.overlay.active {
-
-    display: block;
-}
-
-
-.sidebar {
-
-    position: fixed;
-
-    top: 0;
-
-    left: 0;
-
-    z-index: 60;
-
-    width:
-        min(320px,88vw);
-
-    height: 100%;
-
-    padding: 25px 18px;
-
-    transform:
-        translateX(-105%);
-
-    transition:
-        transform .3s ease;
-
-    background:
-        rgba(3,10,14,.97);
-
-    border-right:
-        1px solid
-        rgba(0,220,255,.16);
-
-    backdrop-filter:
-        blur(25px);
-}
-
-
-.sidebar.active {
-
-    transform:
-        translateX(0);
-}
-
-
-.sidebar-head {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 30px;
-}
-
-
-.sidebar-title {
-
-    font-size: 18px;
-
-    letter-spacing: 2px;
-}
-
-
-.close-btn {
-
-    width: 40px;
-
-    height: 40px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.18);
-
-    background: transparent;
-
-    color: #00d9ff;
-
-    border-radius: 12px;
-
-    font-size: 20px;
-}
-
-
-.profile-card {
-
-    padding: 16px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.13);
-
-    border-radius: 17px;
-
-    background:
-        rgba(0,220,255,.04);
-
-    margin-bottom: 20px;
-}
-
-
-.profile-name {
-
-    font-weight: 600;
-}
-
-
-.profile-role {
-
-    margin-top: 5px;
-
-    color: #71878e;
-
-    font-size: 12px;
-}
-
-
-.menu-item {
-
-    width: 100%;
-
-    padding: 15px;
-
-    margin-bottom: 10px;
-
-    text-align: left;
-
-    border:
-        1px solid
-        rgba(0,220,255,.11);
-
-    border-radius: 16px;
-
-    background:
-        rgba(255,255,255,.025);
-
-    color: #ffffff;
-}
-
-
-.menu-item-title {
-
-    font-size: 14px;
-}
-
-
-.menu-item-sub {
-
-    margin-top: 5px;
-
-    color: #72868d;
-
-    font-size: 11px;
-}
-
-
-.settings {
-
-    margin-top: 25px;
-
-    padding-top: 20px;
-
-    border-top:
-        1px solid
-        rgba(0,220,255,.1);
-}
-
-
-.setting-title {
-
-    margin-bottom: 12px;
-
-    font-size: 11px;
-
-    letter-spacing: 2px;
-
-    color: #00d9ff;
-}
-
-
-.setting-row {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 13px;
+.greeting p {
+    margin:
+        9px 0 0;
+
+    color: #63808a;
 
     font-size: 13px;
 }
 
 
-.toggle {
+/* =========================================================
+   CHAT
+   ========================================================= */
 
-    width: 48px;
+.chat {
+    width: 100%;
+    max-width: 760px;
 
-    height: 27px;
-
-    border-radius: 20px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.2);
-
-    background: #172126;
-
-    position: relative;
+    margin-top: 35px;
 }
 
-
-.toggle span {
-
-    position: absolute;
-
-    width: 21px;
-
-    height: 21px;
-
-    border-radius: 50%;
-
-    top: 2px;
-
-    left: 3px;
-
-    background: #68787d;
-
-    transition: .25s;
-}
-
-
-.toggle.active {
-
-    background:
-        rgba(0,220,255,.2);
-}
-
-
-.toggle.active span {
-
-    left: 22px;
-
-    background: #00d9ff;
-
-    box-shadow:
-        0 0 10px
-        rgba(0,220,255,.7);
-}
-
-
-/* =====================================================
-MODAL
-===================================================== */
-
-.modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: none;
-
-    justify-content: center;
-
-    align-items: center;
-
-    padding: 20px;
-
-    background:
-        rgba(0,0,0,.7);
-
-    backdrop-filter:
-        blur(12px);
-}
-
-
-.modal.active {
-
+.messages {
     display: flex;
-}
+    flex-direction: column;
 
-
-.modal-box {
-
-    width:
-        min(390px,100%);
-
-    padding: 28px 22px;
-
-    border-radius: 25px;
-
-    border:
-        1px solid
-        rgba(0,220,255,.22);
-
-    background: #071116;
-}
-
-
-.modal-logo {
-
-    width: 60px;
-
-    height: 60px;
-
-    margin:
-        0 auto 18px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        #00d9ff;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    color: #00d9ff;
-
-    font-size: 25px;
-}
-
-
-.modal-title {
-
-    text-align: center;
-
-    font-size: 19px;
-
-    letter-spacing: 1px;
-}
-
-
-.modal-subtitle {
-
-    margin-top: 8px;
-
-    margin-bottom: 25px;
-
-    text-align: center;
-
-    color: #71858d;
-
-    font-size: 12px;
-}
-
-
-.field {
-
-    margin-bottom: 13px;
-}
-
-
-.field label {
-
-    display: block;
-
-    margin-bottom: 7px;
-
-    color: #7c929a;
-
-    font-size: 11px;
-}
-
-
-.field input {
+    gap: 14px;
 
     width: 100%;
+}
 
-    height: 49px;
+.message {
+    max-width: 90%;
 
     padding:
-        0 14px;
+        13px 15px;
 
-    border-radius: 14px;
+    border-radius: 17px;
 
-    outline: none;
+    line-height: 1.55;
 
-    border:
-        1px solid
-        rgba(0,220,255,.16);
+    font-size: 14px;
+
+    animation:
+        messageIn 0.25s ease;
+}
+
+.message.jarvis {
+    align-self: flex-start;
 
     background:
-        rgba(255,255,255,.04);
+        rgba(0, 229, 255, 0.045);
+
+    border:
+        1px solid rgba(0, 229, 255, 0.12);
+
+    color: #d9f8fc;
+}
+
+.message.user {
+    align-self: flex-end;
+
+    background:
+        rgba(0, 229, 255, 0.10);
+
+    border:
+        1px solid rgba(0, 229, 255, 0.16);
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.input-area {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 20;
+
+    padding:
+        10px 12px
+        calc(10px + env(safe-area-inset-bottom));
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(3, 10, 17, 0.96) 35%
+        );
+}
+
+.input-box {
+    width: 100%;
+    max-width: 760px;
+
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.17);
+
+    border-radius: 17px;
+
+    background:
+        rgba(5, 14, 22, 0.94);
+
+    backdrop-filter: blur(20px);
+}
+
+.input-box input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 44px;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
 
     color: #fff;
 
     font-size: 16px;
 }
 
+.input-box input::placeholder {
+    color: #506a73;
+}
 
-.login-btn {
+.send {
+    width: 44px;
+    height: 44px;
 
-    width: 100%;
+    border: 0;
 
-    height: 50px;
+    border-radius: 13px;
 
-    margin-top: 8px;
+    background:
+        rgba(0, 229, 255, 0.12);
 
-    border: none;
+    color: #8fefff;
 
-    border-radius: 15px;
+    font-size: 20px;
 
-    background: #00d9ff;
-
-    color: #001015;
-
-    font-weight: 700;
+    cursor: pointer;
 }
 
 
-.modal-error {
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
-    min-height: 18px;
+.sidebar {
+    position: fixed;
 
-    margin-top: 12px;
+    top: 0;
+    bottom: 0;
+    left: 0;
 
-    text-align: center;
+    width: 300px;
 
-    color: #ff6674;
+    z-index: 100;
+
+    padding:
+        80px 18px 20px;
+
+    background:
+        rgba(3, 10, 17, 0.98);
+
+    border-right:
+        1px solid rgba(0, 229, 255, 0.14);
+
+    transform:
+        translateX(-105%);
+
+    transition:
+        transform 0.3s ease;
+}
+
+.sidebar.open {
+    transform:
+        translateX(0);
+}
+
+.sidebar-title {
+    color: #5fd7e7;
+
+    font-size: 10px;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 14px;
+}
+
+.profile-card {
+    padding: 15px;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.12);
+
+    border-radius: 15px;
+
+    background:
+        rgba(0, 229, 255, 0.035);
+
+    margin-bottom: 16px;
+}
+
+.profile-name {
+    font-weight: 700;
+}
+
+.profile-role {
+    margin-top: 4px;
+
+    color: #607981;
+
+    font-size: 11px;
+}
+
+.menu-item {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-bottom: 8px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.08);
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,0.015);
+
+    color: #d9f8fc;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.menu-icon {
+    font-size: 20px;
+}
+
+.menu-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-main {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.menu-sub {
+    margin-top: 3px;
+
+    font-size: 10px;
+
+    color: #607981;
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 90;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease;
+}
+
+.overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0,0,0,0.72);
+
+    backdrop-filter: blur(10px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 390px;
+
+    padding: 25px;
+
+    border:
+        1px solid rgba(0, 229, 255, 0.20);
+
+    border-radius: 23px;
+
+    background:
+        #07131c;
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,0.5);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.modal-subtitle {
+    margin-top: 6px;
+
+    color: #66808a;
 
     font-size: 12px;
 }
 
+.modal-input {
+    width: 100%;
 
-/* =====================================================
-BETÜL
-===================================================== */
+    height: 48px;
 
-body.betul-mode .logo-core {
+    margin-top: 12px;
 
-    color: #ff5275;
+    padding: 0 14px;
 
-    border-color: #ff5275;
+    border:
+        1px solid rgba(0,229,255,0.14);
+
+    border-radius: 13px;
+
+    outline: none;
+
+    background:
+        rgba(0,229,255,0.035);
+
+    color: #fff;
+
+    font-size: 16px;
+}
+
+.modal-actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+.modal-button {
+    flex: 1;
+
+    height: 45px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background:
+        rgba(0,229,255,0.10);
+
+    color: #9beefa;
+
+    font-weight: 700;
+}
+
+.modal-button.cancel {
+    background:
+        rgba(255,255,255,0.04);
+
+    color: #70848b;
+}
+
+.login-error {
+    margin-top: 10px;
+
+    color: #ff7373;
+
+    font-size: 12px;
+
+    min-height: 16px;
+}
+
+
+/* =========================================================
+   BEKLEME
+   ========================================================= */
+
+.typing {
+    display: inline-flex;
+
+    gap: 4px;
+}
+
+.typing span {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #63dceb;
+
+    animation:
+        typing 1s infinite;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+
+/* =========================================================
+   SİNEM TEMASI
+   ========================================================= */
+
+body.sinem-theme {
+    background:
+        #160b14;
+}
+
+body.sinem-theme .grid {
+    background-image:
+        linear-gradient(
+            rgba(255, 105, 180, 0.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 105, 180, 0.035) 1px,
+            transparent 1px
+        );
+}
+
+body.sinem-theme .glow {
+    background:
+        radial-gradient(
+            circle,
+            rgba(255, 72, 160, 0.13),
+            transparent 70%
+        );
+}
+
+body.sinem-theme .header {
+    background:
+        rgba(20, 7, 17, 0.82);
+
+    border-bottom-color:
+        rgba(255, 105, 180, 0.18);
+}
+
+body.sinem-theme .menu-button {
+    border-color:
+        rgba(255, 105, 180, 0.28);
+
+    background:
+        rgba(255, 105, 180, 0.06);
+
+    color: #ff9fd0;
+}
+
+body.sinem-theme .brand-subtitle {
+    color: #ff7fbb;
+}
+
+body.sinem-theme .logo-ring {
+    border-color:
+        rgba(255, 105, 180, 0.38);
+}
+
+body.sinem-theme .logo-ring:nth-child(2) {
+    border-color:
+        rgba(255, 105, 180, 0.23);
+}
+
+body.sinem-theme .logo-ring:nth-child(3) {
+    border-color:
+        rgba(255, 105, 180, 0.16);
+}
+
+body.sinem-theme .logo-core {
+    border-color:
+        rgba(255, 105, 180, 0.58);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255, 105, 180, 0.18),
+            rgba(255, 105, 180, 0.025)
+        );
+
+    color: #ffacd5;
 
     box-shadow:
-        0 0 30px
-        rgba(255,82,117,.7);
+        0 0 35px rgba(255, 105, 180, 0.16);
+
+    text-shadow:
+        0 0 18px rgba(255, 105, 180, 0.75);
 }
 
-
-body.betul-mode .status {
-
-    color: #ff5275;
+body.sinem-theme .logo-status {
+    color: #ff83be;
 }
 
-
-body.betul-mode .ring {
+body.sinem-theme .message.jarvis {
+    background:
+        rgba(255, 105, 180, 0.055);
 
     border-color:
-        rgba(255,82,117,.4);
+        rgba(255, 105, 180, 0.15);
+}
+
+body.sinem-theme .message.user {
+    background:
+        rgba(255, 105, 180, 0.12);
+
+    border-color:
+        rgba(255, 105, 180, 0.18);
+}
+
+body.sinem-theme .input-box {
+    border-color:
+        rgba(255, 105, 180, 0.22);
+
+    background:
+        rgba(24, 8, 19, 0.95);
+}
+
+body.sinem-theme .send {
+    background:
+        rgba(255, 105, 180, 0.13);
+
+    color: #ffacd5;
+}
+
+body.sinem-theme .sidebar {
+    background:
+        rgba(19, 6, 15, 0.99);
+
+    border-right-color:
+        rgba(255, 105, 180, 0.17);
+}
+
+body.sinem-theme .sidebar-title {
+    color: #ff83be;
+}
+
+body.sinem-theme .profile-card {
+    border-color:
+        rgba(255, 105, 180, 0.15);
+
+    background:
+        rgba(255, 105, 180, 0.045);
+}
+
+body.sinem-theme .menu-item {
+    border-color:
+        rgba(255, 105, 180, 0.10);
+}
+
+body.sinem-theme .modal-card {
+    border-color:
+        rgba(255, 105, 180, 0.22);
+
+    background:
+        #190b16;
 }
 
 
-/* =====================================================
-RESPONSIVE
-===================================================== */
+/* =========================================================
+   EĞLENCE MODU
+   ========================================================= */
 
-@media (max-height: 700px) {
+body.fun-mode .logo-ring {
+    animation-duration: 3s;
+}
 
-    .logo-area {
+body.fun-mode .logo-core {
+    transform:
+        rotate(-3deg) scale(1.04);
+}
 
-        margin-top: 12px;
+
+/* =========================================================
+   GÜNDÜZ MODU
+   ========================================================= */
+
+body.day-mode {
+    background:
+        #eef8fb;
+
+    color: #09202a;
+}
+
+body.day-mode .header {
+    background:
+        rgba(238,248,251,0.88);
+
+    border-bottom-color:
+        rgba(0,100,120,0.14);
+}
+
+body.day-mode .brand-title,
+body.day-mode .greeting h1,
+body.day-mode .current-user-name {
+    color: #09202a;
+}
+
+body.day-mode .greeting p,
+body.day-mode .current-user-role {
+    color: #54727b;
+}
+
+body.day-mode .input-box {
+    background:
+        rgba(255,255,255,0.95);
+}
+
+body.day-mode .input-box input {
+    color: #09202a;
+}
+
+body.day-mode .sidebar {
+    background:
+        #f3fbfd;
+}
+
+
+/* =========================================================
+   ANİMASYONLAR
+   ========================================================= */
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
     }
 
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes messageIn {
+    from {
+        opacity: 0;
+        transform:
+            translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes typing {
+    0%,
+    100% {
+        opacity: 0.25;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+
+/* =========================================================
+   MOBİL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .current-user-role {
+        display: none;
+    }
+
+    .brand-title {
+        font-size: 16px;
+    }
+
+    .brand-subtitle {
+        font-size: 8px;
+    }
+
+    .main {
+        padding-top: 25px;
+    }
 
     .logo {
-
-        width: 115px;
-
-        height: 115px;
+        width: 125px;
+        height: 125px;
     }
-
 
     .logo-core {
-
-        width: 62px;
-
-        height: 62px;
-
-        font-size: 28px;
+        width: 66px;
+        height: 66px;
     }
 
-
-    .ring1 {
-
-        inset: 14px;
+    .greeting {
+        margin-top: 27px;
     }
 
-
-    .ring2 {
-
-        inset: 2px;
+    .message {
+        max-width: 94%;
     }
-
-
-    .ring3 {
-
-        inset: -8px;
-    }
-
 }
 
 </style>
@@ -1205,572 +1114,572 @@ RESPONSIVE
 
 <div class="app">
 
-
-<div class="background">
-
-    <div class="grid"></div>
-
-    <div class="glow"></div>
-
-</div>
-
-
-<!-- =====================================================
-HEADER
-===================================================== -->
-
-<header class="header">
-
-
-<button
-    class="menu-btn"
-    onclick="openSidebar()"
->
-    ☰
-</button>
-
-
-<div class="brand">
-
-    <div class="brand-title">
-        J.A.R.V.I.S.
+    <div class="background">
+        <div class="grid"></div>
+        <div class="glow"></div>
     </div>
 
-    <div class="brand-subtitle">
-        KARAHAN INC.
-    </div>
 
-</div>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+        <button
+            class="menu-button"
+            onclick="toggleSidebar()"
+        >
+            ☰
+        </button>
+
+        <div class="brand">
+
+            <div class="brand-title">
+                J.A.R.V.I.S.
+            </div>
+
+            <div class="brand-subtitle">
+                KARAHAN INC.
+            </div>
+
+        </div>
 
 
-<div class="user-mini">
+        <div class="current-user">
 
-    <div class="user-dot"></div>
+            <div
+                id="currentUserName"
+                class="current-user-name"
+            >
+                KARAHAN INC.
+            </div>
+
+            <div
+                id="currentUserRole"
+                class="current-user-role"
+            >
+                Ana Kullanıcı
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        id="sidebar"
+        class="sidebar"
+    >
+
+        <div class="sidebar-title">
+            J.A.R.V.I.S. SYSTEM
+        </div>
+
+
+        <div class="profile-card">
+
+            <div
+                id="sidebarProfileName"
+                class="profile-name"
+            >
+                KARAHAN INC.
+            </div>
+
+            <div
+                id="sidebarProfileRole"
+                class="profile-role"
+            >
+                Ana Kullanıcı
+            </div>
+
+        </div>
+
+
+        <button
+            class="menu-item"
+            onclick="openProfileModal()"
+        >
+
+            <div class="menu-icon">
+                👤
+            </div>
+
+            <div class="menu-text">
+
+                <div class="menu-main">
+                    Kullanıcı / Profil Değiştir
+                </div>
+
+                <div class="menu-sub">
+                    Başka bir kullanıcıya geç
+                </div>
+
+            </div>
+
+        </button>
+
+
+        <button
+            class="menu-item"
+            onclick="toggleTheme()"
+        >
+
+            <div class="menu-icon">
+                🌙
+            </div>
+
+            <div class="menu-text">
+
+                <div class="menu-main">
+                    Gece / Gündüz
+                </div>
+
+                <div class="menu-sub">
+                    Arayüz temasını değiştir
+                </div>
+
+            </div>
+
+        </button>
+
+
+        <button
+            class="menu-item"
+            onclick="toggleFunMode()"
+        >
+
+            <div class="menu-icon">
+                🎭
+            </div>
+
+            <div class="menu-text">
+
+                <div class="menu-main">
+                    Eğlence Modu
+                </div>
+
+                <div class="menu-sub">
+                    JARVIS davranışını değiştir
+                </div>
+
+            </div>
+
+        </button>
+
+    </aside>
+
 
     <div
-        class="user-mini-name"
-        id="miniUserName"
-    >
-        KARAHAN INC.
-    </div>
-
-</div>
-
-
-</header>
-
-
-<!-- =====================================================
-MAIN
-===================================================== -->
-
-<main class="main">
-
-
-<div class="logo-area">
-
-
-<div class="logo">
-
-    <div class="ring ring3"></div>
-
-    <div class="ring ring2"></div>
-
-    <div class="ring ring1"></div>
-
-    <div class="logo-core">
-        K
-    </div>
-
-</div>
-
-
-<div
-    class="status"
-    id="statusText"
->
-    SYSTEM ONLINE
-</div>
-
-
-<div
-    class="greeting"
-    id="greeting"
->
-    Merhaba efendim
-</div>
-
-
-</div>
-
-
-<div
-    class="chat"
-    id="chat"
-></div>
-
-
-<div class="input-area">
-
-
-<div class="input-box">
-
-
-<textarea
-    id="messageInput"
-    rows="1"
-    placeholder="J.A.R.V.I.S.'e bir şey sorun..."
-    autocomplete="off"
-></textarea>
-
-
-<button
-    class="send-btn"
-    onclick="sendMessage()"
->
-    ➤
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</main>
-
-
-<!-- =====================================================
-OVERLAY
-===================================================== -->
-
-<div
-    class="overlay"
-    id="overlay"
-    onclick="closeSidebar()"
-></div>
-
-
-<!-- =====================================================
-SIDEBAR
-===================================================== -->
-
-<aside
-    class="sidebar"
-    id="sidebar"
->
-
-
-<div class="sidebar-head">
-
-    <div class="sidebar-title">
-        J.A.R.V.I.S.
-    </div>
-
-    <button
-        class="close-btn"
+        id="overlay"
+        class="overlay"
         onclick="closeSidebar()"
-    >
-        ×
-    </button>
-
-</div>
+    ></div>
 
 
-<div class="profile-card">
+    <!-- =====================================================
+         ANA İÇERİK
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <section class="logo-area">
+
+            <div class="logo">
+
+                <div class="logo-ring"></div>
+                <div class="logo-ring"></div>
+                <div class="logo-ring"></div>
+
+                <div class="logo-core">
+                    K
+                </div>
+
+            </div>
+
+
+            <div
+                id="logoStatus"
+                class="logo-status"
+            >
+                SYSTEM ONLINE
+            </div>
+
+        </section>
+
+
+        <section class="greeting">
+
+            <h1 id="greetingTitle">
+                Merhaba efendim
+            </h1>
+
+            <p id="greetingSubtitle">
+                Size nasıl yardımcı olabilirim?
+            </p>
+
+        </section>
+
+
+        <section class="chat">
+
+            <div
+                id="messages"
+                class="messages"
+            ></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         INPUT
+    ====================================================== -->
+
+    <div class="input-area">
+
+        <div class="input-box">
+
+            <input
+                id="messageInput"
+                type="text"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="sentences"
+                spellcheck="false"
+                placeholder="JARVIS'e bir şey sorun..."
+                onkeydown="handleInputKey(event)"
+            >
+
+            <button
+                class="send"
+                onclick="sendMessage()"
+            >
+                ➤
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROFİL MODALI
+    ====================================================== -->
 
     <div
-        class="profile-name"
-        id="sideProfileName"
-    >
-        KARAHAN INC.
-    </div>
-
-    <div
-        class="profile-role"
-        id="sideProfileRole"
-    >
-        Ana Kullanıcı
-    </div>
-
-</div>
-
-
-<button
-    class="menu-item"
-    onclick="openProfileModal()"
->
-
-    <div class="menu-item-title">
-        👤 Kullanıcı / Profil Değiştir
-    </div>
-
-    <div class="menu-item-sub">
-        Başka bir kullanıcıya geç
-    </div>
-
-</button>
-
-
-<div class="settings">
-
-
-<div class="setting-title">
-    AYARLAR
-</div>
-
-
-<div class="setting-row">
-
-    <span>
-        Gece / Gündüz
-    </span>
-
-    <button
-        class="toggle"
-        id="themeToggle"
-        onclick="toggleTheme()"
+        id="profileModal"
+        class="modal"
     >
 
-        <span></span>
+        <div class="modal-card">
 
-    </button>
+            <div class="modal-title">
+                Profil Değiştir
+            </div>
 
-</div>
-
-
-<div class="setting-row">
-
-    <span>
-        Eğlence Arayüzü
-    </span>
-
-    <button
-        class="toggle"
-        id="funToggle"
-        onclick="toggleFunMode()"
-    >
-
-        <span></span>
-
-    </button>
-
-</div>
+            <div class="modal-subtitle">
+                Kullanıcı adı ve şifrenizi girin.
+            </div>
 
 
-</div>
+            <input
+                id="profileUsername"
+                class="modal-input"
+                type="text"
+                placeholder="Kullanıcı adı"
+                autocomplete="off"
+            >
 
 
-</aside>
+            <input
+                id="profilePassword"
+                class="modal-input"
+                type="password"
+                placeholder="Şifre"
+                autocomplete="off"
+            >
 
 
-<!-- =====================================================
-PROFILE MODAL
-===================================================== -->
-
-<div
-    class="modal"
-    id="profileModal"
->
+            <div
+                id="loginError"
+                class="login-error"
+            ></div>
 
 
-<div class="modal-box">
+            <div class="modal-actions">
 
+                <button
+                    class="modal-button cancel"
+                    onclick="closeProfileModal()"
+                >
+                    Vazgeç
+                </button>
 
-<div class="modal-logo">
-    K
-</div>
+                <button
+                    class="modal-button"
+                    onclick="loginProfile()"
+                >
+                    Giriş Yap
+                </button>
 
+            </div>
 
-<div class="modal-title">
-    Kullanıcı Girişi
-</div>
+        </div>
 
-
-<div class="modal-subtitle">
-    J.A.R.V.I.S. profil değişikliği
-</div>
-
-
-<div class="field">
-
-<label>
-    KULLANICI ADI
-</label>
-
-
-<input
-    id="usernameInput"
-    type="text"
-    placeholder="Kullanıcı adı"
-    autocomplete="username"
->
-
-
-</div>
-
-
-<div class="field">
-
-<label>
-    ŞİFRE
-</label>
-
-
-<input
-    id="passwordInput"
-    type="password"
-    placeholder="Şifre"
-    autocomplete="current-password"
->
-
-
-</div>
-
-
-<button
-    class="login-btn"
-    onclick="loginProfile()"
->
-    GİRİŞ YAP
-</button>
-
-
-<div
-    class="modal-error"
-    id="modalError"
-></div>
-
-
-</div>
-
-
-</div>
-
+    </div>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-STATE
-===================================================== */
+/* =========================================================
+   DURUM
+========================================================= */
 
 let currentUser = {
-
     username: "karahan",
-
     name: "KARAHAN INC.",
-
-    role: "Ana Kullanıcı"
-
+    role: "Ana Kullanıcı",
+    personality: "professional"
 };
-
-
-let funMode = false;
 
 let waitingTimer = null;
 
 
-/* =====================================================
-BETÜL WAITING
-===================================================== */
+/* =========================================================
+   ELEMENTLER
+========================================================= */
 
-const betulWaitingMessages = [
+const messages =
+    document.getElementById("messages");
 
-    "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
-
-    "Dur kız, bunu da hemen bilmemi bekleme. 😂",
-
-    "Bir dakika aşko, işlemcim çalışıyor...",
-
-    "Tamam tamam, düşünüyorum kız. 😂",
-
-    "Aşko bekle, J.A.R.V.I.S. şu an düşünüyor...",
-
-    "Bir saniye canım, bunu da çözüyorum. 😂",
-
-    "Dur kız, her şeyi ben mi bileceğim? 😭",
-
-    "Aşko bu soruyu beklemiyordum. Bir toparlanayım. 😂",
-
-    "Düşünüyorum kız, üstüme gelme. 😂",
-
-    "Tamam aşko, fanlar çalışıyor..."
-];
-
-
-/* =====================================================
-ELEMENTS
-===================================================== */
-
-const chat =
-    document.getElementById("chat");
-
-
-const input =
-    document.getElementById(
-        "messageInput"
-    );
-
+const messageInput =
+    document.getElementById("messageInput");
 
 const sidebar =
-    document.getElementById(
-        "sidebar"
-    );
-
+    document.getElementById("sidebar");
 
 const overlay =
-    document.getElementById(
-        "overlay"
-    );
-
+    document.getElementById("overlay");
 
 const profileModal =
-    document.getElementById(
-        "profileModal"
+    document.getElementById("profileModal");
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function saveCurrentUser() {
+
+    localStorage.setItem(
+        "jarvis_current_user",
+        JSON.stringify(currentUser)
+    );
+}
+
+
+function loadCurrentUser() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                "jarvis_current_user"
+            );
+
+        if (!saved) {
+            return;
+        }
+
+        const parsed =
+            JSON.parse(saved);
+
+        if (
+            parsed &&
+            parsed.username
+        ) {
+
+            currentUser = parsed;
+        }
+
+    } catch (error) {
+
+        currentUser = {
+            username: "karahan",
+            name: "KARAHAN INC.",
+            role: "Ana Kullanıcı",
+            personality: "professional"
+        };
+    }
+}
+
+
+/* =========================================================
+   TEMA
+========================================================= */
+
+function applyUserTheme() {
+
+    document.body.classList.remove(
+        "sinem-theme"
     );
 
+    if (
+        currentUser.username === "sinem"
+    ) {
 
-const modalError =
-    document.getElementById(
-        "modalError"
-    );
-
-
-const greeting =
-    document.getElementById(
-        "greeting"
-    );
-
-
-const miniUserName =
-    document.getElementById(
-        "miniUserName"
-    );
-
-
-const sideProfileName =
-    document.getElementById(
-        "sideProfileName"
-    );
-
-
-const sideProfileRole =
-    document.getElementById(
-        "sideProfileRole"
-    );
-
-
-const statusText =
-    document.getElementById(
-        "statusText"
-    );
-
-
-/* =====================================================
-START
-===================================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        updateUserInterface();
-
-        addMessage(
-            "jarvis",
-            "Merhaba efendim. J.A.R.V.I.S. hazır."
+        document.body.classList.add(
+            "sinem-theme"
         );
 
-        input.focus();
+        document
+            .getElementById("logoStatus")
+            .textContent =
+            "PRINCESS MODE ONLINE";
 
+        document
+            .getElementById("greetingTitle")
+            .textContent =
+            "Hoş geldiniz prenses";
+
+        document
+            .getElementById("greetingSubtitle")
+            .textContent =
+            "JARVIS sizin için hazır. ❤️";
+
+    } else {
+
+        document
+            .getElementById("logoStatus")
+            .textContent =
+            "SYSTEM ONLINE";
+
+        document
+            .getElementById("greetingTitle")
+            .textContent =
+            "Merhaba efendim";
+
+        document
+            .getElementById("greetingSubtitle")
+            .textContent =
+            "Size nasıl yardımcı olabilirim?";
     }
-);
+}
 
 
-/* =====================================================
-SIDEBAR
-===================================================== */
+/* =========================================================
+   KULLANICI ARAYÜZÜ
+========================================================= */
 
-function openSidebar() {
+function updateUserUI() {
 
-    sidebar.classList.add(
-        "active"
-    );
+    document
+        .getElementById("currentUserName")
+        .textContent =
+        currentUser.name;
 
-    overlay.classList.add(
-        "active"
-    );
+    document
+        .getElementById("currentUserRole")
+        .textContent =
+        currentUser.role;
+
+    document
+        .getElementById("sidebarProfileName")
+        .textContent =
+        currentUser.name;
+
+    document
+        .getElementById("sidebarProfileRole")
+        .textContent =
+        currentUser.role;
+
+    applyUserTheme();
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function toggleSidebar() {
+
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
 }
 
 
 function closeSidebar() {
 
-    sidebar.classList.remove(
-        "active"
-    );
-
-    overlay.classList.remove(
-        "active"
-    );
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
 }
 
 
-/* =====================================================
-PROFILE MODAL
-===================================================== */
+/* =========================================================
+   PROFİL MODALI
+========================================================= */
 
 function openProfileModal() {
 
     closeSidebar();
 
-    document.getElementById(
-        "usernameInput"
-    ).value = "";
+    document
+        .getElementById("profileUsername")
+        .value = "";
 
-    document.getElementById(
-        "passwordInput"
-    ).value = "";
+    document
+        .getElementById("profilePassword")
+        .value = "";
 
-    modalError.textContent = "";
+    document
+        .getElementById("loginError")
+        .textContent = "";
 
-    profileModal.classList.add(
-        "active"
-    );
+    profileModal.classList.add("show");
 }
 
 
 function closeProfileModal() {
 
-    profileModal.classList.remove(
-        "active"
-    );
+    profileModal.classList.remove("show");
 }
 
-
-/* =====================================================
-LOGIN
-===================================================== */
 
 async function loginProfile() {
 
     const username =
-        document.getElementById(
-            "usernameInput"
-        ).value.trim();
-
+        document
+            .getElementById("profileUsername")
+            .value
+            .trim();
 
     const password =
-        document.getElementById(
-            "passwordInput"
-        ).value;
+        document
+            .getElementById("profilePassword")
+            .value;
 
+    const error =
+        document
+            .getElementById("loginError");
 
-    modalError.textContent =
-        "Kontrol ediliyor...";
+    error.textContent = "";
+
+    if (!username) {
+
+        error.textContent =
+            "Kullanıcı adı girin.";
+
+        return;
+    }
 
 
     try {
@@ -1779,7 +1688,6 @@ async function loginProfile() {
             await fetch(
                 "/profile-login",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -1787,17 +1695,10 @@ async function loginProfile() {
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
-
-                            username:
-                                username,
-
-                            password:
-                                password
-
-                        })
-
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
                 }
             );
 
@@ -1806,220 +1707,233 @@ async function loginProfile() {
             await response.json();
 
 
-        if (!data.success) {
+        if (!data.ok) {
 
-            modalError.textContent =
+            error.textContent =
                 data.message ||
-                "Kullanıcı adı veya şifre hatalı.";
+                "Giriş başarısız.";
 
             return;
         }
 
 
-        currentUser =
-            data.user;
+        currentUser = {
+            username:
+                data.username,
 
+            name:
+                data.name,
+
+            role:
+                data.role,
+
+            personality:
+                data.personality
+        };
+
+
+        saveCurrentUser();
+
+        updateUserUI();
+
+        clearChat();
 
         closeProfileModal();
 
 
-        updateUserInterface();
-
-
-        clearChat();
-
-
         if (
-            currentUser.username ===
-            "betul"
+            currentUser.username === "sinem"
         ) {
 
-            addMessage(
-                "jarvis",
-                "Aaa Betül geldi. Hoş geldin aşko. 😂"
+            addJarvisMessage(
+                "Hoş geldiniz prenses. ❤️ JARVIS hazır. Bugün size nasıl yardımcı olabilirim?"
+            );
+
+        } else if (
+            currentUser.username === "betul"
+        ) {
+
+            addJarvisMessage(
+                "Hoş geldin Betül. Tamam kız, yine geldin. 😂"
             );
 
         } else {
 
-            addMessage(
-                "jarvis",
-                "Tekrar hoş geldiniz efendim."
+            addJarvisMessage(
+                "Tekrar hoş geldiniz efendim. JARVIS tüm sistemleri hazır durumda."
             );
         }
 
 
     } catch (error) {
 
-        modalError.textContent =
+        error.textContent =
             "Sunucuya bağlanılamadı.";
     }
-
 }
 
 
-/* =====================================================
-UPDATE UI
-===================================================== */
-
-function updateUserInterface() {
-
-    miniUserName.textContent =
-        currentUser.name;
-
-
-    sideProfileName.textContent =
-        currentUser.name;
-
-
-    sideProfileRole.textContent =
-        currentUser.role;
-
-
-    if (
-        currentUser.username ===
-        "betul"
-    ) {
-
-        document.body.classList.add(
-            "betul-mode"
-        );
-
-
-        greeting.textContent =
-            "Hoş geldin Betül 😏";
-
-
-        statusText.textContent =
-            "BETÜL MODE";
-
-
-    } else {
-
-        document.body.classList.remove(
-            "betul-mode"
-        );
-
-
-        greeting.textContent =
-            "Merhaba efendim";
-
-
-        statusText.textContent =
-            "SYSTEM ONLINE";
-    }
-
-}
-
-
-/* =====================================================
-MESSAGE
-===================================================== */
-
-function addMessage(
-    type,
-    text
-) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.className =
-        "message " + type;
-
-
-    div.textContent =
-        text;
-
-
-    chat.appendChild(
-        div
-    );
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-}
-
-
-/* =====================================================
-CLEAR CHAT
-===================================================== */
+/* =========================================================
+   CHAT TEMİZLEME
+========================================================= */
 
 function clearChat() {
 
-    stopWaitingMessage();
-
-    chat.innerHTML = "";
+    messages.innerHTML = "";
 }
 
 
-/* =====================================================
-WAITING
-===================================================== */
+/* =========================================================
+   MESAJ EKLE
+========================================================= */
+
+function addMessage(
+    text,
+    type
+) {
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "message " + type;
+
+    element.textContent =
+        text;
+
+    messages.appendChild(
+        element
+    );
+
+    window.scrollTo(
+        0,
+        document.body.scrollHeight
+    );
+}
+
+
+function addJarvisMessage(text) {
+
+    addMessage(
+        text,
+        "jarvis"
+    );
+}
+
+
+function addUserMessage(text) {
+
+    addMessage(
+        text,
+        "user"
+    );
+}
+
+
+/* =========================================================
+   BEKLEME MESAJLARI
+========================================================= */
+
+const betulWaitingMessages = [
+
+    "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
+
+    "Dur kız, bunu da hemen bilmemi bekleme. 😂",
+
+    "Bir dakika aşko, işlemcim dedikodu modundan çıkıyor...",
+
+    "Tamam tamam, düşünüyorum kız. Sabırsızlanma. 😂",
+
+    "Aşko bekle, J.A.R.V.I.S. şu an beyninin son kalan hücresini kullanıyor...",
+
+    "Bir saniye canım, NASA'ya bağlanıp geliyorum. 😂",
+
+    "Dur kız, her şeyi ben mi bileceğim? 😭",
+
+    "Aşko bu soruyu beklemiyordum. Bir toparlanayım. 😂",
+
+    "Düşünüyorum kız, üstüme gelme. 😂",
+
+    "Tamam aşko, beynimin fanları şu an son hız dönüyor..."
+];
+
+
+const sinemWaitingMessages = [
+
+    "Bir saniye prenses, sizin için düşünüyorum. ❤️",
+
+    "Prenses bir dakika, JARVIS en güzel cevabı hazırlıyor. 🌸",
+
+    "Hemen bakıyorum prenses. Biraz düşünmeme izin verin. ❤️",
+
+    "Bir saniye Sinem, bunu öylesine cevaplayamam. 😌",
+
+    "Prenses, işlem yapılıyor. Sabır lütfen. 🌸",
+
+    "Durun prenses, JARVIS çalışıyor. ❤️",
+
+    "Biraz bekleyin prenses, size düzgün bir cevap hazırlıyorum."
+];
+
 
 function startWaitingMessage() {
 
     stopWaitingMessage();
 
-
-    /*
-     * Sadece Betül için özel
-     * bekleme mesajları.
-     */
-
     if (
-        currentUser.username !==
-        "betul"
+        currentUser.username !== "betul" &&
+        currentUser.username !== "sinem"
     ) {
 
         return;
     }
 
 
+    const message =
+        document.createElement("div");
+
+    message.className =
+        "message jarvis";
+
+    messages.appendChild(
+        message
+    );
+
+
+    const list =
+        currentUser.username === "sinem"
+            ? sinemWaitingMessages
+            : betulWaitingMessages;
+
+
     let index =
         Math.floor(
-            Math.random()
-            * betulWaitingMessages.length
+            Math.random() * list.length
         );
 
 
-    addMessage(
-        "jarvis",
-        betulWaitingMessages[index]
-    );
+    message.textContent =
+        list[index];
 
 
     waitingTimer =
         setInterval(
-            function() {
-
-                if (
-                    currentUser.username !==
-                    "betul"
-                ) {
-
-                    return;
-                }
-
+            () => {
 
                 index =
-                    Math.floor(
-                        Math.random()
-                        * betulWaitingMessages.length
-                    );
+                    (index + 1)
+                    % list.length;
 
-
-                addMessage(
-                    "jarvis",
-                    betulWaitingMessages[index]
-                );
+                message.textContent =
+                    list[index];
 
             },
             2600
         );
+
+
+    message.dataset.waiting =
+        "true";
 }
 
 
@@ -2033,35 +1947,40 @@ function stopWaitingMessage() {
 
         waitingTimer = null;
     }
+
+
+    const waitingMessages =
+        messages.querySelectorAll(
+            '[data-waiting="true"]'
+        );
+
+    waitingMessages.forEach(
+        element => element.remove()
+    );
 }
 
 
-/* =====================================================
-SEND MESSAGE
-===================================================== */
+/* =========================================================
+   CHAT GÖNDER
+========================================================= */
 
 async function sendMessage() {
 
     const message =
-        input.value.trim();
+        messageInput.value.trim();
 
 
     if (!message) {
-
         return;
     }
 
 
-    addMessage(
-        "user",
+    addUserMessage(
         message
     );
 
 
-    input.value = "";
-
-    input.style.height =
-        "auto";
+    messageInput.value = "";
 
 
     startWaitingMessage();
@@ -2073,27 +1992,20 @@ async function sendMessage() {
             await fetch(
                 "/chat",
                 {
-
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
-                    body:
-                        JSON.stringify({
+                    body: JSON.stringify({
 
-                            message:
-                                message,
+                        message,
 
-                            username:
-                                currentUser.username
-
-                        })
-
+                        username:
+                            currentUser.username
+                    })
                 }
             );
 
@@ -2105,20 +2017,17 @@ async function sendMessage() {
         stopWaitingMessage();
 
 
-        if (!data.success) {
+        if (!response.ok) {
 
-            addMessage(
-                "jarvis",
-                data.message ||
-                "Şu anda cevap oluşturamadım."
+            addJarvisMessage(
+                "Şu anda yapay zeka servislerine erişemiyorum. Lütfen biraz sonra tekrar deneyin."
             );
 
             return;
         }
 
 
-        addMessage(
-            "jarvis",
+        addJarvisMessage(
             data.answer
         );
 
@@ -2127,170 +2036,154 @@ async function sendMessage() {
 
         stopWaitingMessage();
 
-
-        addMessage(
-            "jarvis",
-            "Sunucuya bağlanırken bir problem oluştu."
+        addJarvisMessage(
+            "Bağlantıda bir sorun oluştu. Sunucuyu kontrol edelim efendim."
         );
     }
-
 }
 
 
-/* =====================================================
-ENTER
-===================================================== */
+/* =========================================================
+   ENTER
+========================================================= */
 
-input.addEventListener(
-    "keydown",
-    function(event) {
+function handleInputKey(event) {
 
-        if (
-            event.key === "Enter"
-            &&
-            !event.shiftKey
-        ) {
+    if (
+        event.key === "Enter"
+    ) {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            sendMessage();
-        }
-
+        sendMessage();
     }
-);
+}
 
 
-/* =====================================================
-TEXTAREA
-===================================================== */
-
-input.addEventListener(
-    "input",
-    function() {
-
-        this.style.height =
-            "auto";
-
-
-        this.style.height =
-            Math.min(
-                this.scrollHeight,
-                100
-            ) + "px";
-    }
-);
-
-
-/* =====================================================
-THEME
-===================================================== */
+/* =========================================================
+   TEMA DEĞİŞTİR
+========================================================= */
 
 function toggleTheme() {
 
     document.body.classList.toggle(
-        "light"
+        "day-mode"
     );
-
-
-    document
-        .getElementById(
-            "themeToggle"
-        )
-        .classList.toggle(
-            "active"
-        );
 }
 
 
-/* =====================================================
-FUN MODE
-===================================================== */
+/* =========================================================
+   EĞLENCE MODU
+========================================================= */
 
 function toggleFunMode() {
 
-    funMode =
-        !funMode;
+    document.body.classList.toggle(
+        "fun-mode"
+    );
 
-
-    document
-        .getElementById(
-            "funToggle"
-        )
-        .classList.toggle(
-            "active"
-        );
-
-
-    /*
-     * KARAHAN INC.:
-     *
-     * Bu ayar sadece arayüzü etkiler.
-     * AI karakteri profesyonel kalır.
-     */
 
     if (
-        currentUser.username ===
-        "karahan"
+        currentUser.username === "karahan"
     ) {
 
-        addMessage(
-            "jarvis",
-
-            funMode
-
-                ? "Eğlence arayüzü aktif efendim. Yanıt karakterim profesyonel kalacaktır."
-
-                : "Profesyonel moda geri dönüldü."
+        addJarvisMessage(
+            "Eğlence modu görsel olarak etkinleştirildi efendim. Karakterimi değiştirmiyorum; profesyonel JARVIS olarak kalıyorum."
         );
-
 
         return;
     }
 
 
-    /*
-     * BETÜL
-     */
-
     if (
-        currentUser.username ===
-        "betul"
+        currentUser.username === "sinem"
     ) {
 
-        addMessage(
-            "jarvis",
-
-            funMode
-
-                ? "Tamam aşko, eğlenceyi açtık. 😂"
-
-                : "Tamam kız, biraz ciddileşiyoruz."
+        addJarvisMessage(
+            "Prenses modu biraz daha eğlenceli hale getirildi. 🌸😄"
         );
+
+        return;
     }
 
+
+    if (
+        currentUser.username === "betul"
+    ) {
+
+        addJarvisMessage(
+            "Tamam kız, şimdi başımıza iş açılacak. 😂"
+        );
+    }
 }
 
 
-/* =====================================================
-ESC
-===================================================== */
+/* =========================================================
+   BAŞLANGIÇ
+========================================================= */
 
-document.addEventListener(
-    "keydown",
-    function(event) {
+function initialize() {
 
-        if (
-            event.key ===
-            "Escape"
-        ) {
+    loadCurrentUser();
 
-            closeSidebar();
+    /*
+     * Güvenlik amacıyla localStorage'dan gelen
+     * kullanıcı bilgisini sadece bilinen profillerle sınırla.
+     */
 
-            closeProfileModal();
-        }
+    if (
+        ![
+            "karahan",
+            "betul",
+            "sinem"
+        ].includes(
+            currentUser.username
+        )
+    ) {
 
+        currentUser = {
+            username: "karahan",
+            name: "KARAHAN INC.",
+            role: "Ana Kullanıcı",
+            personality: "professional"
+        };
     }
-);
+
+
+    updateUserUI();
+
+
+    /*
+     * İlk açılışta profil seçme ekranı YOK.
+     * Sistem doğrudan ana kullanıcı ile açılır.
+     */
+
+    if (
+        currentUser.username === "sinem"
+    ) {
+
+        addJarvisMessage(
+            "Tekrar hoş geldiniz prenses. ❤️ JARVIS burada."
+        );
+
+    } else if (
+        currentUser.username === "betul"
+    ) {
+
+        addJarvisMessage(
+            "Hoş geldin Betül. 😂"
+        );
+
+    } else {
+
+        addJarvisMessage(
+            "Merhaba efendim. JARVIS sistemleri hazır."
+        );
+    }
+}
+
+
+initialize();
 
 </script>
 
