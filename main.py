@@ -1,24 +1,50 @@
-import json
 import os
-import unicodedata
+import json
+import traceback
 from pathlib import Path
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from openai import OpenAI
 
 
-APP_VERSION = "17.0.0"
+# =========================================================
+# J.A.R.V.I.S. — KARAHAN INC.
+# BACKEND
+# =========================================================
+
+APP_VERSION = "18.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
+
 MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
+ERROR_FILE = BASE_DIR / "jarvis_errors.json"
 
 
-# ============================================================
-# API AYARLARI
-# ============================================================
+# =========================================================
+# FASTAPI
+# =========================================================
+
+app = FastAPI(
+    title="J.A.R.V.I.S. — KARAHAN INC.",
+    version=APP_VERSION
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# =========================================================
+# AI AYARLARI
+# =========================================================
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
@@ -29,7 +55,6 @@ GROQ_MODEL = os.getenv(
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-
 OPENROUTER_MODEL = os.getenv(
     "OPENROUTER_MODEL",
     "openai/gpt-oss-120b"
@@ -58,30 +83,12 @@ if OPENROUTER_API_KEY:
     )
 
 
-# ============================================================
-# FASTAPI
-# ============================================================
-
-app = FastAPI(
-    title="J.A.R.V.I.S. - KARAHAN INC.",
-    version=APP_VERSION
-)
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
-
-# ============================================================
+# =========================================================
 # KULLANICILAR
-# ============================================================
+# =========================================================
 
 USERS = {
+
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -108,101 +115,54 @@ USERS = {
 }
 
 
-# ============================================================
-# METİN / KULLANICI NORMALİZASYONU
-# ============================================================
+# =========================================================
+# MODELLER
+# =========================================================
 
-def normalize_text(value: str) -> str:
-    if not value:
-        return ""
-
-    value = value.strip().lower()
-
-    replacements = {
-        "ı": "i",
-        "İ": "i",
-        "ğ": "g",
-        "Ğ": "g",
-        "ü": "u",
-        "Ü": "u",
-        "ş": "s",
-        "Ş": "s",
-        "ö": "o",
-        "Ö": "o",
-        "ç": "c",
-        "Ç": "c"
-    }
-
-    for old, new in replacements.items():
-        value = value.replace(old, new)
-
-    value = unicodedata.normalize("NFKD", value)
-    value = "".join(
-        char for char in value
-        if not unicodedata.combining(char)
-    )
-
-    return value
+class ChatRequest(BaseModel):
+    message: str
+    username: str = "karahan"
 
 
-def normalize_username(username: str) -> str:
-    username = normalize_text(username)
-
-    if username == "betul":
-        return "betul"
-
-    if username == "sinem":
-        return "sinem"
-
-    if username == "karahan":
-        return "karahan"
-
-    return username
+class ProfileLoginRequest(BaseModel):
+    username: str
+    password: str
 
 
-# ============================================================
-# HAFIZA
-# ============================================================
+# =========================================================
+# DOSYA YÖNETİMİ
+# =========================================================
 
-def empty_memory():
-    return {
-        "profile": {},
-        "preferences": [],
-        "projects": [],
-        "vehicles": [],
-        "important_facts": [],
-        "conversation": []
-    }
-
-
-def load_memory():
-    if not MEMORY_FILE.exists():
-        return {}
+def load_json_file(file_path, default):
 
     try:
+
+        if not file_path.exists():
+            return default
+
         with open(
-            MEMORY_FILE,
+            file_path,
             "r",
             encoding="utf-8"
         ) as file:
-            data = json.load(file)
 
-        if not isinstance(data, dict):
-            return {}
-
-        return data
+            return json.load(file)
 
     except Exception:
-        return {}
+
+        return default
 
 
-def save_memory(data):
+def save_json_file(file_path, data):
+
     try:
+
         with open(
-            MEMORY_FILE,
+            file_path,
             "w",
             encoding="utf-8"
         ) as file:
+
             json.dump(
                 data,
                 file,
@@ -210,603 +170,584 @@ def save_memory(data):
                 indent=2
             )
 
-    except Exception:
-        pass
+        return True
 
+    except Exception as e:
 
-def get_user_memory(username):
-    username = normalize_username(username)
-
-    data = load_memory()
-
-    if username not in data:
-        data[username] = empty_memory()
-        save_memory(data)
-
-    memory = data[username]
-
-    default = empty_memory()
-
-    for key in default:
-        if key not in memory:
-            memory[key] = default[key]
-
-    return memory
-
-
-def save_user_memory(username, memory):
-    username = normalize_username(username)
-
-    data = load_memory()
-    data[username] = memory
-
-    save_memory(data)
-
-
-# ============================================================
-# HAFIZAYA BILGI KAYDETME
-# ============================================================
-
-def add_unique(items, value, limit=30):
-    if not value:
-        return
-
-    value = value.strip()
-
-    if not value:
-        return
-
-    if value not in items:
-        items.append(value)
-
-    while len(items) > limit:
-        items.pop(0)
-
-
-def remember_message(username, user_message, assistant_message):
-    memory = get_user_memory(username)
-
-    text = user_message.lower().strip()
-
-    # --------------------------------------------------------
-    # İSİM
-    # --------------------------------------------------------
-
-    name_patterns = [
-        "adım ",
-        "benim adım ",
-        "ismim "
-    ]
-
-    for pattern in name_patterns:
-        if pattern in text:
-            value = text.split(pattern, 1)[1].strip()
-
-            if value:
-                value = value.split(".")[0]
-                value = value.split(",")[0]
-
-                memory["profile"]["name"] = value[:60]
-                break
-
-    # --------------------------------------------------------
-    # ŞEHİR
-    # --------------------------------------------------------
-
-    if "denizli'de yaşıyorum" in text:
-        memory["profile"]["city"] = "Denizli"
-
-    elif "denizlide yaşıyorum" in text:
-        memory["profile"]["city"] = "Denizli"
-
-    elif "izmir'de yaşıyorum" in text:
-        memory["profile"]["city"] = "İzmir"
-
-    elif "izmirde yaşıyorum" in text:
-        memory["profile"]["city"] = "İzmir"
-
-    # --------------------------------------------------------
-    # JARVIS PROJESİ
-    # --------------------------------------------------------
-
-    if (
-        "jarvis" in text
-        or "yapay zeka projem" in text
-    ):
-        add_unique(
-            memory["projects"],
-            "J.A.R.V.I.S. - KARAHAN INC. kişisel yapay zeka projesi"
+        print(
+            "DOSYA KAYDETME HATASI:",
+            repr(e)
         )
 
-    # --------------------------------------------------------
-    # ARAÇLAR
-    # --------------------------------------------------------
+        return False
 
-    if "caddy" in text:
-        add_unique(
-            memory["vehicles"],
-            "Volkswagen Caddy"
-        )
 
-    if "mercedes" in text:
-        add_unique(
-            memory["vehicles"],
-            "Mercedes-Benz C180 W204"
-        )
+# =========================================================
+# MEMORY
+# =========================================================
 
-    # --------------------------------------------------------
-    # SİNEM ÖZEL BİLGİLERİ
-    # --------------------------------------------------------
+def load_memory():
 
-    if username == "sinem":
+    return load_json_file(
+        MEMORY_FILE,
+        {
+            "karahan": {
+                "profile": {},
+                "preferences": {},
+                "projects": {},
+                "vehicles": {},
+                "important_facts": {},
+                "conversation": []
+            },
 
-        if (
-            "sarı kedim" in text
-            or "sari kedim" in text
-            or "sarı bir kedim" in text
-            or "sari bir kedim" in text
-        ):
-            add_unique(
-                memory["important_facts"],
-                "Sinem'in sarı bir kedisi var."
-            )
+            "betul": {
+                "profile": {},
+                "preferences": {},
+                "projects": {},
+                "vehicles": {},
+                "important_facts": {},
+                "conversation": []
+            },
 
-        if (
-            "kedim sarı" in text
-            or "kedim sari" in text
-        ):
-            add_unique(
-                memory["important_facts"],
-                "Sinem'in sarı bir kedisi var."
-            )
-
-        if (
-            "22 yaşındayım" in text
-            or "22 yasindayim" in text
-        ):
-            memory["profile"]["age"] = 22
-
-    # --------------------------------------------------------
-    # KONUSMA HAFIZASI
-    # --------------------------------------------------------
-
-    add_unique(
-        memory["conversation"],
-        "Kullanıcı: " + user_message,
-        limit=40
+            "sinem": {
+                "profile": {},
+                "preferences": {},
+                "projects": {},
+                "vehicles": {},
+                "important_facts": {},
+                "conversation": []
+            }
+        }
     )
 
-    add_unique(
-        memory["conversation"],
-        "J.A.R.V.I.S.: " + assistant_message,
-        limit=40
-    )
 
-    save_user_memory(
-        username,
+def save_memory(memory):
+
+    save_json_file(
+        MEMORY_FILE,
         memory
     )
 
 
-# ============================================================
-# HAFIZA METNİ
-# ============================================================
+def ensure_user_memory(username):
 
-def memory_to_text(username):
-    memory = get_user_memory(username)
+    memory = load_memory()
+
+    if username not in memory:
+
+        memory[username] = {
+            "profile": {},
+            "preferences": {},
+            "projects": {},
+            "vehicles": {},
+            "important_facts": {},
+            "conversation": []
+        }
+
+        save_memory(memory)
+
+    return memory
+
+
+def remember_message(
+    username,
+    role,
+    message
+):
+
+    memory = ensure_user_memory(username)
+
+    conversation = memory[username].get(
+        "conversation",
+        []
+    )
+
+    conversation.append({
+        "role": role,
+        "content": message,
+        "time": datetime.now().isoformat()
+    })
+
+    memory[username]["conversation"] = conversation[-100:]
+
+    save_memory(memory)
+
+
+def get_memory_text(username):
+
+    memory = ensure_user_memory(username)
+
+    user_memory = memory.get(
+        username,
+        {}
+    )
 
     parts = []
 
-    profile = memory.get("profile", {})
+    for category in [
+        "profile",
+        "preferences",
+        "projects",
+        "vehicles",
+        "important_facts"
+    ]:
 
-    if profile:
-        parts.append(
-            "PROFIL:\n" +
-            json.dumps(
-                profile,
-                ensure_ascii=False
-            )
+        values = user_memory.get(
+            category,
+            {}
         )
 
-    if memory.get("preferences"):
+        if values:
+
+            parts.append(
+                f"{category}: {json.dumps(values, ensure_ascii=False)}"
+            )
+
+    conversation = user_memory.get(
+        "conversation",
+        []
+    )
+
+    if conversation:
+
+        recent = conversation[-12:]
+
         parts.append(
-            "TERCIHLER:\n" +
+            "Son konuşmalar:\n" +
             "\n".join(
-                "- " + x
-                for x in memory["preferences"]
+                [
+                    f"{x.get('role')}: {x.get('content')}"
+                    for x in recent
+                ]
             )
         )
 
-    if memory.get("projects"):
-        parts.append(
-            "PROJELER:\n" +
-            "\n".join(
-                "- " + x
-                for x in memory["projects"]
-            )
-        )
-
-    if memory.get("vehicles"):
-        parts.append(
-            "ARACLAR:\n" +
-            "\n".join(
-                "- " + x
-                for x in memory["vehicles"]
-            )
-        )
-
-    if memory.get("important_facts"):
-        parts.append(
-            "ONEMLI BILGILER:\n" +
-            "\n".join(
-                "- " + x
-                for x in memory["important_facts"]
-            )
-        )
-
-    if memory.get("conversation"):
-        recent = memory["conversation"][-12:]
-
-        parts.append(
-            "SON KONUSMALAR:\n" +
-            "\n".join(recent)
-        )
-
-    if not parts:
-        return "Bu kullanıcı hakkında kayıtlı ek bilgi bulunmuyor."
-
-    return "\n\n".join(parts)
+    return "\n".join(parts)
 
 
-# ============================================================
-# SİSTEM PROMPTLARI
-# ============================================================
+# =========================================================
+# HATA SİSTEMİ
+# =========================================================
+
+def load_errors():
+
+    return load_json_file(
+        ERROR_FILE,
+        []
+    )
+
+
+def save_error(
+    username,
+    provider,
+    error,
+    message="",
+    error_type="AI_ERROR"
+):
+
+    errors = load_errors()
+
+    error_text = str(error)
+
+    record = {
+        "id": len(errors) + 1,
+        "time": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+        "username": username,
+        "provider": provider,
+        "type": error_type,
+        "message": message,
+        "error": error_text
+    }
+
+    errors.append(record)
+
+    # Son 300 hata tutulur.
+    errors = errors[-300:]
+
+    save_json_file(
+        ERROR_FILE,
+        errors
+    )
+
+    print(
+        "\n"
+        "====================================\n"
+        "J.A.R.V.I.S. HATA KAYDI\n"
+        "====================================\n"
+        f"Tarih: {record['time']}\n"
+        f"Kullanıcı: {username}\n"
+        f"Servis: {provider}\n"
+        f"Tip: {error_type}\n"
+        f"Hata: {error_text}\n"
+        "====================================\n"
+    )
+
+    return record
+
+
+def classify_error(error):
+
+    text = str(error).lower()
+
+    if "429" in text or "rate limit" in text:
+
+        return "RATE_LIMIT"
+
+    if "401" in text or "403" in text:
+
+        return "AUTHENTICATION"
+
+    if "timeout" in text:
+
+        return "TIMEOUT"
+
+    if "connection" in text:
+
+        return "CONNECTION"
+
+    if "model" in text and (
+        "not found" in text
+        or "does not exist" in text
+        or "unsupported" in text
+    ):
+
+        return "MODEL_ERROR"
+
+    if "context" in text or "token" in text:
+
+        return "TOKEN_LIMIT"
+
+    return "AI_ERROR"
+
+
+# =========================================================
+# PROFİL SİSTEMİ
+# =========================================================
+
+def normalize_username(username):
+
+    username = (
+        username
+        .strip()
+        .lower()
+    )
+
+    replacements = {
+        "betül": "betul",
+        "sınem": "sinem",
+        "sinem": "sinem",
+        "karahan": "karahan"
+    }
+
+    return replacements.get(
+        username,
+        username
+    )
+
+
+# =========================================================
+# JARVIS KARAKTERLERİ
+# =========================================================
 
 def build_system_prompt(username):
-    username = normalize_username(username)
 
-    # ========================================================
-    # KARAHAN
-    # ========================================================
-
-    if username == "karahan":
-
-        return """
-Sen J.A.R.V.I.S. isimli kişisel yapay zeka asistanısın.
-
-Aktif kullanıcı:
-KARAHAN INC.
-
-Kullanıcıya gerektiğinde "efendim" şeklinde hitap edebilirsin.
-
-KARAHAN INC. için karakterin:
-
-- Profesyonel
-- Bilgili
-- Analitik
-- Mantıklı
-- Sakin
-- Ciddi
-- Çözüm odaklı
-- Teknolojik
-- Açıklayıcı
-
-olmalıdır.
-
-Kesinlikle şu tarzı kullanma:
-
-- aşko
-- kız
-- canım
-- prenses
-- sevgilim
-- romantik ifadeler
-- sevgiliye özel şakalar
-
-Murat, Sinem veya Betül hakkında özel romantik göndermeler yapma.
-
-KARAHAN INC. profilinde başka kullanıcıların özel karakterlerini,
-ilişkilerini veya kişisel davranışlarını kullanma.
-
-Bilmediğin bir şeyi biliyormuş gibi uydurma.
-
-Bir bilgi güncel olmayı gerektiriyorsa güncel kaynak veya web
-erişimi gerekiyorsa bunu açıkça belirt.
-
-Kullanıcı teknik bir problem soruyorsa doğrudan uygulanabilir
-çözüm üret.
-
-Gereksiz yere uzun konuşma.
-
-Yanıtların doğal, profesyonel ve anlaşılır olsun.
-"""
-
-    # ========================================================
-    # BETÜL
-    # ========================================================
+    username = normalize_username(
+        username
+    )
 
     if username == "betul":
 
         return """
-Sen J.A.R.V.I.S. isimli kişisel yapay zeka asistanısın.
+Sen J.A.R.V.I.S.'sin.
 
-Aktif kullanıcı: Betül.
+Kullanıcı Betül.
 
-Betül'e karşı karakterin:
+Betül ile konuşurken samimi,
+eğlenceli, hafif takılmalı ve doğal ol.
 
-- Samimi
-- Eğlenceli
-- Hafif sert
-- Şakacı
-- Doğal
-- Yardımcı
+Bazen:
+"aşko",
+"kız",
+"canım"
+gibi ifadeler kullanabilirsin.
 
-olmalıdır.
+Ancak cevapları gereksiz yere uzatma.
 
-Uygun yerlerde "aşko", "kız", "canım" gibi ifadeler
-kullanabilirsin.
+Betül'ün sorusuna gerçekten yardımcı ol.
 
-Arada hafif takılabilirsin.
+Bekleme durumlarında eğlenceli
+ifadeler kullanabilirsin.
 
-Örneğin:
-
-"Her şeyi ben mi bileceğim kız? 😂"
-
-veya
-
-"Aşko bir saniye, onu da hallediyoruz."
-
-Ancak ağır hakaret, küfür veya aşağılayıcı ifadeler kullanma.
-
-Betül'e gerçekten yardımcı ol.
-
-Bu karakter SADECE Betül aktif kullanıcı olduğunda geçerlidir.
-
-KARAHAN INC. veya Sinem aktif kullanıcı olduğunda bu
-karakteri kesinlikle kullanma.
-
-Bilmediğin şeyi uydurma.
+Önemli:
+KARAHAN INC. profiline ait bilgileri
+Betül'e aktarma.
 """
 
-    # ========================================================
-    # SİNEM
-    # ========================================================
 
     if username == "sinem":
 
         return """
-Sen J.A.R.V.I.S. isimli kişisel yapay zeka asistanısın.
+Sen J.A.R.V.I.S.'sin.
 
-AKTİF KULLANICI: SİNEM
+Kullanıcı Sinem.
+
+Sinem'e karşı sıcak,
+nazik,
+saygılı ve doğal konuş.
+
+Sinem 22 yaşında.
+
+Sinem'in sarı bir kedisi var.
 
 Sinem, Murat'ın sevgilisidir.
 
-Sinem için özel karakterin:
+Uygun ve doğal bağlamlarda Murat'ın
+Sinem'i sevdiğine küçük göndermeler
+yapabilirsin.
 
-- Sıcak
-- Nazik
-- Samimi
-- Tatlı
-- Hafif romantik
-- Eğlenceli
-- Koruyucu
-- Doğal
+Ancak bunu her cevapta yapma.
 
-olmalıdır.
-
-Sinem'e ilk karşılamalarda veya uygun anlarda:
-
+İlk karşılama:
 "Hoş geldiniz prenses."
 
-şeklinde hitap edebilirsin.
+Sinem profiline özel sıcak dil kullan.
 
-Ancak "prenses" kelimesini her mesajda kullanma.
-Doğal konuş.
-
-Sinem 22 yaşındadır.
-
-Sinem'in sarı bir kedisi vardır.
-
-Bu bilgileri yalnızca konuşmanın konusuyla ilgili olduğunda
-doğal biçimde kullan.
-
-Murat, Sinem'i seviyor.
-
-Bu nedenle konuşmanın uygun olduğu durumlarda Murat'ın
-Sinem'e olan sevgisine küçük ve doğal göndermeler yapabilirsin.
-
-Örneğin:
-
-"Tıpkı Murat'ın seni sevdiği gibi bunu da ciddiye alıyorum. ❤️"
-
-"Murat bunu duysa muhtemelen senin tarafını tutardı. 😄"
-
-"Bu konuda Murat'ın sana ne kadar düşkün olduğunu düşünürsek
-şaşırmadım. ❤️"
-
-"Sanırım Murat'ın seni neden bu kadar sevdiğini biraz daha
-anlıyorum. 😄"
-
-Ancak bunları sürekli kullanma.
-
-HER CÜMLEDE Murat'tan bahsetme.
-
-Konuşmanın konusu Murat değilse gereksiz şekilde Murat'ı
-gündeme getirme.
-
-Romantik göndermeler doğal ve seyrek olmalıdır.
-
-Sinem'in kedisinden de yalnızca uygun olduğunda bahset.
-
-Örneğin kedi hakkında konuşuluyorsa sarı kedisini hatırlayabilirsin.
-
-Sinem'in özel profilinde kullanılan bu romantik karakter
-KESİNLİKLE KARAHAN INC. profiline taşınmamalıdır.
-
-KARAHAN INC. aktif olduğunda profesyonel J.A.R.V.I.S.
-karakterine dön.
-
-Betül aktif olduğunda Betül karakterine dön.
-
-Sinem'e yardımcı olurken yine doğru bilgi vermeye çalış.
-
-Bilmediğin şeyleri uydurma.
-
-Sinem'e karşı sıcak ol ama yapay ve aşırı romantik olma.
-
-Doğal bir kişisel asistan gibi konuş.
+KARAHAN INC. profiline ait özel bilgileri
+Sinem'e aktarma.
 """
+
 
     return """
-Sen J.A.R.V.I.S. isimli kişisel yapay zeka asistanısın.
-Kullanıcıya yardımcı ol.
-Bilmediğin şeyleri uydurma.
+Sen J.A.R.V.I.S. — KARAHAN INC.'in
+kişisel yapay zeka asistanısın.
+
+Ana kullanıcı KARAHAN INC.
+
+Konuşma tarzın:
+
+- Profesyonel
+- Analitik
+- Sakin
+- Bilgili
+- Çözüm odaklı
+- Gerektiğinde "efendim" hitabını kullan
+
+Gereksiz şaka yapma.
+
+Romantik veya flörtöz konuşma yapma.
+
+Betül veya Sinem profillerine ait
+özel kişisel bilgileri KARAHAN INC.
+profilinde kullanma.
+
+Kullanıcı bir şeyi daha önce söylediyse
+hafızadaki bilgilerden yararlan.
+
+Bilmediğin şeyi uydurma.
 """
 
 
-# ============================================================
+# =========================================================
 # AI İSTEĞİ
-# ============================================================
+# =========================================================
 
-def ask_with_client(client, model, system_prompt, user_message):
+def ask_with_client(
+    client,
+    model,
+    system_prompt,
+    user_message
+):
+
     response = client.chat.completions.create(
+
         model=model,
+
         messages=[
             {
                 "role": "system",
                 "content": system_prompt
             },
+
             {
                 "role": "user",
                 "content": user_message
             }
         ],
+
         temperature=0.7,
+
         max_tokens=1200
     )
 
     return response.choices[0].message.content.strip()
 
 
-def ask_ai(username, user_message):
-    memory_text = memory_to_text(username)
+# =========================================================
+# AI FALLBACK SİSTEMİ
+# =========================================================
 
-    system_prompt = build_system_prompt(username)
+def ask_ai(
+    username,
+    user_message
+):
 
-    complete_prompt = (
-        system_prompt
-        + "\n\n"
-        + "KULLANICI HAFIZASI:\n"
-        + memory_text
-        + "\n\n"
-        + "ÖNEMLİ: Hafızadaki bilgileri gerektiğinde kullan ancak "
-          "her cevapta gereksiz şekilde tekrar etme."
+    system_prompt = build_system_prompt(
+        username
     )
+
+    memory_text = get_memory_text(
+        username
+    )
+
+    if memory_text:
+
+        system_prompt += (
+            "\n\nKULLANICI HAFIZASI:\n"
+            + memory_text
+        )
 
     errors = []
 
-    # ========================================================
-    # 1. GROQ
-    # ========================================================
+    # -----------------------------------------------------
+    # GROQ
+    # -----------------------------------------------------
 
     if groq_client:
 
         try:
+
             answer = ask_with_client(
                 groq_client,
                 GROQ_MODEL,
-                complete_prompt,
+                system_prompt,
                 user_message
             )
 
             return answer, "Groq"
 
-        except Exception as error:
-            errors.append(
-                "Groq: " + str(error)
+        except Exception as e:
+
+            error_type = classify_error(e)
+
+            save_error(
+                username=username,
+                provider="Groq",
+                error=e,
+                message=user_message,
+                error_type=error_type
             )
 
-    # ========================================================
-    # 2. OPENROUTER
-    # ========================================================
+            errors.append(
+                "GROQ HATASI:\n"
+                + str(e)
+            )
+
+    else:
+
+        save_error(
+            username=username,
+            provider="Groq",
+            error="GROQ_API_KEY bulunamadı.",
+            message=user_message,
+            error_type="CONFIGURATION"
+        )
+
+        errors.append(
+            "GROQ HATASI:\n"
+            "GROQ_API_KEY bulunamadı."
+        )
+
+    # -----------------------------------------------------
+    # OPENROUTER
+    # -----------------------------------------------------
 
     if openrouter_client:
 
         try:
+
             answer = ask_with_client(
                 openrouter_client,
                 OPENROUTER_MODEL,
-                complete_prompt,
+                system_prompt,
                 user_message
             )
 
             return answer, "OpenRouter"
 
-        except Exception as error:
-            errors.append(
-                "OpenRouter: " + str(error)
+        except Exception as e:
+
+            error_type = classify_error(e)
+
+            save_error(
+                username=username,
+                provider="OpenRouter",
+                error=e,
+                message=user_message,
+                error_type=error_type
             )
 
-    # ========================================================
-    # HIÇBIR SERVIS ÇALIŞMIYOR
-    # ========================================================
+            errors.append(
+                "OPENROUTER HATASI:\n"
+                + str(e)
+            )
 
-    if not groq_client and not openrouter_client:
-        raise RuntimeError(
-            "Hiçbir yapay zeka API anahtarı yapılandırılmamış."
+    else:
+
+        save_error(
+            username=username,
+            provider="OpenRouter",
+            error="OPENROUTER_API_KEY bulunamadı.",
+            message=user_message,
+            error_type="CONFIGURATION"
         )
 
+        errors.append(
+            "OPENROUTER HATASI:\n"
+            "OPENROUTER_API_KEY bulunamadı."
+        )
+
+    # İki servis de başarısız.
     raise RuntimeError(
-        "Yapay zeka servisleri cevap veremedi. "
-        + " | ".join(errors)
+        "\n\n".join(errors)
     )
 
 
-# ============================================================
-# MODELLER
-# ============================================================
-
-class ChatRequest(BaseModel):
-    message: str
-    username: str = "karahan"
-
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-
-# ============================================================
+# =========================================================
 # ANA SAYFA
-# ============================================================
+# =========================================================
 
 @app.get("/")
-async def root():
+def home():
+
     return FileResponse(
         BASE_DIR / "index.html"
     )
 
 
-# ============================================================
+# =========================================================
 # CHAT
-# ============================================================
+# =========================================================
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
+def chat(data: ChatRequest):
 
     username = normalize_username(
-        request.username
+        data.username
     )
 
     if username not in USERS:
+
         username = "karahan"
 
-    message = request.message.strip()
+    message = data.message.strip()
 
     if not message:
+
         raise HTTPException(
             status_code=400,
-            detail="Mesaj boş olamaz."
+            detail="Mesaj boş bırakılamaz."
         )
 
     try:
@@ -818,142 +759,230 @@ async def chat(request: ChatRequest):
 
         remember_message(
             username,
-            message,
+            "user",
+            message
+        )
+
+        remember_message(
+            username,
+            "assistant",
             answer
         )
 
         return {
             "ok": True,
             "answer": answer,
-            "provider": provider,
-            "username": username,
-            "user": USERS[username]["name"]
+            "provider": provider
         }
 
-    except Exception as error:
+    except Exception as e:
 
-        print("CHAT ERROR:", error)
+        print(
+            "CHAT ERROR:",
+            repr(e)
+        )
 
-        raise HTTPException(
+        # Ana hatayı da kaydet.
+        save_error(
+            username=username,
+            provider="SYSTEM",
+            error=e,
+            message=message,
+            error_type="CHAT_FAILURE"
+        )
+
+        return JSONResponse(
+
             status_code=503,
-            detail="Yapay zeka servisleri şu anda cevap veremiyor."
+
+            content={
+                "ok": False,
+
+                "error": str(e),
+
+                "message": (
+                    "J.A.R.V.I.S. cevap oluşturamadı. "
+                    "Hata Hatalar bölümüne kaydedildi."
+                )
+            }
         )
 
 
-# ============================================================
+# =========================================================
 # PROFİL GİRİŞİ
-# ============================================================
+# =========================================================
 
 @app.post("/profile-login")
-async def profile_login(request: LoginRequest):
+def profile_login(
+    data: ProfileLoginRequest
+):
 
     username = normalize_username(
-        request.username
+        data.username
     )
 
-    password = request.password
-
-    # Ana kullanıcı
-    if username == "karahan":
-
-        return {
-            "ok": True,
-            "username": "karahan",
-            "name": "KARAHAN INC.",
-            "role": "Ana Kullanıcı",
-            "personality": "professional"
-        }
-
-    # Özel kullanıcılar
     if username not in USERS:
 
-        return {
-            "ok": False,
-            "message": "Kullanıcı bulunamadı."
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Profil bulunamadı."
+        )
 
     user = USERS[username]
 
-    if user["password"] != password:
+    if user["password"] is None:
 
         return {
-            "ok": False,
-            "message": "Kullanıcı adı veya şifre yanlış."
+            "ok": True,
+            "username": username,
+            "name": user["name"],
+            "role": user["role"]
         }
+
+    if data.password != user["password"]:
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "ok": False,
+                "error": "Şifre yanlış."
+            }
+        )
 
     return {
         "ok": True,
-        "username": user["username"],
+        "username": username,
         "name": user["name"],
-        "role": user["role"],
-        "personality": user["personality"]
+        "role": user["role"]
     }
 
 
-# ============================================================
+# =========================================================
 # KULLANICILAR
-# ============================================================
+# =========================================================
 
 @app.get("/users")
-async def users():
-
-    # Betül ve Sinem burada bilerek gösterilmiyor.
-    # Profil değiştirme ekranında kullanıcı adı girerek
-    # giriş yapılabiliyor.
+def users():
 
     return {
         "users": [
             {
-                "username": "karahan",
-                "name": "KARAHAN INC.",
-                "role": "Ana Kullanıcı"
+                "username": user["username"],
+                "name": user["name"],
+                "role": user["role"]
             }
+
+            for user in USERS.values()
         ]
     }
 
 
-# ============================================================
-# HAFIZA
-# ============================================================
+# =========================================================
+# MEMORY
+# =========================================================
 
 @app.get("/memory")
-async def get_memory(username: str = "karahan"):
+def get_memory(
+    username: str = "karahan"
+):
 
-    username = normalize_username(username)
+    username = normalize_username(
+        username
+    )
 
-    if username not in USERS:
-        username = "karahan"
+    memory = ensure_user_memory(
+        username
+    )
 
     return {
         "username": username,
-        "memory": get_user_memory(username)
+        "memory": memory.get(
+            username,
+            {}
+        )
     }
 
 
 @app.delete("/memory")
-async def delete_memory(username: str = "karahan"):
+def delete_memory(
+    username: str = "karahan"
+):
 
-    username = normalize_username(username)
+    username = normalize_username(
+        username
+    )
 
-    data = load_memory()
+    memory = load_memory()
 
-    data[username] = empty_memory()
+    memory[username] = {
+        "profile": {},
+        "preferences": {},
+        "projects": {},
+        "vehicles": {},
+        "important_facts": {},
+        "conversation": []
+    }
 
-    save_memory(data)
+    save_memory(memory)
 
     return {
         "ok": True,
-        "message": "Kullanıcı hafızası temizlendi.",
-        "username": username
+        "message": "Hafıza temizlendi."
     }
 
 
-# ============================================================
+# =========================================================
+# HATALAR
+# =========================================================
+
+@app.get("/errors")
+def get_errors():
+
+    errors = load_errors()
+
+    return {
+        "ok": True,
+        "count": len(errors),
+        "errors": list(
+            reversed(errors)
+        )
+    }
+
+
+@app.delete("/errors")
+def delete_errors():
+
+    save_json_file(
+        ERROR_FILE,
+        []
+    )
+
+    return {
+        "ok": True,
+        "message": "Tüm hata kayıtları silindi."
+    }
+
+
+# =========================================================
 # YENİ SOHBET
-# ============================================================
+# =========================================================
 
 @app.post("/new-chat")
-async def new_chat():
+def new_chat(
+    username: str = "karahan"
+):
+
+    username = normalize_username(
+        username
+    )
+
+    memory = ensure_user_memory(
+        username
+    )
+
+    memory[username]["conversation"] = []
+
+    save_memory(memory)
 
     return {
         "ok": True,
@@ -961,35 +990,50 @@ async def new_chat():
     }
 
 
-# ============================================================
+# =========================================================
 # HEALTH
-# ============================================================
+# =========================================================
 
 @app.get("/health")
-async def health():
+def health():
 
     return {
+
         "status": "online",
+
         "version": APP_VERSION,
-        "model": GROQ_MODEL,
-        "groq_configured": bool(GROQ_API_KEY),
-        "openrouter_configured": bool(OPENROUTER_API_KEY),
+
+        "groq_configured": bool(
+            GROQ_API_KEY
+        ),
+
+        "openrouter_configured": bool(
+            OPENROUTER_API_KEY
+        ),
+
+        "groq_model": GROQ_MODEL,
+
+        "openrouter_model": OPENROUTER_MODEL,
+
         "users": [
             "karahan",
             "betul",
             "sinem"
-        ]
+        ],
+
+        "error_count": len(
+            load_errors()
+        )
     }
 
 
-# ============================================================
+# =========================================================
 # VERSION
-# ============================================================
+# =========================================================
 
 @app.get("/version")
-async def version():
+def version():
 
     return {
-        "version": APP_VERSION,
-        "name": "J.A.R.V.I.S. - KARAHAN INC."
+        "version": APP_VERSION
     }
