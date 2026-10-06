@@ -29,7 +29,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 # MAIN BACKEND
 # ============================================================
 
-APP_VERSION = "26.0.0"
+APP_VERSION = "26.1.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -455,8 +455,6 @@ def get_user_mode(
         username or "karahan"
     ).strip().lower()
 
-    # İlknur Hocam'ın varsayılan modu
-    # Ders Asistanı.
     if username == "ilknur":
 
         if not requested_mode:
@@ -1189,149 +1187,388 @@ SADECE JSON DÖNDÜR.
 
 
 # ============================================================
+# GÖRSEL HTTP SİSTEMİ
+# ============================================================
+
+IMAGE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 "
+        "(KHTML, like Gecko) "
+        "Chrome/128.0.0.0 Safari/537.36"
+    ),
+    "Accept": (
+        "image/avif,image/webp,image/apng,"
+        "image/svg+xml,image/*,*/*;q=0.8"
+    ),
+    "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Connection": "keep-alive"
+}
+
+
+def get_image_headers(url):
+
+    headers = dict(
+        IMAGE_HEADERS
+    )
+
+    url_lower = str(
+        url or ""
+    ).lower()
+
+    if "wikimedia.org" in url_lower:
+        headers["Referer"] = (
+            "https://commons.wikimedia.org/"
+        )
+
+    elif "wikipedia.org" in url_lower:
+        headers["Referer"] = (
+            "https://tr.wikipedia.org/"
+        )
+
+    elif "openverse.org" in url_lower:
+        headers["Referer"] = (
+            "https://openverse.org/"
+        )
+
+    return headers
+
+
+# ============================================================
 # GÖRSEL İNDİRME
 # ============================================================
 
 def download_image(
     url,
-    filename=None
+    filename=None,
+    retries=2
 ):
 
-    try:
+    if not url:
+        return None
 
-        if not url:
-            return None
+    url = str(
+        url
+    ).strip()
 
-        print("")
-        print(
-            "GÖRSEL İNDİRİLİYOR:"
-        )
-        print(url)
-
-        response = requests.get(
-            url,
-            headers={
-                "User-Agent":
-                    "Mozilla/5.0 "
-                    "(Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 "
-                    "Chrome/120 Safari/537.36"
-            },
-            timeout=25,
-            allow_redirects=True
-        )
+    if not url.startswith(
+        ("http://", "https://")
+    ):
 
         print(
-            "Görsel HTTP:",
-            response.status_code
+            "✗ Geçersiz görsel URL:",
+            url
         )
 
-        if response.status_code != 200:
+        return None
 
-            return None
+    print("")
+    print(
+        "GÖRSEL İNDİRİLİYOR:"
+    )
+    print(url)
 
-        if len(response.content) < 1000:
+    last_error = None
 
-            return None
+    for attempt in range(
+        1,
+        retries + 1
+    ):
 
         try:
 
-            from PIL import Image
+            print(
+                f"Görsel deneme: {attempt}/{retries}"
+            )
 
-            image = Image.open(
-                BytesIO(
-                    response.content
+            response = requests.get(
+                url,
+                headers=get_image_headers(
+                    url
+                ),
+                timeout=(8, 25),
+                allow_redirects=True,
+                stream=True
+            )
+
+            print(
+                "Görsel HTTP:",
+                response.status_code
+            )
+
+            if response.status_code != 200:
+
+                print(
+                    "✗ HTTP hatası, başka görsele geçiliyor."
+                )
+
+                response.close()
+
+                continue
+
+            content_type = (
+                response.headers
+                .get(
+                    "Content-Type",
+                    ""
+                )
+                .lower()
+            )
+
+            content_length = (
+                response.headers
+                .get(
+                    "Content-Length",
+                    ""
                 )
             )
 
             print(
-                "Görsel formatı:",
-                image.format
+                "Content-Type:",
+                content_type
             )
 
-            print(
-                "Görsel boyutu:",
+            if content_length:
+                print(
+                    "Content-Length:",
+                    content_length
+                )
+
+            content = response.content
+
+            response.close()
+
+            if not content:
+
+                print(
+                    "✗ Boş içerik."
+                )
+
+                continue
+
+            if len(content) < 1000:
+
+                print(
+                    "✗ Görsel çok küçük / geçersiz."
+                )
+
+                continue
+
+            # ------------------------------------------------
+            # PIL İLE GERÇEK GÖRSEL KONTROLÜ
+            # ------------------------------------------------
+
+            try:
+
+                from PIL import Image
+
+                image = Image.open(
+                    BytesIO(content)
+                )
+
+                print(
+                    "Görsel formatı:",
+                    image.format
+                )
+
+                print(
+                    "Görsel boyutu:",
+                    image.size
+                )
+
+                # Gerçek görsel değilse
+                # PIL burada hata verir.
+
+                image.verify()
+
+                image = Image.open(
+                    BytesIO(content)
+                )
+
+            except Exception as error:
+
+                print(
+                    "✗ Geçersiz / bozuk görsel:",
+                    error
+                )
+
+                last_error = error
+
+                continue
+
+            image_width, image_height = (
                 image.size
             )
 
-            if image.mode != "RGB":
+            # Çok küçük görselleri alma.
+            if (
+                image_width < 250
+                or image_height < 150
+            ):
 
-                if image.mode in (
-                    "RGBA",
-                    "LA"
-                ):
+                print(
+                    "✗ Görsel çözünürlüğü çok düşük:",
+                    image.size
+                )
 
-                    background = Image.new(
-                        "RGB",
-                        image.size,
-                        "white"
-                    )
+                continue
 
-                    background.paste(
-                        image,
-                        mask=image.getchannel(
-                            "A"
+            # ------------------------------------------------
+            # RGB / RGBA DÖNÜŞÜMÜ
+            # ------------------------------------------------
+
+            try:
+
+                if image.mode != "RGB":
+
+                    if image.mode in (
+                        "RGBA",
+                        "LA"
+                    ):
+
+                        background = Image.new(
+                            "RGB",
+                            image.size,
+                            "white"
                         )
-                        if "A" in image.getbands()
-                        else None
-                    )
 
-                    image = background
+                        alpha = None
+
+                        if "A" in image.getbands():
+
+                            alpha = image.getchannel(
+                                "A"
+                            )
+
+                        background.paste(
+                            image,
+                            mask=alpha
+                        )
+
+                        image = background
+
+                    else:
+
+                        image = image.convert(
+                            "RGB"
+                        )
+
+                # ------------------------------------------------
+                # DOSYA ADI
+                # ------------------------------------------------
+
+                if filename:
+
+                    destination = (
+                        FILES_DIR
+                        / filename
+                    )
 
                 else:
 
-                    image = image.convert(
-                        "RGB"
+                    destination = (
+                        FILES_DIR
+                        / (
+                            "visual_"
+                            + uuid.uuid4().hex
+                            + ".jpg"
+                        )
                     )
 
-            if filename:
-
-                destination = (
-                    FILES_DIR / filename
+                # JPEG olarak kaydet.
+                image.save(
+                    destination,
+                    "JPEG",
+                    quality=90,
+                    optimize=True
                 )
 
-            else:
+                # Dosya gerçekten oluştu mu?
+                if not destination.exists():
 
-                destination = (
-                    FILES_DIR
-                    / (
-                        "visual_"
-                        + uuid.uuid4().hex
-                        + ".jpg"
+                    print(
+                        "✗ Dosya oluşturulamadı."
                     )
+
+                    continue
+
+                if destination.stat().st_size < 1000:
+
+                    print(
+                        "✗ Oluşan dosya geçersiz."
+                    )
+
+                    try:
+                        destination.unlink()
+                    except Exception:
+                        pass
+
+                    continue
+
+                print(
+                    "✓ Görsel kaydedildi:",
+                    destination
                 )
 
-            image.save(
-                destination,
-                "JPEG",
-                quality=90,
-                optimize=True
-            )
+                return destination
+
+            except Exception as error:
+
+                print(
+                    "PIL kayıt hatası:",
+                    error
+                )
+
+                last_error = error
+
+                try:
+                    if destination.exists():
+                        destination.unlink()
+                except Exception:
+                    pass
+
+                continue
+
+        except requests.exceptions.Timeout as error:
 
             print(
-                "Görsel kaydedildi:",
-                destination
+                "✗ Görsel zaman aşımı."
             )
 
-            return destination
+            last_error = error
+
+            continue
+
+        except requests.exceptions.RequestException as error:
+
+            print(
+                "✗ HTTP bağlantı hatası:",
+                error
+            )
+
+            last_error = error
+
+            continue
 
         except Exception as error:
 
             print(
-                "PIL görsel açma hatası:",
+                "✗ Görsel indirme hatası:",
                 error
             )
 
-            return None
+            last_error = error
 
-    except Exception as error:
+            continue
+
+    if last_error:
 
         print(
-            "Görsel indirme hatası:",
-            error
+            "Son görsel hatası:",
+            last_error
         )
 
-        return None
+    return None
 
 
 # ============================================================
@@ -1362,10 +1599,10 @@ def download_wikimedia_visual(
             "generator": "search",
             "gsrsearch": str(query),
             "gsrnamespace": 6,
-            "gsrlimit": 15,
+            "gsrlimit": 20,
             "prop": "imageinfo",
             "iiprop": "url|mime|size",
-            "iiurlwidth": 1400,
+            "iiurlwidth": 1600,
             "format": "json"
         }
 
@@ -1374,7 +1611,7 @@ def download_wikimedia_visual(
             params=params,
             headers={
                 "User-Agent":
-                    "KARVIS-KARAHAN-INC/26.0"
+                    "KARVIS-KARAHAN-INC/26.1"
             },
             timeout=20
         )
@@ -1385,6 +1622,7 @@ def download_wikimedia_visual(
         )
 
         if response.status_code != 200:
+
             return None
 
         data = response.json()
@@ -1395,7 +1633,13 @@ def download_wikimedia_visual(
             .get("pages", {})
         )
 
-        for page in pages.values():
+        # Wikimedia sonuçlarını daha
+        # stabil bir sırada değerlendir.
+        page_items = list(
+            pages.values()
+        )
+
+        for page in page_items:
 
             imageinfo = page.get(
                 "imageinfo",
@@ -1414,49 +1658,85 @@ def download_wikimedia_visual(
                 )
             ).lower()
 
-            if mime not in [
-                "image/jpeg",
-                "image/png",
-                "image/webp",
-                "image/gif",
-                "image/bmp",
-                "image/tiff"
-            ]:
+            if not mime.startswith(
+                "image/"
+            ):
 
                 continue
 
-            image_url = (
-                info.get("thumburl")
-                or info.get("url")
+            # Aynı sonuç için birden fazla
+            # URL deniyoruz.
+            candidate_urls = []
+
+            thumb_url = info.get(
+                "thumburl"
             )
 
-            if not image_url:
-                continue
-
-            filename = (
-                "visual_"
-                + uuid.uuid4().hex
-                + ".jpg"
+            original_url = info.get(
+                "url"
             )
 
-            image = download_image(
-                image_url,
-                filename
-            )
-
-            if image:
-
-                print(
-                    "✓ WIKIMEDIA GÖRSELİ HAZIR"
+            if thumb_url:
+                candidate_urls.append(
+                    thumb_url
                 )
 
-                return image
+            if original_url:
+                candidate_urls.append(
+                    original_url
+                )
+
+            # Aynı URL'leri temizle.
+            unique_urls = []
+
+            for item in candidate_urls:
+
+                if (
+                    item
+                    and item not in unique_urls
+                ):
+
+                    unique_urls.append(
+                        item
+                    )
+
+            for image_url in unique_urls:
+
+                filename = (
+                    "visual_"
+                    + uuid.uuid4().hex
+                    + ".jpg"
+                )
+
+                image = download_image(
+                    image_url,
+                    filename,
+                    retries=2
+                )
+
+                if image:
+
+                    print(
+                        "✓ WIKIMEDIA GÖRSELİ HAZIR"
+                    )
+
+                    return image
+
+                print(
+                    "Wikimedia URL başarısız, "
+                    "sonraki URL deneniyor."
+                )
 
     except Exception as error:
 
         print(
             "Wikimedia hatası:",
             error
+        )
+
+        log_error(
+            error,
+            "wikimedia_visual"
         )
 
     return None
@@ -1489,10 +1769,10 @@ def download_wikipedia_visual(
             "action": "query",
             "generator": "search",
             "gsrsearch": str(query),
-            "gsrlimit": 10,
+            "gsrlimit": 15,
             "prop": "pageimages",
             "piprop": "original|thumbnail",
-            "pithumbsize": 1400,
+            "pithumbsize": 1600,
             "format": "json"
         }
 
@@ -1501,7 +1781,7 @@ def download_wikipedia_visual(
             params=params,
             headers={
                 "User-Agent":
-                    "KARVIS-KARAHAN-INC/26.0"
+                    "KARVIS-KARAHAN-INC/26.1"
             },
             timeout=20
         )
@@ -1524,45 +1804,82 @@ def download_wikipedia_visual(
 
         for page in pages.values():
 
-            image_info = (
-                page.get("original")
-                or page.get("thumbnail")
+            candidates = []
+
+            original = page.get(
+                "original"
             )
 
-            if not image_info:
-                continue
-
-            image_url = image_info.get(
-                "source"
+            thumbnail = page.get(
+                "thumbnail"
             )
 
-            if not image_url:
-                continue
+            if original:
 
-            filename = (
-                "visual_"
-                + uuid.uuid4().hex
-                + ".jpg"
-            )
-
-            image = download_image(
-                image_url,
-                filename
-            )
-
-            if image:
-
-                print(
-                    "✓ WIKIPEDIA GÖRSELİ HAZIR"
+                candidates.append(
+                    original.get(
+                        "source"
+                    )
                 )
 
-                return image
+            if thumbnail:
+
+                candidates.append(
+                    thumbnail.get(
+                        "source"
+                    )
+                )
+
+            unique_urls = []
+
+            for item in candidates:
+
+                if (
+                    item
+                    and item not in unique_urls
+                ):
+
+                    unique_urls.append(
+                        item
+                    )
+
+            for image_url in unique_urls:
+
+                filename = (
+                    "visual_"
+                    + uuid.uuid4().hex
+                    + ".jpg"
+                )
+
+                image = download_image(
+                    image_url,
+                    filename,
+                    retries=2
+                )
+
+                if image:
+
+                    print(
+                        "✓ WIKIPEDIA GÖRSELİ HAZIR"
+                    )
+
+                    return image
+
+                print(
+                    "Wikipedia URL başarısız, "
+                    "sonraki görsele geçiliyor."
+                )
 
     except Exception as error:
 
         print(
             "Wikipedia görsel hatası:",
             error
+        )
+
+        log_error(
+            error,
+            "wikipedia_visual"
         )
 
     return None
@@ -1595,12 +1912,14 @@ def download_openverse_visual(
             url,
             params={
                 "q": str(query),
-                "page_size": 20,
+                "page_size": 30,
                 "mature": "false"
             },
             headers={
                 "User-Agent":
-                    "KARVIS-KARAHAN-INC/26.0"
+                    "KARVIS-KARAHAN-INC/26.1",
+                "Accept":
+                    "application/json"
             },
             timeout=20
         )
@@ -1611,6 +1930,7 @@ def download_openverse_visual(
         )
 
         if response.status_code != 200:
+
             return None
 
         data = response.json()
@@ -1622,39 +1942,64 @@ def download_openverse_visual(
 
         for item in results:
 
-            image_url = (
-                item.get("thumbnail")
-                or item.get("url")
-                or item.get("image")
-            )
+            # Openverse'de farklı alanlarda
+            # farklı görsel URL'leri bulunabilir.
+            candidate_urls = [
+                item.get("thumbnail"),
+                item.get("url"),
+                item.get("image")
+            ]
 
-            if not image_url:
-                continue
+            unique_urls = []
 
-            filename = (
-                "visual_"
-                + uuid.uuid4().hex
-                + ".jpg"
-            )
+            for image_url in candidate_urls:
 
-            image = download_image(
-                image_url,
-                filename
-            )
+                if (
+                    image_url
+                    and image_url not in unique_urls
+                ):
 
-            if image:
+                    unique_urls.append(
+                        image_url
+                    )
 
-                print(
-                    "✓ OPENVERSE GÖRSELİ HAZIR"
+            for image_url in unique_urls:
+
+                filename = (
+                    "visual_"
+                    + uuid.uuid4().hex
+                    + ".jpg"
                 )
 
-                return image
+                image = download_image(
+                    image_url,
+                    filename,
+                    retries=2
+                )
+
+                if image:
+
+                    print(
+                        "✓ OPENVERSE GÖRSELİ HAZIR"
+                    )
+
+                    return image
+
+                print(
+                    "Openverse URL başarısız, "
+                    "sonraki URL deneniyor."
+                )
 
     except Exception as error:
 
         print(
             "Openverse hatası:",
             error
+        )
+
+        log_error(
+            error,
+            "openverse_visual"
         )
 
     return None
@@ -1679,7 +2024,9 @@ def build_visual_queries(
 
     if query not in queries:
 
-        queries.append(query)
+        queries.append(
+            query
+        )
 
     cleaned = re.sub(
         r"[^\w\sçğıöşüÇĞİÖŞÜ-]",
@@ -1694,27 +2041,38 @@ def build_visual_queries(
         cleaned
     ).strip()
 
-    if cleaned and cleaned not in queries:
+    if (
+        cleaned
+        and cleaned not in queries
+    ):
 
-        queries.append(cleaned)
+        queries.append(
+            cleaned
+        )
 
     extra_queries = [
         cleaned + " photograph",
         cleaned + " photo",
         cleaned + " historical photograph",
         cleaned + " diagram",
-        cleaned + " map"
+        cleaned + " map",
+        cleaned + " educational"
     ]
 
     for item in extra_queries:
 
         item = item.strip()
 
-        if item and item not in queries:
+        if (
+            item
+            and item not in queries
+        ):
 
-            queries.append(item)
+            queries.append(
+                item
+            )
 
-    return queries[:6]
+    return queries[:7]
 
 
 # ============================================================
@@ -1742,11 +2100,17 @@ def get_slide_image(
         query
     )
 
-    # --------------------------------------------------------
+    # ========================================================
     # WIKIMEDIA
-    # --------------------------------------------------------
+    # ========================================================
 
     for search_query in queries:
+
+        print("")
+        print(
+            "WIKIMEDIA SORGU:",
+            search_query
+        )
 
         image = download_wikimedia_visual(
             search_query
@@ -1760,11 +2124,17 @@ def get_slide_image(
 
             return image
 
-    # --------------------------------------------------------
+    # ========================================================
     # WIKIPEDIA
-    # --------------------------------------------------------
+    # ========================================================
 
     for search_query in queries:
+
+        print("")
+        print(
+            "WIKIPEDIA SORGU:",
+            search_query
+        )
 
         image = download_wikipedia_visual(
             search_query
@@ -1778,11 +2148,17 @@ def get_slide_image(
 
             return image
 
-    # --------------------------------------------------------
+    # ========================================================
     # OPENVERSE
-    # --------------------------------------------------------
+    # ========================================================
 
     for search_query in queries:
+
+        print("")
+        print(
+            "OPENVERSE SORGU:",
+            search_query
+        )
 
         image = download_openverse_visual(
             search_query
@@ -1796,9 +2172,11 @@ def get_slide_image(
 
             return image
 
+    print("")
     print(
         "✗ UYGUN GÖRSEL BULUNAMADI."
     )
+    print("")
 
     return None
 
@@ -2079,7 +2457,6 @@ def draw_teacher_note(
         note or ""
     ).strip()
 
-    # Kutu
     pdf.roundRect(
         x,
         y,
@@ -2090,7 +2467,6 @@ def draw_teacher_note(
         fill=0
     )
 
-    # Başlık
     pdf.setFont(
         BOLD_FONT,
         9.5
@@ -2102,7 +2478,6 @@ def draw_teacher_note(
         "Öğretmen Notu"
     )
 
-    # Metin alanı
     text_x = (
         x + 105
     )
@@ -2115,7 +2490,6 @@ def draw_teacher_note(
         width - 120
     )
 
-    # Metni otomatik satırlandır.
     draw_wrapped_text(
         pdf,
         note,
@@ -2323,20 +2697,15 @@ def create_presentation_pdf(
         )
 
         # ====================================================
-        # SOL İÇERİK ALANI
+        # SOL İÇERİK
         # ====================================================
 
         left_x = 55
-
         left_width = 390
 
         text_y = (
             page_height - 90
         )
-
-        # ----------------------------------------------------
-        # AÇIKLAMA BAŞLIĞI
-        # ----------------------------------------------------
 
         pdf.setFont(
             BOLD_FONT,
@@ -2351,10 +2720,6 @@ def create_presentation_pdf(
 
         text_y -= 20
 
-        # ----------------------------------------------------
-        # UZUN AÇIKLAMA
-        # ----------------------------------------------------
-
         text_y = draw_wrapped_text(
             pdf,
             paragraph,
@@ -2366,10 +2731,6 @@ def create_presentation_pdf(
             leading=15,
             max_lines=11
         )
-
-        # ----------------------------------------------------
-        # ÖNEMLİ NOKTALAR
-        # ----------------------------------------------------
 
         text_y -= 10
 
@@ -2455,11 +2816,7 @@ def create_presentation_pdf(
 
         # ====================================================
         # ÖĞRETMEN NOTU
-        #
-        # Ayrı sabit kutu kullanılıyor.
-        # Böylece metinler artık birbirinin
-        # üzerine binmiyor.
-        # ========================================================
+        # ====================================================
 
         draw_teacher_note(
             pdf,
@@ -2648,8 +3005,6 @@ def profile_login(
             }
         )
 
-    # Ana kullanıcı
-    # şifresiz kullanılabilir.
     if username == "karahan":
 
         return {
@@ -2670,8 +3025,6 @@ def profile_login(
             }
         )
 
-    # İlknur Hocam için otomatik
-    # Ders Asistanı.
     if username == "ilknur":
 
         return {
@@ -3116,6 +3469,11 @@ def startup():
     print(
         "Görsel kaynakları:"
         " Wikimedia + Wikipedia + Openverse"
+    )
+
+    print(
+        "Gelişmiş görsel indirme:"
+        " AKTİF"
     )
 
     print(
