@@ -6,148 +6,883 @@
 <title>K.A.R.V.I.S. - KARAHAN INC.</title>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#02070a;color:#fff}
-body{background:radial-gradient(circle at center,rgba(0,229,255,.09),transparent 38%),radial-gradient(circle at 50% 100%,rgba(0,229,255,.035),transparent 45%),#02070a}
-button,input{font:inherit}
-button{cursor:pointer;-webkit-appearance:none}
-button:active{transform:scale(.97)}
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent
+}
 
-.header{height:72px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,229,255,.15);background:rgba(2,7,10,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;z-index:10}
-.logo-small{width:44px;height:44px;border-radius:50%;border:2px solid #00e5ff;display:flex;align-items:center;justify-content:center;color:#00e5ff;font-size:21px;font-weight:800;box-shadow:0 0 12px rgba(0,229,255,.5),inset 0 0 12px rgba(0,229,255,.12);animation:logoPulse 3s ease-in-out infinite}
-.brand{margin-left:12px}
-.brand-title{font-size:18px;font-weight:800;letter-spacing:2px}
-.brand-subtitle{color:rgba(255,255,255,.5);font-size:9px;letter-spacing:3px;margin-top:2px}
-.online{margin-left:10px;font-size:9px;color:#00e5ff;letter-spacing:.5px}
-.menu-button{margin-left:auto;width:44px;height:44px;border:1px solid rgba(0,229,255,.25);border-radius:14px;background:rgba(0,229,255,.05);color:#00e5ff;font-size:22px}
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#02070a;
+    color:#fff
+}
 
-.main{height:calc(100vh - 72px);display:flex;flex-direction:column;position:relative}
-.hud{flex:1;position:relative;overflow:hidden}
+body{
+    background:
+        radial-gradient(circle at center,rgba(0,229,255,.09),transparent 38%),
+        radial-gradient(circle at 50% 100%,rgba(0,229,255,.035),transparent 45%),
+        #02070a
+}
 
-.hud-core{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:210px;height:210px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,.35);animation:spin 9s linear infinite}
-.ring.one{width:210px;height:210px}
-.ring.two{width:170px;height:170px;border-style:dashed;animation-duration:6s;animation-direction:reverse}
-.ring.three{width:130px;height:130px;border-color:rgba(0,229,255,.7);animation-duration:4s}
-.core{width:82px;height:82px;border-radius:50%;border:2px solid #00e5ff;color:#00e5ff;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;box-shadow:0 0 25px rgba(0,229,255,.7),inset 0 0 20px rgba(0,229,255,.2);z-index:2}
-.status{position:absolute;top:calc(38% + 120px);left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:2px;white-space:nowrap;text-align:center}
-.status.busy{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,.5)}
+button,input{
+    font:inherit
+}
 
-.chat{position:absolute;left:12px;right:12px;bottom:100px;max-height:38%;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:4px;scrollbar-width:none}
-.chat::-webkit-scrollbar{display:none}
-.message{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word;animation:messageIn .2s ease}
-.message.ai{align-self:flex-start;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.16)}
-.message.user{align-self:flex-end;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
-.message a{color:#00e5ff;text-decoration:none}
+button{
+    cursor:pointer;
+    -webkit-appearance:none
+}
 
-.waiting-message{min-width:190px}
-.waiting-title{color:#00e5ff;font-weight:700;margin-bottom:4px}
-.waiting-detail{color:rgba(255,255,255,.55);font-size:11px}
+button:active{
+    transform:scale(.97)
+}
 
-.input-area{position:absolute;left:12px;right:12px;bottom:15px;height:58px;display:flex;gap:8px}
-.input{min-width:0;flex:1;border:1px solid rgba(0,229,255,.22);border-radius:18px;background:rgba(5,15,20,.95);color:white;padding:0 17px;outline:none;font-size:16px}
-.input::placeholder{color:rgba(255,255,255,.38)}
-.input:focus{border-color:rgba(0,229,255,.65)}
-.send{width:58px;border:0;border-radius:18px;background:#00e5ff;color:#001014;font-size:22px;font-weight:900;box-shadow:0 0 15px rgba(0,229,255,.25)}
-.send:disabled{opacity:.45;cursor:default}
+/* =====================================================
+   HEADER
+===================================================== */
 
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:min(330px,88vw);background:rgba(2,7,10,.98);border-right:1px solid rgba(0,229,255,.2);z-index:100;transform:translateX(-105%);transition:transform .25s ease;padding:22px 15px;overflow-y:auto;box-shadow:10px 0 40px rgba(0,0,0,.35)}
-.sidebar.open{transform:translateX(0)}
-.sidebar-title{color:#00e5ff;font-size:16px;font-weight:800;letter-spacing:2px;margin-bottom:20px}
-.menu-item{width:100%;min-height:48px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035);color:white;text-align:left;padding:12px 14px;margin-bottom:8px;transition:.2s ease}
-.menu-item:hover,.menu-item.active{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.08);color:#00e5ff}
-.academic-title{margin:22px 5px 10px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.4)}
-.close-sidebar{position:absolute;right:14px;top:15px;border:0;background:transparent;color:#00e5ff;font-size:24px}
+.header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    padding:0 16px;
+    border-bottom:1px solid rgba(0,229,255,.15);
+    background:rgba(2,7,10,.92);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    position:relative;
+    z-index:10
+}
 
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);z-index:90;display:none}
-.overlay.show{display:block}
+.logo-small{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#00e5ff;
+    font-size:21px;
+    font-weight:800;
+    box-shadow:
+        0 0 12px rgba(0,229,255,.5),
+        inset 0 0 12px rgba(0,229,255,.12);
+    animation:logoPulse 3s ease-in-out infinite
+}
 
-.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,440px);max-height:85vh;overflow-y:auto;background:#071116;border:1px solid rgba(0,229,255,.25);border-radius:22px;z-index:200;padding:22px;display:none;box-shadow:0 20px 80px rgba(0,0,0,.55)}
-.modal.show{display:block}
-.modal h2{margin-top:0;color:#00e5ff}
-.modal input{width:100%;height:48px;margin-bottom:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:white;padding:0 12px;font-size:16px;outline:none}
-.modal-button{width:100%;height:46px;border:0;border-radius:12px;background:#00e5ff;color:#001014;font-weight:800}
-.secondary-button{margin-top:8px;background:rgba(255,255,255,.08);color:white}
+.brand{
+    margin-left:12px
+}
 
-.progress-bar{width:100%;height:3px;margin-top:10px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.08)}
-.progress-bar-inner{width:20%;height:100%;background:#00e5ff;border-radius:99px;animation:progressMove 1.1s ease-in-out infinite}
+.brand-title{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:2px
+}
 
-.error-list{max-height:50vh;overflow-y:auto}
-.error-item{padding:10px;margin-bottom:8px;border-radius:10px;background:rgba(255,70,70,.06);border:1px solid rgba(255,70,70,.12);color:rgba(255,255,255,.8);font-size:12px;white-space:pre-wrap;word-break:break-word}
+.brand-subtitle{
+    color:rgba(255,255,255,.5);
+    font-size:9px;
+    letter-spacing:3px;
+    margin-top:2px
+}
 
-body.sinem-mode .ring{border-color:rgba(255,80,180,.45)}
-body.sinem-mode .core{color:#ff5ab4;border-color:#ff5ab4;box-shadow:0 0 25px rgba(255,90,180,.55),inset 0 0 20px rgba(255,90,180,.15)}
-body.fun-mode .ring{border-color:rgba(255,50,50,.6)}
-body.fun-mode .core{color:#ff4444;border-color:#ff4444;box-shadow:0 0 25px rgba(255,50,50,.6),inset 0 0 20px rgba(255,50,50,.15)}
-body.fun-mode .status{color:#ff4444}
+.online{
+    margin-left:10px;
+    font-size:9px;
+    color:#00e5ff;
+    letter-spacing:.5px
+}
 
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes logoPulse{0%,100%{box-shadow:0 0 12px rgba(0,229,255,.5),inset 0 0 12px rgba(0,229,255,.12)}50%{box-shadow:0 0 22px rgba(0,229,255,.75),inset 0 0 16px rgba(0,229,255,.18)}}
-@keyframes messageIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-@keyframes progressMove{0%{transform:translateX(-130%)}100%{transform:translateX(550%)}}
+.menu-button{
+    margin-left:auto;
+    width:44px;
+    height:44px;
+    border:1px solid rgba(0,229,255,.25);
+    border-radius:14px;
+    background:rgba(0,229,255,.05);
+    color:#00e5ff;
+    font-size:22px
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+    height:calc(100vh - 72px);
+    display:flex;
+    flex-direction:column;
+    position:relative
+}
+
+.hud{
+    flex:1;
+    position:relative;
+    overflow:hidden
+}
+
+.hud-core{
+    position:absolute;
+    left:50%;
+    top:38%;
+    transform:translate(-50%,-50%);
+    width:210px;
+    height:210px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center
+}
+
+.ring{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid rgba(0,229,255,.35);
+    animation:spin 9s linear infinite
+}
+
+.ring.one{
+    width:210px;
+    height:210px
+}
+
+.ring.two{
+    width:170px;
+    height:170px;
+    border-style:dashed;
+    animation-duration:6s;
+    animation-direction:reverse
+}
+
+.ring.three{
+    width:130px;
+    height:130px;
+    border-color:rgba(0,229,255,.7);
+    animation-duration:4s
+}
+
+.core{
+    width:82px;
+    height:82px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    color:#00e5ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:38px;
+    font-weight:900;
+    box-shadow:
+        0 0 25px rgba(0,229,255,.7),
+        inset 0 0 20px rgba(0,229,255,.2);
+    z-index:2
+}
+
+.status{
+    position:absolute;
+    top:calc(38% + 120px);
+    left:50%;
+    transform:translateX(-50%);
+    color:rgba(255,255,255,.5);
+    font-size:10px;
+    letter-spacing:2px;
+    white-space:nowrap;
+    text-align:center
+}
+
+.status.busy{
+    color:#00e5ff;
+    text-shadow:0 0 10px rgba(0,229,255,.5)
+}
+
+/* =====================================================
+   CHAT
+===================================================== */
+
+.chat{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:100px;
+    max-height:38%;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding-bottom:4px;
+    scrollbar-width:none
+}
+
+.chat::-webkit-scrollbar{
+    display:none
+}
+
+.message{
+    max-width:86%;
+    padding:11px 14px;
+    border-radius:15px;
+    font-size:14px;
+    line-height:1.45;
+    white-space:pre-wrap;
+    word-break:break-word;
+    animation:messageIn .2s ease
+}
+
+.message.ai{
+    align-self:flex-start;
+    background:rgba(0,229,255,.08);
+    border:1px solid rgba(0,229,255,.16)
+}
+
+.message.user{
+    align-self:flex-end;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1)
+}
+
+.message a{
+    color:#00e5ff;
+    text-decoration:none
+}
+
+.waiting-message{
+    min-width:190px
+}
+
+.waiting-title{
+    color:#00e5ff;
+    font-weight:700;
+    margin-bottom:4px
+}
+
+.waiting-detail{
+    color:rgba(255,255,255,.55);
+    font-size:11px
+}
+
+/* =====================================================
+   PRESENTATION LIVE PANEL
+===================================================== */
+
+.presentation-box{
+    min-width:min(340px,82vw);
+    padding:14px;
+    border-radius:16px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,229,255,.08),
+            rgba(0,229,255,.025)
+        );
+    border:1px solid rgba(0,229,255,.18);
+    box-shadow:
+        inset 0 0 25px rgba(0,229,255,.025),
+        0 0 20px rgba(0,0,0,.12)
+}
+
+.presentation-heading{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-bottom:12px
+}
+
+.presentation-orb{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#00e5ff;
+    box-shadow:0 0 12px rgba(0,229,255,.8);
+    animation:liveOrb 1.1s ease-in-out infinite
+}
+
+.presentation-heading-text{
+    color:#00e5ff;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:1.6px
+}
+
+.presentation-percent{
+    margin-left:auto;
+    color:#00e5ff;
+    font-size:12px;
+    font-weight:800
+}
+
+.presentation-current{
+    min-height:30px;
+    margin-bottom:11px;
+    padding:8px 10px;
+    border-radius:10px;
+    background:rgba(0,229,255,.045);
+    border:1px solid rgba(0,229,255,.10);
+    color:rgba(255,255,255,.78);
+    font-size:11px;
+    line-height:1.45
+}
+
+.presentation-current strong{
+    color:#00e5ff
+}
+
+.presentation-steps{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    margin-bottom:12px
+}
+
+.presentation-step{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-height:20px;
+    color:rgba(255,255,255,.28);
+    font-size:10px;
+    transition:.25s ease
+}
+
+.presentation-step-icon{
+    width:17px;
+    height:17px;
+    flex:none;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    font-weight:900;
+    border:1px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.25)
+}
+
+.presentation-step.done{
+    color:rgba(255,255,255,.65)
+}
+
+.presentation-step.done .presentation-step-icon{
+    color:#00e5ff;
+    border-color:rgba(0,229,255,.4);
+    background:rgba(0,229,255,.08);
+    box-shadow:0 0 8px rgba(0,229,255,.12)
+}
+
+.presentation-step.active{
+    color:#fff
+}
+
+.presentation-step.active .presentation-step-icon{
+    color:#001014;
+    background:#00e5ff;
+    border-color:#00e5ff;
+    box-shadow:0 0 12px rgba(0,229,255,.55);
+    animation:stepPulse 1.1s ease-in-out infinite
+}
+
+.presentation-progress{
+    height:5px;
+    width:100%;
+    border-radius:99px;
+    overflow:hidden;
+    background:rgba(255,255,255,.08);
+    margin-top:4px
+}
+
+.presentation-progress-inner{
+    height:100%;
+    width:0%;
+    border-radius:99px;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,229,255,.45),
+            #00e5ff
+        );
+    box-shadow:0 0 10px rgba(0,229,255,.55);
+    transition:width .45s ease
+}
+
+.presentation-live-footer{
+    margin-top:8px;
+    color:rgba(255,255,255,.32);
+    font-size:9px;
+    letter-spacing:.4px
+}
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.input-area{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:15px;
+    height:58px;
+    display:flex;
+    gap:8px
+}
+
+.input{
+    min-width:0;
+    flex:1;
+    border:1px solid rgba(0,229,255,.22);
+    border-radius:18px;
+    background:rgba(5,15,20,.95);
+    color:white;
+    padding:0 17px;
+    outline:none;
+    font-size:16px
+}
+
+.input::placeholder{
+    color:rgba(255,255,255,.38)
+}
+
+.input:focus{
+    border-color:rgba(0,229,255,.65)
+}
+
+.send{
+    width:58px;
+    border:0;
+    border-radius:18px;
+    background:#00e5ff;
+    color:#001014;
+    font-size:22px;
+    font-weight:900;
+    box-shadow:0 0 15px rgba(0,229,255,.25)
+}
+
+.send:disabled{
+    opacity:.45;
+    cursor:default
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:min(330px,88vw);
+    background:rgba(2,7,10,.98);
+    border-right:1px solid rgba(0,229,255,.2);
+    z-index:100;
+    transform:translateX(-105%);
+    transition:transform .25s ease;
+    padding:22px 15px;
+    overflow-y:auto;
+    box-shadow:10px 0 40px rgba(0,0,0,.35)
+}
+
+.sidebar.open{
+    transform:translateX(0)
+}
+
+.sidebar-title{
+    color:#00e5ff;
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:2px;
+    margin-bottom:20px
+}
+
+.menu-item{
+    width:100%;
+    min-height:48px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    color:white;
+    text-align:left;
+    padding:12px 14px;
+    margin-bottom:8px;
+    transition:.2s ease
+}
+
+.menu-item:hover,
+.menu-item.active{
+    border-color:rgba(0,229,255,.45);
+    background:rgba(0,229,255,.08);
+    color:#00e5ff
+}
+
+.academic-title{
+    margin:22px 5px 10px;
+    font-size:10px;
+    letter-spacing:2px;
+    color:rgba(255,255,255,.4)
+}
+
+.close-sidebar{
+    position:absolute;
+    right:14px;
+    top:15px;
+    border:0;
+    background:transparent;
+    color:#00e5ff;
+    font-size:24px
+}
+
+/* =====================================================
+   OVERLAY / MODALS
+===================================================== */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(2px);
+    z-index:90;
+    display:none
+}
+
+.overlay.show{
+    display:block
+}
+
+.modal{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(92vw,440px);
+    max-height:85vh;
+    overflow-y:auto;
+    background:#071116;
+    border:1px solid rgba(0,229,255,.25);
+    border-radius:22px;
+    z-index:200;
+    padding:22px;
+    display:none;
+    box-shadow:0 20px 80px rgba(0,0,0,.55)
+}
+
+.modal.show{
+    display:block
+}
+
+.modal h2{
+    margin-top:0;
+    color:#00e5ff
+}
+
+.modal input{
+    width:100%;
+    height:48px;
+    margin-bottom:10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.05);
+    color:white;
+    padding:0 12px;
+    font-size:16px;
+    outline:none
+}
+
+.modal-button{
+    width:100%;
+    height:46px;
+    border:0;
+    border-radius:12px;
+    background:#00e5ff;
+    color:#001014;
+    font-weight:800
+}
+
+.secondary-button{
+    margin-top:8px;
+    background:rgba(255,255,255,.08);
+    color:white
+}
+
+.error-list{
+    max-height:50vh;
+    overflow-y:auto
+}
+
+.error-item{
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:10px;
+    background:rgba(255,70,70,.06);
+    border:1px solid rgba(255,70,70,.12);
+    color:rgba(255,255,255,.8);
+    font-size:12px;
+    white-space:pre-wrap;
+    word-break:break-word
+}
+
+/* =====================================================
+   THEMES
+===================================================== */
+
+body.sinem-mode .ring{
+    border-color:rgba(255,80,180,.45)
+}
+
+body.sinem-mode .core{
+    color:#ff5ab4;
+    border-color:#ff5ab4;
+    box-shadow:
+        0 0 25px rgba(255,90,180,.55),
+        inset 0 0 20px rgba(255,90,180,.15)
+}
+
+body.fun-mode .ring{
+    border-color:rgba(255,50,50,.6)
+}
+
+body.fun-mode .core{
+    color:#ff4444;
+    border-color:#ff4444;
+    box-shadow:
+        0 0 25px rgba(255,50,50,.6),
+        inset 0 0 20px rgba(255,50,50,.15)
+}
+
+body.fun-mode .status{
+    color:#ff4444
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes spin{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
+}
+
+@keyframes logoPulse{
+    0%,100%{
+        box-shadow:
+            0 0 12px rgba(0,229,255,.5),
+            inset 0 0 12px rgba(0,229,255,.12)
+    }
+
+    50%{
+        box-shadow:
+            0 0 22px rgba(0,229,255,.75),
+            inset 0 0 16px rgba(0,229,255,.18)
+    }
+}
+
+@keyframes messageIn{
+    from{
+        opacity:0;
+        transform:translateY(5px)
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0)
+    }
+}
+
+@keyframes liveOrb{
+    0%,100%{
+        transform:scale(.75);
+        opacity:.55
+    }
+
+    50%{
+        transform:scale(1.15);
+        opacity:1
+    }
+}
+
+@keyframes stepPulse{
+    0%,100%{
+        box-shadow:0 0 6px rgba(0,229,255,.35)
+    }
+
+    50%{
+        box-shadow:0 0 16px rgba(0,229,255,.8)
+    }
+}
+
+@media(max-width:480px){
+
+    .presentation-box{
+        min-width:0;
+        width:100%
+    }
+
+    .presentation-step{
+        font-size:9.5px
+    }
+
+    .message{
+        max-width:92%
+    }
+}
 </style>
 </head>
 
 <body>
 
 <div class="header">
+
     <div class="logo-small">K</div>
+
     <div class="brand">
         <div class="brand-title">K.A.R.V.I.S.</div>
         <div class="brand-subtitle">KARAHAN INC.</div>
     </div>
-    <div id="onlineStatus" class="online">● ONLINE</div>
-    <button class="menu-button" onclick="openSidebar()">☰</button>
+
+    <div id="onlineStatus" class="online">
+        ● ONLINE
+    </div>
+
+    <button
+        class="menu-button"
+        onclick="openSidebar()"
+    >
+        ☰
+    </button>
+
 </div>
 
-<div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+<div
+    id="overlay"
+    class="overlay"
+    onclick="closeSidebar()"
+></div>
 
 <div id="sidebar" class="sidebar">
-    <button class="close-sidebar" onclick="closeSidebar()">×</button>
 
-    <div class="sidebar-title">K.A.R.V.I.S.</div>
+    <button
+        class="close-sidebar"
+        onclick="closeSidebar()"
+    >
+        ×
+    </button>
 
-    <button class="menu-item" onclick="newChat()">＋ Yeni Sohbet</button>
-    <button class="menu-item" onclick="openErrors()">⚠ Hatalar</button>
-    <button class="menu-item" onclick="openProfile()">◉ Profil Değiştir</button>
+    <div class="sidebar-title">
+        K.A.R.V.I.S.
+    </div>
 
-    <button id="funButton" class="menu-item" onclick="toggleFunMode()">
+    <button
+        class="menu-item"
+        onclick="newChat()"
+    >
+        ＋ Yeni Sohbet
+    </button>
+
+    <button
+        class="menu-item"
+        onclick="openErrors()"
+    >
+        ⚠ Hatalar
+    </button>
+
+    <button
+        class="menu-item"
+        onclick="openProfile()"
+    >
+        ◉ Profil Değiştir
+    </button>
+
+    <button
+        id="funButton"
+        class="menu-item"
+        onclick="toggleFunMode()"
+    >
         ◈ Eğlence Modu
     </button>
 
-    <div id="teacherMenu" style="display:none;">
-        <div class="academic-title">AKADEMİK ASİSTAN</div>
+    <div
+        id="teacherMenu"
+        style="display:none;"
+    >
 
-        <button class="menu-item academic-menu-item" data-mode="research" onclick="selectAcademicMode('research')">
+        <div class="academic-title">
+            AKADEMİK ASİSTAN
+        </div>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="research"
+            onclick="selectAcademicMode('research')"
+        >
             🔬 Araştırma Modu
         </button>
 
-        <button class="menu-item academic-menu-item" data-mode="academic" onclick="selectAcademicMode('academic')">
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="academic"
+            onclick="selectAcademicMode('academic')"
+        >
             📚 Akademik Mod
         </button>
 
-        <button class="menu-item academic-menu-item" data-mode="article" onclick="selectAcademicMode('article')">
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="article"
+            onclick="selectAcademicMode('article')"
+        >
             📝 Makale Asistanı
         </button>
 
-        <button class="menu-item academic-menu-item" data-mode="lesson" onclick="selectAcademicMode('lesson')">
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="lesson"
+            onclick="selectAcademicMode('lesson')"
+        >
             🎓 Ders Asistanı
         </button>
 
-        <button class="menu-item academic-menu-item" data-mode="quiz" onclick="selectAcademicMode('quiz')">
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="quiz"
+            onclick="selectAcademicMode('quiz')"
+        >
             🧪 Sınav / Quiz
         </button>
 
-        <button class="menu-item academic-menu-item" data-mode="presentation" onclick="selectAcademicMode('presentation')">
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="presentation"
+            onclick="selectAcademicMode('presentation')"
+        >
             📊 Sunum Hazırlama
         </button>
+
     </div>
+
 </div>
 
-<div id="profileModal" class="modal">
-    <h2>Profil Değiştir</h2>
+<!-- =====================================================
+     PROFILE
+===================================================== -->
 
-    <input id="usernameInput" placeholder="Kullanıcı adı" autocomplete="username">
+<div
+    id="profileModal"
+    class="modal"
+>
+
+    <h2>
+        Profil Değiştir
+    </h2>
+
+    <input
+        id="usernameInput"
+        placeholder="Kullanıcı adı"
+        autocomplete="username"
+    >
 
     <input
         id="passwordInput"
@@ -157,42 +892,85 @@ body.fun-mode .status{color:#ff4444}
         onkeydown="handleLoginKey(event)"
     >
 
-    <button class="modal-button" onclick="login()">Giriş Yap</button>
+    <button
+        class="modal-button"
+        onclick="login()"
+    >
+        Giriş Yap
+    </button>
 
-    <button class="modal-button secondary-button" onclick="closeModals()">
+    <button
+        class="modal-button secondary-button"
+        onclick="closeModals()"
+    >
         Vazgeç
     </button>
+
 </div>
 
-<div id="errorModal" class="modal">
-    <h2>Hatalar</h2>
+<!-- =====================================================
+     ERROR MODAL
+===================================================== -->
 
-    <div id="errorContent" class="error-list">
+<div
+    id="errorModal"
+    class="modal"
+>
+
+    <h2>
+        Hatalar
+    </h2>
+
+    <div
+        id="errorContent"
+        class="error-list"
+    >
         Yükleniyor...
     </div>
 
-    <button class="modal-button secondary-button" onclick="closeModals()">
+    <button
+        class="modal-button secondary-button"
+        onclick="closeModals()"
+    >
         Kapat
     </button>
+
 </div>
 
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <div class="main">
+
     <div class="hud">
 
         <div class="hud-core">
+
             <div class="ring one"></div>
             <div class="ring two"></div>
             <div class="ring three"></div>
-            <div class="core">K</div>
+
+            <div class="core">
+                K
+            </div>
+
         </div>
 
-        <div id="status" class="status">
+        <div
+            id="status"
+            class="status"
+        >
             K.A.R.V.I.S. HAZIR
         </div>
 
-        <div id="chat" class="chat"></div>
+        <div
+            id="chat"
+            class="chat"
+        ></div>
 
         <div class="input-area">
+
             <input
                 id="messageInput"
                 class="input"
@@ -201,12 +979,18 @@ body.fun-mode .status{color:#ff4444}
                 onkeydown="handleKey(event)"
             >
 
-            <button id="sendButton" class="send" onclick="sendMessage()">
+            <button
+                id="sendButton"
+                class="send"
+                onclick="sendMessage()"
+            >
                 ➤
             </button>
+
         </div>
 
     </div>
+
 </div>
 
 <script>
@@ -217,6 +1001,7 @@ let currentUser = "karahan";
 let currentMode = "normal";
 let funMode = false;
 let sending = false;
+
 let presentationPolling = null;
 let dotsTimer = null;
 
@@ -228,11 +1013,12 @@ const waitMessages = [
     "K.A.R.V.I.S. analiz ediyor..."
 ];
 
-function $(id) {
+function $(id){
     return document.getElementById(id);
 }
 
-function escapeHTML(text) {
+function escapeHTML(text){
+
     return String(text)
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
@@ -241,7 +1027,8 @@ function escapeHTML(text) {
         .replace(/'/g,"&#039;");
 }
 
-function formatText(text) {
+function formatText(text){
+
     let safe = escapeHTML(text);
 
     safe = safe.replace(
@@ -252,100 +1039,147 @@ function formatText(text) {
     return safe;
 }
 
-function addMessage(text,type="ai") {
-    const chat = $("chat");
-    const div = document.createElement("div");
+function addMessage(
+    text,
+    type="ai"
+){
 
-    div.className = "message " + type;
-    div.innerHTML = formatText(text);
+    const chat = $("chat");
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "message " + type;
+
+    div.innerHTML =
+        formatText(text);
 
     chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+
+    chat.scrollTop =
+        chat.scrollHeight;
 
     return div;
 }
 
-function openSidebar() {
-    $("sidebar").classList.add("open");
-    $("overlay").classList.add("show");
+function openSidebar(){
+
+    $("sidebar")
+        .classList.add("open");
+
+    $("overlay")
+        .classList.add("show");
 }
 
-function closeSidebar() {
-    $("sidebar").classList.remove("open");
-    $("overlay").classList.remove("show");
+function closeSidebar(){
+
+    $("sidebar")
+        .classList.remove("open");
+
+    $("overlay")
+        .classList.remove("show");
 }
 
-function closeModals() {
-    document.querySelectorAll(".modal").forEach(
-        modal => modal.classList.remove("show")
+function closeModals(){
+
+    document
+        .querySelectorAll(".modal")
+        .forEach(
+            modal =>
+                modal.classList.remove("show")
+        );
+}
+
+function openProfile(){
+
+    closeSidebar();
+
+    $("profileModal")
+        .classList.add("show");
+
+    setTimeout(
+        () => {
+            $("usernameInput").focus();
+        },
+        100
     );
 }
 
-function openProfile() {
-    closeSidebar();
+function handleLoginKey(event){
 
-    $("profileModal").classList.add("show");
-
-    setTimeout(() => {
-        $("usernameInput").focus();
-    },100);
-}
-
-function handleLoginKey(event) {
     if(event.key === "Enter"){
+
         event.preventDefault();
+
         login();
     }
 }
 
 /* =====================================================
    LOGIN
-   ÖNEMLİ:
-   Güncel main.py -> POST /login
 ===================================================== */
 
-async function login() {
+async function login(){
 
-    const username = $("usernameInput")
+    const username =
+        $("usernameInput")
         .value
         .trim()
         .toLowerCase();
 
-    const password = $("passwordInput").value;
+    const password =
+        $("passwordInput").value;
 
     if(!username){
-        alert("Kullanıcı adı girin.");
+
+        alert(
+            "Kullanıcı adı girin."
+        );
+
         $("usernameInput").focus();
+
         return;
     }
 
-    try {
+    try{
 
-        const response = await fetch(
-            API + "/login",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    username:username,
-                    password:password
-                })
-            }
-        );
+        const response =
+            await fetch(
+                API + "/login",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        username:username,
+                        password:password
+                    })
+                }
+            );
 
         let data;
 
-        try {
-            data = await response.json();
-        } catch {
+        try{
+
+            data =
+                await response.json();
+
+        }catch{
+
             throw new Error(
                 "Sunucudan geçersiz yanıt geldi."
             );
         }
 
-        if(!response.ok || data.success !== true){
+        if(
+            !response.ok ||
+            data.success !== true
+        ){
 
             alert(
                 data.detail ||
@@ -356,25 +1190,15 @@ async function login() {
             return;
         }
 
-        /*
-         * Güncel main.py:
-         *
-         * data.username
-         *
-         * Bazı sürümlerde:
-         *
-         * data.user.username
-         *
-         * İkisini de destekliyoruz.
-         */
-
-        currentUser = String(
-            (data.user && data.user.username) ||
-            data.username ||
-            username
-        )
-        .trim()
-        .toLowerCase();
+        currentUser =
+            String(
+                (data.user &&
+                 data.user.username) ||
+                data.username ||
+                username
+            )
+            .trim()
+            .toLowerCase();
 
         if(
             ![
@@ -384,18 +1208,25 @@ async function login() {
                 "ilknur"
             ].includes(currentUser)
         ){
-            currentUser = username;
+
+            currentUser =
+                username;
         }
 
-        if(currentUser === "ilknur"){
+        if(
+            currentUser === "ilknur"
+        ){
 
             currentMode =
-                localStorage.getItem("karvis_mode") ||
+                localStorage.getItem(
+                    "karvis_mode"
+                ) ||
                 "lesson";
 
         }else{
 
-            currentMode = "normal";
+            currentMode =
+                "normal";
         }
 
         localStorage.setItem(
@@ -414,14 +1245,18 @@ async function login() {
         closeModals();
 
         funMode = false;
-        document.body.classList.remove("fun-mode");
+
+        document.body
+            .classList.remove(
+                "fun-mode"
+            );
 
         applyUserTheme();
         updateSidebar();
         showGreeting();
         updateStatus();
 
-    } catch(error){
+    }catch(error){
 
         console.error(
             "Profil giriş hatası:",
@@ -437,10 +1272,19 @@ async function login() {
 
 function applyUserTheme(){
 
-    document.body.classList.remove("sinem-mode");
+    document.body
+        .classList.remove(
+            "sinem-mode"
+        );
 
-    if(currentUser === "sinem"){
-        document.body.classList.add("sinem-mode");
+    if(
+        currentUser === "sinem"
+    ){
+
+        document.body
+            .classList.add(
+                "sinem-mode"
+            );
     }
 }
 
@@ -454,7 +1298,9 @@ function updateStatus(){
         return;
     }
 
-    if(currentUser === "ilknur"){
+    if(
+        currentUser === "ilknur"
+    ){
 
         $("status").textContent =
             "AKADEMİK ASİSTAN HAZIR";
@@ -468,34 +1314,53 @@ function updateStatus(){
 
 function updateSidebar(){
 
-    const teacherMenu = $("teacherMenu");
-    const funButton = $("funButton");
+    const teacherMenu =
+        $("teacherMenu");
 
-    if(currentUser === "ilknur"){
+    const funButton =
+        $("funButton");
 
-        teacherMenu.style.display = "block";
-        funButton.style.display = "none";
+    if(
+        currentUser === "ilknur"
+    ){
+
+        teacherMenu.style.display =
+            "block";
+
+        funButton.style.display =
+            "none";
 
     }else{
 
-        teacherMenu.style.display = "none";
-        funButton.style.display = "block";
+        teacherMenu.style.display =
+            "none";
+
+        funButton.style.display =
+            "block";
     }
 
     document
-        .querySelectorAll(".academic-menu-item")
-        .forEach(button => {
+        .querySelectorAll(
+            ".academic-menu-item"
+        )
+        .forEach(
+            button => {
 
-            button.classList.toggle(
-                "active",
-                button.dataset.mode === currentMode
-            );
-        });
+                button.classList.toggle(
+                    "active",
+                    button.dataset.mode ===
+                    currentMode
+                );
+            }
+        );
 }
 
 function selectAcademicMode(mode){
 
-    if(currentUser !== "ilknur"){
+    if(
+        currentUser !== "ilknur"
+    ){
+
         return;
     }
 
@@ -507,6 +1372,7 @@ function selectAcademicMode(mode){
     );
 
     updateSidebar();
+
     closeSidebar();
 
     const names = {
@@ -531,7 +1397,8 @@ function selectAcademicMode(mode){
     };
 
     addMessage(
-        names[mode] || "Akademik mod aktif.",
+        names[mode] ||
+        "Akademik mod aktif.",
         "ai"
     );
 
@@ -542,28 +1409,36 @@ function showGreeting(){
 
     $("chat").innerHTML = "";
 
-    if(currentUser === "karahan"){
+    if(
+        currentUser === "karahan"
+    ){
 
         addMessage(
             "Merhaba efendim. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    }else if(currentUser === "betul"){
+    }else if(
+        currentUser === "betul"
+    ){
 
         addMessage(
             "Merhaba Betül. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    }else if(currentUser === "sinem"){
+    }else if(
+        currentUser === "sinem"
+    ){
 
         addMessage(
             "Hoş geldiniz prenses. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    }else if(currentUser === "ilknur"){
+    }else if(
+        currentUser === "ilknur"
+    ){
 
         addMessage(
             "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır.",
@@ -579,7 +1454,9 @@ function showGreeting(){
 
 function getWaitingMessage(){
 
-    if(currentUser === "ilknur"){
+    if(
+        currentUser === "ilknur"
+    ){
 
         const messages = {
 
@@ -602,32 +1479,44 @@ function getWaitingMessage(){
                 "Hocam, sunum içeriğini hazırlıyorum..."
         };
 
-        return messages[currentMode] ||
-            "Hocam, talebinizi değerlendiriyorum...";
+        return (
+            messages[currentMode] ||
+            "Hocam, talebinizi değerlendiriyorum..."
+        );
     }
 
     return waitMessages[
         Math.floor(
-            Math.random() * waitMessages.length
+            Math.random() *
+            waitMessages.length
         )
     ];
 }
 
 function setBusy(value){
 
-    $("status").classList.toggle(
-        "busy",
-        value
-    );
+    $("status")
+        .classList.toggle(
+            "busy",
+            value
+        );
 
-    $("sendButton").disabled = value;
-    $("messageInput").disabled = value;
+    $("sendButton").disabled =
+        value;
+
+    $("messageInput").disabled =
+        value;
 }
 
-function isPresentationRequest(message){
+function isPresentationRequest(
+    message
+){
 
-    const text = String(message)
-        .toLocaleLowerCase("tr-TR")
+    const text =
+        String(message)
+        .toLocaleLowerCase(
+            "tr-TR"
+        )
         .trim();
 
     const words = [
@@ -654,46 +1543,80 @@ function isPresentationRequest(message){
         "sunum istiyorum"
     ];
 
-    for(const word of words){
+    for(
+        const word of words
+    ){
 
-        if(text.includes(word)){
+        if(
+            text.includes(word)
+        ){
+
             return true;
         }
     }
 
-    return /\b\d+\s*slayt\b/i.test(text);
+    return /\b\d+\s*slayt\b/i
+        .test(text);
 }
+
+/* =====================================================
+   SEND
+===================================================== */
 
 async function sendMessage(){
 
     if(sending){
+
         return;
     }
 
-    const input = $("messageInput");
-    const message = input.value.trim();
+    const input =
+        $("messageInput");
+
+    const message =
+        input.value.trim();
 
     if(!message){
+
         return;
     }
 
     sending = true;
+
     setBusy(true);
+
     input.value = "";
 
-    addMessage(message,"user");
+    addMessage(
+        message,
+        "user"
+    );
 
-    const waiting = document.createElement("div");
+    const waiting =
+        document.createElement(
+            "div"
+        );
 
-    waiting.className = "message ai";
-    waiting.textContent = getWaitingMessage();
+    waiting.className =
+        "message ai";
 
-    $("chat").appendChild(waiting);
-    $("chat").scrollTop = $("chat").scrollHeight;
+    waiting.textContent =
+        getWaitingMessage();
+
+    $("chat").appendChild(
+        waiting
+    );
+
+    $("chat").scrollTop =
+        $("chat").scrollHeight;
 
     try{
 
-        if(isPresentationRequest(message)){
+        if(
+            isPresentationRequest(
+                message
+            )
+        ){
 
             await createPresentation(
                 message,
@@ -702,32 +1625,42 @@ async function sendMessage(){
 
         }else{
 
-            const response = await fetch(
-                API + "/chat",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body:JSON.stringify({
-                        message:message,
-                        username:currentUser,
-                        mode:currentMode
-                    })
-                }
-            );
+            const response =
+                await fetch(
+                    API + "/chat",
+                    {
+                        method:"POST",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:JSON.stringify({
+                            message:message,
+                            username:currentUser,
+                            mode:currentMode
+                        })
+                    }
+                );
 
             let data;
 
             try{
-                data = await response.json();
+
+                data =
+                    await response.json();
+
             }catch{
+
                 throw new Error(
                     "Sunucudan geçersiz JSON yanıtı geldi."
                 );
             }
 
-            if(!response.ok){
+            if(
+                !response.ok
+            ){
 
                 throw new Error(
                     data.detail ||
@@ -746,7 +1679,10 @@ async function sendMessage(){
                 data.message ||
                 "K.A.R.V.I.S. yanıt oluşturamadı.";
 
-            addMessage(answer,"ai");
+            addMessage(
+                answer,
+                "ai"
+            );
         }
 
     }catch(error){
@@ -767,71 +1703,219 @@ async function sendMessage(){
     }finally{
 
         sending = false;
+
         setBusy(false);
+
         input.focus();
     }
 }
 
-async function createPresentation(topic,waiting){
+/* =====================================================
+   PRESENTATION
+===================================================== */
+
+async function createPresentation(
+    topic,
+    waiting
+){
 
     stopPresentationAnimation();
 
     const progressMessage =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     progressMessage.className =
         "message ai waiting-message";
 
     progressMessage.innerHTML = `
-        <div id="presentationStage" class="waiting-title">
-            Sunum hazırlanıyor
-            <span id="presentationDots"></span>
-        </div>
 
-        <div id="presentationDetail" class="waiting-detail">
-            K.A.R.V.I.S. sunum içeriğini hazırlıyor...
-        </div>
+        <div class="presentation-box">
 
-        <div class="progress-bar">
-            <div class="progress-bar-inner"></div>
+            <div class="presentation-heading">
+
+                <div class="presentation-orb"></div>
+
+                <div class="presentation-heading-text">
+                    SUNUM HAZIRLANIYOR
+                </div>
+
+                <div
+                    id="presentationPercent"
+                    class="presentation-percent"
+                >
+                    0%
+                </div>
+
+            </div>
+
+            <div
+                id="presentationCurrent"
+                class="presentation-current"
+            >
+                K.A.R.V.I.S. konu üzerinde çalışmaya hazırlanıyor...
+            </div>
+
+            <div
+                id="presentationSteps"
+                class="presentation-steps"
+            >
+
+                <div
+                    class="presentation-step active"
+                    data-step="analysis"
+                >
+                    <div class="presentation-step-icon">
+                        ●
+                    </div>
+                    <div>
+                        Konu analiz ediliyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="research"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        Güvenilir kaynaklar araştırılıyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="content"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        Akademik içerik hazırlanıyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="visuals"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        Fotoğraflar araştırılıyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="design"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        Görseller slaytlara yerleştiriliyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="pdf"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        PDF oluşturuluyor
+                    </div>
+                </div>
+
+                <div
+                    class="presentation-step"
+                    data-step="finish"
+                >
+                    <div class="presentation-step-icon">
+                        ○
+                    </div>
+                    <div>
+                        Son kontroller yapılıyor
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="presentation-progress">
+
+                <div
+                    id="presentationProgressInner"
+                    class="presentation-progress-inner"
+                ></div>
+
+            </div>
+
+            <div
+                id="presentationLiveFooter"
+                class="presentation-live-footer"
+            >
+                K.A.R.V.I.S. sunumunuzu profesyonel biçimde hazırlıyor.
+            </div>
+
         </div>
     `;
 
     waiting.remove();
 
-    $("chat").appendChild(progressMessage);
-    $("chat").scrollTop = $("chat").scrollHeight;
+    $("chat").appendChild(
+        progressMessage
+    );
+
+    $("chat").scrollTop =
+        $("chat").scrollHeight;
 
     startPresentationAnimation();
 
     try{
 
-        const response = await fetch(
-            API + "/presentation",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    topic:topic,
-                    username:currentUser,
-                    slide_count:7
-                })
-            }
-        );
+        const response =
+            await fetch(
+                API + "/presentation",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        topic:topic,
+                        username:currentUser,
+                        slide_count:7
+                    })
+                }
+            );
 
         let data;
 
         try{
-            data = await response.json();
+
+            data =
+                await response.json();
+
         }catch{
+
             throw new Error(
                 "Sunum sunucusundan geçersiz yanıt geldi."
             );
         }
 
-        if(!response.ok){
+        if(
+            !response.ok
+        ){
 
             throw new Error(
                 data.detail ||
@@ -841,12 +1925,22 @@ async function createPresentation(topic,waiting){
             );
         }
 
-        if(!data.job_id){
+        if(
+            !data.job_id
+        ){
 
             throw new Error(
                 "Sunum işi başlatıldı fakat job_id alınamadı."
             );
         }
+
+        /*
+         * İlk durum hemen gösterilir.
+         */
+        updatePresentationUI(
+            data,
+            progressMessage
+        );
 
         await pollPresentation(
             data.job_id,
@@ -856,6 +1950,7 @@ async function createPresentation(topic,waiting){
     }catch(error){
 
         stopPresentationAnimation();
+
         progressMessage.remove();
 
         addMessage(
@@ -875,6 +1970,7 @@ async function pollPresentation(
         function(resolve,reject){
 
             let attempts = 0;
+
             const maxAttempts = 600;
 
             presentationPolling =
@@ -883,13 +1979,17 @@ async function pollPresentation(
 
                         attempts++;
 
-                        if(attempts > maxAttempts){
+                        if(
+                            attempts >
+                            maxAttempts
+                        ){
 
                             clearInterval(
                                 presentationPolling
                             );
 
-                            presentationPolling = null;
+                            presentationPolling =
+                                null;
 
                             reject(
                                 new Error(
@@ -906,10 +2006,14 @@ async function pollPresentation(
                                 await fetch(
                                     API +
                                     "/presentation-status/" +
-                                    encodeURIComponent(jobId)
+                                    encodeURIComponent(
+                                        jobId
+                                    )
                                 );
 
-                            if(!response.ok){
+                            if(
+                                !response.ok
+                            ){
 
                                 throw new Error(
                                     "Sunum durumu alınamadı."
@@ -933,7 +2037,8 @@ async function pollPresentation(
                                     presentationPolling
                                 );
 
-                                presentationPolling = null;
+                                presentationPolling =
+                                    null;
 
                                 stopPresentationAnimation();
 
@@ -981,7 +2086,8 @@ async function pollPresentation(
                                     presentationPolling
                                 );
 
-                                presentationPolling = null;
+                                presentationPolling =
+                                    null;
 
                                 stopPresentationAnimation();
 
@@ -1004,7 +2110,8 @@ async function pollPresentation(
                                 presentationPolling
                             );
 
-                            presentationPolling = null;
+                            presentationPolling =
+                                null;
 
                             reject(error);
                         }
@@ -1016,6 +2123,238 @@ async function pollPresentation(
     );
 }
 
+/* =====================================================
+   LIVE PRESENTATION UI
+===================================================== */
+
+function getPresentationStage(
+    data
+){
+
+    const progress =
+        Number(data.progress || 0);
+
+    const message =
+        String(
+            data.message || ""
+        ).toLocaleLowerCase(
+            "tr-TR"
+        );
+
+    if(
+        data.status === "completed"
+    ){
+
+        return "finish";
+    }
+
+    if(
+        message.includes("son kontroller") ||
+        message.includes("bitirmek")
+    ){
+
+        return "finish";
+    }
+
+    if(
+        message.includes("pdf") ||
+        message.includes("oluşturuluyor")
+    ){
+
+        if(progress >= 88){
+            return "pdf";
+        }
+    }
+
+    if(
+        message.includes("slayt") ||
+        message.includes("tasarım") ||
+        message.includes("profesyonel")
+    ){
+
+        if(progress >= 76){
+            return "design";
+        }
+
+        if(progress >= 35){
+            return "content";
+        }
+    }
+
+    if(
+        message.includes("görsel") ||
+        message.includes("fotoğraf")
+    ){
+
+        return "visuals";
+    }
+
+    if(
+        message.includes("doğrula") ||
+        message.includes("kaynak") ||
+        message.includes("araştır")
+    ){
+
+        if(progress >= 28){
+            return "content";
+        }
+
+        return "research";
+    }
+
+    if(
+        message.includes("analiz") ||
+        progress <= 8
+    ){
+
+        return "analysis";
+    }
+
+    if(progress < 30){
+        return "research";
+    }
+
+    if(progress < 40){
+        return "content";
+    }
+
+    if(progress < 76){
+        return "visuals";
+    }
+
+    if(progress < 88){
+        return "design";
+    }
+
+    if(progress < 98){
+        return "pdf";
+    }
+
+    return "finish";
+}
+
+function updatePresentationSteps(
+    currentStage
+){
+
+    const order = [
+        "analysis",
+        "research",
+        "content",
+        "visuals",
+        "design",
+        "pdf",
+        "finish"
+    ];
+
+    const currentIndex =
+        order.indexOf(
+            currentStage
+        );
+
+    document
+        .querySelectorAll(
+            ".presentation-step"
+        )
+        .forEach(
+            step => {
+
+                const stepName =
+                    step.dataset.step;
+
+                const stepIndex =
+                    order.indexOf(
+                        stepName
+                    );
+
+                const icon =
+                    step.querySelector(
+                        ".presentation-step-icon"
+                    );
+
+                step.classList.remove(
+                    "done",
+                    "active"
+                );
+
+                if(
+                    stepIndex <
+                    currentIndex
+                ){
+
+                    step.classList.add(
+                        "done"
+                    );
+
+                    icon.textContent =
+                        "✓";
+
+                }else if(
+                    stepIndex ===
+                    currentIndex
+                ){
+
+                    step.classList.add(
+                        "active"
+                    );
+
+                    icon.textContent =
+                        "●";
+
+                }else{
+
+                    icon.textContent =
+                        "○";
+                }
+            }
+        );
+}
+
+function getFriendlyPresentationMessage(
+    data
+){
+
+    const message =
+        String(
+            data.message || ""
+        );
+
+    if(message){
+        return message;
+    }
+
+    const progress =
+        Number(
+            data.progress || 0
+        );
+
+    if(progress < 10){
+        return "Konu analiz ediliyor...";
+    }
+
+    if(progress < 35){
+        return "Güvenilir kaynaklar araştırılıyor...";
+    }
+
+    if(progress < 40){
+        return "Bilgiler doğrulanıyor...";
+    }
+
+    if(progress < 76){
+        return "Fotoğraflar araştırılıyor...";
+    }
+
+    if(progress < 88){
+        return "Slayt tasarımı hazırlanıyor...";
+    }
+
+    if(progress < 98){
+        return "PDF oluşturuluyor...";
+    }
+
+    return "Bitirmek üzereyim...";
+}
+
 function updatePresentationUI(
     data,
     progressElement
@@ -1025,77 +2364,95 @@ function updatePresentationUI(
         return;
     }
 
+    const percent =
+        progressElement.querySelector(
+            "#presentationPercent"
+        );
+
+    const progressInner =
+        progressElement.querySelector(
+            "#presentationProgressInner"
+        );
+
+    const current =
+        progressElement.querySelector(
+            "#presentationCurrent"
+        );
+
+    const footer =
+        progressElement.querySelector(
+            "#presentationLiveFooter"
+        );
+
+    const progress =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                Number(
+                    data.progress || 0
+                )
+            )
+        );
+
+    if(percent){
+
+        percent.textContent =
+            Math.round(progress) + "%";
+    }
+
+    if(progressInner){
+
+        progressInner.style.width =
+            progress + "%";
+    }
+
     const stage =
-        progressElement.querySelector(
-            "#presentationStage"
+        getPresentationStage(
+            data
         );
 
-    const detail =
-        progressElement.querySelector(
-            "#presentationDetail"
+    updatePresentationSteps(
+        stage
+    );
+
+    const friendly =
+        getFriendlyPresentationMessage(
+            data
         );
 
-    if(!stage){
-        return;
+    if(current){
+
+        current.innerHTML =
+            "<strong>CANLI DURUM</strong><br>" +
+            escapeHTML(friendly);
     }
 
-    let title = "Sunum hazırlanıyor";
-    let detailText =
-        "K.A.R.V.I.S. sunumu hazırlıyor...";
+    if(footer){
 
-    if(data.status === "queued"){
+        if(
+            data.status === "completed"
+        ){
 
-        title = "Sunum sıraya alındı";
+            footer.textContent =
+                "Sunum başarıyla tamamlandı.";
 
-        detailText =
-            "Sunum oluşturma işlemi başlatılıyor...";
+        }else if(
+            data.status === "error"
+        ){
 
-    }else if(data.stage === "content"){
+            footer.textContent =
+                "Sunum oluşturulurken bir hata meydana geldi.";
 
-        title = "İçerik hazırlanıyor";
-        detailText =
-            "Sunum içeriği hazırlanıyor...";
+        }else{
 
-    }else if(data.stage === "visuals"){
-
-        title = "Görseller aranıyor";
-
-        detailText =
-            "Sunuma uygun görseller aranıyor...";
-
-    }else if(data.stage === "pdf"){
-
-        title = "PDF oluşturuluyor";
-
-        detailText =
-            "PDF dosyası hazırlanıyor...";
-
-    }else if(
-        data.status === "completed"
-    ){
-
-        title = "Sunum hazır";
-        detailText =
-            "PDF başarıyla oluşturuldu.";
-
-    }else if(
-        data.status === "error"
-    ){
-
-        title = "Sunum oluşturulamadı";
-        detailText =
-            data.error ||
-            "Bilinmeyen bir hata oluştu.";
+            footer.textContent =
+                "K.A.R.V.I.S. işlemi arka planda sürdürüyor...";
+        }
     }
 
-    stage.innerHTML =
-        escapeHTML(title) +
-        ' <span id="presentationDots"></span>';
-
-    if(detail){
-        detail.textContent =
-            detailText;
-    }
+    $("chat").scrollTop =
+        $("chat").scrollHeight;
 }
 
 function startPresentationAnimation(){
@@ -1106,12 +2463,12 @@ function startPresentationAnimation(){
 
     function updateDots(){
 
-        const dots =
-            document.getElementById(
-                "presentationDots"
+        const current =
+            document.querySelector(
+                "#presentationCurrent"
             );
 
-        if(!dots){
+        if(!current){
             return;
         }
 
@@ -1121,8 +2478,11 @@ function startPresentationAnimation(){
             dotState = 1;
         }
 
-        dots.textContent =
-            ".".repeat(dotState);
+        /*
+         * Mevcut mesajın sonuna animasyonlu
+         * noktalar eklemek yerine ayrı bir
+         * görsel efekt uyguluyoruz.
+         */
     }
 
     updateDots();
@@ -1146,10 +2506,18 @@ function stopPresentationAnimation(){
     }
 }
 
-function showPresentationResult(fileUrl){
+/* =====================================================
+   PRESENTATION RESULT
+===================================================== */
+
+function showPresentationResult(
+    fileUrl
+){
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     div.className =
         "message ai";
@@ -1175,8 +2543,8 @@ function showPresentationResult(fileUrl){
             margin-bottom:14px;
         ">
             K.A.R.V.I.S. sunumu başarıyla oluşturdu.
-            PDF dosyasını aşağıdaki butonlardan açabilir
-            veya indirebilirsiniz.
+            PDF dosyasını aşağıdaki butonlardan
+            açabilir veya indirebilirsiniz.
         </div>
 
         <div style="
@@ -1226,10 +2594,17 @@ function showPresentationResult(fileUrl){
         </div>
     `;
 
-    $("chat").appendChild(div);
+    $("chat").appendChild(
+        div
+    );
+
     $("chat").scrollTop =
         $("chat").scrollHeight;
 }
+
+/* =====================================================
+   OTHER
+===================================================== */
 
 async function newChat(){
 
@@ -1238,8 +2613,7 @@ async function newChat(){
     try{
 
         await fetch(
-            API +
-            "/new-chat",
+            API + "/new-chat",
             {
                 method:"POST"
             }
@@ -1282,7 +2656,9 @@ async function openErrors(){
         }
 
         const wrapper =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         wrapper.className =
             "error-list";
@@ -1290,31 +2666,43 @@ async function openErrors(){
         errors
             .slice()
             .reverse()
-            .forEach(item => {
+            .forEach(
+                item => {
 
-                const div =
-                    document.createElement("div");
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
 
-                div.className =
-                    "error-item";
+                    div.className =
+                        "error-item";
 
-                div.textContent =
-                    (
-                        item.time
-                            ? item.time + "\n"
-                            : ""
-                    ) +
-                    (
-                        item.error ||
-                        item.message ||
-                        "Bilinmeyen hata."
+                    div.textContent =
+                        (
+                            item.time
+                                ? item.time +
+                                  "\n"
+                                : ""
+                        ) +
+                        (
+                            item.error ||
+                            item.message ||
+                            "Bilinmeyen hata."
+                        );
+
+                    wrapper.appendChild(
+                        div
                     );
+                }
+            );
 
-                wrapper.appendChild(div);
-            });
+        $("errorContent").innerHTML =
+            "";
 
-        $("errorContent").innerHTML = "";
-        $("errorContent").appendChild(wrapper);
+        $("errorContent")
+            .appendChild(
+                wrapper
+            );
 
     }catch(error){
 
@@ -1328,10 +2716,11 @@ function toggleFunMode(){
 
     funMode = !funMode;
 
-    document.body.classList.toggle(
-        "fun-mode",
-        funMode
-    );
+    document.body
+        .classList.toggle(
+            "fun-mode",
+            funMode
+        );
 
     closeSidebar();
 
@@ -1358,6 +2747,7 @@ function handleKey(event){
     if(event.key === "Enter"){
 
         event.preventDefault();
+
         sendMessage();
     }
 }
@@ -1382,7 +2772,9 @@ function initialize(){
             savedUser;
     }
 
-    if(currentUser === "ilknur"){
+    if(
+        currentUser === "ilknur"
+    ){
 
         currentMode =
             localStorage.getItem(
@@ -1403,7 +2795,10 @@ function initialize(){
 
     setTimeout(
         () => {
-            $("messageInput").focus();
+
+            $("messageInput")
+                .focus();
+
         },
         150
     );
