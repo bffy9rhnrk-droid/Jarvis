@@ -94,16 +94,9 @@ body::before {
 /* =========================
    ÖZEL SCROLLBAR
 ========================= */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: var(--hud-ring);
-    border-radius: 10px;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--hud-ring); border-radius: 10px; }
 
 /* =========================
    KÖŞE ÇİZGİLERİ
@@ -591,16 +584,16 @@ function toggleTheme() {
 }
 
 /* =========================
-   MESAJ GÖNDERİMİ (SİMÜLASYON)
+   JARVIS (İLK KODUNUZDAKİ ORİJİNAL FETCH MANTIĞI)
 ========================= */
-function sendMessage() {
+async function sendMessage() {
     const input = document.getElementById("input");
     const messages = document.getElementById("messages");
     const message = input.value.trim();
 
     if (!message) return;
 
-    // Kullanıcı Mesajı
+    /* Kullanıcı */
     const userMessage = document.createElement("div");
     userMessage.className = "message user";
     userMessage.textContent = message;
@@ -609,23 +602,41 @@ function sendMessage() {
     input.value = "";
     messages.scrollTop = messages.scrollHeight;
 
-    // Bot Bekleme
+    /* Bekleme */
     const loading = document.createElement("div");
     loading.className = "message jarvis";
-    loading.textContent = "Veriler işleniyor...";
+    loading.textContent = "JARVIS düşünüyor...";
     messages.appendChild(loading);
-    messages.scrollTop = messages.scrollHeight;
 
-    // Sahte Gecikme (Sunucu Yokken Arayüzü Test Etmek İçin)
-    setTimeout(() => {
-        loading.textContent = "Karahan INC. veritabanında komutunuz işlendi: '" + message + "'";
-        messages.scrollTop = messages.scrollHeight;
-    }, 1000);
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: message })
+        });
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        loading.textContent = data.response || "Cevap alınamadı.";
+
+    } catch(error) {
+        console.error(error);
+        loading.textContent = "Sunucuya bağlanılamadı.";
+    }
+
+    messages.scrollTop = messages.scrollHeight;
 }
 
-// ENTER Tuşu Dinleyici
+/* ENTER */
 document.getElementById("input").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") sendMessage();
+    if (event.key === "Enter") {
+        sendMessage();
+    }
 });
 </script>
 
