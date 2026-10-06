@@ -27,7 +27,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 # KARVIS - KARAHAN INC.
 # =========================================================
 
-APP_VERSION = "23.1.0"
+APP_VERSION = "23.2.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -54,26 +54,35 @@ REGULAR_FONT_FILE = FONT_DIR / "DejaVuSans.ttf"
 BOLD_FONT_FILE = FONT_DIR / "DejaVuSans-Bold.ttf"
 
 try:
+
     if REGULAR_FONT_FILE.exists():
+
         pdfmetrics.registerFont(
             TTFont(
                 "DejaVu",
                 str(REGULAR_FONT_FILE)
             )
         )
+
         REGULAR_FONT = "DejaVu"
 
     if BOLD_FONT_FILE.exists():
+
         pdfmetrics.registerFont(
             TTFont(
                 "DejaVu-Bold",
                 str(BOLD_FONT_FILE)
             )
         )
+
         BOLD_FONT = "DejaVu-Bold"
 
 except Exception as error:
-    print("Font yükleme hatası:", error)
+
+    print(
+        "Font yükleme hatası:",
+        error
+    )
 
 
 # =========================================================
@@ -95,7 +104,9 @@ app.add_middleware(
 
 app.mount(
     "/files",
-    StaticFiles(directory=str(FILES_DIR)),
+    StaticFiles(
+        directory=str(FILES_DIR)
+    ),
     name="files"
 )
 
@@ -105,6 +116,7 @@ app.mount(
 # =========================================================
 
 USERS = {
+
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -112,6 +124,7 @@ USERS = {
         "password": None,
         "personality": "professional"
     },
+
     "betul": {
         "username": "betul",
         "name": "Betül",
@@ -119,6 +132,7 @@ USERS = {
         "password": "1234",
         "personality": "betul"
     },
+
     "sinem": {
         "username": "sinem",
         "name": "Sinem",
@@ -126,6 +140,7 @@ USERS = {
         "password": "3021",
         "personality": "sinem"
     },
+
     "ilknur": {
         "username": "ilknur",
         "name": "İlknur Hocam",
@@ -141,26 +156,32 @@ USERS = {
 # =========================================================
 
 ACADEMIC_MODES = {
+
     "research": {
         "name": "Araştırma Modu",
         "icon": "🔬"
     },
+
     "academic": {
         "name": "Akademik Mod",
         "icon": "📚"
     },
+
     "article": {
         "name": "Makale Asistanı",
         "icon": "📝"
     },
+
     "lesson": {
         "name": "Ders Asistanı",
         "icon": "🎓"
     },
+
     "quiz": {
         "name": "Sınav / Quiz",
         "icon": "🧪"
     },
+
     "presentation": {
         "name": "Sunum Hazırlama",
         "icon": "📊"
@@ -172,10 +193,19 @@ ACADEMIC_MODES = {
 # API SETTINGS
 # =========================================================
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+GROQ_API_KEY = os.getenv(
+    "GROQ_API_KEY",
+    ""
+)
 
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+    ""
+)
+
+GROQ_BASE_URL = (
+    "https://api.groq.com/openai/v1"
+)
 
 GROQ_MODELS = [
     "openai/gpt-oss-120b",
@@ -193,7 +223,9 @@ OPENROUTER_MODEL = os.getenv(
 # =========================================================
 
 def load_json(path, default):
+
     try:
+
         if not path.exists():
             return default
 
@@ -202,30 +234,46 @@ def load_json(path, default):
             "r",
             encoding="utf-8"
         ) as file:
+
             return json.load(file)
 
-    except Exception:
+    except Exception as error:
+
+        print(
+            "JSON okuma hatası:",
+            error
+        )
+
         return default
 
 
 def save_json(path, data):
+
     try:
+
         with open(
             path,
             "w",
             encoding="utf-8"
         ) as file:
+
             json.dump(
                 data,
                 file,
                 ensure_ascii=False,
                 indent=2
             )
+
     except Exception as error:
-        print("JSON kayıt hatası:", error)
+
+        print(
+            "JSON kayıt hatası:",
+            error
+        )
 
 
 def get_memory():
+
     return load_json(
         MEMORY_FILE,
         {}
@@ -233,6 +281,7 @@ def get_memory():
 
 
 def save_memory(data):
+
     save_json(
         MEMORY_FILE,
         data
@@ -240,6 +289,7 @@ def save_memory(data):
 
 
 def get_errors():
+
     return load_json(
         ERROR_FILE,
         []
@@ -247,6 +297,7 @@ def get_errors():
 
 
 def save_error(message):
+
     errors = get_errors()
 
     errors.append({
@@ -267,25 +318,36 @@ def save_error(message):
 # =========================================================
 
 class ChatRequest(BaseModel):
+
     message: str
+
     username: str = "karahan"
+
     mode: str = "normal"
 
 
 class LoginRequest(BaseModel):
+
     username: str
+
     password: str
 
 
 class ResearchRequest(BaseModel):
+
     query: str
+
     username: str = "ilknur"
 
 
 class PresentationRequest(BaseModel):
+
     topic: str
+
     username: str = "ilknur"
+
     slide_count: int = 10
+
     include_visuals: bool = True
 
 
@@ -294,7 +356,12 @@ class PresentationRequest(BaseModel):
 # =========================================================
 
 def get_user(username):
-    username = username.lower().strip()
+
+    username = (
+        username
+        .lower()
+        .strip()
+    )
 
     return USERS.get(
         username,
@@ -306,8 +373,14 @@ def get_user(username):
 # SYSTEM PROMPT
 # =========================================================
 
-def build_system_prompt(username, mode):
-    user = get_user(username)
+def build_system_prompt(
+    username,
+    mode
+):
+
+    user = get_user(
+        username
+    )
 
     personality = user.get(
         "personality",
@@ -329,6 +402,7 @@ Cevapların:
 - profesyonel
 - yardımcı
 - gereksiz tekrar içermeyen
+
 olmalı.
 
 Bilmediğin bilgileri kesinmiş gibi söyleme.
@@ -337,59 +411,70 @@ Kod istenirse çalışabilir kod üret.
 """
 
     if personality == "betul":
+
         prompt += """
 Betül ile konuşurken sıcak ve samimi ol.
 """
 
     elif personality == "sinem":
+
         prompt += """
 Sinem ile konuşurken samimi ve pozitif ol.
 """
 
     elif personality == "teacher":
+
         prompt += """
 Kullanıcı İlknur Hocam'dır.
 
 Akademik konularda:
+
 - düzenli
 - öğretici
 - açık
 - kaynak odaklı
 - öğrenci seviyesinde anlaşılır
+
 ol.
 """
 
         if mode == "research":
+
             prompt += """
 Araştırma Modu aktif.
 Konuyu sistematik olarak incele.
 """
 
         elif mode == "academic":
+
             prompt += """
 Akademik Mod aktif.
 Akademik terminoloji kullan.
 """
 
         elif mode == "article":
+
             prompt += """
 Makale Asistanı aktif.
 Makale düzenine uygun içerik üret.
 """
 
         elif mode == "lesson":
+
             prompt += """
 Ders Asistanı aktif.
 Konuyu öğrencilerin anlayacağı şekilde açıkla.
 """
 
         elif mode == "quiz":
+
             prompt += """
 Sınav / Quiz Modu aktif.
 Açık ve ölçülebilir sorular üret.
 """
 
         elif mode == "presentation":
+
             prompt += """
 Sunum Hazırlama Modu aktif.
 Kısa slayt maddeleri ve görsel önerileri üret.
@@ -402,32 +487,58 @@ Kısa slayt maddeleri ve görsel önerileri üret.
 # AI
 # =========================================================
 
-def ask_ai(messages, temperature=0.4, max_tokens=2500):
+def ask_ai(
+    messages,
+    temperature=0.4,
+    max_tokens=2500
+):
+
     last_error = None
 
+    # -----------------------------------------------------
+    # GROQ
+    # -----------------------------------------------------
+
     if GROQ_API_KEY:
+
         try:
+
             client = OpenAI(
                 api_key=GROQ_API_KEY,
                 base_url=GROQ_BASE_URL
             )
 
             for model in GROQ_MODELS:
+
                 try:
-                    response = client.chat.completions.create(
-                        model=model,
-                        messages=messages,
-                        temperature=temperature,
-                        max_tokens=max_tokens
+
+                    response = (
+                        client
+                        .chat
+                        .completions
+                        .create(
+                            model=model,
+                            messages=messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens
+                        )
                     )
 
-                    answer = response.choices[0].message.content
+                    answer = (
+                        response
+                        .choices[0]
+                        .message
+                        .content
+                    )
 
                     if answer:
+
                         return answer.strip()
 
                 except Exception as error:
+
                     last_error = error
+
                     print(
                         "Groq hata:",
                         model,
@@ -435,32 +546,57 @@ def ask_ai(messages, temperature=0.4, max_tokens=2500):
                     )
 
         except Exception as error:
+
             last_error = error
 
+
+    # -----------------------------------------------------
+    # OPENROUTER
+    # -----------------------------------------------------
+
     if OPENROUTER_API_KEY:
+
         try:
+
             client = OpenAI(
                 api_key=OPENROUTER_API_KEY,
-                base_url="https://openrouter.ai/api/v1"
+                base_url=(
+                    "https://openrouter.ai/api/v1"
+                )
             )
 
-            response = client.chat.completions.create(
-                model=OPENROUTER_MODEL,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens
+            response = (
+                client
+                .chat
+                .completions
+                .create(
+                    model=OPENROUTER_MODEL,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens
+                )
             )
 
-            answer = response.choices[0].message.content
+            answer = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
 
             if answer:
+
                 return answer.strip()
 
         except Exception as error:
+
             last_error = error
 
+
     save_error(
-        last_error or "AI bağlantısı bulunamadı."
+        last_error
+        or
+        "AI bağlantısı bulunamadı."
     )
 
     return (
@@ -473,11 +609,19 @@ def ask_ai(messages, temperature=0.4, max_tokens=2500):
 # INTERNET SEARCH
 # =========================================================
 
-def internet_search(query, limit=8):
+def internet_search(
+    query,
+    limit=8
+):
+
     try:
-        url = "https://html.duckduckgo.com/html/"
+
+        url = (
+            "https://html.duckduckgo.com/html/"
+        )
 
         headers = {
+
             "User-Agent": (
                 "Mozilla/5.0 "
                 "(iPhone; CPU iPhone OS 17_0 like Mac OS X) "
@@ -488,7 +632,9 @@ def internet_search(query, limit=8):
 
         response = requests.get(
             url,
-            params={"q": query},
+            params={
+                "q": query
+            },
             headers=headers,
             timeout=15
         )
@@ -507,6 +653,7 @@ def internet_search(query, limit=8):
         results = []
 
         for href, title in matches[:limit]:
+
             clean_title = re.sub(
                 r"<.*?>",
                 "",
@@ -514,16 +661,22 @@ def internet_search(query, limit=8):
             )
 
             results.append({
+
                 "title": clean_title.strip(),
+
                 "url": href
+
             })
 
         return results
 
     except Exception as error:
+
         save_error(
-            "Arama hatası: " + str(error)
+            "Arama hatası: "
+            + str(error)
         )
+
         return []
 
 
@@ -532,13 +685,17 @@ def internet_search(query, limit=8):
 # =========================================================
 
 def build_research_context(query):
+
     results = internet_search(
         query,
         8
     )
 
     if not results:
-        return "Araştırma sonucu bulunamadı."
+
+        return (
+            "Araştırma sonucu bulunamadı."
+        )
 
     lines = [
         "İnternet araştırma sonuçları:"
@@ -548,13 +705,16 @@ def build_research_context(query):
         results,
         1
     ):
+
         lines.append(
             f"{index}. "
             f"{result['title']} - "
             f"{result['url']}"
         )
 
-    return "\n".join(lines)
+    return "\n".join(
+        lines
+    )
 
 
 # =========================================================
@@ -565,9 +725,13 @@ def generate_presentation_outline(
     topic,
     slide_count
 ):
+
     slide_count = max(
         4,
-        min(int(slide_count), 30)
+        min(
+            int(slide_count),
+            30
+        )
     )
 
     prompt = f"""
@@ -614,18 +778,21 @@ Kurallar:
 """
 
     messages = [
+
         {
             "role": "system",
             "content": (
-                "Sen profesyonel akademik sunum "
-                "hazırlayan bir asistansın. "
+                "Sen profesyonel akademik "
+                "sunum hazırlayan bir asistansın. "
                 "Yalnızca geçerli JSON döndür."
             )
         },
+
         {
             "role": "user",
             "content": prompt
         }
+
     ]
 
     raw = ask_ai(
@@ -637,6 +804,7 @@ Kurallar:
     raw = raw.strip()
 
     if raw.startswith("```"):
+
         raw = re.sub(
             r"^```json",
             "",
@@ -659,12 +827,16 @@ Kurallar:
     raw = raw.strip()
 
     try:
-        data = json.loads(raw)
+
+        data = json.loads(
+            raw
+        )
 
         if not isinstance(
             data.get("slides"),
             list
         ):
+
             raise ValueError(
                 "slides listesi bulunamadı."
             )
@@ -672,51 +844,70 @@ Kurallar:
         return data
 
     except Exception as error:
+
         save_error(
             "Sunum JSON hatası: "
             + str(error)
         )
 
         return {
+
             "title": topic,
-            "subtitle": "K.A.R.V.I.S. - KARAHAN INC.",
+
+            "subtitle": (
+                "K.A.R.V.I.S. - KARAHAN INC."
+            ),
+
             "slides": [
+
                 {
                     "title": "Giriş",
+
                     "bullets": [
                         topic + " nedir?",
                         "Temel özellikleri",
                         "Konunun önemi"
                     ],
+
                     "visual_query": topic,
+
                     "teacher_note": (
                         "Konunun temel tanımını açıklayın."
                     )
                 },
+
                 {
                     "title": "Temel Kavramlar",
+
                     "bullets": [
                         "Temel kavramlar",
                         "Önemli unsurlar",
                         "Uygulama alanları"
                     ],
+
                     "visual_query": topic,
+
                     "teacher_note": (
                         "Temel kavramları örneklerle açıklayın."
                     )
                 },
+
                 {
                     "title": "Sonuç",
+
                     "bullets": [
                         "Ana noktaların özeti",
                         "Konunun önemi",
                         "Genel değerlendirme"
                     ],
+
                     "visual_query": topic,
+
                     "teacher_note": (
                         "Sunumun ana mesajını vurgulayın."
                     )
                 }
+
             ]
         }
 
@@ -729,7 +920,9 @@ def download_wikimedia_visual(
     query,
     output_path
 ):
+
     try:
+
         api_url = (
             "https://commons.wikimedia.org/w/api.php"
         )
@@ -741,14 +934,23 @@ def download_wikimedia_visual(
         }
 
         params = {
+
             "action": "query",
+
             "generator": "search",
+
             "gsrsearch": query,
+
             "gsrnamespace": 6,
+
             "gsrlimit": 20,
+
             "prop": "imageinfo",
+
             "iiprop": "url",
+
             "iiurlwidth": 1400,
+
             "format": "json"
         }
 
@@ -763,12 +965,10 @@ def download_wikimedia_visual(
 
         data = response.json()
 
-        pages = data.get(
-            "query",
-            {}
-        ).get(
-            "pages",
-            {}
+        pages = (
+            data
+            .get("query", {})
+            .get("pages", {})
         )
 
         for page in pages.values():
@@ -785,13 +985,15 @@ def download_wikimedia_visual(
 
             image_url = (
                 info.get("thumburl")
-                or info.get("url")
+                or
+                info.get("url")
             )
 
             if not image_url:
                 continue
 
             try:
+
                 image_response = requests.get(
                     image_url,
                     headers=headers,
@@ -829,20 +1031,26 @@ def download_wikimedia_visual(
                     output_path,
                     "wb"
                 ) as file:
-                    file.write(content)
+
+                    file.write(
+                        content
+                    )
 
                 return output_path
 
             except Exception:
+
                 continue
 
         return None
 
     except Exception as error:
+
         print(
             "Wikimedia hatası:",
             error
         )
+
         return None
 
 
@@ -854,8 +1062,12 @@ def download_openverse_visual(
     query,
     output_path
 ):
+
     try:
-        url = "https://api.openverse.org/v1/images/"
+
+        url = (
+            "https://api.openverse.org/v1/images/"
+        )
 
         response = requests.get(
             url,
@@ -864,34 +1076,42 @@ def download_openverse_visual(
                 "page_size": 10
             },
             headers={
-                "User-Agent": "KARVIS-Karahan-Inc/1.0"
+                "User-Agent":
+                    "KARVIS-Karahan-Inc/1.0"
             },
             timeout=20
         )
 
         response.raise_for_status()
 
-        results = response.json().get(
-            "results",
-            []
+        results = (
+            response
+            .json()
+            .get(
+                "results",
+                []
+            )
         )
 
         for item in results:
 
             image_url = (
                 item.get("thumbnail")
-                or item.get("url")
+                or
+                item.get("url")
             )
 
             if not image_url:
                 continue
 
             try:
+
                 image_response = requests.get(
                     image_url,
                     timeout=20,
                     headers={
-                        "User-Agent": "KARVIS-Karahan-Inc/1.0"
+                        "User-Agent":
+                            "KARVIS-Karahan-Inc/1.0"
                     }
                 )
 
@@ -926,20 +1146,26 @@ def download_openverse_visual(
                     output_path,
                     "wb"
                 ) as file:
-                    file.write(content)
+
+                    file.write(
+                        content
+                    )
 
                 return output_path
 
             except Exception:
+
                 continue
 
         return None
 
     except Exception as error:
+
         print(
             "Openverse hatası:",
             error
         )
+
         return None
 
 
@@ -951,6 +1177,7 @@ def get_slide_image(
     query,
     slide_number
 ):
+
     if not query:
         return None
 
@@ -1000,6 +1227,7 @@ def draw_wrapped_text(
     font_size,
     leading=None
 ):
+
     if leading is None:
         leading = font_size + 5
 
@@ -1021,7 +1249,9 @@ def draw_wrapped_text(
     for paragraph in str(text).split("\n"):
 
         if not paragraph:
+
             lines.append("")
+
             continue
 
         wrapped = textwrap.wrap(
@@ -1031,7 +1261,9 @@ def draw_wrapped_text(
             break_on_hyphens=False
         )
 
-        lines.extend(wrapped)
+        lines.extend(
+            wrapped
+        )
 
     for line in lines:
 
@@ -1057,6 +1289,7 @@ def draw_bullets(
     y,
     width
 ):
+
     for bullet in bullets:
 
         pdf.setFont(
@@ -1098,6 +1331,7 @@ def draw_fallback_visual(
     height,
     title
 ):
+
     pdf.rect(
         x,
         y,
@@ -1117,6 +1351,7 @@ def draw_fallback_visual(
     )
 
     box_width = width * 0.70
+
     box_height = 60
 
     box_x = (
@@ -1140,6 +1375,7 @@ def draw_fallback_visual(
     short_title = str(title)
 
     if len(short_title) > 45:
+
         short_title = (
             short_title[:42]
             + "..."
@@ -1180,6 +1416,7 @@ def draw_image(
     width,
     height
 ):
+
     try:
 
         from PIL import Image
@@ -1252,12 +1489,14 @@ def create_presentation_pdf(
     topic,
     include_visuals=True
 ):
+
     slides = presentation.get(
         "slides",
         []
     )
 
     if not slides:
+
         raise ValueError(
             "Sunum slaytı oluşturulamadı."
         )
@@ -1344,12 +1583,15 @@ def create_presentation_pdf(
     # SLAYTLAR
     # -----------------------------------------------------
 
-    total_slides = len(slides)
+    total_slides = len(
+        slides
+    )
 
     for number, slide in enumerate(
         slides,
         1
     ):
+
         slide_title = slide.get(
             "title",
             "Slayt"
@@ -1370,10 +1612,10 @@ def create_presentation_pdf(
             ""
         )
 
-        # Görsel indir
         image_path = None
 
         if include_visuals:
+
             image_path = get_slide_image(
                 visual_query,
                 number
@@ -1399,13 +1641,19 @@ def create_presentation_pdf(
         # -------------------------------------------------
 
         content_x = 50
-        content_y = page_height - 105
+
+        content_y = (
+            page_height - 105
+        )
 
         if image_path:
+
             content_width = (
                 page_width * 0.46
             )
+
         else:
+
             content_width = (
                 page_width * 0.50
             )
@@ -1448,6 +1696,7 @@ def create_presentation_pdf(
             )
 
             if not success:
+
                 draw_fallback_visual(
                     pdf,
                     visual_x,
@@ -1521,6 +1770,19 @@ def create_presentation_pdf(
 
     pdf.save()
 
+    # PDF gerçekten oluşmuş mu?
+    if not pdf_path.exists():
+
+        raise FileNotFoundError(
+            "PDF dosyası oluşturulamadı."
+        )
+
+    if pdf_path.stat().st_size < 1000:
+
+        raise ValueError(
+            "PDF dosyası boş veya bozuk."
+        )
+
     return pdf_path
 
 
@@ -1530,16 +1792,24 @@ def create_presentation_pdf(
 
 @app.get("/")
 def home():
-    index_file = BASE_DIR / "index.html"
+
+    index_file = (
+        BASE_DIR
+        / "index.html"
+    )
 
     if index_file.exists():
+
         return FileResponse(
             str(index_file)
         )
 
     return {
+
         "app": "K.A.R.V.I.S.",
+
         "company": "KARAHAN INC.",
+
         "version": APP_VERSION
     }
 
@@ -1550,9 +1820,13 @@ def home():
 
 @app.get("/health")
 def health():
+
     return {
+
         "status": "online",
+
         "app": "K.A.R.V.I.S.",
+
         "version": APP_VERSION
     }
 
@@ -1563,6 +1837,7 @@ def health():
 
 @app.get("/version")
 def version():
+
     return {
         "version": APP_VERSION
     }
@@ -1580,9 +1855,13 @@ def users():
     for username, user in USERS.items():
 
         result.append({
+
             "username": username,
+
             "name": user["name"],
+
             "role": user["role"]
+
         })
 
     return result
@@ -1593,20 +1872,32 @@ def users():
 # =========================================================
 
 @app.post("/profile-login")
-def profile_login(request: LoginRequest):
+def profile_login(
+    request: LoginRequest
+):
 
-    username = request.username.lower().strip()
+    username = (
+        request.username
+        .lower()
+        .strip()
+    )
 
     user = USERS.get(
         username
     )
 
     if not user:
+
         return JSONResponse(
+
             status_code=401,
+
             content={
+
                 "success": False,
-                "message": "Kullanıcı bulunamadı."
+
+                "message":
+                    "Kullanıcı bulunamadı."
             }
         )
 
@@ -1619,20 +1910,32 @@ def profile_login(request: LoginRequest):
         if request.password != password:
 
             return JSONResponse(
+
                 status_code=401,
+
                 content={
+
                     "success": False,
-                    "message": "Şifre hatalı."
+
+                    "message":
+                        "Şifre hatalı."
                 }
             )
 
     return {
+
         "success": True,
+
         "user": {
+
             "username": username,
+
             "name": user["name"],
+
             "role": user["role"],
-            "personality": user["personality"]
+
+            "personality":
+                user["personality"]
         }
     }
 
@@ -1643,6 +1946,7 @@ def profile_login(request: LoginRequest):
 
 @app.get("/academic-modes")
 def academic_modes():
+
     return {
         "modes": ACADEMIC_MODES
     }
@@ -1653,11 +1957,21 @@ def academic_modes():
 # =========================================================
 
 @app.post("/chat")
-def chat(request: ChatRequest):
+def chat(
+    request: ChatRequest
+):
 
-    username = request.username.lower()
+    username = (
+        request.username
+        .lower()
+        .strip()
+    )
 
-    mode = request.mode or "normal"
+    mode = (
+        request.mode
+        or
+        "normal"
+    )
 
     memory = get_memory()
 
@@ -1667,66 +1981,95 @@ def chat(request: ChatRequest):
     )
 
     messages = [
+
         {
             "role": "system",
-            "content": build_system_prompt(
-                username,
-                mode
-            )
+
+            "content":
+                build_system_prompt(
+                    username,
+                    mode
+                )
         }
+
     ]
 
     for item in user_memory[-10:]:
 
         messages.append({
-            "role": item.get(
-                "role",
-                "user"
-            ),
-            "content": item.get(
-                "content",
-                ""
-            )
+
+            "role":
+                item.get(
+                    "role",
+                    "user"
+                ),
+
+            "content":
+                item.get(
+                    "content",
+                    ""
+                )
         })
 
     messages.append({
+
         "role": "user",
-        "content": request.message
+
+        "content":
+            request.message
     })
 
     answer = ask_ai(
+
         messages,
+
         temperature=0.45,
+
         max_tokens=3000
     )
 
     if username not in memory:
+
         memory[username] = []
 
     memory[username].append({
+
         "role": "user",
-        "content": request.message,
-        "time": datetime.now().isoformat()
+
+        "content":
+            request.message,
+
+        "time":
+            datetime.now().isoformat()
     })
 
     memory[username].append({
+
         "role": "assistant",
-        "content": answer,
-        "time": datetime.now().isoformat()
+
+        "content":
+            answer,
+
+        "time":
+            datetime.now().isoformat()
     })
 
-    memory[username] = memory[
-        username
-    ][-100:]
+    memory[username] = (
+        memory[username][-100:]
+    )
 
     save_memory(
         memory
     )
 
     return {
+
         "success": True,
+
         "answer": answer,
+
         "username": username,
+
         "mode": mode
     }
 
@@ -1736,48 +2079,66 @@ def chat(request: ChatRequest):
 # =========================================================
 
 @app.post("/research")
-def research(request: ResearchRequest):
+def research(
+    request: ResearchRequest
+):
 
     context = build_research_context(
         request.query
     )
 
     messages = [
+
         {
             "role": "system",
-            "content": build_system_prompt(
-                request.username,
-                "research"
-            )
+
+            "content":
+                build_system_prompt(
+                    request.username,
+                    "research"
+                )
         },
+
         {
             "role": "user",
+
             "content": (
                 "Araştırma konusu:\n"
                 + request.query
                 + "\n\n"
                 + context
                 + "\n\n"
-                + "Bu bilgilerle düzenli bir araştırma "
-                  "özeti hazırla."
+                + "Bu bilgilerle düzenli bir "
+                  "araştırma özeti hazırla."
             )
         }
+
     ]
 
     answer = ask_ai(
+
         messages,
+
         temperature=0.25,
+
         max_tokens=5000
     )
 
     return {
+
         "success": True,
-        "query": request.query,
-        "answer": answer,
-        "sources": internet_search(
+
+        "query":
             request.query,
-            8
-        )
+
+        "answer":
+            answer,
+
+        "sources":
+            internet_search(
+                request.query,
+                8
+            )
     }
 
 
@@ -1789,61 +2150,119 @@ def research(request: ResearchRequest):
 def presentation(
     request: PresentationRequest
 ):
+
     try:
 
+        if not request.topic.strip():
+
+            return JSONResponse(
+
+                status_code=400,
+
+                content={
+
+                    "success": False,
+
+                    "message":
+                        "Sunum konusu boş bırakılamaz."
+                }
+            )
+
         slides_count = max(
+
             4,
+
             min(
-                int(request.slide_count),
+                int(
+                    request.slide_count
+                ),
                 30
             )
         )
 
-        outline = generate_presentation_outline(
-            request.topic,
-            slides_count
+        outline = (
+            generate_presentation_outline(
+
+                request.topic,
+
+                slides_count
+            )
         )
 
-        pdf_path = create_presentation_pdf(
-            outline,
-            request.topic,
-            request.include_visuals
+        pdf_path = (
+            create_presentation_pdf(
+
+                outline,
+
+                request.topic,
+
+                request.include_visuals
+            )
         )
 
         filename = pdf_path.name
 
+        # =================================================
+        # ÖNEMLİ:
+        # FRONTEND data.file_url BEKLİYOR
+        # =================================================
+
+        file_url = (
+            "/generated/"
+            + filename
+        )
+
         return {
+
             "success": True,
-            "title": outline.get(
-                "title",
-                request.topic
-            ),
-            "slides": len(
+
+            "title":
                 outline.get(
-                    "slides",
-                    []
-                )
-            ),
-            "download_url": (
-                "/generated/"
-                + filename
-            )
+                    "title",
+                    request.topic
+                ),
+
+            "slides":
+                len(
+                    outline.get(
+                        "slides",
+                        []
+                    )
+                ),
+
+            "file_url":
+                file_url,
+
+            # Geriye dönük uyumluluk
+            "download_url":
+                file_url
         }
 
     except Exception as error:
 
+        print(
+            "SUNUM HATASI:",
+            error
+        )
+
         save_error(
+
             "Sunum oluşturma hatası: "
             + str(error)
         )
 
         return JSONResponse(
+
             status_code=500,
+
             content={
+
                 "success": False,
+
                 "message": (
                     "Sunum oluşturulurken "
-                    "bir hata oluştu."
+                    "bir hata oluştu: "
+                    + str(error)
                 )
             }
         )
@@ -1854,11 +2273,31 @@ def presentation(
 # =========================================================
 
 @app.get("/generated/{filename}")
-def generated_file(filename: str):
+def generated_file(
+    filename: str
+):
 
     safe_name = os.path.basename(
         filename
     )
+
+    # Sadece PDF dosyalarına izin ver
+    if not safe_name.lower().endswith(
+        ".pdf"
+    ):
+
+        return JSONResponse(
+
+            status_code=400,
+
+            content={
+
+                "success": False,
+
+                "message":
+                    "Geçersiz dosya türü."
+            }
+        )
 
     file_path = (
         GENERATED_DIR
@@ -1868,16 +2307,24 @@ def generated_file(filename: str):
     if not file_path.exists():
 
         return JSONResponse(
+
             status_code=404,
+
             content={
+
                 "success": False,
-                "message": "Dosya bulunamadı."
+
+                "message":
+                    "Dosya bulunamadı."
             }
         )
 
     return FileResponse(
+
         str(file_path),
+
         media_type="application/pdf",
+
         filename=safe_name
     )
 
@@ -1894,11 +2341,15 @@ def memory(
     data = get_memory()
 
     return {
-        "username": username,
-        "memory": data.get(
+
+        "username":
             username,
-            []
-        )
+
+        "memory":
+            data.get(
+                username,
+                []
+            )
     }
 
 
@@ -1910,6 +2361,7 @@ def delete_memory(
     data = get_memory()
 
     if username in data:
+
         del data[username]
 
     save_memory(
@@ -1917,8 +2369,11 @@ def delete_memory(
     )
 
     return {
+
         "success": True,
-        "message": "Hafıza temizlendi."
+
+        "message":
+            "Hafıza temizlendi."
     }
 
 
@@ -1940,8 +2395,11 @@ def new_chat(
     )
 
     return {
+
         "success": True,
-        "message": "Yeni sohbet başlatıldı."
+
+        "message":
+            "Yeni sohbet başlatıldı."
     }
 
 
@@ -1953,7 +2411,9 @@ def new_chat(
 def errors():
 
     return {
-        "errors": get_errors()
+
+        "errors":
+            get_errors()
     }
 
 
@@ -1966,8 +2426,11 @@ def delete_errors():
     )
 
     return {
+
         "success": True,
-        "message": "Hata kayıtları temizlendi."
+
+        "message":
+            "Hata kayıtları temizlendi."
     }
 
 
@@ -1978,29 +2441,62 @@ def delete_errors():
 @app.on_event("startup")
 def startup():
 
-    print("=" * 50)
-    print("K.A.R.V.I.S. - KARAHAN INC.")
-    print("Version:", APP_VERSION)
-    print("Server hazır.")
-    print("=" * 50)
+    print("=" * 55)
+
+    print(
+        "K.A.R.V.I.S. - KARAHAN INC."
+    )
+
+    print(
+        "Version:",
+        APP_VERSION
+    )
+
+    print(
+        "Server hazır."
+    )
+
+    print("=" * 55)
 
     if REGULAR_FONT == "DejaVu":
-        print("Türkçe PDF fontu: AKTİF")
+
+        print(
+            "Türkçe PDF fontu: AKTİF"
+        )
+
     else:
+
         print(
             "UYARI: DejaVuSans.ttf bulunamadı."
         )
 
     if GROQ_API_KEY:
-        print("Groq API: AKTİF")
+
+        print(
+            "Groq API: AKTİF"
+        )
+
     else:
-        print("Groq API: KAPALI")
+
+        print(
+            "Groq API: KAPALI"
+        )
 
     if OPENROUTER_API_KEY:
+
         print(
             "OpenRouter fallback: AKTİF"
         )
+
     else:
+
         print(
             "OpenRouter fallback: KAPALI"
         )
+
+    print(
+        "PDF klasörü:",
+        str(GENERATED_DIR)
+    )
+
+    print("=" * 55)
