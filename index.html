@@ -10,33 +10,62 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<meta name="theme-color" content="#020708">
+<meta
+    name="theme-color"
+    content="#020708"
+>
 
-<title>J.A.R.V.I.S. — KARAHAN INC.</title>
+<meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+>
+
+<meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+>
+
+<meta
+    name="apple-mobile-web-app-title"
+    content="K.A.R.V.I.S."
+>
+
+<link
+    rel="apple-touch-icon"
+    href="/icon.png"
+>
+
+<link
+    rel="icon"
+    type="image/png"
+    href="/icon.png"
+>
+
+<title>
+K.A.R.V.I.S. - KARAHAN INC.
+</title>
+
 
 <style>
-
-/* =====================================================
-   TEMEL
-===================================================== */
 
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
+
 html,
 body {
+
     margin: 0;
     padding: 0;
 
     width: 100%;
-    height: 100%;
     min-height: 100%;
 
-    overflow: hidden;
-
     background: #020708 !important;
+
+    color: #e9ffff;
 
     font-family:
         -apple-system,
@@ -45,199 +74,520 @@ body {
         sans-serif;
 }
 
+
 body {
-
-    color: #dffcff;
-
-    background:
-        radial-gradient(
-            circle at 50% 35%,
-            #071b20 0%,
-            #020708 55%,
-            #000000 100%
-        ) !important;
+    overflow: hidden;
 }
 
 
-/* =====================================================
-   ANA UYGULAMA
-===================================================== */
+button,
+input {
+    font: inherit;
+}
+
+
+button {
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   APP
+   ============================================================ */
 
 .app {
 
     width: 100%;
+
+    height: 100vh;
     height: 100dvh;
-    min-height: 100dvh;
 
     display: flex;
     flex-direction: column;
 
-    position: relative;
-
     background:
         radial-gradient(
-            circle at 50% 30%,
-            rgba(0, 238, 255, 0.025),
-            transparent 45%
+            circle at 50% 15%,
+            rgba(0,255,255,.08),
+            transparent 35%
         ),
-        #020708;
+        #020708 !important;
 }
 
 
-/* =====================================================
+/* ============================================================
    HEADER
-===================================================== */
+   ============================================================ */
 
 .header {
 
-    height: 75px;
-    min-height: 75px;
+    height: 70px;
+
+    flex-shrink: 0;
 
     display: flex;
+
     align-items: center;
+
+    justify-content: space-between;
 
     padding: 0 18px;
 
+    background:
+        rgba(2,7,8,.98) !important;
+
     border-bottom:
-        1px solid
-        rgba(0, 238, 255, 0.18);
+        1px solid rgba(0,255,255,.15);
 
-    background:
-        rgba(2, 7, 8, 0.97) !important;
-
-    backdrop-filter: blur(15px);
-
-    -webkit-backdrop-filter: blur(15px);
-
-    z-index: 20;
-
-    color: #dffcff;
-}
-
-
-.menu-btn {
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 12px;
-
-    border:
-        1px solid
-        rgba(0, 238, 255, 0.3);
-
-    background:
-        rgba(0, 238, 255, 0.05);
-
-    color: #00eaff;
-
-    font-size: 22px;
-
-    cursor: pointer;
+    z-index: 10;
 }
 
 
 .brand {
 
-    margin-left: 14px;
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.logo-mini {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
 
     display: flex;
-    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid #00ffff;
+
+    color: #00ffff;
+
+    box-shadow:
+        0 0 10px rgba(0,255,255,.35),
+        inset 0 0 12px rgba(0,255,255,.1);
+
+    font-weight: 800;
+
+    font-size: 18px;
 }
 
 
-.brand-main {
+.brand-title {
 
-    font-size: 20px;
+    font-size: 16px;
 
-    font-weight: 700;
+    font-weight: 800;
 
-    letter-spacing: 4px;
-
-    color: #eaffff;
-
-    text-shadow:
-        0 0 14px
-        rgba(0, 238, 255, 0.55);
+    letter-spacing: 2px;
 }
 
 
-.brand-sub {
-
-    font-size: 8px;
-
-    letter-spacing: 4px;
+.brand-subtitle {
 
     margin-top: 2px;
 
-    color: #00eaff;
+    font-size: 9px;
+
+    letter-spacing: 3px;
+
+    color: #6a9295;
+}
+
+
+.header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
 }
 
 
 .status {
 
-    margin-left: auto;
+    font-size: 9px;
 
-    display: flex;
-    align-items: center;
+    letter-spacing: 1px;
 
-    gap: 7px;
-
-    font-size: 10px;
-
-    color: #7bdde7;
+    color: #54ffb1;
 }
 
 
-.status-dot {
+.menu-button {
 
-    width: 8px;
-    height: 8px;
+    width: 42px;
+    height: 42px;
+
+    border:
+        1px solid rgba(0,255,255,.25);
+
+    border-radius: 12px;
+
+    background:
+        rgba(0,255,255,.04);
+
+    color: #00ffff;
+
+    font-size: 20px;
+}
+
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+.main {
+
+    position: relative;
+
+    flex: 1;
+
+    overflow: hidden;
+
+    background:
+        #020708 !important;
+}
+
+
+.hero {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding-top: 45px;
+
+    overflow-y: auto;
+
+    padding-bottom: 140px;
+
+    background:
+        #020708 !important;
+}
+
+
+/* ============================================================
+   KARVIS CORE
+   ============================================================ */
+
+.jarvis-orb {
+
+    position: relative;
+
+    width: 190px;
+    height: 190px;
 
     border-radius: 50%;
 
-    background: #00ffcc;
+    display: flex;
 
-    box-shadow:
-        0 0 10px #00ffcc;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 24px;
 }
 
 
-/* =====================================================
+.ring {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0,255,255,.45);
+}
+
+
+.ring.one {
+
+    width: 190px;
+    height: 190px;
+
+    animation:
+        spin 15s linear infinite;
+}
+
+
+.ring.two {
+
+    width: 160px;
+    height: 160px;
+
+    border-style: dashed;
+
+    animation:
+        spinReverse 11s linear infinite;
+}
+
+
+.ring.three {
+
+    width: 125px;
+    height: 125px;
+
+    box-shadow:
+        0 0 25px rgba(0,255,255,.3),
+        inset 0 0 25px rgba(0,255,255,.15);
+}
+
+
+.core {
+
+    width: 70px;
+    height: 70px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        2px solid #00ffff;
+
+    color: #00ffff;
+
+    font-size: 28px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 0 25px rgba(0,255,255,.45),
+        inset 0 0 20px rgba(0,255,255,.15);
+
+    animation:
+        pulse 2.5s infinite;
+}
+
+
+.hero-title {
+
+    font-size: 26px;
+
+    font-weight: 800;
+
+    letter-spacing: 5px;
+
+    margin-bottom: 4px;
+}
+
+
+.hero-subtitle {
+
+    font-size: 9px;
+
+    letter-spacing: 4px;
+
+    color: #63878a;
+}
+
+
+/* ============================================================
+   CHAT
+   ============================================================ */
+
+.chat {
+
+    width:
+        min(720px, 92%);
+
+    margin-top: 25px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+.message {
+
+    padding:
+        14px 16px;
+
+    border-radius: 15px;
+
+    max-width: 92%;
+
+    line-height: 1.55;
+
+    font-size: 14px;
+
+    white-space: pre-wrap;
+}
+
+
+.message.jarvis {
+
+    align-self: flex-start;
+
+    border:
+        1px solid rgba(0,255,255,.15);
+
+    background:
+        rgba(0,255,255,.035);
+
+    color: #d9ffff;
+}
+
+
+.message.user {
+
+    align-self: flex-end;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color: white;
+}
+
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+
+.input-area {
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 12px;
+
+    background:
+        linear-gradient(
+            to top,
+            #020708 75%,
+            transparent
+        ) !important;
+
+    z-index: 5;
+}
+
+
+.input-box {
+
+    width:
+        min(720px, 100%);
+
+    margin: auto;
+
+    display: flex;
+
+    gap: 8px;
+
+    padding: 8px;
+
+    border:
+        1px solid rgba(0,255,255,.22);
+
+    border-radius: 17px;
+
+    background:
+        rgba(3,12,14,.98) !important;
+
+    box-shadow:
+        0 0 20px rgba(0,255,255,.05);
+}
+
+
+.input-box input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+
+    padding: 12px;
+
+    font-size: 16px;
+}
+
+
+.send-button {
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius: 13px;
+
+    background:
+        #00d9d9;
+
+    color:
+        #001010;
+
+    font-weight: 900;
+}
+
+
+.send-button:disabled {
+    opacity: .35;
+}
+
+
+/* ============================================================
    SIDEBAR
-===================================================== */
+   ============================================================ */
 
 .sidebar {
 
     position: fixed;
 
-    left: -290px;
     top: 0;
 
-    width: 290px;
-    height: 100dvh;
+    left: -290px;
+
+    width: 280px;
+
+    height: 100vh;
+
+    padding: 22px;
 
     background:
-        linear-gradient(
-            180deg,
-            #061317 0%,
-            #020708 100%
-        ) !important;
+        #030a0c !important;
 
     border-right:
-        1px solid
-        rgba(0, 238, 255, 0.25);
+        1px solid rgba(0,255,255,.18);
 
     z-index: 100;
 
-    padding: 24px 18px;
-
     transition:
-        left .28s ease;
-
-    box-shadow:
-        10px 0 40px
-        rgba(0, 0, 0, .55);
+        left .25s ease;
 }
 
 
@@ -248,410 +598,68 @@ body {
 
 .sidebar-title {
 
-    font-size: 11px;
+    display: flex;
 
-    letter-spacing: 3px;
+    justify-content: space-between;
 
-    color: #00eaff;
+    align-items: center;
 
-    margin-bottom: 22px;
+    margin-bottom: 25px;
 }
 
 
-.sidebar-item {
+.sidebar-title strong {
+
+    letter-spacing: 3px;
+}
+
+
+.close-sidebar {
+
+    border: none;
+
+    background: transparent;
+
+    color: #00ffff;
+
+    font-size: 22px;
+}
+
+
+.menu-item {
 
     width: 100%;
 
-    border: 0;
-
-    background:
-        rgba(0, 238, 255, 0.035);
-
-    border:
-        1px solid
-        rgba(0, 238, 255, 0.12);
-
-    color: #d9fbff;
-
     padding: 14px;
 
-    border-radius: 13px;
-
-    margin-bottom: 10px;
+    margin-bottom: 9px;
 
     text-align: left;
 
-    font-size: 14px;
-
-    cursor: pointer;
-}
-
-
-.sidebar-item:active {
-    transform: scale(.98);
-}
-
-
-.sidebar-item .icon {
-    margin-right: 10px;
-}
-
-
-.sidebar-bottom {
-
-    position: absolute;
-
-    left: 18px;
-    right: 18px;
-    bottom: 20px;
-
-    font-size: 9px;
-
-    color: #4e777c;
-
-    text-align: center;
-}
-
-
-/* =====================================================
-   OVERLAY
-===================================================== */
-
-.overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(0, 0, 0, .65);
-
-    z-index: 90;
-
-    display: none;
-}
-
-
-.overlay.active {
-    display: block;
-}
-
-
-/* =====================================================
-   ANA EKRAN
-===================================================== */
-
-.main {
-
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
-
-    min-height: 0;
-
-    background:
-        transparent !important;
-}
-
-
-.hero {
-
-    padding:
-        24px
-        20px
-        12px;
-
-    text-align: center;
-
-    background: transparent !important;
-}
-
-
-.logo {
-
-    width: 100px;
-    height: 100px;
-
-    margin:
-        4px
-        auto
-        15px;
-
-    border-radius: 50%;
-
     border:
-        1px solid
-        rgba(0, 238, 255, .75);
+        1px solid rgba(0,255,255,.1);
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    position: relative;
-
-    color: #00eaff;
-
-    font-size: 42px;
-
-    font-weight: 800;
-
-    text-shadow:
-        0 0 20px #00eaff;
-
-    box-shadow:
-        0 0 30px
-        rgba(0, 238, 255, .18),
-
-        inset 0 0 30px
-        rgba(0, 238, 255, .1);
-}
-
-
-.logo::before,
-.logo::after {
-
-    content: "";
-
-    position: absolute;
-
-    inset: -8px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(0, 238, 255, .3);
-
-    animation:
-        rotate 8s linear infinite;
-}
-
-
-.logo::after {
-
-    inset: -16px;
-
-    border-style: dashed;
-
-    animation-direction:
-        reverse;
-
-    animation-duration: 12s;
-}
-
-
-@keyframes rotate {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-
-.hero h1 {
-
-    margin: 0;
-
-    font-size: 22px;
-
-    letter-spacing: 2px;
-
-    color: #eaffff;
-}
-
-
-.hero p {
-
-    margin:
-        7px 0 0;
-
-    color: #67949a;
-
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   CHAT
-===================================================== */
-
-.chat {
-
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding:
-        10px
-        16px
-        12px;
-
-    scroll-behavior: smooth;
-
-    background: transparent !important;
-
-    -webkit-overflow-scrolling: touch;
-}
-
-
-.message {
-
-    max-width: 88%;
-
-    padding:
-        12px
-        14px;
-
-    margin-bottom: 12px;
-
-    border-radius: 15px;
-
-    font-size: 14px;
-
-    line-height: 1.55;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-}
-
-
-.message.user {
-
-    margin-left: auto;
+    border-radius: 12px;
 
     background:
-        rgba(0, 238, 255, .09);
+        rgba(0,255,255,.025);
 
-    border:
-        1px solid
-        rgba(0, 238, 255, .2);
+    color: #d9ffff;
 
-    color: #e8feff;
+    font-size: 13px;
 }
 
 
-.message.assistant {
+.menu-item:hover {
 
-    margin-right: auto;
-
-    background:
-        rgba(255, 255, 255, .035);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, .08);
-
-    color: #d4edef;
+    border-color:
+        rgba(0,255,255,.35);
 }
 
 
-.message.error {
-
-    border:
-        1px solid
-        rgba(255, 75, 75, .5);
-
-    background:
-        rgba(255, 45, 45, .07);
-
-    color: #ffb8b8;
-}
-
-
-/* =====================================================
-   INPUT
-===================================================== */
-
-.input-area {
-
-    padding:
-        10px
-        12px
-        calc(
-            10px +
-            env(safe-area-inset-bottom)
-        );
-
-    display: flex;
-
-    gap: 8px;
-
-    border-top:
-        1px solid
-        rgba(0, 238, 255, .14);
-
-    background:
-        rgba(2, 7, 8, .98) !important;
-
-    position: relative;
-
-    z-index: 10;
-}
-
-
-.input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 48px;
-
-    border-radius: 14px;
-
-    border:
-        1px solid
-        rgba(0, 238, 255, .2);
-
-    background:
-        rgba(255, 255, 255, .035) !important;
-
-    color: white;
-
-    padding:
-        0 14px;
-
-    outline: none;
-
-    font-size: 16px;
-}
-
-
-.input::placeholder {
-    color: #527277;
-}
-
-
-.send {
-
-    width: 50px;
-
-    border: 0;
-
-    border-radius: 14px;
-
-    background:
-        #00d9eb;
-
-    color: #001014;
-
-    font-size: 19px;
-
-    font-weight: 800;
-
-    cursor: pointer;
-}
-
-
-/* =====================================================
+/* ============================================================
    MODAL
-===================================================== */
+   ============================================================ */
 
 .modal {
 
@@ -659,103 +667,139 @@ body {
 
     inset: 0;
 
-    background:
-        rgba(0, 0, 0, .78);
-
-    z-index: 200;
-
     display: none;
 
     align-items: center;
-
     justify-content: center;
 
-    padding: 20px;
+    padding: 18px;
+
+    background:
+        rgba(0,0,0,.72);
+
+    z-index: 200;
 }
 
 
-.modal.active {
+.modal.show {
     display: flex;
 }
 
 
 .modal-box {
 
-    width: 100%;
+    width:
+        min(600px, 100%);
 
-    max-width: 430px;
-
-    max-height: 82dvh;
+    max-height: 85vh;
 
     overflow-y: auto;
 
-    background:
-        #071215 !important;
+    padding: 20px;
 
     border:
-        1px solid
-        rgba(0, 238, 255, .25);
+        1px solid rgba(0,255,255,.2);
 
     border-radius: 20px;
 
-    padding: 22px;
-
-    box-shadow:
-        0 20px 70px
-        rgba(0, 0, 0, .65);
-
-    color: #dffcff;
+    background:
+        #041012 !important;
 }
 
 
 .modal-title {
 
-    font-size: 16px;
+    display: flex;
 
-    font-weight: 700;
+    justify-content: space-between;
 
-    letter-spacing: 1px;
+    align-items: center;
 
     margin-bottom: 18px;
-
-    color: #00eaff;
 }
 
 
-.close-btn {
+.modal-title h2 {
 
-    float: right;
+    margin: 0;
 
-    border: 0;
+    font-size: 17px;
+
+    letter-spacing: 2px;
+}
+
+
+.modal-close {
+
+    border: none;
 
     background: transparent;
 
-    color: #78969b;
+    color: #00ffff;
 
-    font-size: 20px;
-
-    cursor: pointer;
+    font-size: 22px;
 }
 
 
-/* =====================================================
-   HATA KARTLARI
-===================================================== */
+.modal input {
 
-.error-card {
-
-    border:
-        1px solid
-        rgba(255, 90, 90, .22);
-
-    background:
-        rgba(255, 60, 60, .045);
-
-    border-radius: 14px;
+    width: 100%;
 
     padding: 13px;
 
     margin-bottom: 10px;
+
+    border:
+        1px solid rgba(0,255,255,.18);
+
+    border-radius: 10px;
+
+    background:
+        #020708 !important;
+
+    color: white;
+
+    outline: none;
+}
+
+
+.modal-action {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        #00d9d9;
+
+    color:
+        #001010;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.error-card {
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,70,70,.04);
+
+    border:
+        1px solid rgba(255,80,80,.16);
 }
 
 
@@ -767,60 +811,47 @@ body {
 
     gap: 8px;
 
+    font-size: 10px;
+
     margin-bottom: 7px;
 }
 
 
 .error-provider {
 
-    color: #ff8f8f;
+    color: #ff7373;
 
-    font-size: 12px;
-
-    font-weight: 700;
-}
-
-
-.error-time {
-
-    color: #60787d;
-
-    font-size: 9px;
+    font-weight: 800;
 }
 
 
 .error-type {
 
-    display: inline-block;
-
-    padding:
-        3px 7px;
-
-    border-radius: 6px;
-
-    background:
-        rgba(255, 90, 90, .12);
-
-    color: #ff9f9f;
-
-    font-size: 9px;
-
-    margin-bottom: 8px;
+    color: #ffbd6b;
 }
 
 
-.error-text {
+.error-time {
 
-    font-family:
-        monospace;
+    color: #668487;
+}
 
-    font-size: 11px;
 
-    line-height: 1.5;
+.error-message {
 
-    color: #d6bebe;
+    color: #d7eeee;
 
-    white-space: pre-wrap;
+    font-size: 12px;
+
+    margin-bottom: 7px;
+}
+
+
+.error-detail {
+
+    color: #80999b;
+
+    font-size: 10px;
 
     word-break: break-word;
 }
@@ -830,172 +861,125 @@ body {
 
     width: 100%;
 
-    padding: 13px;
+    padding: 12px;
 
-    border-radius: 12px;
+    margin-top: 8px;
 
     border:
-        1px solid
-        rgba(255, 80, 80, .3);
+        1px solid rgba(255,70,70,.3);
+
+    border-radius: 10px;
 
     background:
-        rgba(255, 60, 60, .08);
+        rgba(255,70,70,.06);
 
-    color: #ff9b9b;
-
-    margin-bottom: 15px;
-
-    cursor: pointer;
+    color:
+        #ff8a8a;
 }
 
 
-/* =====================================================
-   PEMBE SİNEM TEMASI
-===================================================== */
+/* ============================================================
+   SINEM
+   ============================================================ */
 
-body.sinem-theme {
-
-    background:
-        radial-gradient(
-            circle at 50% 35%,
-            #270c1c 0%,
-            #090208 55%,
-            #000 100%
-        ) !important;
-}
-
-
-body.sinem-theme .app {
-
-    background:
-        radial-gradient(
-            circle at 50% 30%,
-            rgba(255, 100, 190, .035),
-            transparent 45%
-        ),
-        #090208;
-}
-
-
-body.sinem-theme .header {
-
-    background:
-        rgba(9, 2, 8, .97) !important;
-
-    border-bottom-color:
-        rgba(255, 90, 180, .22);
-}
-
-
-body.sinem-theme .brand-main,
-body.sinem-theme .brand-sub,
-body.sinem-theme .hero h1 {
-
-    color: #ff8bc7;
-
-    text-shadow:
-        0 0 14px
-        rgba(255, 80, 170, .4);
-}
-
-
-body.sinem-theme .logo {
-
-    color: #ff72bd;
+body.sinem-mode .core,
+body.sinem-mode .ring {
 
     border-color:
-        rgba(255, 100, 190, .8);
+        #ff6fae;
+}
+
+
+body.sinem-mode .core {
+
+    color:
+        #ff6fae;
 
     box-shadow:
-        0 0 35px
-        rgba(255, 70, 170, .2);
+        0 0 30px rgba(255,105,170,.45);
 }
 
 
-body.sinem-theme .logo::before,
-body.sinem-theme .logo::after {
+body.sinem-mode .ring {
 
     border-color:
-        rgba(255, 100, 190, .35);
+        rgba(255,105,170,.5);
 }
 
 
-body.sinem-theme .input-area {
+body.sinem-mode .send-button {
 
     background:
-        rgba(9, 2, 8, .98) !important;
-
-    border-top-color:
-        rgba(255, 90, 180, .18);
+        #ff72b2;
 }
 
 
-body.sinem-theme .send {
+/* ============================================================
+   EĞLENCE
+   ============================================================ */
 
-    background: #ff72bd;
+body.fun-mode .core,
+body.fun-mode .ring {
 
-    color: #240716;
+    border-color:
+        #ff3030;
 }
 
 
-/* =====================================================
-   MOBİL
-===================================================== */
+body.fun-mode .core {
 
-@media (max-width: 480px) {
+    color:
+        #ff3030;
 
-    .header {
-        height: 70px;
-        min-height: 70px;
+    box-shadow:
+        0 0 30px rgba(255,40,40,.5);
+}
+
+
+body.fun-mode .ring {
+
+    border-color:
+        rgba(255,40,40,.55);
+}
+
+
+/* ============================================================
+   ANIMASYON
+   ============================================================ */
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
     }
 
-    .brand-main {
-        font-size: 18px;
-        letter-spacing: 3px;
-    }
-
-    .hero {
-        padding-top: 20px;
-    }
-
-    .logo {
-        width: 88px;
-        height: 88px;
-        font-size: 36px;
-    }
-
-    .hero h1 {
-        font-size: 20px;
-    }
-
-    .message {
-        max-width: 92%;
+    to {
+        transform: rotate(360deg);
     }
 }
 
 
-/* =====================================================
-   MASAÜSTÜ
-===================================================== */
+@keyframes spinReverse {
 
-@media (min-width: 700px) {
-
-    .chat {
-
-        width: 100%;
-
-        max-width: 720px;
-
-        margin: auto;
+    from {
+        transform: rotate(360deg);
     }
 
-    .input-area {
+    to {
+        transform: rotate(0deg);
+    }
+}
 
-        max-width: 720px;
 
-        width: 100%;
+@keyframes pulse {
 
-        margin: auto;
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
     }
 }
 
@@ -1006,330 +990,348 @@ body.sinem-theme .send {
 
 <body>
 
+
 <div class="app">
 
 
-    <!-- =================================================
-         SIDEBAR
-    ================================================== -->
-
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
-        <div class="sidebar-title">
-            J.A.R.V.I.S. SYSTEM
-        </div>
+<header class="header">
 
 
-        <button
-            class="sidebar-item"
-            onclick="newChat()"
-        >
-            <span class="icon">＋</span>
-            Yeni Sohbet
-        </button>
+<div class="brand">
 
 
-        <button
-            class="sidebar-item"
-            onclick="openErrors()"
-        >
-            <span class="icon">⚠️</span>
-            Hatalar
-        </button>
+<div class="logo-mini">
+K
+</div>
 
 
-        <button
-            class="sidebar-item"
-            onclick="openProfile()"
-        >
-            <span class="icon">👤</span>
-            Profil Değiştir
-        </button>
+<div>
+
+<div class="brand-title">
+K.A.R.V.I.S.
+</div>
 
 
-        <button
-            class="sidebar-item"
-            onclick="toggleFunMode()"
-        >
-            <span class="icon">⚡</span>
-            Eğlence Modu
-        </button>
-
-
-        <div class="sidebar-bottom">
-
-            KARAHAN INC.<br>
-
-            J.A.R.V.I.S. v18.0.0
-
-        </div>
-
-    </aside>
-
-
-    <div
-        class="overlay"
-        id="overlay"
-        onclick="closeSidebar()"
-    ></div>
-
-
-    <!-- =================================================
-         HEADER
-    ================================================== -->
-
-    <header class="header">
-
-        <button
-            class="menu-btn"
-            onclick="openSidebar()"
-        >
-            ☰
-        </button>
-
-
-        <div class="brand">
-
-            <div class="brand-main">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="brand-sub">
-                KARAHAN INC.
-            </div>
-
-        </div>
-
-
-        <div class="status">
-
-            <span class="status-dot"></span>
-
-            ONLINE
-
-        </div>
-
-    </header>
-
-
-    <!-- =================================================
-         MAIN
-    ================================================== -->
-
-    <main class="main">
-
-
-        <section class="hero">
-
-            <div class="logo">
-                K
-            </div>
-
-
-            <h1 id="greeting">
-                Merhaba efendim
-            </h1>
-
-
-            <p id="subtitle">
-                JARVIS sizin için hazır.
-            </p>
-
-        </section>
-
-
-        <section
-            class="chat"
-            id="chat"
-        ></section>
-
-
-        <div class="input-area">
-
-            <input
-                id="messageInput"
-                class="input"
-                type="text"
-                autocomplete="off"
-                placeholder="JARVIS'e bir şey sorun..."
-            >
-
-
-            <button
-                class="send"
-                onclick="sendMessage()"
-            >
-                ➤
-            </button>
-
-        </div>
-
-    </main>
+<div class="brand-subtitle">
+KARAHAN INC.
+</div>
 
 </div>
 
 
-<!-- =====================================================
-     PROFİL MODAL
-===================================================== -->
+</div>
+
+
+<div class="header-right">
+
+
+<div
+    class="status"
+    id="statusText"
+>
+ONLINE
+</div>
+
+
+<button
+    class="menu-button"
+    onclick="openSidebar()"
+>
+☰
+</button>
+
+
+</div>
+
+
+</header>
+
+
+<main class="main">
+
+
+<section class="hero">
+
+
+<div class="jarvis-orb">
+
+
+<div class="ring one"></div>
+
+<div class="ring two"></div>
+
+<div class="ring three"></div>
+
+
+<div class="core">
+K
+</div>
+
+
+</div>
+
+
+<div class="hero-title">
+K.A.R.V.I.S.
+</div>
+
+
+<div class="hero-subtitle">
+KARAHAN INTELLIGENT SYSTEM
+</div>
+
+
+<div
+    class="chat"
+    id="chat"
+>
+</div>
+
+
+</section>
+
+
+<div class="input-area">
+
+
+<div class="input-box">
+
+
+<input
+    id="messageInput"
+    type="text"
+    placeholder="K.A.R.V.I.S.'e bir şey sorun..."
+    autocomplete="off"
+>
+
+
+<button
+    class="send-button"
+    id="sendButton"
+    onclick="sendMessage()"
+>
+➤
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</main>
+
+
+</div>
+
+
+<!-- ========================================================
+     SIDEBAR
+========================================================= -->
+
+
+<div
+    class="sidebar"
+    id="sidebar"
+>
+
+
+<div class="sidebar-title">
+
+
+<strong>
+K.A.R.V.I.S.
+</strong>
+
+
+<button
+    class="close-sidebar"
+    onclick="closeSidebar()"
+>
+×
+</button>
+
+
+</div>
+
+
+<button
+    class="menu-item"
+    onclick="newChat()"
+>
+＋ Yeni Sohbet
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="openErrors()"
+>
+⚠ Hatalar
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="openProfile()"
+>
+◉ Profil Değiştir
+</button>
+
+
+<button
+    class="menu-item"
+    onclick="toggleFunMode()"
+>
+◈ Eğlence Modu
+</button>
+
+
+</div>
+
+
+<!-- ========================================================
+     ERROR MODAL
+========================================================= -->
+
+
+<div
+    class="modal"
+    id="errorModal"
+>
+
+
+<div class="modal-box">
+
+
+<div class="modal-title">
+
+
+<h2>
+HATA KAYITLARI
+</h2>
+
+
+<button
+    class="modal-close"
+    onclick="closeErrors()"
+>
+×
+</button>
+
+
+</div>
+
+
+<div id="errorList">
+Yükleniyor...
+</div>
+
+
+<button
+    class="clear-errors"
+    onclick="clearErrors()"
+>
+Tüm Hataları Temizle
+</button>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ========================================================
+     PROFILE MODAL
+========================================================= -->
+
 
 <div
     class="modal"
     id="profileModal"
 >
 
-    <div class="modal-box">
 
-        <button
-            class="close-btn"
-            onclick="closeModal('profileModal')"
-        >
-            ×
-        </button>
+<div class="modal-box">
 
 
-        <div class="modal-title">
-            PROFİL DEĞİŞTİR
-        </div>
+<div class="modal-title">
 
 
-        <input
-            id="profileUsername"
-            class="input"
-            placeholder="Kullanıcı adı"
-            style="
-                width:100%;
-                margin-bottom:10px;
-            "
-        >
+<h2>
+PROFİL DEĞİŞTİR
+</h2>
 
 
-        <input
-            id="profilePassword"
-            class="input"
-            type="password"
-            placeholder="Şifre"
-            style="
-                width:100%;
-                margin-bottom:10px;
-            "
-        >
+<button
+    class="modal-close"
+    onclick="closeProfile()"
+>
+×
+</button>
 
-
-        <button
-            class="send"
-            style="
-                width:100%;
-                height:48px;
-            "
-            onclick="loginProfile()"
-        >
-            GİRİŞ YAP
-        </button>
-
-
-        <div
-            id="loginError"
-            style="
-                color:#ff8d8d;
-                font-size:12px;
-                margin-top:12px;
-            "
-        ></div>
-
-    </div>
 
 </div>
 
 
-<!-- =====================================================
-     HATA MODAL
-===================================================== -->
-
-<div
-    class="modal"
-    id="errorsModal"
+<input
+    id="profileUsername"
+    placeholder="Kullanıcı adı"
 >
 
-    <div class="modal-box">
 
-        <button
-            class="close-btn"
-            onclick="closeModal('errorsModal')"
-        >
-            ×
-        </button>
+<input
+    id="profilePassword"
+    type="password"
+    placeholder="Şifre"
+>
 
 
-        <div class="modal-title">
-            ⚠️ HATA KAYITLARI
-        </div>
+<button
+    class="modal-action"
+    onclick="loginProfile()"
+>
+Giriş Yap
+</button>
 
 
-        <button
-            class="clear-errors"
-            onclick="clearErrors()"
-        >
-            🗑 TÜM HATALARI TEMİZLE
-        </button>
+<div
+    id="profileError"
+    style="
+        margin-top:12px;
+        color:#ff7373;
+        font-size:12px;
+    "
+>
+</div>
 
 
-        <div id="errorList">
+</div>
 
-            <div
-                style="
-                    color:#617d82;
-                    font-size:12px;
-                    text-align:center;
-                "
-            >
-                Hatalar yükleniyor...
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-   DEĞİŞKENLER
-===================================================== */
 
-let currentUser =
-    localStorage.getItem(
-        "jarvis_user"
-    ) || "karahan";
+const API = "";
+
+
+let currentUser = "karahan";
 
 
 let funMode = false;
 
 
-/* =====================================================
-   ELEMENTLER
-===================================================== */
-
-const chat =
-    document.getElementById(
-        "chat"
-    );
+let sending = false;
 
 
-const input =
-    document.getElementById(
-        "messageInput"
-    );
-
-
-/* =====================================================
+/* ============================================================
    SIDEBAR
-===================================================== */
+============================================================ */
 
 function openSidebar() {
 
@@ -1337,11 +1339,6 @@ function openSidebar() {
         .getElementById("sidebar")
         .classList
         .add("open");
-
-    document
-        .getElementById("overlay")
-        .classList
-        .add("active");
 }
 
 
@@ -1351,136 +1348,68 @@ function closeSidebar() {
         .getElementById("sidebar")
         .classList
         .remove("open");
-
-    document
-        .getElementById("overlay")
-        .classList
-        .remove("active");
 }
 
 
-/* =====================================================
-   MODAL
-===================================================== */
-
-function closeModal(id) {
-
-    document
-        .getElementById(id)
-        .classList
-        .remove("active");
-}
-
-
-function openProfile() {
-
-    closeSidebar();
-
-    document
-        .getElementById(
-            "profileModal"
-        )
-        .classList
-        .add("active");
-}
-
-
-/* =====================================================
+/* ============================================================
    MESAJ
-===================================================== */
+============================================================ */
 
 function addMessage(
     text,
-    type = "assistant"
+    type
 ) {
 
-    const element =
-        document.createElement(
-            "div"
-        );
+    const chat =
+        document.getElementById("chat");
 
-    element.className =
+
+    const div =
+        document.createElement("div");
+
+
+    div.className =
         "message " + type;
 
-    element.textContent =
+
+    div.textContent =
         text;
 
-    chat.appendChild(
-        element
-    );
 
-    chat.scrollTop =
-        chat.scrollHeight;
+    chat.appendChild(div);
 
-    return element;
+
+    const hero =
+        document.querySelector(".hero");
+
+
+    hero.scrollTop =
+        hero.scrollHeight;
 }
 
 
-/* =====================================================
-   BEKLEME MESAJLARI
-===================================================== */
-
-function waitingMessage() {
-
-    if (
-        currentUser === "sinem"
-    ) {
-
-        const messages = [
-
-            "Bir saniye prenses, düşünüyorum... ❤️",
-
-            "Hemen bakıyorum prenses... 🌸",
-
-            "Bir dakika prenses, JARVIS çalışıyor...",
-
-            "Tamam prenses, cevabı hazırlıyorum... ❤️"
-
-        ];
-
-        return messages[
-            Math.floor(
-                Math.random() *
-                messages.length
-            )
-        ];
-    }
-
-
-    if (
-        currentUser === "betul"
-    ) {
-
-        const messages = [
-
-            "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
-
-            "Dur kız, bunu da hemen bilmemi bekleme. 😂",
-
-            "Tamam tamam, düşünüyorum kız. 😂",
-
-            "Bir dakika aşko, işlemcim çalışıyor..."
-
-        ];
-
-        return messages[
-            Math.floor(
-                Math.random() *
-                messages.length
-            )
-        ];
-    }
-
-
-    return "Efendim, işlem yapıyorum...";
-}
-
-
-/* =====================================================
-   CHAT
-===================================================== */
+/* ============================================================
+   MESAJ GÖNDER
+============================================================ */
 
 async function sendMessage() {
+
+    if (sending) {
+        return;
+    }
+
+
+    const input =
+        document.getElementById(
+            "messageInput"
+        );
+
+
+    const button =
+        document.getElementById(
+            "sendButton"
+        );
+
 
     const message =
         input.value.trim();
@@ -1491,29 +1420,93 @@ async function sendMessage() {
     }
 
 
+    sending = true;
+
+    button.disabled = true;
+
+
+    input.value = "";
+
+
     addMessage(
         message,
         "user"
     );
 
 
-    input.value = "";
+    let waitingMessages = [
+
+        "Bir saniye efendim...",
+
+        "Tamam, bir bakıyorum...",
+
+        "Dur, bunu birlikte çözelim...",
+
+        "Bir dakika, düşünüyorum...",
+
+        "Tamam, hemen ilgileniyorum..."
+
+    ];
+
+
+    if (currentUser === "betul") {
+
+        waitingMessages = [
+
+            "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
+
+            "Dur kız, düşünüyorum. 😂",
+
+            "Tamam tamam, bakıyorum.",
+
+            "Bir dakika aşko, işlemciyi çalıştırıyorum..."
+
+        ];
+    }
+
+
+    if (currentUser === "sinem") {
+
+        waitingMessages = [
+
+            "Bir saniye prenses, hemen bakıyorum... 💗",
+
+            "Tamam prenses, düşünüyorum...",
+
+            "Bir dakika, hemen ilgileniyorum. 💗"
+
+        ];
+    }
 
 
     const waiting =
-        addMessage(
-            waitingMessage(),
-            "assistant"
-        );
+        document.createElement("div");
+
+
+    waiting.className =
+        "message jarvis";
+
+
+    waiting.textContent =
+        waitingMessages[
+            Math.floor(
+                Math.random()
+                * waitingMessages.length
+            )
+        ];
+
+
+    document
+        .getElementById("chat")
+        .appendChild(waiting);
 
 
     try {
 
         const response =
             await fetch(
-                "/chat",
+                API + "/chat",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -1522,15 +1515,9 @@ async function sendMessage() {
                     },
 
                     body: JSON.stringify({
-
-                        message:
-                            message,
-
-                        username:
-                            currentUser
-
+                        message: message,
+                        username: currentUser
                     })
-
                 }
             );
 
@@ -1544,31 +1531,74 @@ async function sendMessage() {
 
         if (!response.ok) {
 
-            const errorText =
-                data.error ||
-                data.detail ||
-                data.message ||
+            let errorText =
                 "Bilinmeyen hata.";
+
+            let errorType =
+                "";
+
+
+            if (
+                data
+                && data.detail
+            ) {
+
+                if (
+                    typeof data.detail === "string"
+                ) {
+
+                    errorText =
+                        data.detail;
+
+                } else {
+
+                    errorText =
+                        data.detail.error
+                        || data.detail.message
+                        || errorText;
+
+                    errorType =
+                        data.detail.type
+                        || "";
+                }
+            }
 
 
             addMessage(
-
-                "⚠️ J.A.R.V.I.S. HATA\n\n" +
-                errorText +
-                "\n\n" +
-                "Hata kaydı Hatalar bölümüne kaydedildi.",
-
-                "error"
+                "⚠️ K.A.R.V.I.S. HATA\n\n"
+                + errorText
+                + (
+                    errorType
+                        ? "\n\nHata tipi: "
+                          + errorType
+                        : ""
+                )
+                + "\n\nHata kaydı Hatalar bölümüne kaydedildi.",
+                "jarvis"
             );
+
 
             return;
         }
 
 
+        /*
+         * Burada özellikle provider göstermiyoruz.
+         *
+         * Arka planda hangi AI cevap verirse versin
+         * kullanıcı sadece K.A.R.V.I.S. ile konuşuyor.
+         */
+
         addMessage(
             data.answer,
-            "assistant"
+            "jarvis"
         );
+
+
+        document
+            .getElementById("statusText")
+            .textContent =
+            "ONLINE";
 
 
     } catch (error) {
@@ -1577,44 +1607,127 @@ async function sendMessage() {
 
 
         addMessage(
-
-            "⚠️ BAĞLANTI HATASI\n\n" +
-            error.message +
-            "\n\n" +
-            "Sunucuya ulaşılamıyor.",
-
-            "error"
+            "⚠️ K.A.R.V.I.S.\n\n"
+            + "Sunucuya bağlanırken bir sorun oluştu.\n\n"
+            + error.message,
+            "jarvis"
         );
 
-    }
 
+    } finally {
+
+        sending = false;
+
+        button.disabled = false;
+
+        input.focus();
+    }
 }
 
 
-/* =====================================================
+/* ============================================================
    ENTER
-===================================================== */
+============================================================ */
 
-input.addEventListener(
-    "keydown",
-    function(event) {
+document
+    .getElementById("messageInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
 
-        if (
-            event.key === "Enter"
-        ) {
+            if (
+                event.key === "Enter"
+                && !event.shiftKey
+            ) {
 
-            event.preventDefault();
+                event.preventDefault();
 
-            sendMessage();
+                sendMessage();
+            }
         }
+    );
 
+
+/* ============================================================
+   YENI SOHBET
+============================================================ */
+
+async function newChat() {
+
+    closeSidebar();
+
+
+    try {
+
+        await fetch(
+            API
+            + "/new-chat?username="
+            + encodeURIComponent(
+                currentUser
+            ),
+            {
+                method: "POST"
+            }
+        );
+
+    } catch (error) {
     }
-);
 
 
-/* =====================================================
+    document
+        .getElementById("chat")
+        .innerHTML = "";
+
+
+    showGreeting();
+}
+
+
+/* ============================================================
+   GREETING
+============================================================ */
+
+function showGreeting() {
+
+    const chat =
+        document.getElementById("chat");
+
+
+    if (
+        chat.children.length > 0
+    ) {
+        return;
+    }
+
+
+    let greeting =
+        "Merhaba efendim. K.A.R.V.I.S. hazır.";
+
+
+    if (currentUser === "betul") {
+
+        greeting =
+            "Merhaba Betül. 😏 K.A.R.V.I.S. hazır.";
+    }
+
+
+    if (currentUser === "sinem") {
+
+        greeting =
+            "Hoş geldiniz prenses. 💗 K.A.R.V.I.S. hazır.";
+    }
+
+
+    addMessage(
+        greeting,
+        "jarvis"
+    );
+}
+
+
+/* ============================================================
    HATALAR
-===================================================== */
+============================================================ */
 
 async function openErrors() {
 
@@ -1622,14 +1735,21 @@ async function openErrors() {
 
 
     document
-        .getElementById(
-            "errorsModal"
-        )
+        .getElementById("errorModal")
         .classList
-        .add("active");
+        .add("show");
 
 
     await loadErrors();
+}
+
+
+function closeErrors() {
+
+    document
+        .getElementById("errorModal")
+        .classList
+        .remove("show");
 }
 
 
@@ -1642,23 +1762,14 @@ async function loadErrors() {
 
 
     list.innerHTML =
-        `
-        <div style="
-            color:#617d82;
-            text-align:center;
-            font-size:12px;
-            padding:20px;
-        ">
-            Hatalar yükleniyor...
-        </div>
-        `;
+        "Yükleniyor...";
 
 
     try {
 
         const response =
             await fetch(
-                "/errors"
+                API + "/errors"
             );
 
 
@@ -1666,22 +1777,16 @@ async function loadErrors() {
             await response.json();
 
 
+        const errors =
+            data.errors || [];
+
+
         if (
-            !data.errors ||
-            data.errors.length === 0
+            errors.length === 0
         ) {
 
             list.innerHTML =
-                `
-                <div style="
-                    text-align:center;
-                    color:#617d82;
-                    padding:25px;
-                    font-size:12px;
-                ">
-                    ✓ Henüz kayıtlı hata yok.
-                </div>
-                `;
+                "<div style='color:#6d8b8e;font-size:13px;'>Henüz hata kaydı yok.</div>";
 
             return;
         }
@@ -1690,101 +1795,82 @@ async function loadErrors() {
         list.innerHTML = "";
 
 
-        data.errors.forEach(
-            error => {
+        [...errors]
+            .reverse()
+            .forEach(
+                error => {
 
-                const card =
-                    document.createElement(
-                        "div"
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    card.className =
+                        "error-card";
+
+
+                    card.innerHTML = `
+
+                        <div class="error-top">
+
+                            <span class="error-provider">
+                                ${escapeHtml(
+                                    error.provider
+                                )}
+                            </span>
+
+                            <span class="error-type">
+                                ${escapeHtml(
+                                    error.type
+                                )}
+                            </span>
+
+                            <span class="error-time">
+                                ${escapeHtml(
+                                    error.time
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div class="error-message">
+                            ${escapeHtml(
+                                error.message || ""
+                            )}
+                        </div>
+
+                        <div class="error-detail">
+                            ${escapeHtml(
+                                error.error || ""
+                            )}
+                        </div>
+
+                    `;
+
+
+                    list.appendChild(
+                        card
                     );
-
-
-                card.className =
-                    "error-card";
-
-
-                card.innerHTML = `
-
-                    <div class="error-top">
-
-                        <div class="error-provider">
-
-                            ${escapeHtml(
-                                error.provider
-                            )}
-
-                        </div>
-
-                        <div class="error-time">
-
-                            ${escapeHtml(
-                                error.time
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="error-type">
-
-                        ${escapeHtml(
-                            error.type
-                        )}
-
-                    </div>
-
-
-                    <div class="error-text">
-
-                        ${escapeHtml(
-                            error.error
-                        )}
-
-                    </div>
-
-                `;
-
-
-                list.appendChild(
-                    card
-                );
-
-            }
-        );
+                }
+            );
 
 
     } catch (error) {
 
         list.innerHTML =
-            `
-            <div style="
-                color:#ff8d8d;
-                font-size:12px;
-            ">
-                Hatalar yüklenemedi:
-                ${escapeHtml(
-                    error.message
-                )}
-            </div>
-            `;
+            "Hatalar yüklenemedi.";
     }
 }
 
 
-/* =====================================================
-   HATALARI TEMİZLE
-===================================================== */
-
 async function clearErrors() {
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             "Tüm hata kayıtları silinsin mi?"
-        );
-
-
-    if (!confirmed) {
+        )
+    ) {
         return;
     }
 
@@ -1792,7 +1878,7 @@ async function clearErrors() {
     try {
 
         await fetch(
-            "/errors",
+            API + "/errors",
             {
                 method: "DELETE"
             }
@@ -1805,130 +1891,84 @@ async function clearErrors() {
     } catch (error) {
 
         alert(
-            "Hatalar temizlenemedi: " +
-            error.message
+            "Hatalar temizlenemedi."
         );
     }
 }
 
 
-/* =====================================================
-   HTML GÜVENLİĞİ
-===================================================== */
+/* ============================================================
+   PROFIL
+============================================================ */
 
-function escapeHtml(text) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        String(text ?? "");
-
-    return div.innerHTML;
-}
-
-
-/* =====================================================
-   YENİ SOHBET
-===================================================== */
-
-async function newChat() {
+function openProfile() {
 
     closeSidebar();
 
 
-    chat.innerHTML = "";
-
-
-    addMessage(
-
-        currentUser === "sinem"
-            ? "Yeni sohbet hazır prenses. ❤️"
-            : currentUser === "betul"
-                ? "Tamam kız, yeni sohbet açtım. 😂"
-                : "Yeni sohbet hazır efendim.",
-
-        "assistant"
-
-    );
-
-
-    try {
-
-        await fetch(
-
-            "/new-chat?username=" +
-            encodeURIComponent(
-                currentUser
-            ),
-
-            {
-                method: "POST"
-            }
-
-        );
-
-    } catch (error) {
-
-        console.log(
-            "Yeni sohbet hatası:",
-            error
-        );
-    }
+    document
+        .getElementById("profileModal")
+        .classList
+        .add("show");
 }
 
 
-/* =====================================================
-   PROFİL GİRİŞ
-===================================================== */
+function closeProfile() {
+
+    document
+        .getElementById("profileModal")
+        .classList
+        .remove("show");
+}
+
 
 async function loginProfile() {
 
-    const username =
-        document
-            .getElementById(
-                "profileUsername"
-            )
-            .value
-            .trim();
+    const usernameInput =
+        document.getElementById(
+            "profileUsername"
+        );
+
+
+    const passwordInput =
+        document.getElementById(
+            "profilePassword"
+        );
+
+
+    const errorBox =
+        document.getElementById(
+            "profileError"
+        );
+
+
+    let username =
+        usernameInput.value
+            .trim()
+            .toLowerCase();
+
+
+    if (
+        username === "betül"
+    ) {
+        username = "betul";
+    }
 
 
     const password =
-        document
-            .getElementById(
-                "profilePassword"
-            )
-            .value;
+        passwordInput.value;
 
 
-    const loginError =
-        document
-            .getElementById(
-                "loginError"
-            );
-
-
-    loginError.textContent = "";
-
-
-    if (!username) {
-
-        loginError.textContent =
-            "Kullanıcı adı girin.";
-
-        return;
-    }
+    errorBox.textContent =
+        "";
 
 
     try {
 
         const response =
             await fetch(
-                "/profile-login",
+                API + "/profile-login",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -1937,15 +1977,9 @@ async function loginProfile() {
                     },
 
                     body: JSON.stringify({
-
-                        username:
-                            username,
-
-                        password:
-                            password
-
+                        username: username,
+                        password: password
                     })
-
                 }
             );
 
@@ -1956,10 +1990,9 @@ async function loginProfile() {
 
         if (!response.ok) {
 
-            loginError.textContent =
-                data.error ||
-                data.detail ||
-                "Giriş başarısız.";
+            errorBox.textContent =
+                data.detail
+                || "Giriş başarısız.";
 
             return;
         }
@@ -1970,7 +2003,7 @@ async function loginProfile() {
 
 
         localStorage.setItem(
-            "jarvis_user",
+            "karvis_user",
             currentUser
         );
 
@@ -1978,74 +2011,35 @@ async function loginProfile() {
         applyUserTheme();
 
 
-        closeModal(
-            "profileModal"
-        );
+        document
+            .getElementById("chat")
+            .innerHTML = "";
 
 
-        chat.innerHTML = "";
+        closeProfile();
 
 
-        if (
-            currentUser === "sinem"
-        ) {
-
-            addMessage(
-                "Hoş geldiniz prenses. ❤️ JARVIS hazır. Bugün size nasıl yardımcı olabilirim?",
-                "assistant"
-            );
-
-        } else if (
-            currentUser === "betul"
-        ) {
-
-            addMessage(
-                "Hoş geldin Betül. Tamam kız, yine geldin. 😂",
-                "assistant"
-            );
-
-        } else {
-
-            addMessage(
-                "Tekrar hoş geldiniz efendim. JARVIS tüm sistemleri hazır durumda.",
-                "assistant"
-            );
-
-        }
+        showGreeting();
 
 
     } catch (error) {
 
-        loginError.textContent =
-            error.message;
+        errorBox.textContent =
+            "Sunucu bağlantı hatası.";
     }
 }
 
 
-/* =====================================================
+/* ============================================================
    TEMA
-===================================================== */
+============================================================ */
 
 function applyUserTheme() {
 
-    const body =
-        document.body;
-
-
-    body.classList.remove(
-        "sinem-theme"
-    );
-
-
-    const greeting =
-        document.getElementById(
-            "greeting"
-        );
-
-
-    const subtitle =
-        document.getElementById(
-            "subtitle"
+    document.body
+        .classList
+        .remove(
+            "sinem-mode"
         );
 
 
@@ -2053,109 +2047,123 @@ function applyUserTheme() {
         currentUser === "sinem"
     ) {
 
-        body.classList.add(
-            "sinem-theme"
-        );
-
-
-        greeting.textContent =
-            "Hoş geldiniz prenses";
-
-
-        subtitle.textContent =
-            "JARVIS sizin için hazır. ❤️";
-
-
-    } else if (
-        currentUser === "betul"
-    ) {
-
-        greeting.textContent =
-            "Merhaba Betül";
-
-
-        subtitle.textContent =
-            "JARVIS hazır.";
-
-
-    } else {
-
-        greeting.textContent =
-            "Merhaba efendim";
-
-
-        subtitle.textContent =
-            "JARVIS sizin için hazır.";
+        document.body
+            .classList
+            .add("sinem-mode");
     }
 }
 
 
-/* =====================================================
-   EĞLENCE MODU
-===================================================== */
+/* ============================================================
+   EGLENCE
+============================================================ */
 
 function toggleFunMode() {
+
+    closeSidebar();
+
 
     funMode =
         !funMode;
 
 
-    closeSidebar();
-
-
-    if (
-        currentUser === "karahan"
-    ) {
-
-        addMessage(
-
+    document.body
+        .classList
+        .toggle(
+            "fun-mode",
             funMode
-                ? "Eğlence modu açıldı efendim. Ancak profesyonel JARVIS protokolü korunuyor."
-                : "Eğlence modu kapatıldı efendim.",
-
-            "assistant"
         );
 
-        return;
+
+    if (funMode) {
+
+        addMessage(
+            "Eğlence modu aktif. K.A.R.V.I.S. biraz daha rahat takılabilir. 😈",
+            "jarvis"
+        );
+
+
+    } else {
+
+        addMessage(
+            "Eğlence modu kapatıldı. Standart K.A.R.V.I.S. sistemine dönüldü.",
+            "jarvis"
+        );
     }
-
-
-    addMessage(
-
-        funMode
-            ? "Eğlence modu aktif. 😄"
-            : "Eğlence modu kapatıldı.",
-
-        "assistant"
-    );
 }
 
 
-/* =====================================================
-   BAŞLANGIÇ
-===================================================== */
+/* ============================================================
+   GUVENLIK
+============================================================ */
+
+function escapeHtml(text) {
+
+    return String(text)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* ============================================================
+   BASLANGIC
+============================================================ */
 
 function initialize() {
 
+    const savedUser =
+        localStorage.getItem(
+            "karvis_user"
+        );
+
+
+    if (
+        savedUser
+        && (
+            savedUser === "karahan"
+            || savedUser === "betul"
+            || savedUser === "sinem"
+        )
+    ) {
+
+        currentUser =
+            savedUser;
+    }
+
+
     applyUserTheme();
 
-
-    addMessage(
-
-        currentUser === "sinem"
-            ? "Hoş geldiniz prenses. ❤️ JARVIS hazır."
-            : currentUser === "betul"
-                ? "Hoş geldin Betül. JARVIS hazır. 😂"
-                : "Merhaba efendim. JARVIS tüm sistemleri hazır durumda.",
-
-        "assistant"
-    );
+    showGreeting();
 }
 
 
 initialize();
 
 </script>
+
 
 </body>
 
