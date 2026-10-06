@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <meta name="theme-color" content="#02070a">
 
@@ -21,11 +21,8 @@
 
 <title>K.A.R.V.I.S. - KARAHAN INC.</title>
 
-<style>
 
-/* =========================================================
-   TEMEL
-========================================================= */
+<style>
 
 * {
     box-sizing: border-box;
@@ -40,7 +37,6 @@ body {
     min-height: 100%;
     background: #02070a;
     color: #eaffff;
-
     font-family:
         Inter,
         -apple-system,
@@ -63,9 +59,9 @@ button {
 }
 
 
-/* =========================================================
-   ANA UYGULAMA
-========================================================= */
+/* =====================================================
+   APP
+===================================================== */
 
 .app {
     width: 100%;
@@ -78,26 +74,26 @@ button {
     background:
         radial-gradient(
             circle at 50% 18%,
-            rgba(0, 255, 255, 0.10),
+            rgba(0,255,255,.10),
             transparent 27%
         ),
         radial-gradient(
             circle at 50% 65%,
-            rgba(0, 170, 190, 0.045),
+            rgba(0,170,190,.045),
             transparent 40%
         ),
         linear-gradient(
             180deg,
-            #02070a 0%,
+            #02070a,
             #02080b 45%,
-            #010506 100%
+            #010506
         );
 }
 
 
-/* =========================================================
+/* =====================================================
    HEADER
-========================================================= */
+===================================================== */
 
 .header {
     height: 72px;
@@ -112,15 +108,12 @@ button {
     background:
         linear-gradient(
             180deg,
-            rgba(2, 9, 12, 0.98),
-            rgba(2, 7, 9, 0.92)
+            rgba(2,9,12,.98),
+            rgba(2,7,9,.92)
         );
 
     border-bottom:
-        1px solid rgba(0, 255, 255, 0.16);
-
-    box-shadow:
-        0 5px 25px rgba(0, 0, 0, 0.25);
+        1px solid rgba(0,255,255,.16);
 
     z-index: 10;
 }
@@ -141,7 +134,8 @@ button {
 
     border-radius: 50%;
 
-    border: 1px solid rgba(0, 255, 255, 0.9);
+    border:
+        1px solid rgba(0,255,255,.9);
 
     color: #00ffff;
 
@@ -155,22 +149,12 @@ button {
         0 0 12px rgba(0,255,255,.35),
         0 0 30px rgba(0,255,255,.08),
         inset 0 0 16px rgba(0,255,255,.12);
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(0,255,255,.10),
-            rgba(0,0,0,.05)
-        );
 }
 
 .brand-title {
     font-size: 16px;
     font-weight: 850;
     letter-spacing: 3px;
-
-    text-shadow:
-        0 0 10px rgba(0,255,255,.12);
 }
 
 .brand-subtitle {
@@ -189,15 +173,9 @@ button {
 }
 
 .status {
-    position: relative;
-
     font-size: 9px;
     letter-spacing: 2px;
-
     color: #58ffb5;
-
-    text-shadow:
-        0 0 8px rgba(88,255,181,.4);
 }
 
 .status::before {
@@ -233,22 +211,12 @@ button {
     color: #00ffff;
 
     font-size: 20px;
-
-    box-shadow:
-        inset 0 0 12px rgba(0,255,255,.035);
-
-    transition: .2s;
-}
-
-.menu-button:active {
-    transform: scale(.94);
-    background: rgba(0,255,255,.09);
 }
 
 
-/* =========================================================
-   ANA ALAN
-========================================================= */
+/* =====================================================
+   MAIN
+===================================================== */
 
 .main {
     position: relative;
@@ -256,12 +224,11 @@ button {
     flex: 1;
 
     overflow: hidden;
-
-    background: transparent;
 }
 
 .hero {
     position: absolute;
+
     inset: 0;
 
     display: flex;
@@ -282,9 +249,9 @@ button {
 }
 
 
-/* =========================================================
-   HUD K.A.R.V.I.S. CORE
-========================================================= */
+/* =====================================================
+   CORE
+===================================================== */
 
 .jarvis-orb {
     position: relative;
@@ -297,11 +264,6 @@ button {
     justify-content: center;
 
     margin-bottom: 25px;
-
-    filter:
-        drop-shadow(
-            0 0 18px rgba(0,255,255,.12)
-        );
 }
 
 .jarvis-orb::before {
@@ -355,9 +317,6 @@ button {
     border-top-color: rgba(0,255,255,.9);
     border-bottom-color: rgba(0,255,255,.18);
 
-    box-shadow:
-        0 0 12px rgba(0,255,255,.12);
-
     animation:
         spin 15s linear infinite;
 }
@@ -384,7 +343,6 @@ button {
 
     box-shadow:
         0 0 25px rgba(0,255,255,.22),
-        0 0 50px rgba(0,255,255,.05),
         inset 0 0 25px rgba(0,255,255,.12);
 }
 
@@ -428,41 +386,10 @@ button {
         pulse 2.5s infinite;
 }
 
-.core::before {
-    content: "";
 
-    position: absolute;
-
-    width: 88px;
-    height: 88px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid rgba(0,255,255,.15);
-}
-
-.core::after {
-    content: "";
-
-    position: absolute;
-
-    width: 5px;
-    height: 5px;
-
-    border-radius: 50%;
-
-    background: #00ffff;
-
-    box-shadow:
-        0 0 12px #00ffff,
-        0 0 25px #00ffff;
-}
-
-
-/* =========================================================
-   BAŞLIK
-========================================================= */
+/* =====================================================
+   TITLE
+===================================================== */
 
 .hero-title {
     font-size: 27px;
@@ -472,11 +399,6 @@ button {
     letter-spacing: 6px;
 
     margin-bottom: 6px;
-
-    color: #eaffff;
-
-    text-shadow:
-        0 0 12px rgba(0,255,255,.14);
 }
 
 .hero-subtitle {
@@ -488,9 +410,9 @@ button {
 }
 
 
-/* =========================================================
-   AKTİF MOD GÖSTERGESİ
-========================================================= */
+/* =====================================================
+   MODE
+===================================================== */
 
 .active-mode {
     display: none;
@@ -512,9 +434,6 @@ button {
     font-size: 9px;
 
     letter-spacing: 1.5px;
-
-    box-shadow:
-        0 0 18px rgba(0,255,255,.045);
 }
 
 .active-mode.show {
@@ -522,12 +441,12 @@ button {
 }
 
 
-/* =========================================================
+/* =====================================================
    CHAT
-========================================================= */
+===================================================== */
 
 .chat {
-    width: min(720px, 92%);
+    width: min(720px,92%);
 
     margin-top: 27px;
 
@@ -549,8 +468,6 @@ button {
     font-size: 14px;
 
     white-space: pre-wrap;
-
-    backdrop-filter: blur(8px);
 }
 
 .message.jarvis {
@@ -567,9 +484,6 @@ button {
         );
 
     color: #d9ffff;
-
-    box-shadow:
-        0 5px 20px rgba(0,0,0,.16);
 }
 
 .message.user {
@@ -589,40 +503,41 @@ button {
 }
 
 
-/* =========================================================
-   ARAŞTIRMA SONUÇLARI
-========================================================= */
+/* =====================================================
+   PDF BUTTON
+===================================================== */
 
-.research-card {
-    width: min(720px, 92%);
+.file-button {
+    display: inline-block;
 
     margin-top: 12px;
 
-    padding: 14px;
+    padding: 11px 15px;
 
-    border:
-        1px solid rgba(0,255,255,.14);
-
-    border-radius: 14px;
+    border-radius: 11px;
 
     background:
-        rgba(0,255,255,.025);
+        linear-gradient(
+            135deg,
+            #00ffff,
+            #00bfc8
+        );
 
-    color: #9ddfe3;
+    color: #001010;
 
-    font-size: 11px;
+    text-decoration: none;
 
-    line-height: 1.6;
+    font-size: 12px;
+
+    font-weight: 900;
+
+    letter-spacing: .5px;
 }
 
-.research-card strong {
-    color: #00ffff;
-}
 
-
-/* =========================================================
+/* =====================================================
    INPUT
-========================================================= */
+===================================================== */
 
 .input-area {
     position: absolute;
@@ -638,14 +553,14 @@ button {
             to top,
             rgba(2,7,10,1) 55%,
             rgba(2,7,10,.85) 72%,
-            transparent 100%
+            transparent
         );
 
     z-index: 5;
 }
 
 .input-box {
-    width: min(720px, 100%);
+    width: min(720px,100%);
 
     margin: auto;
 
@@ -664,8 +579,7 @@ button {
         rgba(3,13,16,.94);
 
     box-shadow:
-        0 0 25px rgba(0,255,255,.055),
-        inset 0 0 15px rgba(0,255,255,.025);
+        0 0 25px rgba(0,255,255,.055);
 
     backdrop-filter: blur(15px);
 }
@@ -711,25 +625,12 @@ button {
     color: #001010;
 
     font-weight: 900;
-
-    box-shadow:
-        0 0 15px rgba(0,255,255,.25);
-
-    transition: .2s;
-}
-
-.send-button:active {
-    transform: scale(.94);
-}
-
-.send-button:disabled {
-    opacity: .35;
 }
 
 
-/* =========================================================
+/* =====================================================
    SIDEBAR
-========================================================= */
+===================================================== */
 
 .sidebar {
     position: fixed;
@@ -778,8 +679,6 @@ button {
 
 .sidebar-title strong {
     letter-spacing: 3px;
-
-    color: #eaffff;
 }
 
 .close-sidebar {
@@ -795,7 +694,6 @@ button {
 .sidebar-profile {
     display: none;
 
-    margin-top: -10px;
     margin-bottom: 17px;
 
     padding: 10px 12px;
@@ -811,8 +709,6 @@ button {
     color: #7fa9ad;
 
     font-size: 10px;
-
-    letter-spacing: 1px;
 }
 
 .sidebar-profile.show {
@@ -865,17 +761,6 @@ button {
     color: #d9ffff;
 
     font-size: 13px;
-
-    transition: .2s;
-}
-
-.menu-item:active,
-.menu-item:hover {
-    border-color:
-        rgba(0,255,255,.38);
-
-    background:
-        rgba(0,255,255,.055);
 }
 
 .academic-menu {
@@ -886,11 +771,6 @@ button {
     display: block;
 }
 
-.academic-menu .menu-item {
-    border-color:
-        rgba(0,220,255,.16);
-}
-
 .academic-menu .menu-item.active {
     border-color:
         rgba(0,255,255,.60);
@@ -899,14 +779,13 @@ button {
         rgba(0,255,255,.08);
 
     box-shadow:
-        inset 0 0 15px rgba(0,255,255,.035),
-        0 0 15px rgba(0,255,255,.035);
+        inset 0 0 15px rgba(0,255,255,.035);
 }
 
 
-/* =========================================================
+/* =====================================================
    MODAL
-========================================================= */
+===================================================== */
 
 .modal {
     position: fixed;
@@ -933,7 +812,7 @@ button {
 }
 
 .modal-box {
-    width: min(600px, 100%);
+    width: min(600px,100%);
 
     max-height: 85vh;
 
@@ -952,9 +831,6 @@ button {
             #061417,
             #02090b
         );
-
-    box-shadow:
-        0 0 40px rgba(0,255,255,.07);
 }
 
 .modal-title {
@@ -1026,88 +902,9 @@ button {
 }
 
 
-/* =========================================================
-   HATALAR
-========================================================= */
-
-.error-card {
-    padding: 13px;
-
-    margin-bottom: 10px;
-
-    border-radius: 12px;
-
-    background:
-        rgba(255,70,70,.045);
-
-    border:
-        1px solid rgba(255,80,80,.17);
-}
-
-.error-top {
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 8px;
-
-    font-size: 10px;
-
-    margin-bottom: 7px;
-}
-
-.error-provider {
-    color: #ff7373;
-    font-weight: 800;
-}
-
-.error-type {
-    color: #ffbd6b;
-}
-
-.error-time {
-    color: #668487;
-}
-
-.error-message {
-    color: #d7eeee;
-
-    font-size: 12px;
-
-    margin-bottom: 7px;
-}
-
-.error-detail {
-    color: #80999b;
-
-    font-size: 10px;
-
-    word-break: break-word;
-}
-
-.clear-errors {
-    width: 100%;
-
-    padding: 12px;
-
-    margin-top: 8px;
-
-    border:
-        1px solid rgba(255,70,70,.3);
-
-    border-radius: 10px;
-
-    background:
-        rgba(255,70,70,.06);
-
-    color:
-        #ff8a8a;
-}
-
-
-/* =========================================================
-   SINEM
-========================================================= */
+/* =====================================================
+   TEMALAR
+===================================================== */
 
 body.sinem-mode .core,
 body.sinem-mode .ring {
@@ -1116,30 +913,7 @@ body.sinem-mode .ring {
 
 body.sinem-mode .core {
     color: #ff6fae;
-
-    box-shadow:
-        0 0 30px rgba(255,105,170,.45),
-        0 0 55px rgba(255,105,170,.12);
 }
-
-body.sinem-mode .ring {
-    border-color:
-        rgba(255,105,170,.5);
-}
-
-body.sinem-mode .send-button {
-    background:
-        linear-gradient(
-            135deg,
-            #ff83bd,
-            #ff5da4
-        );
-}
-
-
-/* =========================================================
-   ÖĞRETMEN MODU
-========================================================= */
 
 body.teacher-mode .core,
 body.teacher-mode .ring {
@@ -1148,26 +922,7 @@ body.teacher-mode .ring {
 
 body.teacher-mode .core {
     color: #36dfff;
-
-    box-shadow:
-        0 0 28px rgba(54,223,255,.42),
-        0 0 55px rgba(54,223,255,.10);
 }
-
-body.teacher-mode .hero-title {
-    text-shadow:
-        0 0 16px rgba(54,223,255,.20);
-}
-
-body.teacher-mode .sidebar {
-    border-right-color:
-        rgba(54,223,255,.25);
-}
-
-
-/* =========================================================
-   EĞLENCE MODU
-========================================================= */
 
 body.fun-mode .core,
 body.fun-mode .ring {
@@ -1176,24 +931,12 @@ body.fun-mode .ring {
 
 body.fun-mode .core {
     color: #ff3030;
-
-    text-shadow:
-        0 0 12px rgba(255,40,40,.9);
-
-    box-shadow:
-        0 0 30px rgba(255,40,40,.5),
-        0 0 55px rgba(255,40,40,.12);
-}
-
-body.fun-mode .ring {
-    border-color:
-        rgba(255,40,40,.55);
 }
 
 
-/* =========================================================
-   ANIMASYONLAR
-========================================================= */
+/* =====================================================
+   ANIMASYON
+===================================================== */
 
 @keyframes spin {
 
@@ -1264,15 +1007,15 @@ KARAHAN INC.
 <div class="header-right">
 
 <div
-    class="status"
-    id="statusText"
+class="status"
+id="statusText"
 >
 ONLINE
 </div>
 
 <button
-    class="menu-button"
-    onclick="openSidebar()"
+class="menu-button"
+onclick="openSidebar()"
 >
 ☰
 </button>
@@ -1309,15 +1052,15 @@ KARAHAN INTELLIGENT SYSTEM
 
 
 <div
-    class="active-mode"
-    id="activeMode"
+class="active-mode"
+id="activeMode"
 >
 </div>
 
 
 <div
-    class="chat"
-    id="chat"
+class="chat"
+id="chat"
 >
 </div>
 
@@ -1329,16 +1072,16 @@ KARAHAN INTELLIGENT SYSTEM
 <div class="input-box">
 
 <input
-    id="messageInput"
-    type="text"
-    placeholder="K.A.R.V.I.S.'e bir şey sorun..."
-    autocomplete="off"
+id="messageInput"
+type="text"
+placeholder="K.A.R.V.I.S.'e bir şey sorun..."
+autocomplete="off"
 >
 
 <button
-    class="send-button"
-    id="sendButton"
-    onclick="sendMessage()"
+class="send-button"
+id="sendButton"
+onclick="sendMessage()"
 >
 ➤
 </button>
@@ -1354,11 +1097,11 @@ KARAHAN INTELLIGENT SYSTEM
 
 <!-- =====================================================
      SIDEBAR
-====================================================== -->
+===================================================== -->
 
 <div
-    class="sidebar"
-    id="sidebar"
+class="sidebar"
+id="sidebar"
 >
 
 <div class="sidebar-title">
@@ -1368,8 +1111,8 @@ K.A.R.V.I.S.
 </strong>
 
 <button
-    class="close-sidebar"
-    onclick="closeSidebar()"
+class="close-sidebar"
+onclick="closeSidebar()"
 >
 ×
 </button>
@@ -1378,11 +1121,14 @@ K.A.R.V.I.S.
 
 
 <div
-    class="sidebar-profile"
-    id="sidebarProfile"
+class="sidebar-profile"
+id="sidebarProfile"
 >
+
 <strong id="sidebarProfileName"></strong>
+
 <span id="sidebarProfileRole"></span>
+
 </div>
 
 
@@ -1391,32 +1137,29 @@ K.A.R.V.I.S.
 <div id="normalMenu">
 
 <button
-    class="menu-item"
-    onclick="newChat()"
+class="menu-item"
+onclick="newChat()"
 >
 ＋ Yeni Sohbet
 </button>
 
-
 <button
-    class="menu-item"
-    onclick="openErrors()"
+class="menu-item"
+onclick="openErrors()"
 >
 ⚠ Hatalar
 </button>
 
-
 <button
-    class="menu-item"
-    onclick="openProfile()"
+class="menu-item"
+onclick="openProfile()"
 >
 ◉ Profil Değiştir
 </button>
 
-
 <button
-    class="menu-item"
-    onclick="toggleFunMode()"
+class="menu-item"
+onclick="toggleFunMode()"
 >
 ◈ Eğlence Modu
 </button>
@@ -1424,85 +1167,94 @@ K.A.R.V.I.S.
 </div>
 
 
-<!-- ÖĞRETMEN MENÜSÜ -->
+<!-- AKADEMİK MENÜ -->
 
 <div
-    class="menu-section-title"
-    id="academicTitle"
+class="menu-section-title"
+id="academicTitle"
 >
 AKADEMİK ASİSTAN
 </div>
 
 
 <div
-    class="academic-menu"
-    id="academicMenu"
+class="academic-menu"
+id="academicMenu"
 >
 
 <button
-    class="menu-item"
-    data-mode="research"
-    onclick="selectAcademicMode('research')"
+class="menu-item"
+data-mode="research"
+onclick="selectAcademicMode('research')"
 >
 🔬 Araştırma Modu
 </button>
 
 
 <button
-    class="menu-item"
-    data-mode="academic"
-    onclick="selectAcademicMode('academic')"
+class="menu-item"
+data-mode="academic"
+onclick="selectAcademicMode('academic')"
 >
 📚 Akademik Mod
 </button>
 
 
 <button
-    class="menu-item"
-    data-mode="article"
-    onclick="selectAcademicMode('article')"
+class="menu-item"
+data-mode="article"
+onclick="selectAcademicMode('article')"
 >
 📝 Makale Asistanı
 </button>
 
 
 <button
-    class="menu-item"
-    data-mode="lesson"
-    onclick="selectAcademicMode('lesson')"
+class="menu-item"
+data-mode="lesson"
+onclick="selectAcademicMode('lesson')"
 >
 🎓 Ders Asistanı
 </button>
 
 
 <button
-    class="menu-item"
-    data-mode="quiz"
-    onclick="selectAcademicMode('quiz')"
+class="menu-item"
+data-mode="quiz"
+onclick="selectAcademicMode('quiz')"
 >
 🧪 Sınav / Quiz
 </button>
 
 
 <button
-    class="menu-item"
-    onclick="newChat()"
+class="menu-item"
+data-mode="presentation"
+onclick="selectAcademicMode('presentation')"
+>
+🎞️ Sunum Asistanı
+</button>
+
+
+<button
+class="menu-item"
+onclick="newChat()"
 >
 ＋ Yeni Sohbet
 </button>
 
 
 <button
-    class="menu-item"
-    onclick="openProfile()"
+class="menu-item"
+onclick="openProfile()"
 >
 ◉ Profil Değiştir
 </button>
 
 
 <button
-    class="menu-item"
-    onclick="openErrors()"
+class="menu-item"
+onclick="openErrors()"
 >
 ⚠ Hatalar
 </button>
@@ -1514,11 +1266,11 @@ AKADEMİK ASİSTAN
 
 <!-- =====================================================
      ERROR MODAL
-====================================================== -->
+===================================================== -->
 
 <div
-    class="modal"
-    id="errorModal"
+class="modal"
+id="errorModal"
 >
 
 <div class="modal-box">
@@ -1530,8 +1282,8 @@ HATA KAYITLARI
 </h2>
 
 <button
-    class="modal-close"
-    onclick="closeErrors()"
+class="modal-close"
+onclick="closeErrors()"
 >
 ×
 </button>
@@ -1543,8 +1295,8 @@ Yükleniyor...
 </div>
 
 <button
-    class="clear-errors"
-    onclick="clearErrors()"
+class="modal-action"
+onclick="clearErrors()"
 >
 Tüm Hataları Temizle
 </button>
@@ -1556,11 +1308,11 @@ Tüm Hataları Temizle
 
 <!-- =====================================================
      PROFILE MODAL
-====================================================== -->
+===================================================== -->
 
 <div
-    class="modal"
-    id="profileModal"
+class="modal"
+id="profileModal"
 >
 
 <div class="modal-box">
@@ -1572,8 +1324,8 @@ PROFİL DEĞİŞTİR
 </h2>
 
 <button
-    class="modal-close"
-    onclick="closeProfile()"
+class="modal-close"
+onclick="closeProfile()"
 >
 ×
 </button>
@@ -1582,31 +1334,31 @@ PROFİL DEĞİŞTİR
 
 
 <input
-    id="profileUsername"
-    placeholder="Kullanıcı adı"
+id="profileUsername"
+placeholder="Kullanıcı adı"
 >
 
 <input
-    id="profilePassword"
-    type="password"
-    placeholder="Şifre"
+id="profilePassword"
+type="password"
+placeholder="Şifre"
 >
 
 <button
-    class="modal-action"
-    onclick="loginProfile()"
+class="modal-action"
+onclick="loginProfile()"
 >
 Giriş Yap
 </button>
 
 
 <div
-    id="profileError"
-    style="
-        margin-top:12px;
-        color:#ff7373;
-        font-size:12px;
-    "
+id="profileError"
+style="
+margin-top:12px;
+color:#ff7373;
+font-size:12px;
+"
 >
 </div>
 
@@ -1628,9 +1380,9 @@ let funMode = false;
 let sending = false;
 
 
-/* =========================================================
+/* =====================================================
    SIDEBAR
-========================================================= */
+===================================================== */
 
 function openSidebar() {
 
@@ -1650,42 +1402,146 @@ function closeSidebar() {
 }
 
 
-/* =========================================================
+/* =====================================================
    MESAJ
-========================================================= */
+===================================================== */
 
-function addMessage(text, type) {
+function addMessage(
+    text,
+    type
+) {
 
     const chat =
-        document.getElementById("chat");
+        document.getElementById(
+            "chat"
+        );
+
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.className =
         "message " + type;
 
+
     div.textContent =
         text;
 
+
     chat.appendChild(div);
 
+
     const hero =
-        document.querySelector(".hero");
+        document.querySelector(
+            ".hero"
+        );
+
+
+    hero.scrollTop =
+        hero.scrollHeight;
+
+
+    return div;
+}
+
+
+/* =====================================================
+   PDF MESAJI
+===================================================== */
+
+function addPresentationMessage(
+    text,
+    fileUrl,
+    fileName
+) {
+
+    const chat =
+        document.getElementById(
+            "chat"
+        );
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "message jarvis";
+
+
+    div.textContent =
+        text;
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.className =
+        "file-button";
+
+
+    link.href =
+        fileUrl;
+
+
+    link.target =
+        "_blank";
+
+
+    link.rel =
+        "noopener";
+
+
+    link.textContent =
+        "📄 PDF SUNUMU AÇ";
+
+
+    div.appendChild(
+        document.createElement(
+            "br"
+        )
+    );
+
+
+    div.appendChild(
+        link
+    );
+
+
+    chat.appendChild(
+        div
+    );
+
+
+    const hero =
+        document.querySelector(
+            ".hero"
+        );
+
 
     hero.scrollTop =
         hero.scrollHeight;
 }
 
 
-/* =========================================================
+/* =====================================================
    MOD GÖSTERGESİ
-========================================================= */
+===================================================== */
 
 function updateModeIndicator() {
 
     const indicator =
-        document.getElementById("activeMode");
+        document.getElementById(
+            "activeMode"
+        );
 
 
     const names = {
@@ -1703,54 +1559,74 @@ function updateModeIndicator() {
             "🎓 DERS ASİSTANI",
 
         quiz:
-            "🧪 SINAV / QUIZ"
+            "🧪 SINAV / QUIZ",
+
+        presentation:
+            "🎞️ SUNUM ASİSTANI"
 
     };
 
 
     if (
-        currentUser === "ilknur" &&
+        currentUser === "ilknur"
+        &&
         names[currentMode]
     ) {
 
         indicator.textContent =
             names[currentMode];
 
-        indicator.classList.add("show");
+        indicator.classList.add(
+            "show"
+        );
 
     } else {
 
-        indicator.classList.remove("show");
+        indicator.classList.remove(
+            "show"
+        );
     }
 }
 
 
-/* =========================================================
-   AKADEMİK MOD SEÇ
-========================================================= */
+/* =====================================================
+   MOD SEÇ
+===================================================== */
 
-function selectAcademicMode(mode) {
+function selectAcademicMode(
+    mode
+) {
 
-    if (currentUser !== "ilknur") {
+    if (
+        currentUser !== "ilknur"
+    ) {
+
         return;
     }
 
 
-    currentMode = mode;
+    currentMode =
+        mode;
 
 
     document
         .querySelectorAll(
             ".academic-menu .menu-item[data-mode]"
         )
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.classList.toggle(
-                "active",
-                button.dataset.mode === mode
-            );
+                button.classList.toggle(
 
-        });
+                    "active",
+
+                    button.dataset.mode ===
+                    mode
+
+                );
+
+            }
+        );
 
 
     updateModeIndicator();
@@ -1758,36 +1634,39 @@ function selectAcademicMode(mode) {
     closeSidebar();
 
 
-    const modeMessages = {
+    const messages = {
 
         research:
-            "🔬 Araştırma Modu aktif. Güncel internet kaynaklarını kullanarak araştırma yapabilirim.",
+            "🔬 Araştırma Modu aktif. Güncel internet kaynaklarını araştırabilirim.",
 
         academic:
-            "📚 Akademik Mod aktif. Akademik analiz, kavram, literatür ve araştırma konularında hazırım.",
+            "📚 Akademik Mod aktif. Akademik analiz ve araştırmalarda hazırım.",
 
         article:
-            "📝 Makale Asistanı aktif. Makale hazırlama ve akademik metin çalışmalarında hazırım.",
+            "📝 Makale Asistanı aktif. Akademik metin ve makale çalışmalarında hazırım.",
 
         lesson:
-            "🎓 Ders Asistanı aktif. Ders planı, konu anlatımı ve eğitim materyalleri hazırlayabilirim.",
+            "🎓 Ders Asistanı aktif. Ders planı ve konu anlatımı hazırlamaya hazırım.",
 
         quiz:
-            "🧪 Sınav / Quiz modu aktif. Soru, test ve cevap anahtarı hazırlayabilirim."
+            "🧪 Sınav / Quiz modu aktif. Öğrenciler için soru ve test hazırlayabilirim.",
+
+        presentation:
+            "🎞️ Sunum Asistanı aktif. Profesyonel, görselli PDF sunumları hazırlayabilirim."
 
     };
 
 
     addMessage(
-        modeMessages[mode],
+        messages[mode],
         "jarvis"
     );
 }
 
 
-/* =========================================================
-   MESAJ GONDER
-========================================================= */
+/* =====================================================
+   MESAJ GÖNDER
+===================================================== */
 
 async function sendMessage() {
 
@@ -1797,10 +1676,15 @@ async function sendMessage() {
 
 
     const input =
-        document.getElementById("messageInput");
+        document.getElementById(
+            "messageInput"
+        );
+
 
     const button =
-        document.getElementById("sendButton");
+        document.getElementById(
+            "sendButton"
+        );
 
 
     const message =
@@ -1840,41 +1724,13 @@ async function sendMessage() {
     ];
 
 
-    if (currentUser === "betul") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         waitingMessages = [
 
-            "Aşko bir saniye, beynimi çalıştırıyorum... 🧠😂",
-
-            "Dur kız, düşünüyorum. 😂",
-
-            "Tamam tamam, bakıyorum.",
-
-            "Bir dakika aşko, işlemciyi çalıştırıyorum..."
-
-        ];
-    }
-
-
-    if (currentUser === "sinem") {
-
-        waitingMessages = [
-
-            "Bir saniye prenses, hemen bakıyorum... 💗",
-
-            "Tamam prenses, düşünüyorum...",
-
-            "Bir dakika, hemen ilgileniyorum. 💗"
-
-        ];
-    }
-
-
-    if (currentUser === "ilknur") {
-
-        waitingMessages = [
-
-            "Elbette Hocam, hemen araştırıyorum...",
+            "Elbette Hocam, hemen bakıyorum...",
 
             "Tabii Hocam, konuyu inceliyorum...",
 
@@ -1883,57 +1739,93 @@ async function sendMessage() {
             "Bir dakika Hocam, kaynakları kontrol ediyorum..."
 
         ];
+
+
+        if (
+            currentMode === "research"
+        ) {
+
+            waitingMessages = [
+
+                "Elbette Hocam, güncel kaynakları araştırıyorum...",
+
+                "Hocam, internet kaynaklarını inceliyorum...",
+
+                "Kaynakları kontrol ediyorum Hocam..."
+
+            ];
+
+        }
+
+
+        if (
+            currentMode === "presentation"
+        ) {
+
+            waitingMessages = [
+
+                "Hocam, profesyonel sunumu hazırlıyorum...",
+
+                "Görselleri ve ders içeriğini düzenliyorum...",
+
+                "PDF sunumunuzu oluşturuyorum Hocam..."
+
+            ];
+
+        }
+
     }
 
 
     const waiting =
-        document.createElement("div");
+        addMessage(
 
+            waitingMessages[
+                Math.floor(
+                    Math.random() *
+                    waitingMessages.length
+                )
+            ],
 
-    waiting.className =
-        "message jarvis";
+            "jarvis"
 
-
-    waiting.textContent =
-        waitingMessages[
-            Math.floor(
-                Math.random() *
-                waitingMessages.length
-            )
-        ];
-
-
-    document
-        .getElementById("chat")
-        .appendChild(waiting);
+        );
 
 
     try {
 
         const response =
             await fetch(
+
                 API + "/chat",
+
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message: message,
+                            message:
+                                message,
 
-                        username: currentUser,
+                            username:
+                                currentUser,
 
-                        mode:
-                            currentUser === "ilknur"
-                                ? currentMode
-                                : "normal"
+                            mode:
+                                currentMode
 
-                    })
+                        })
+
                 }
+
             );
 
 
@@ -1944,73 +1836,60 @@ async function sendMessage() {
         waiting.remove();
 
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
-            let errorText =
-                "Bilinmeyen hata.";
-
-            let errorType =
-                "";
-
-
-            if (
-                data &&
-                data.detail
-            ) {
-
-                if (
-                    typeof data.detail === "string"
-                ) {
-
-                    errorText =
-                        data.detail;
-
-                } else {
-
-                    errorText =
-                        data.detail.error ||
-                        data.detail.message ||
-                        errorText;
-
-                    errorType =
-                        data.detail.type ||
-                        "";
-                }
-            }
+            const detail =
+                data.detail || {};
 
 
             addMessage(
 
                 "⚠️ K.A.R.V.I.S. HATA\n\n" +
 
-                errorText +
-
                 (
-                    errorType
-                        ? "\n\nHata tipi: " +
-                          errorType
-                        : ""
+                    detail.message ||
+                    "Beklenmeyen bir hata oluştu."
                 ) +
 
                 "\n\nHata kaydı Hatalar bölümüne kaydedildi.",
 
                 "jarvis"
+
             );
+
 
             return;
         }
 
 
-        addMessage(
-            data.answer,
-            "jarvis"
-        );
+        if (
+            data.presentation &&
+            data.file_url
+        ) {
 
+            addPresentationMessage(
 
-        document
-            .getElementById("statusText")
-            .textContent =
-            "ONLINE";
+                data.answer,
+
+                data.file_url,
+
+                data.file_name
+
+            );
+
+        } else {
+
+            addMessage(
+
+                data.answer,
+
+                "jarvis"
+
+            );
+
+        }
 
 
     } catch (error) {
@@ -2027,8 +1906,8 @@ async function sendMessage() {
             error.message,
 
             "jarvis"
-        );
 
+        );
 
     } finally {
 
@@ -2037,36 +1916,42 @@ async function sendMessage() {
         button.disabled = false;
 
         input.focus();
+
     }
 }
 
 
-/* =========================================================
+/* =====================================================
    ENTER
-========================================================= */
+===================================================== */
 
 document
-    .getElementById("messageInput")
+    .getElementById(
+        "messageInput"
+    )
     .addEventListener(
         "keydown",
         function(event) {
 
             if (
-                event.key === "Enter" &&
+                event.key === "Enter"
+                &&
                 !event.shiftKey
             ) {
 
                 event.preventDefault();
 
                 sendMessage();
+
             }
+
         }
     );
 
 
-/* =========================================================
-   YENI SOHBET
-========================================================= */
+/* =====================================================
+   YENİ SOHBET
+===================================================== */
 
 async function newChat() {
 
@@ -2079,7 +1964,9 @@ async function newChat() {
 
             API +
             "/new-chat?username=" +
-            encodeURIComponent(currentUser),
+            encodeURIComponent(
+                currentUser
+            ),
 
             {
                 method: "POST"
@@ -2092,7 +1979,9 @@ async function newChat() {
 
 
     document
-        .getElementById("chat")
+        .getElementById(
+            "chat"
+        )
         .innerHTML = "";
 
 
@@ -2100,17 +1989,22 @@ async function newChat() {
 }
 
 
-/* =========================================================
+/* =====================================================
    GREETING
-========================================================= */
+===================================================== */
 
 function showGreeting() {
 
     const chat =
-        document.getElementById("chat");
+        document.getElementById(
+            "chat"
+        );
 
 
-    if (chat.children.length > 0) {
+    if (
+        chat.children.length > 0
+    ) {
+
         return;
     }
 
@@ -2119,24 +2013,33 @@ function showGreeting() {
         "Merhaba efendim. K.A.R.V.I.S. hazır.";
 
 
-    if (currentUser === "betul") {
+    if (
+        currentUser === "betul"
+    ) {
 
         greeting =
             "Merhaba Betül. 😏 K.A.R.V.I.S. hazır.";
+
     }
 
 
-    if (currentUser === "sinem") {
+    if (
+        currentUser === "sinem"
+    ) {
 
         greeting =
             "Hoş geldiniz prenses. 💗 K.A.R.V.I.S. hazır.";
+
     }
 
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         greeting =
             "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır.";
+
     }
 
 
@@ -2147,9 +2050,9 @@ function showGreeting() {
 }
 
 
-/* =========================================================
+/* =====================================================
    HATALAR
-========================================================= */
+===================================================== */
 
 async function openErrors() {
 
@@ -2157,7 +2060,9 @@ async function openErrors() {
 
 
     document
-        .getElementById("errorModal")
+        .getElementById(
+            "errorModal"
+        )
         .classList
         .add("show");
 
@@ -2169,7 +2074,9 @@ async function openErrors() {
 function closeErrors() {
 
     document
-        .getElementById("errorModal")
+        .getElementById(
+            "errorModal"
+        )
         .classList
         .remove("show");
 }
@@ -2178,7 +2085,9 @@ function closeErrors() {
 async function loadErrors() {
 
     const list =
-        document.getElementById("errorList");
+        document.getElementById(
+            "errorList"
+        );
 
 
     list.innerHTML =
@@ -2201,10 +2110,12 @@ async function loadErrors() {
             data.errors || [];
 
 
-        if (errors.length === 0) {
+        if (
+            errors.length === 0
+        ) {
 
             list.innerHTML =
-                "<div style='color:#6d8b8e;font-size:13px;'>Henüz hata kaydı yok.</div>";
+                "Henüz hata kaydı yok.";
 
             return;
         }
@@ -2215,48 +2126,52 @@ async function loadErrors() {
 
         [...errors]
             .reverse()
-            .forEach(error => {
+            .forEach(
+                error => {
 
-                const card =
-                    document.createElement("div");
-
-
-                card.className =
-                    "error-card";
-
-
-                card.innerHTML = `
-
-                    <div class="error-top">
-
-                        <span class="error-provider">
-                            ${escapeHtml(error.provider)}
-                        </span>
-
-                        <span class="error-type">
-                            ${escapeHtml(error.type)}
-                        </span>
-
-                        <span class="error-time">
-                            ${escapeHtml(error.time)}
-                        </span>
-
-                    </div>
-
-                    <div class="error-message">
-                        ${escapeHtml(error.message || "")}
-                    </div>
-
-                    <div class="error-detail">
-                        ${escapeHtml(error.error || "")}
-                    </div>
-
-                `;
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
 
 
-                list.appendChild(card);
+                    card.style.cssText =
+                        "padding:13px;margin-bottom:10px;border-radius:12px;background:rgba(255,70,70,.045);border:1px solid rgba(255,80,80,.17);";
 
-            });
+
+                    card.innerHTML =
+
+                        "<b>" +
+                        escapeHtml(
+                            error.provider
+                        ) +
+                        "</b><br>" +
+
+                        "<span style='color:#ffbd6b'>" +
+                        escapeHtml(
+                            error.type
+                        ) +
+                        "</span><br><br>" +
+
+                        escapeHtml(
+                            error.message
+                        ) +
+
+                        "<br><small>" +
+
+                        escapeHtml(
+                            error.error || ""
+                        ) +
+
+                        "</small>";
+
+
+                    list.appendChild(
+                        card
+                    );
+
+                }
+            );
 
 
     } catch (error) {
@@ -2268,16 +2183,6 @@ async function loadErrors() {
 
 
 async function clearErrors() {
-
-    if (
-        !confirm(
-            "Tüm hata kayıtları silinsin mi?"
-        )
-    ) {
-
-        return;
-    }
-
 
     try {
 
@@ -2304,9 +2209,9 @@ async function clearErrors() {
 }
 
 
-/* =========================================================
-   PROFIL
-========================================================= */
+/* =====================================================
+   PROFİL
+===================================================== */
 
 function openProfile() {
 
@@ -2314,7 +2219,9 @@ function openProfile() {
 
 
     document
-        .getElementById("profileModal")
+        .getElementById(
+            "profileModal"
+        )
         .classList
         .add("show");
 }
@@ -2323,7 +2230,9 @@ function openProfile() {
 function closeProfile() {
 
     document
-        .getElementById("profileModal")
+        .getElementById(
+            "profileModal"
+        )
         .classList
         .remove("show");
 }
@@ -2355,8 +2264,12 @@ async function loginProfile() {
             .toLowerCase();
 
 
-    if (username === "betül") {
-        username = "betul";
+    if (
+        username === "betül"
+    ) {
+
+        username =
+            "betul";
     }
 
 
@@ -2364,7 +2277,8 @@ async function loginProfile() {
         passwordInput.value;
 
 
-    errorBox.textContent = "";
+    errorBox.textContent =
+        "";
 
 
     try {
@@ -2380,19 +2294,22 @@ async function loginProfile() {
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        username:
-                            username,
+                            username:
+                                username,
 
-                        password:
-                            password
+                            password:
+                                password
 
-                    })
+                        })
 
                 }
 
@@ -2403,7 +2320,9 @@ async function loginProfile() {
             await response.json();
 
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
             errorBox.textContent =
                 data.detail ||
@@ -2423,10 +2342,12 @@ async function loginProfile() {
         );
 
 
-        if (currentUser === "ilknur") {
+        if (
+            currentUser === "ilknur"
+        ) {
 
             currentMode =
-                "research";
+                "lesson";
 
         } else {
 
@@ -2443,7 +2364,9 @@ async function loginProfile() {
 
 
         document
-            .getElementById("chat")
+            .getElementById(
+                "chat"
+            )
             .innerHTML = "";
 
 
@@ -2461,9 +2384,9 @@ async function loginProfile() {
 }
 
 
-/* =========================================================
+/* =====================================================
    TEMA
-========================================================= */
+===================================================== */
 
 function applyUserTheme() {
 
@@ -2475,26 +2398,34 @@ function applyUserTheme() {
         );
 
 
-    if (currentUser === "sinem") {
+    if (
+        currentUser === "sinem"
+    ) {
 
         document.body
             .classList
-            .add("sinem-mode");
+            .add(
+                "sinem-mode"
+            );
     }
 
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         document.body
             .classList
-            .add("teacher-mode");
+            .add(
+                "teacher-mode"
+            );
     }
 }
 
 
-/* =========================================================
-   SIDEBAR KULLANICI GÖRÜNÜMÜ
-========================================================= */
+/* =====================================================
+   SIDEBAR KULLANICI
+===================================================== */
 
 function updateSidebar() {
 
@@ -2534,7 +2465,9 @@ function updateSidebar() {
         );
 
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         normalMenu.style.display =
             "none";
@@ -2589,24 +2522,28 @@ function updateSidebar() {
         .querySelectorAll(
             ".academic-menu .menu-item[data-mode]"
         )
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.classList.toggle(
+                button.classList.toggle(
 
-                "active",
+                    "active",
 
-                currentUser === "ilknur" &&
-                button.dataset.mode === currentMode
+                    currentUser === "ilknur"
+                    &&
+                    button.dataset.mode ===
+                    currentMode
 
-            );
+                );
 
-        });
+            }
+        );
 }
 
 
-/* =========================================================
-   EGLENCE
-========================================================= */
+/* =====================================================
+   EĞLENCE
+===================================================== */
 
 function toggleFunMode() {
 
@@ -2625,66 +2562,62 @@ function toggleFunMode() {
         );
 
 
-    if (funMode) {
+    addMessage(
 
-        addMessage(
+        funMode
 
-            "Eğlence modu aktif. K.A.R.V.I.S. biraz daha rahat takılabilir. 😈",
+            ? "Eğlence modu aktif. 😈"
 
-            "jarvis"
-        );
+            : "Eğlence modu kapatıldı.",
 
+        "jarvis"
 
-    } else {
-
-        addMessage(
-
-            "Eğlence modu kapatıldı. Standart K.A.R.V.I.S. sistemine dönüldü.",
-
-            "jarvis"
-        );
-    }
+    );
 }
 
 
-/* =========================================================
-   GUVENLIK
-========================================================= */
+/* =====================================================
+   GÜVENLİK
+===================================================== */
 
-function escapeHtml(text) {
+function escapeHtml(
+    text
+) {
 
-    return String(text)
+    return String(
+        text || ""
+    )
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+    .replace(
+        /</g,
+        "&lt;"
+    )
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+    .replace(
+        />/g,
+        "&gt;"
+    )
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    .replace(
+        /'/g,
+        "&#039;"
+    );
 }
 
 
-/* =========================================================
-   BASLANGIC
-========================================================= */
+/* =====================================================
+   BAŞLANGIÇ
+===================================================== */
 
 function initialize() {
 
@@ -2696,31 +2629,28 @@ function initialize() {
 
     if (
 
-        savedUser &&
+        savedUser === "karahan" ||
 
-        (
+        savedUser === "betul" ||
 
-            savedUser === "karahan" ||
+        savedUser === "sinem" ||
 
-            savedUser === "betul" ||
-
-            savedUser === "sinem" ||
-
-            savedUser === "ilknur"
-
-        )
+        savedUser === "ilknur"
 
     ) {
 
         currentUser =
             savedUser;
+
     }
 
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         currentMode =
-            "research";
+            "lesson";
 
     } else {
 
@@ -2744,4 +2674,5 @@ initialize();
 </script>
 
 </body>
+
 </html>
