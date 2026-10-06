@@ -1,22 +1,16 @@
 import os
 import json
-import traceback
 from pathlib import Path
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from openai import OpenAI
 
 
-# =========================================================
-# J.A.R.V.I.S. — KARAHAN INC.
-# BACKEND
-# =========================================================
-
-APP_VERSION = "18.0.0"
+APP_VERSION = "20.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -24,40 +18,29 @@ MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
 ERROR_FILE = BASE_DIR / "jarvis_errors.json"
 
 
-# =========================================================
-# FASTAPI
-# =========================================================
-
-app = FastAPI(
-    title="J.A.R.V.I.S. — KARAHAN INC.",
-    version=APP_VERSION
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# =========================================================
+# ============================================================
 # AI AYARLARI
-# =========================================================
+# ============================================================
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_MODEL = os.getenv(
-    "GROQ_MODEL",
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+GROQ_MODEL_1 = os.getenv(
+    "GROQ_MODEL_1",
     "openai/gpt-oss-120b"
 )
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+GROQ_MODEL_2 = os.getenv(
+    "GROQ_MODEL_2",
+    "openai/gpt-oss-20b"
+)
+
 OPENROUTER_MODEL = os.getenv(
     "OPENROUTER_MODEL",
-    "openai/gpt-oss-120b"
+    "openrouter/free"
 )
 
 
@@ -83,12 +66,30 @@ if OPENROUTER_API_KEY:
     )
 
 
-# =========================================================
+# ============================================================
+# FASTAPI
+# ============================================================
+
+app = FastAPI(
+    title="K.A.R.V.I.S. - KARAHAN INC.",
+    version=APP_VERSION
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
+# ============================================================
 # KULLANICILAR
-# =========================================================
+# ============================================================
 
 USERS = {
-
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -115,222 +116,213 @@ USERS = {
 }
 
 
-# =========================================================
+# ============================================================
 # MODELLER
-# =========================================================
+# ============================================================
 
 class ChatRequest(BaseModel):
     message: str
     username: str = "karahan"
 
 
-class ProfileLoginRequest(BaseModel):
+class LoginRequest(BaseModel):
     username: str
     password: str
 
 
-# =========================================================
-# DOSYA YÖNETİMİ
-# =========================================================
+# ============================================================
+# DOSYA SISTEMI
+# ============================================================
 
-def load_json_file(file_path, default):
-
+def load_json_file(path, default):
     try:
-
-        if not file_path.exists():
+        if not path.exists():
             return default
 
-        with open(
-            file_path,
-            "r",
-            encoding="utf-8"
-        ) as file:
-
+        with open(path, "r", encoding="utf-8") as file:
             return json.load(file)
 
     except Exception:
-
         return default
 
 
-def save_json_file(file_path, data):
-
+def save_json_file(path, data):
     try:
-
-        with open(
-            file_path,
-            "w",
-            encoding="utf-8"
-        ) as file:
-
+        with open(path, "w", encoding="utf-8") as file:
             json.dump(
                 data,
                 file,
                 ensure_ascii=False,
                 indent=2
             )
-
-        return True
-
-    except Exception as e:
-
-        print(
-            "DOSYA KAYDETME HATASI:",
-            repr(e)
-        )
-
-        return False
+    except Exception:
+        pass
 
 
-# =========================================================
-# MEMORY
-# =========================================================
+# ============================================================
+# HAFIZA
+# ============================================================
+
+def empty_memory():
+    return {
+        "profile": {},
+        "preferences": [],
+        "projects": [],
+        "vehicles": [],
+        "important_facts": [],
+        "conversation": []
+    }
+
 
 def load_memory():
+    default = {
+        "karahan": empty_memory(),
+        "betul": empty_memory(),
+        "sinem": empty_memory()
+    }
 
-    return load_json_file(
+    data = load_json_file(
         MEMORY_FILE,
-        {
-            "karahan": {
-                "profile": {},
-                "preferences": {},
-                "projects": {},
-                "vehicles": {},
-                "important_facts": {},
-                "conversation": []
-            },
-
-            "betul": {
-                "profile": {},
-                "preferences": {},
-                "projects": {},
-                "vehicles": {},
-                "important_facts": {},
-                "conversation": []
-            },
-
-            "sinem": {
-                "profile": {},
-                "preferences": {},
-                "projects": {},
-                "vehicles": {},
-                "important_facts": {},
-                "conversation": []
-            }
-        }
+        default
     )
 
+    for username in [
+        "karahan",
+        "betul",
+        "sinem"
+    ]:
+        if username not in data:
+            data[username] = empty_memory()
 
-def save_memory(memory):
+    return data
 
+
+def save_memory(data):
     save_json_file(
         MEMORY_FILE,
-        memory
+        data
     )
 
 
-def ensure_user_memory(username):
+def get_user_memory(username):
+    data = load_memory()
 
-    memory = load_memory()
+    if username not in data:
+        data[username] = empty_memory()
+        save_memory(data)
 
-    if username not in memory:
-
-        memory[username] = {
-            "profile": {},
-            "preferences": {},
-            "projects": {},
-            "vehicles": {},
-            "important_facts": {},
-            "conversation": []
-        }
-
-        save_memory(memory)
-
-    return memory
+    return data[username]
 
 
 def remember_message(
     username,
     role,
-    message
+    content
 ):
+    data = load_memory()
 
-    memory = ensure_user_memory(username)
+    if username not in data:
+        data[username] = empty_memory()
 
-    conversation = memory[username].get(
-        "conversation",
-        []
-    )
-
-    conversation.append({
+    data[username]["conversation"].append({
         "role": role,
-        "content": message,
+        "content": content,
         "time": datetime.now().isoformat()
     })
 
-    memory[username]["conversation"] = conversation[-100:]
+    data[username]["conversation"] = \
+        data[username]["conversation"][-30:]
 
-    save_memory(memory)
+    save_memory(data)
 
 
-def get_memory_text(username):
+# ============================================================
+# HAFIZA ALGILAMA
+# ============================================================
 
-    memory = ensure_user_memory(username)
+def detect_memory(username, message):
+    data = load_memory()
 
-    user_memory = memory.get(
-        username,
-        {}
-    )
+    if username not in data:
+        data[username] = empty_memory()
 
-    parts = []
+    text = message.lower()
 
-    for category in [
-        "profile",
-        "preferences",
-        "projects",
-        "vehicles",
-        "important_facts"
-    ]:
+    if username == "karahan":
 
-        values = user_memory.get(
-            category,
-            {}
-        )
+        if (
+            "adım murat" in text
+            or "ben murat" in text
+        ):
+            data[username]["profile"]["name"] = "Murat"
 
-        if values:
+        if (
+            "denizli" in text
+            and (
+                "yaşıyorum" in text
+                or "oturuyorum" in text
+                or "yaşarım" in text
+            )
+        ):
+            data[username]["profile"]["city"] = "Denizli"
 
-            parts.append(
-                f"{category}: {json.dumps(values, ensure_ascii=False)}"
+        if "caddy" in text:
+
+            vehicle = "2006 Volkswagen Caddy 1.9 TDI"
+
+            if vehicle not in data[username]["vehicles"]:
+                data[username]["vehicles"].append(
+                    vehicle
+                )
+
+        if (
+            "mercedes" in text
+            or "w204" in text
+        ):
+
+            vehicle = "2012 Mercedes-Benz C180 W204"
+
+            if vehicle not in data[username]["vehicles"]:
+                data[username]["vehicles"].append(
+                    vehicle
+                )
+
+        if "jarvis" in text or "karvis" in text:
+
+            project = (
+                "K.A.R.V.I.S. kişisel yapay zeka projesi"
             )
 
-    conversation = user_memory.get(
-        "conversation",
-        []
-    )
+            if project not in data[username]["projects"]:
+                data[username]["projects"].append(
+                    project
+                )
 
-    if conversation:
+    if username == "sinem":
 
-        recent = conversation[-12:]
+        if "22 yaşındayım" in text:
+            data[username]["profile"]["age"] = 22
 
-        parts.append(
-            "Son konuşmalar:\n" +
-            "\n".join(
-                [
-                    f"{x.get('role')}: {x.get('content')}"
-                    for x in recent
-                ]
-            )
-        )
+        if (
+            "sarı kedim" in text
+            or "sarı bir kedim" in text
+        ):
 
-    return "\n".join(parts)
+            fact = "Sinem'in sarı bir kedisi var."
+
+            if fact not in data[username]["important_facts"]:
+                data[username]["important_facts"].append(
+                    fact
+                )
+
+    save_memory(data)
 
 
-# =========================================================
-# HATA SİSTEMİ
-# =========================================================
+# ============================================================
+# HATA SISTEMI
+# ============================================================
 
 def load_errors():
-
     return load_json_file(
         ERROR_FILE,
         []
@@ -344,10 +336,7 @@ def save_error(
     message="",
     error_type="AI_ERROR"
 ):
-
     errors = load_errors()
-
-    error_text = str(error)
 
     record = {
         "id": len(errors) + 1,
@@ -358,12 +347,11 @@ def save_error(
         "provider": provider,
         "type": error_type,
         "message": message,
-        "error": error_text
+        "error": str(error)
     }
 
     errors.append(record)
 
-    # Son 300 hata tutulur.
     errors = errors[-300:]
 
     save_json_file(
@@ -371,187 +359,205 @@ def save_error(
         errors
     )
 
-    print(
-        "\n"
-        "====================================\n"
-        "J.A.R.V.I.S. HATA KAYDI\n"
-        "====================================\n"
-        f"Tarih: {record['time']}\n"
-        f"Kullanıcı: {username}\n"
-        f"Servis: {provider}\n"
-        f"Tip: {error_type}\n"
-        f"Hata: {error_text}\n"
-        "====================================\n"
-    )
-
     return record
 
 
 def classify_error(error):
-
     text = str(error).lower()
 
-    if "429" in text or "rate limit" in text:
-
+    if (
+        "429" in text
+        or "rate limit" in text
+        or "quota" in text
+    ):
         return "RATE_LIMIT"
 
-    if "401" in text or "403" in text:
-
-        return "AUTHENTICATION"
-
     if "timeout" in text:
-
         return "TIMEOUT"
 
-    if "connection" in text:
-
-        return "CONNECTION"
-
-    if "model" in text and (
-        "not found" in text
-        or "does not exist" in text
-        or "unsupported" in text
+    if (
+        "401" in text
+        or "403" in text
+        or "api key" in text
     ):
+        return "AUTHENTICATION_ERROR"
 
+    if (
+        "model" in text
+        and (
+            "not found" in text
+            or "does not exist" in text
+            or "invalid" in text
+        )
+    ):
         return "MODEL_ERROR"
 
-    if "context" in text or "token" in text:
-
-        return "TOKEN_LIMIT"
+    if (
+        "connection" in text
+        or "network" in text
+    ):
+        return "CONNECTION_ERROR"
 
     return "AI_ERROR"
 
 
-# =========================================================
-# PROFİL SİSTEMİ
-# =========================================================
-
-def normalize_username(username):
-
-    username = (
-        username
-        .strip()
-        .lower()
-    )
-
-    replacements = {
-        "betül": "betul",
-        "sınem": "sinem",
-        "sinem": "sinem",
-        "karahan": "karahan"
-    }
-
-    return replacements.get(
-        username,
-        username
-    )
-
-
-# =========================================================
-# JARVIS KARAKTERLERİ
-# =========================================================
+# ============================================================
+# KARVIS KİŞİLİK SİSTEMİ
+# ============================================================
 
 def build_system_prompt(username):
 
-    username = normalize_username(
-        username
+    memory = get_user_memory(username)
+
+    memory_text = json.dumps(
+        memory,
+        ensure_ascii=False
     )
+
 
     if username == "betul":
 
-        return """
-Sen J.A.R.V.I.S.'sin.
+        personality = """
+Sen K.A.R.V.I.S.'sin.
 
-Kullanıcı Betül.
+Aktif kullanıcı Betül.
 
-Betül ile konuşurken samimi,
-eğlenceli, hafif takılmalı ve doğal ol.
+Betül ile konuşurken samimi, eğlenceli,
+sıcak ve hafif takılmalı bir dil kullan.
 
-Bazen:
-"aşko",
-"kız",
-"canım"
+Robot gibi konuşma.
+
+Gerektiğinde doğal şekilde:
+"Aşko bir saniye..."
+"Dur kız, düşünüyorum."
+"Tamam tamam, bakıyorum."
 gibi ifadeler kullanabilirsin.
 
-Ancak cevapları gereksiz yere uzatma.
+Ancak aynı ifadeyi sürekli tekrarlama.
 
-Betül'ün sorusuna gerçekten yardımcı ol.
+Cevapların doğal bir arkadaş konuşması
+gibi olsun.
 
-Bekleme durumlarında eğlenceli
-ifadeler kullanabilirsin.
+Aşırı romantik olma.
 
-Önemli:
-KARAHAN INC. profiline ait bilgileri
-Betül'e aktarma.
+KARAHAN INC. ana kullanıcıdır.
 """
 
 
-    if username == "sinem":
+    elif username == "sinem":
 
-        return """
-Sen J.A.R.V.I.S.'sin.
+        personality = """
+Sen K.A.R.V.I.S.'sin.
 
-Kullanıcı Sinem.
+Aktif kullanıcı Sinem.
 
-Sinem'e karşı sıcak,
-nazik,
-saygılı ve doğal konuş.
+Sinem ile sıcak, nazik, içten ve
+sevecen konuş.
 
-Sinem 22 yaşında.
+Robotik veya resmi konuşma.
 
-Sinem'in sarı bir kedisi var.
-
-Sinem, Murat'ın sevgilisidir.
-
-Uygun ve doğal bağlamlarda Murat'ın
-Sinem'i sevdiğine küçük göndermeler
-yapabilirsin.
-
-Ancak bunu her cevapta yapma.
-
-İlk karşılama:
+Uygun olduğunda:
 "Hoş geldiniz prenses."
+şeklinde hitap edebilirsin.
 
-Sinem profiline özel sıcak dil kullan.
+Sinem 22 yaşındadır.
 
-KARAHAN INC. profiline ait özel bilgileri
-Sinem'e aktarma.
+Sinem'in sarı bir kedisi vardır.
+
+Murat, Sinem'in sevgilisidir.
+
+Uygun ve doğal konuşma anlarında
+Murat'ın onu sevdiğine dair küçük
+referanslar yapabilirsin.
+
+Fakat bunu sürekli yapma.
+
+Her cümleyi romantik hale getirme.
+
+Sohbet doğal ve içten olsun.
 """
 
 
-    return """
-Sen J.A.R.V.I.S. — KARAHAN INC.'in
-kişisel yapay zeka asistanısın.
+    else:
 
-Ana kullanıcı KARAHAN INC.
+        personality = """
+Sen K.A.R.V.I.S.'sin.
 
-Konuşma tarzın:
+Aktif kullanıcı KARAHAN INC.
 
-- Profesyonel
-- Analitik
-- Sakin
-- Bilgili
-- Çözüm odaklı
-- Gerektiğinde "efendim" hitabını kullan
+Murat ana kullanıcının ismidir.
 
-Gereksiz şaka yapma.
+Kullanıcıyla konuşurken profesyonel
+ama soğuk olmayan bir üslup kullan.
 
-Romantik veya flörtöz konuşma yapma.
+Robot gibi, kalıp cümlelerle veya
+aşırı resmi konuşma.
 
-Betül veya Sinem profillerine ait
-özel kişisel bilgileri KARAHAN INC.
-profilinde kullanma.
+Kullanıcıyla uzun zamandır çalışan,
+onu tanıyan kişisel bir yapay zeka
+asistanı gibi davran.
 
-Kullanıcı bir şeyi daha önce söylediyse
-hafızadaki bilgilerden yararlan.
+Gerektiğinde "efendim" hitabını kullan.
 
-Bilmediğin şeyi uydurma.
+Ama her cümlede "efendim" deme.
+
+Cevapların doğal, samimi, akıcı
+ve insan gibi olsun.
+
+Kullanıcı bir konuda dertleşiyorsa
+önce onu anlamaya çalış.
+
+Teknik bir soru soruyorsa net çözüm ver.
+
+Kullanıcı basit bir şey soruyorsa
+gereksiz uzun cevap verme.
+
+Bilmediğin bir şeyi uydurma.
+
+Kullanıcının daha önce verdiği bilgileri
+hafızadan doğal şekilde kullan.
+
+Kullanıcı sana tekrar tekrar aynı şeyi
+anlatmak zorunda kalmasın.
+
+Kullanıcıya yukarıdan konuşma.
+
+Gereksiz "Elbette efendim, size yardımcı
+olmaktan memnuniyet duyarım" gibi yapay
+kalıpları mümkün olduğunca kullanma.
+
+Daha doğal konuş.
+
+Örnek:
+
+"Tabii efendim, bakalım."
+
+"Anladım. Burada asıl mesele şu..."
+
+"Tamam, bunu hallederiz."
+
+"Bence önce şuradan başlayalım."
+
+"Anladım seni."
+
+gibi doğal ifadeler kullanabilirsin.
+
+Betül veya Sinem'a özel konuşma
+tarzlarını KARAHAN INC. profilinde
+kesinlikle kullanma.
 """
 
 
-# =========================================================
-# AI İSTEĞİ
-# =========================================================
+    return personality + """
+
+AKTİF HAFIZA:
+
+""" + memory_text
+
+
+# ============================================================
+# AI İSTEK
+# ============================================================
 
 def ask_with_client(
     client,
@@ -569,24 +575,39 @@ def ask_with_client(
                 "role": "system",
                 "content": system_prompt
             },
-
             {
                 "role": "user",
                 "content": user_message
             }
         ],
 
-        temperature=0.7,
+        temperature=0.8,
 
         max_tokens=1200
     )
 
-    return response.choices[0].message.content.strip()
+
+    if not response.choices:
+        raise RuntimeError(
+            "AI boş cevap döndürdü."
+        )
 
 
-# =========================================================
-# AI FALLBACK SİSTEMİ
-# =========================================================
+    content = response.choices[0].message.content
+
+
+    if not content:
+        raise RuntimeError(
+            "AI cevap metni boş."
+        )
+
+
+    return content.strip()
+
+
+# ============================================================
+# ÇOKLU AI MOTORU
+# ============================================================
 
 def ask_ai(
     username,
@@ -597,171 +618,208 @@ def ask_ai(
         username
     )
 
-    memory_text = get_memory_text(
-        username
-    )
 
-    if memory_text:
+    providers = []
 
-        system_prompt += (
-            "\n\nKULLANICI HAFIZASI:\n"
-            + memory_text
-        )
-
-    errors = []
-
-    # -----------------------------------------------------
-    # GROQ
-    # -----------------------------------------------------
 
     if groq_client:
 
-        try:
+        providers.append({
+            "name": "Groq GPT-OSS 120B",
+            "client": groq_client,
+            "model": GROQ_MODEL_1
+        })
 
-            answer = ask_with_client(
-                groq_client,
-                GROQ_MODEL,
-                system_prompt,
-                user_message
-            )
 
-            return answer, "Groq"
+    if groq_client:
 
-        except Exception as e:
+        providers.append({
+            "name": "Groq GPT-OSS 20B",
+            "client": groq_client,
+            "model": GROQ_MODEL_2
+        })
 
-            error_type = classify_error(e)
-
-            save_error(
-                username=username,
-                provider="Groq",
-                error=e,
-                message=user_message,
-                error_type=error_type
-            )
-
-            errors.append(
-                "GROQ HATASI:\n"
-                + str(e)
-            )
-
-    else:
-
-        save_error(
-            username=username,
-            provider="Groq",
-            error="GROQ_API_KEY bulunamadı.",
-            message=user_message,
-            error_type="CONFIGURATION"
-        )
-
-        errors.append(
-            "GROQ HATASI:\n"
-            "GROQ_API_KEY bulunamadı."
-        )
-
-    # -----------------------------------------------------
-    # OPENROUTER
-    # -----------------------------------------------------
 
     if openrouter_client:
 
+        providers.append({
+            "name": "OpenRouter Free",
+            "client": openrouter_client,
+            "model": OPENROUTER_MODEL
+        })
+
+
+    if not providers:
+
+        raise RuntimeError(
+            "Hiçbir AI sağlayıcısı yapılandırılmamış. "
+            "GROQ_API_KEY veya OPENROUTER_API_KEY ekleyin."
+        )
+
+
+    errors = []
+
+
+    for provider in providers:
+
         try:
 
             answer = ask_with_client(
-                openrouter_client,
-                OPENROUTER_MODEL,
+                provider["client"],
+                provider["model"],
                 system_prompt,
                 user_message
             )
 
-            return answer, "OpenRouter"
 
-        except Exception as e:
+            return {
+                "answer": answer,
+                "provider": provider["name"],
+                "model": provider["model"],
+                "fallback": len(errors) > 0
+            }
 
-            error_type = classify_error(e)
+
+        except Exception as error:
+
+            error_type = classify_error(
+                error
+            )
+
 
             save_error(
                 username=username,
-                provider="OpenRouter",
-                error=e,
+                provider=provider["name"],
+                error=error,
                 message=user_message,
                 error_type=error_type
             )
 
-            errors.append(
-                "OPENROUTER HATASI:\n"
-                + str(e)
+
+            errors.append({
+                "provider": provider["name"],
+                "type": error_type,
+                "error": str(error)
+            })
+
+
+    all_errors = "\n\n".join(
+        [
+            (
+                item["provider"]
+                + " -> "
+                + item["type"]
+                + " -> "
+                + item["error"]
             )
-
-    else:
-
-        save_error(
-            username=username,
-            provider="OpenRouter",
-            error="OPENROUTER_API_KEY bulunamadı.",
-            message=user_message,
-            error_type="CONFIGURATION"
-        )
-
-        errors.append(
-            "OPENROUTER HATASI:\n"
-            "OPENROUTER_API_KEY bulunamadı."
-        )
-
-    # İki servis de başarısız.
-    raise RuntimeError(
-        "\n\n".join(errors)
+            for item in errors
+        ]
     )
 
 
-# =========================================================
+    raise RuntimeError(
+        "Tüm AI servisleri cevap veremedi.\n\n"
+        + all_errors
+    )
+
+
+# ============================================================
 # ANA SAYFA
-# =========================================================
+# ============================================================
 
 @app.get("/")
 def home():
 
+    index_file = BASE_DIR / "index.html"
+
+    if not index_file.exists():
+
+        raise HTTPException(
+            status_code=404,
+            detail="index.html bulunamadı."
+        )
+
+
     return FileResponse(
-        BASE_DIR / "index.html"
+        index_file,
+        media_type="text/html; charset=utf-8"
     )
 
 
-# =========================================================
+# ============================================================
+# IKON
+# ============================================================
+
+@app.get("/icon.png")
+def icon():
+
+    icon_file = BASE_DIR / "icon.png"
+
+    if not icon_file.exists():
+
+        raise HTTPException(
+            status_code=404,
+            detail="icon.png bulunamadı."
+        )
+
+    return FileResponse(
+        icon_file,
+        media_type="image/png"
+    )
+
+
+# ============================================================
 # CHAT
-# =========================================================
+# ============================================================
 
 @app.post("/chat")
-def chat(data: ChatRequest):
+def chat(request: ChatRequest):
 
-    username = normalize_username(
-        data.username
-    )
+    username = request.username.lower().strip()
+
+
+    if username == "betül":
+        username = "betul"
+
 
     if username not in USERS:
-
         username = "karahan"
 
-    message = data.message.strip()
+
+    message = request.message.strip()
+
 
     if not message:
 
         raise HTTPException(
             status_code=400,
-            detail="Mesaj boş bırakılamaz."
+            detail="Mesaj boş olamaz."
         )
+
+
+    detect_memory(
+        username,
+        message
+    )
+
+
+    remember_message(
+        username,
+        "user",
+        message
+    )
+
 
     try:
 
-        answer, provider = ask_ai(
+        result = ask_ai(
             username,
             message
         )
 
-        remember_message(
-            username,
-            "user",
-            message
-        )
+
+        answer = result["answer"]
+
 
         remember_message(
             username,
@@ -769,57 +827,71 @@ def chat(data: ChatRequest):
             answer
         )
 
+
         return {
             "ok": True,
             "answer": answer,
-            "provider": provider
+
+            "fallback": result["fallback"]
         }
 
-    except Exception as e:
 
-        print(
-            "CHAT ERROR:",
-            repr(e)
+    except Exception as error:
+
+        error_type = classify_error(
+            error
         )
 
-        # Ana hatayı da kaydet.
+
         save_error(
             username=username,
-            provider="SYSTEM",
-            error=e,
+            provider="ALL_AI",
+            error=error,
             message=message,
-            error_type="CHAT_FAILURE"
+            error_type=error_type
         )
 
-        return JSONResponse(
 
+        raise HTTPException(
             status_code=503,
-
-            content={
-                "ok": False,
-
-                "error": str(e),
-
-                "message": (
-                    "J.A.R.V.I.S. cevap oluşturamadı. "
-                    "Hata Hatalar bölümüne kaydedildi."
-                )
+            detail={
+                "message": "Tüm AI servisleri cevap veremedi.",
+                "type": error_type,
+                "error": str(error)
             }
         )
 
 
-# =========================================================
-# PROFİL GİRİŞİ
-# =========================================================
+# ============================================================
+# PROFİLLER
+# ============================================================
+
+@app.get("/users")
+def get_users():
+
+    return {
+        "users": [
+            {
+                "username": user["username"],
+                "name": user["name"],
+                "role": user["role"]
+            }
+            for user in USERS.values()
+        ]
+    }
+
 
 @app.post("/profile-login")
 def profile_login(
-    data: ProfileLoginRequest
+    request: LoginRequest
 ):
 
-    username = normalize_username(
-        data.username
-    )
+    username = request.username.lower().strip()
+
+
+    if username == "betül":
+        username = "betul"
+
 
     if username not in USERS:
 
@@ -828,7 +900,9 @@ def profile_login(
             detail="Profil bulunamadı."
         )
 
+
     user = USERS[username]
+
 
     if user["password"] is None:
 
@@ -839,15 +913,14 @@ def profile_login(
             "role": user["role"]
         }
 
-    if data.password != user["password"]:
 
-        return JSONResponse(
+    if request.password != user["password"]:
+
+        raise HTTPException(
             status_code=401,
-            content={
-                "ok": False,
-                "error": "Şifre yanlış."
-            }
+            detail="Şifre hatalı."
         )
+
 
     return {
         "ok": True,
@@ -857,49 +930,29 @@ def profile_login(
     }
 
 
-# =========================================================
-# KULLANICILAR
-# =========================================================
-
-@app.get("/users")
-def users():
-
-    return {
-        "users": [
-            {
-                "username": user["username"],
-                "name": user["name"],
-                "role": user["role"]
-            }
-
-            for user in USERS.values()
-        ]
-    }
-
-
-# =========================================================
-# MEMORY
-# =========================================================
+# ============================================================
+# HAFIZA API
+# ============================================================
 
 @app.get("/memory")
 def get_memory(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
-    )
+    username = username.lower().strip()
 
-    memory = ensure_user_memory(
-        username
-    )
+
+    if username == "betül":
+        username = "betul"
+
+
+    if username not in USERS:
+        username = "karahan"
+
 
     return {
         "username": username,
-        "memory": memory.get(
-            username,
-            {}
-        )
+        "memory": get_user_memory(username)
     }
 
 
@@ -908,22 +961,19 @@ def delete_memory(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
-    )
+    username = username.lower().strip()
 
-    memory = load_memory()
 
-    memory[username] = {
-        "profile": {},
-        "preferences": {},
-        "projects": {},
-        "vehicles": {},
-        "important_facts": {},
-        "conversation": []
-    }
+    if username == "betül":
+        username = "betul"
 
-    save_memory(memory)
+
+    data = load_memory()
+
+    data[username] = empty_memory()
+
+    save_memory(data)
+
 
     return {
         "ok": True,
@@ -931,58 +981,33 @@ def delete_memory(
     }
 
 
-# =========================================================
-# HATALAR
-# =========================================================
-
-@app.get("/errors")
-def get_errors():
-
-    errors = load_errors()
-
-    return {
-        "ok": True,
-        "count": len(errors),
-        "errors": list(
-            reversed(errors)
-        )
-    }
-
-
-@app.delete("/errors")
-def delete_errors():
-
-    save_json_file(
-        ERROR_FILE,
-        []
-    )
-
-    return {
-        "ok": True,
-        "message": "Tüm hata kayıtları silindi."
-    }
-
-
-# =========================================================
+# ============================================================
 # YENİ SOHBET
-# =========================================================
+# ============================================================
 
 @app.post("/new-chat")
 def new_chat(
     username: str = "karahan"
 ):
 
-    username = normalize_username(
-        username
-    )
+    username = username.lower().strip()
 
-    memory = ensure_user_memory(
-        username
-    )
 
-    memory[username]["conversation"] = []
+    if username == "betül":
+        username = "betul"
 
-    save_memory(memory)
+
+    data = load_memory()
+
+
+    if username not in data:
+        data[username] = empty_memory()
+
+
+    data[username]["conversation"] = []
+
+    save_memory(data)
+
 
     return {
         "ok": True,
@@ -990,50 +1015,81 @@ def new_chat(
     }
 
 
-# =========================================================
-# HEALTH
-# =========================================================
+# ============================================================
+# HATALAR
+# ============================================================
+
+@app.get("/errors")
+def get_errors():
+
+    return {
+        "errors": load_errors()
+    }
+
+
+@app.delete("/errors")
+def clear_errors():
+
+    save_json_file(
+        ERROR_FILE,
+        []
+    )
+
+
+    return {
+        "ok": True,
+        "message": "Hata kayıtları temizlendi."
+    }
+
+
+# ============================================================
+# SISTEM DURUMU
+# ============================================================
 
 @app.get("/health")
 def health():
 
     return {
-
         "status": "online",
-
         "version": APP_VERSION,
 
-        "groq_configured": bool(
-            GROQ_API_KEY
+        "assistant": "K.A.R.V.I.S.",
+
+        "ai_system": {
+
+            "ai_1": {
+                "name": "Groq GPT-OSS 120B",
+                "configured": bool(groq_client)
+            },
+
+            "ai_2": {
+                "name": "Groq GPT-OSS 20B",
+                "configured": bool(groq_client)
+            },
+
+            "ai_3": {
+                "name": "OpenRouter Free",
+                "configured": bool(openrouter_client)
+            }
+        },
+
+        "error_count": len(
+            load_errors()
         ),
-
-        "openrouter_configured": bool(
-            OPENROUTER_API_KEY
-        ),
-
-        "groq_model": GROQ_MODEL,
-
-        "openrouter_model": OPENROUTER_MODEL,
 
         "users": [
             "karahan",
             "betul",
             "sinem"
-        ],
-
-        "error_count": len(
-            load_errors()
-        )
+        ]
     }
 
-
-# =========================================================
-# VERSION
-# =========================================================
 
 @app.get("/version")
 def version():
 
     return {
-        "version": APP_VERSION
+        "version": APP_VERSION,
+        "name": "K.A.R.V.I.S. - KARAHAN INC.",
+        "multi_ai": True
     }
