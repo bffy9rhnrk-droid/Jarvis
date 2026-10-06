@@ -5,100 +5,70 @@
 
 <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<meta
-    name="theme-color"
-    content="#020708"
->
+<meta name="theme-color" content="#02070a">
 
-<meta
-    name="apple-mobile-web-app-capable"
-    content="yes"
->
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-<meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="black-translucent"
->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<meta
-    name="apple-mobile-web-app-title"
-    content="K.A.R.V.I.S."
->
+<meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
 
-<link
-    rel="apple-touch-icon"
-    href="/icon.png"
->
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="icon" type="image/png" href="/icon.png">
 
-<link
-    rel="icon"
-    type="image/png"
-    href="/icon.png"
->
-
-<title>
-K.A.R.V.I.S. - KARAHAN INC.
-</title>
-
+<title>K.A.R.V.I.S. - KARAHAN INC.</title>
 
 <style>
+
+/* =========================================================
+   TEMEL
+========================================================= */
 
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
-
 html,
 body {
-
     margin: 0;
     padding: 0;
-
     width: 100%;
     min-height: 100%;
-
-    background: #020708 !important;
-
-    color: #e9ffff;
+    background: #02070a;
+    color: #eaffff;
 
     font-family:
+        Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
 }
 
-
 body {
     overflow: hidden;
 }
-
 
 button,
 input {
     font: inherit;
 }
 
-
 button {
     cursor: pointer;
 }
 
 
-/* ============================================================
-   APP
-   ============================================================ */
+/* =========================================================
+   ANA UYGULAMA
+========================================================= */
 
 .app {
-
     width: 100%;
-
     height: 100vh;
     height: 100dvh;
 
@@ -107,204 +77,276 @@ button {
 
     background:
         radial-gradient(
-            circle at 50% 15%,
-            rgba(0,255,255,.08),
-            transparent 35%
+            circle at 50% 18%,
+            rgba(0, 255, 255, 0.10),
+            transparent 27%
         ),
-        #020708 !important;
+        radial-gradient(
+            circle at 50% 65%,
+            rgba(0, 170, 190, 0.045),
+            transparent 40%
+        ),
+        linear-gradient(
+            180deg,
+            #02070a 0%,
+            #02080b 45%,
+            #010506 100%
+        );
 }
 
 
-/* ============================================================
+/* =========================================================
    HEADER
-   ============================================================ */
+========================================================= */
 
 .header {
-
-    height: 70px;
-
+    height: 72px;
     flex-shrink: 0;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     padding: 0 18px;
 
     background:
-        rgba(2,7,8,.98) !important;
+        linear-gradient(
+            180deg,
+            rgba(2, 9, 12, 0.98),
+            rgba(2, 7, 9, 0.92)
+        );
 
     border-bottom:
-        1px solid rgba(0,255,255,.15);
+        1px solid rgba(0, 255, 255, 0.16);
+
+    box-shadow:
+        0 5px 25px rgba(0, 0, 0, 0.25);
 
     z-index: 10;
 }
 
-
 .brand {
-
     display: flex;
-
     align-items: center;
-
     gap: 12px;
 }
 
-
 .logo-mini {
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 50%;
+    width: 43px;
+    height: 43px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    border:
-        1px solid #00ffff;
+    border-radius: 50%;
+
+    border: 1px solid rgba(0, 255, 255, 0.9);
 
     color: #00ffff;
 
-    box-shadow:
-        0 0 10px rgba(0,255,255,.35),
-        inset 0 0 12px rgba(0,255,255,.1);
-
-    font-weight: 800;
-
     font-size: 18px;
-}
+    font-weight: 900;
 
+    text-shadow:
+        0 0 8px rgba(0,255,255,.8);
+
+    box-shadow:
+        0 0 12px rgba(0,255,255,.35),
+        0 0 30px rgba(0,255,255,.08),
+        inset 0 0 16px rgba(0,255,255,.12);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,255,255,.10),
+            rgba(0,0,0,.05)
+        );
+}
 
 .brand-title {
-
     font-size: 16px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-}
-
-
-.brand-subtitle {
-
-    margin-top: 2px;
-
-    font-size: 9px;
-
+    font-weight: 850;
     letter-spacing: 3px;
 
-    color: #6a9295;
+    text-shadow:
+        0 0 10px rgba(0,255,255,.12);
 }
 
+.brand-subtitle {
+    margin-top: 3px;
+
+    font-size: 8px;
+    letter-spacing: 4px;
+
+    color: #64898d;
+}
 
 .header-right {
-
     display: flex;
-
     align-items: center;
-
-    gap: 8px;
+    gap: 10px;
 }
-
 
 .status {
+    position: relative;
 
     font-size: 9px;
+    letter-spacing: 2px;
 
-    letter-spacing: 1px;
+    color: #58ffb5;
 
-    color: #54ffb1;
+    text-shadow:
+        0 0 8px rgba(88,255,181,.4);
 }
 
+.status::before {
+    content: "";
+
+    display: inline-block;
+
+    width: 6px;
+    height: 6px;
+
+    margin-right: 5px;
+
+    border-radius: 50%;
+
+    background: #58ffb5;
+
+    box-shadow:
+        0 0 8px #58ffb5;
+}
 
 .menu-button {
-
-    width: 42px;
-    height: 42px;
+    width: 43px;
+    height: 43px;
 
     border:
         1px solid rgba(0,255,255,.25);
 
-    border-radius: 12px;
+    border-radius: 13px;
 
     background:
-        rgba(0,255,255,.04);
+        rgba(0,255,255,.035);
 
     color: #00ffff;
 
     font-size: 20px;
+
+    box-shadow:
+        inset 0 0 12px rgba(0,255,255,.035);
+
+    transition: .2s;
+}
+
+.menu-button:active {
+    transform: scale(.94);
+    background: rgba(0,255,255,.09);
 }
 
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+/* =========================================================
+   ANA ALAN
+========================================================= */
 
 .main {
-
     position: relative;
 
     flex: 1;
 
     overflow: hidden;
 
-    background:
-        #020708 !important;
+    background: transparent;
 }
 
-
 .hero {
-
     position: absolute;
-
     inset: 0;
 
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
 
-    padding-top: 45px;
+    padding-top: 48px;
+    padding-bottom: 145px;
 
     overflow-y: auto;
+    overflow-x: hidden;
 
-    padding-bottom: 140px;
+    scrollbar-width: none;
+}
 
-    background:
-        #020708 !important;
+.hero::-webkit-scrollbar {
+    display: none;
 }
 
 
-/* ============================================================
-   KARVIS CORE
-   ============================================================ */
+/* =========================================================
+   HUD K.A.R.V.I.S. CORE
+========================================================= */
 
 .jarvis-orb {
-
     position: relative;
 
-    width: 190px;
-    height: 190px;
-
-    border-radius: 50%;
+    width: 205px;
+    height: 205px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    margin-bottom: 24px;
+    margin-bottom: 25px;
+
+    filter:
+        drop-shadow(
+            0 0 18px rgba(0,255,255,.12)
+        );
+}
+
+
+/* Dış enerji halkası */
+
+.jarvis-orb::before {
+    content: "";
+
+    position: absolute;
+
+    width: 204px;
+    height: 204px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0,255,255,.11);
+
+    box-shadow:
+        0 0 45px rgba(0,255,255,.06),
+        inset 0 0 35px rgba(0,255,255,.04);
+}
+
+
+/* Küçük HUD çizgileri */
+
+.jarvis-orb::after {
+    content: "";
+
+    position: absolute;
+
+    width: 218px;
+    height: 218px;
+
+    border-radius: 50%;
+
+    border:
+        1px dashed rgba(0,255,255,.09);
+
+    animation:
+        spin 28s linear infinite;
 }
 
 
 .ring {
-
     position: absolute;
 
     border-radius: 50%;
@@ -313,49 +355,58 @@ button {
         1px solid rgba(0,255,255,.45);
 }
 
-
 .ring.one {
-
     width: 190px;
     height: 190px;
+
+    border-top-color: rgba(0,255,255,.9);
+    border-bottom-color: rgba(0,255,255,.18);
+
+    box-shadow:
+        0 0 12px rgba(0,255,255,.12);
 
     animation:
         spin 15s linear infinite;
 }
 
-
 .ring.two {
-
     width: 160px;
     height: 160px;
 
     border-style: dashed;
 
+    border-color:
+        rgba(0,255,255,.34);
+
     animation:
         spinReverse 11s linear infinite;
 }
 
-
 .ring.three {
+    width: 126px;
+    height: 126px;
 
-    width: 125px;
-    height: 125px;
+    border-color:
+        rgba(0,255,255,.6);
 
     box-shadow:
-        0 0 25px rgba(0,255,255,.3),
-        inset 0 0 25px rgba(0,255,255,.15);
+        0 0 25px rgba(0,255,255,.22),
+        0 0 50px rgba(0,255,255,.05),
+        inset 0 0 25px rgba(0,255,255,.12);
 }
 
 
-.core {
+/* Merkez K */
 
-    width: 70px;
-    height: 70px;
+.core {
+    position: relative;
+
+    width: 76px;
+    height: 76px;
 
     border-radius: 50%;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -364,111 +415,161 @@ button {
 
     color: #00ffff;
 
-    font-size: 28px;
+    font-size: 29px;
+    font-weight: 950;
 
-    font-weight: 900;
+    text-shadow:
+        0 0 12px rgba(0,255,255,.95);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,255,255,.12),
+            rgba(0,20,23,.65) 65%,
+            rgba(0,0,0,.4)
+        );
 
     box-shadow:
-        0 0 25px rgba(0,255,255,.45),
-        inset 0 0 20px rgba(0,255,255,.15);
+        0 0 18px rgba(0,255,255,.5),
+        0 0 45px rgba(0,255,255,.16),
+        inset 0 0 25px rgba(0,255,255,.14);
 
     animation:
         pulse 2.5s infinite;
 }
 
+.core::before {
+    content: "";
+
+    position: absolute;
+
+    width: 88px;
+    height: 88px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0,255,255,.15);
+}
+
+.core::after {
+    content: "";
+
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #00ffff;
+
+    box-shadow:
+        0 0 12px #00ffff,
+        0 0 25px #00ffff;
+}
+
+
+/* =========================================================
+   BAŞLIK
+========================================================= */
 
 .hero-title {
+    font-size: 27px;
 
-    font-size: 26px;
+    font-weight: 850;
 
-    font-weight: 800;
+    letter-spacing: 6px;
+
+    margin-bottom: 6px;
+
+    color: #eaffff;
+
+    text-shadow:
+        0 0 12px rgba(0,255,255,.14);
+}
+
+.hero-subtitle {
+    font-size: 8px;
 
     letter-spacing: 5px;
 
-    margin-bottom: 4px;
+    color: #668d91;
 }
 
 
-.hero-subtitle {
-
-    font-size: 9px;
-
-    letter-spacing: 4px;
-
-    color: #63878a;
-}
-
-
-/* ============================================================
+/* =========================================================
    CHAT
-   ============================================================ */
+========================================================= */
 
 .chat {
+    width: min(720px, 92%);
 
-    width:
-        min(720px, 92%);
-
-    margin-top: 25px;
+    margin-top: 27px;
 
     display: flex;
-
     flex-direction: column;
 
     gap: 12px;
 }
 
-
 .message {
-
-    padding:
-        14px 16px;
+    padding: 14px 16px;
 
     border-radius: 15px;
 
     max-width: 92%;
 
-    line-height: 1.55;
+    line-height: 1.58;
 
     font-size: 14px;
 
     white-space: pre-wrap;
+
+    backdrop-filter: blur(8px);
 }
 
-
 .message.jarvis {
-
     align-self: flex-start;
 
     border:
         1px solid rgba(0,255,255,.15);
 
     background:
-        rgba(0,255,255,.035);
+        linear-gradient(
+            135deg,
+            rgba(0,255,255,.055),
+            rgba(0,20,23,.38)
+        );
 
     color: #d9ffff;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.16);
 }
 
-
 .message.user {
-
     align-self: flex-end;
 
     background:
-        rgba(255,255,255,.06);
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.025)
+        );
 
     border:
-        1px solid rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.10);
 
     color: white;
 }
 
 
-/* ============================================================
+/* =========================================================
    INPUT
-   ============================================================ */
+========================================================= */
 
 .input-area {
-
     position: absolute;
 
     left: 0;
@@ -480,18 +581,16 @@ button {
     background:
         linear-gradient(
             to top,
-            #020708 75%,
-            transparent
-        ) !important;
+            rgba(2,7,10,1) 55%,
+            rgba(2,7,10,.85) 72%,
+            transparent 100%
+        );
 
     z-index: 5;
 }
 
-
 .input-box {
-
-    width:
-        min(720px, 100%);
+    width: min(720px, 100%);
 
     margin: auto;
 
@@ -502,26 +601,26 @@ button {
     padding: 8px;
 
     border:
-        1px solid rgba(0,255,255,.22);
+        1px solid rgba(0,255,255,.25);
 
-    border-radius: 17px;
+    border-radius: 18px;
 
     background:
-        rgba(3,12,14,.98) !important;
+        rgba(3,13,16,.94);
 
     box-shadow:
-        0 0 20px rgba(0,255,255,.05);
+        0 0 25px rgba(0,255,255,.055),
+        inset 0 0 15px rgba(0,255,255,.025);
+
+    backdrop-filter: blur(15px);
 }
 
-
 .input-box input {
-
     flex: 1;
 
     min-width: 0;
 
     border: none;
-
     outline: none;
 
     background: transparent;
@@ -533,9 +632,11 @@ button {
     font-size: 16px;
 }
 
+.input-box input::placeholder {
+    color: #5c7d81;
+}
 
 .send-button {
-
     width: 48px;
     height: 48px;
 
@@ -546,43 +647,58 @@ button {
     border-radius: 13px;
 
     background:
-        #00d9d9;
+        linear-gradient(
+            135deg,
+            #00ffff,
+            #00caca
+        );
 
-    color:
-        #001010;
+    color: #001010;
 
     font-weight: 900;
+
+    box-shadow:
+        0 0 15px rgba(0,255,255,.25);
+
+    transition: .2s;
 }
 
+.send-button:active {
+    transform: scale(.94);
+}
 
 .send-button:disabled {
     opacity: .35;
 }
 
 
-/* ============================================================
+/* =========================================================
    SIDEBAR
-   ============================================================ */
+========================================================= */
 
 .sidebar {
-
     position: fixed;
 
     top: 0;
+    left: -295px;
 
-    left: -290px;
-
-    width: 280px;
-
+    width: 285px;
     height: 100vh;
 
     padding: 22px;
 
     background:
-        #030a0c !important;
+        linear-gradient(
+            180deg,
+            #030b0e,
+            #02080a
+        );
 
     border-right:
-        1px solid rgba(0,255,255,.18);
+        1px solid rgba(0,255,255,.20);
+
+    box-shadow:
+        15px 0 40px rgba(0,0,0,.35);
 
     z-index: 100;
 
@@ -590,44 +706,36 @@ button {
         left .25s ease;
 }
 
-
 .sidebar.open {
     left: 0;
 }
 
-
 .sidebar-title {
-
     display: flex;
 
     justify-content: space-between;
-
     align-items: center;
 
     margin-bottom: 25px;
 }
 
-
 .sidebar-title strong {
-
     letter-spacing: 3px;
+
+    color: #eaffff;
 }
 
-
 .close-sidebar {
-
     border: none;
 
     background: transparent;
 
     color: #00ffff;
 
-    font-size: 22px;
+    font-size: 24px;
 }
 
-
 .menu-item {
-
     width: 100%;
 
     padding: 14px;
@@ -637,7 +745,7 @@ button {
     text-align: left;
 
     border:
-        1px solid rgba(0,255,255,.1);
+        1px solid rgba(0,255,255,.11);
 
     border-radius: 12px;
 
@@ -647,22 +755,25 @@ button {
     color: #d9ffff;
 
     font-size: 13px;
+
+    transition: .2s;
 }
 
-
+.menu-item:active,
 .menu-item:hover {
-
     border-color:
-        rgba(0,255,255,.35);
+        rgba(0,255,255,.38);
+
+    background:
+        rgba(0,255,255,.055);
 }
 
 
-/* ============================================================
+/* =========================================================
    MODAL
-   ============================================================ */
+========================================================= */
 
 .modal {
-
     position: fixed;
 
     inset: 0;
@@ -675,21 +786,19 @@ button {
     padding: 18px;
 
     background:
-        rgba(0,0,0,.72);
+        rgba(0,0,0,.76);
+
+    backdrop-filter: blur(7px);
 
     z-index: 200;
 }
-
 
 .modal.show {
     display: flex;
 }
 
-
 .modal-box {
-
-    width:
-        min(600px, 100%);
+    width: min(600px, 100%);
 
     max-height: 85vh;
 
@@ -698,29 +807,31 @@ button {
     padding: 20px;
 
     border:
-        1px solid rgba(0,255,255,.2);
+        1px solid rgba(0,255,255,.22);
 
     border-radius: 20px;
 
     background:
-        #041012 !important;
+        linear-gradient(
+            145deg,
+            #061417,
+            #02090b
+        );
+
+    box-shadow:
+        0 0 40px rgba(0,255,255,.07);
 }
 
-
 .modal-title {
-
     display: flex;
 
     justify-content: space-between;
-
     align-items: center;
 
     margin-bottom: 18px;
 }
 
-
 .modal-title h2 {
-
     margin: 0;
 
     font-size: 17px;
@@ -728,21 +839,17 @@ button {
     letter-spacing: 2px;
 }
 
-
 .modal-close {
-
     border: none;
 
     background: transparent;
 
     color: #00ffff;
 
-    font-size: 22px;
+    font-size: 23px;
 }
 
-
 .modal input {
-
     width: 100%;
 
     padding: 13px;
@@ -755,16 +862,14 @@ button {
     border-radius: 10px;
 
     background:
-        #020708 !important;
+        #020708;
 
     color: white;
 
     outline: none;
 }
 
-
 .modal-action {
-
     width: 100%;
 
     padding: 13px;
@@ -774,21 +879,23 @@ button {
     border-radius: 10px;
 
     background:
-        #00d9d9;
+        linear-gradient(
+            135deg,
+            #00ffff,
+            #00caca
+        );
 
-    color:
-        #001010;
+    color: #001010;
 
     font-weight: 800;
 }
 
 
-/* ============================================================
-   ERROR
-   ============================================================ */
+/* =========================================================
+   HATALAR
+========================================================= */
 
 .error-card {
-
     padding: 13px;
 
     margin-bottom: 10px;
@@ -796,15 +903,13 @@ button {
     border-radius: 12px;
 
     background:
-        rgba(255,70,70,.04);
+        rgba(255,70,70,.045);
 
     border:
-        1px solid rgba(255,80,80,.16);
+        1px solid rgba(255,80,80,.17);
 }
 
-
 .error-top {
-
     display: flex;
 
     justify-content: space-between;
@@ -816,29 +921,20 @@ button {
     margin-bottom: 7px;
 }
 
-
 .error-provider {
-
     color: #ff7373;
-
     font-weight: 800;
 }
 
-
 .error-type {
-
     color: #ffbd6b;
 }
 
-
 .error-time {
-
     color: #668487;
 }
 
-
 .error-message {
-
     color: #d7eeee;
 
     font-size: 12px;
@@ -846,9 +942,7 @@ button {
     margin-bottom: 7px;
 }
 
-
 .error-detail {
-
     color: #80999b;
 
     font-size: 10px;
@@ -856,9 +950,7 @@ button {
     word-break: break-word;
 }
 
-
 .clear-errors {
-
     width: 100%;
 
     padding: 12px;
@@ -878,77 +970,69 @@ button {
 }
 
 
-/* ============================================================
+/* =========================================================
    SINEM
-   ============================================================ */
+========================================================= */
 
 body.sinem-mode .core,
 body.sinem-mode .ring {
-
-    border-color:
-        #ff6fae;
+    border-color: #ff6fae;
 }
-
 
 body.sinem-mode .core {
-
-    color:
-        #ff6fae;
+    color: #ff6fae;
 
     box-shadow:
-        0 0 30px rgba(255,105,170,.45);
+        0 0 30px rgba(255,105,170,.45),
+        0 0 55px rgba(255,105,170,.12);
 }
 
-
 body.sinem-mode .ring {
-
     border-color:
         rgba(255,105,170,.5);
 }
 
-
 body.sinem-mode .send-button {
-
     background:
-        #ff72b2;
+        linear-gradient(
+            135deg,
+            #ff83bd,
+            #ff5da4
+        );
 }
 
 
-/* ============================================================
-   EĞLENCE
-   ============================================================ */
+/* =========================================================
+   EĞLENCE MODU
+========================================================= */
 
 body.fun-mode .core,
 body.fun-mode .ring {
-
-    border-color:
-        #ff3030;
+    border-color: #ff3030;
 }
-
 
 body.fun-mode .core {
+    color: #ff3030;
 
-    color:
-        #ff3030;
+    text-shadow:
+        0 0 12px rgba(255,40,40,.9);
 
     box-shadow:
-        0 0 30px rgba(255,40,40,.5);
+        0 0 30px rgba(255,40,40,.5),
+        0 0 55px rgba(255,40,40,.12);
 }
 
-
 body.fun-mode .ring {
-
     border-color:
         rgba(255,40,40,.55);
 }
 
 
-/* ============================================================
-   ANIMASYON
-   ============================================================ */
+/* =========================================================
+   ANIMASYONLAR
+========================================================= */
 
 @keyframes spin {
-
     from {
         transform: rotate(0deg);
     }
@@ -957,10 +1041,8 @@ body.fun-mode .ring {
         transform: rotate(360deg);
     }
 }
-
 
 @keyframes spinReverse {
-
     from {
         transform: rotate(360deg);
     }
@@ -970,16 +1052,14 @@ body.fun-mode .ring {
     }
 }
 
-
 @keyframes pulse {
-
     0%,
     100% {
         transform: scale(1);
     }
 
     50% {
-        transform: scale(1.05);
+        transform: scale(1.055);
     }
 }
 
@@ -990,20 +1070,15 @@ body.fun-mode .ring {
 
 <body>
 
-
 <div class="app">
-
 
 <header class="header">
 
-
 <div class="brand">
-
 
 <div class="logo-mini">
 K
 </div>
-
 
 <div>
 
@@ -1011,19 +1086,16 @@ K
 K.A.R.V.I.S.
 </div>
 
-
 <div class="brand-subtitle">
 KARAHAN INC.
 </div>
 
 </div>
 
-
 </div>
 
 
 <div class="header-right">
-
 
 <div
     class="status"
@@ -1032,7 +1104,6 @@ KARAHAN INC.
 ONLINE
 </div>
 
-
 <button
     class="menu-button"
     onclick="openSidebar()"
@@ -1040,33 +1111,24 @@ ONLINE
 ☰
 </button>
 
-
 </div>
-
 
 </header>
 
 
 <main class="main">
 
-
 <section class="hero">
-
 
 <div class="jarvis-orb">
 
-
 <div class="ring one"></div>
-
 <div class="ring two"></div>
-
 <div class="ring three"></div>
-
 
 <div class="core">
 K
 </div>
-
 
 </div>
 
@@ -1074,7 +1136,6 @@ K
 <div class="hero-title">
 K.A.R.V.I.S.
 </div>
-
 
 <div class="hero-subtitle">
 KARAHAN INTELLIGENT SYSTEM
@@ -1087,15 +1148,12 @@ KARAHAN INTELLIGENT SYSTEM
 >
 </div>
 
-
 </section>
 
 
 <div class="input-area">
 
-
 <div class="input-box">
-
 
 <input
     id="messageInput"
@@ -1103,7 +1161,6 @@ KARAHAN INTELLIGENT SYSTEM
     placeholder="K.A.R.V.I.S.'e bir şey sorun..."
     autocomplete="off"
 >
-
 
 <button
     class="send-button"
@@ -1113,37 +1170,27 @@ KARAHAN INTELLIGENT SYSTEM
 ➤
 </button>
 
-
 </div>
 
-
 </div>
-
 
 </main>
 
-
 </div>
 
 
-<!-- ========================================================
-     SIDEBAR
-========================================================= -->
-
+<!-- SIDEBAR -->
 
 <div
     class="sidebar"
     id="sidebar"
 >
 
-
 <div class="sidebar-title">
-
 
 <strong>
 K.A.R.V.I.S.
 </strong>
-
 
 <button
     class="close-sidebar"
@@ -1151,7 +1198,6 @@ K.A.R.V.I.S.
 >
 ×
 </button>
-
 
 </div>
 
@@ -1187,31 +1233,23 @@ K.A.R.V.I.S.
 ◈ Eğlence Modu
 </button>
 
-
 </div>
 
 
-<!-- ========================================================
-     ERROR MODAL
-========================================================= -->
-
+<!-- ERROR MODAL -->
 
 <div
     class="modal"
     id="errorModal"
 >
 
-
 <div class="modal-box">
 
-
 <div class="modal-title">
-
 
 <h2>
 HATA KAYITLARI
 </h2>
-
 
 <button
     class="modal-close"
@@ -1220,14 +1258,11 @@ HATA KAYITLARI
 ×
 </button>
 
-
 </div>
-
 
 <div id="errorList">
 Yükleniyor...
 </div>
-
 
 <button
     class="clear-errors"
@@ -1236,34 +1271,25 @@ Yükleniyor...
 Tüm Hataları Temizle
 </button>
 
+</div>
 
 </div>
 
 
-</div>
-
-
-<!-- ========================================================
-     PROFILE MODAL
-========================================================= -->
-
+<!-- PROFILE MODAL -->
 
 <div
     class="modal"
     id="profileModal"
 >
 
-
 <div class="modal-box">
 
-
 <div class="modal-title">
-
 
 <h2>
 PROFİL DEĞİŞTİR
 </h2>
-
 
 <button
     class="modal-close"
@@ -1271,7 +1297,6 @@ PROFİL DEĞİŞTİR
 >
 ×
 </button>
-
 
 </div>
 
@@ -1281,13 +1306,11 @@ PROFİL DEĞİŞTİR
     placeholder="Kullanıcı adı"
 >
 
-
 <input
     id="profilePassword"
     type="password"
     placeholder="Şifre"
 >
-
 
 <button
     class="modal-action"
@@ -1307,43 +1330,34 @@ Giriş Yap
 >
 </div>
 
-
 </div>
-
 
 </div>
 
 
 <script>
 
-
 const API = "";
-
 
 let currentUser = "karahan";
 
-
 let funMode = false;
-
 
 let sending = false;
 
 
-/* ============================================================
+/* =========================================================
    SIDEBAR
-============================================================ */
+========================================================= */
 
 function openSidebar() {
-
     document
         .getElementById("sidebar")
         .classList
         .add("open");
 }
 
-
 function closeSidebar() {
-
     document
         .getElementById("sidebar")
         .classList
@@ -1351,46 +1365,37 @@ function closeSidebar() {
 }
 
 
-/* ============================================================
+/* =========================================================
    MESAJ
-============================================================ */
+========================================================= */
 
-function addMessage(
-    text,
-    type
-) {
+function addMessage(text, type) {
 
     const chat =
         document.getElementById("chat");
 
-
     const div =
         document.createElement("div");
-
 
     div.className =
         "message " + type;
 
-
     div.textContent =
         text;
 
-
     chat.appendChild(div);
-
 
     const hero =
         document.querySelector(".hero");
-
 
     hero.scrollTop =
         hero.scrollHeight;
 }
 
 
-/* ============================================================
-   MESAJ GÖNDER
-============================================================ */
+/* =========================================================
+   MESAJ GONDER
+========================================================= */
 
 async function sendMessage() {
 
@@ -1398,40 +1403,26 @@ async function sendMessage() {
         return;
     }
 
-
     const input =
-        document.getElementById(
-            "messageInput"
-        );
-
+        document.getElementById("messageInput");
 
     const button =
-        document.getElementById(
-            "sendButton"
-        );
-
+        document.getElementById("sendButton");
 
     const message =
         input.value.trim();
-
 
     if (!message) {
         return;
     }
 
-
     sending = true;
 
     button.disabled = true;
 
-
     input.value = "";
 
-
-    addMessage(
-        message,
-        "user"
-    );
+    addMessage(message, "user");
 
 
     let waitingMessages = [
@@ -1482,19 +1473,16 @@ async function sendMessage() {
     const waiting =
         document.createElement("div");
 
-
     waiting.className =
         "message jarvis";
-
 
     waiting.textContent =
         waitingMessages[
             Math.floor(
-                Math.random()
-                * waitingMessages.length
+                Math.random() *
+                waitingMessages.length
             )
         ];
-
 
     document
         .getElementById("chat")
@@ -1539,8 +1527,8 @@ async function sendMessage() {
 
 
             if (
-                data
-                && data.detail
+                data &&
+                data.detail
             ) {
 
                 if (
@@ -1553,41 +1541,33 @@ async function sendMessage() {
                 } else {
 
                     errorText =
-                        data.detail.error
-                        || data.detail.message
-                        || errorText;
+                        data.detail.error ||
+                        data.detail.message ||
+                        errorText;
 
                     errorType =
-                        data.detail.type
-                        || "";
+                        data.detail.type ||
+                        "";
                 }
             }
 
 
             addMessage(
-                "⚠️ K.A.R.V.I.S. HATA\n\n"
-                + errorText
-                + (
+                "⚠️ K.A.R.V.I.S. HATA\n\n" +
+                errorText +
+                (
                     errorType
-                        ? "\n\nHata tipi: "
-                          + errorType
+                        ? "\n\nHata tipi: " +
+                          errorType
                         : ""
-                )
-                + "\n\nHata kaydı Hatalar bölümüne kaydedildi.",
+                ) +
+                "\n\nHata kaydı Hatalar bölümüne kaydedildi.",
                 "jarvis"
             );
-
 
             return;
         }
 
-
-        /*
-         * Burada özellikle provider göstermiyoruz.
-         *
-         * Arka planda hangi AI cevap verirse versin
-         * kullanıcı sadece K.A.R.V.I.S. ile konuşuyor.
-         */
 
         addMessage(
             data.answer,
@@ -1605,14 +1585,12 @@ async function sendMessage() {
 
         waiting.remove();
 
-
         addMessage(
-            "⚠️ K.A.R.V.I.S.\n\n"
-            + "Sunucuya bağlanırken bir sorun oluştu.\n\n"
-            + error.message,
+            "⚠️ K.A.R.V.I.S.\n\n" +
+            "Sunucuya bağlanırken bir sorun oluştu.\n\n" +
+            error.message,
             "jarvis"
         );
-
 
     } finally {
 
@@ -1625,9 +1603,9 @@ async function sendMessage() {
 }
 
 
-/* ============================================================
+/* =========================================================
    ENTER
-============================================================ */
+========================================================= */
 
 document
     .getElementById("messageInput")
@@ -1636,8 +1614,8 @@ document
         function(event) {
 
             if (
-                event.key === "Enter"
-                && !event.shiftKey
+                event.key === "Enter" &&
+                !event.shiftKey
             ) {
 
                 event.preventDefault();
@@ -1648,23 +1626,20 @@ document
     );
 
 
-/* ============================================================
+/* =========================================================
    YENI SOHBET
-============================================================ */
+========================================================= */
 
 async function newChat() {
 
     closeSidebar();
 
-
     try {
 
         await fetch(
-            API
-            + "/new-chat?username="
-            + encodeURIComponent(
-                currentUser
-            ),
+            API +
+            "/new-chat?username=" +
+            encodeURIComponent(currentUser),
             {
                 method: "POST"
             }
@@ -1678,24 +1653,20 @@ async function newChat() {
         .getElementById("chat")
         .innerHTML = "";
 
-
     showGreeting();
 }
 
 
-/* ============================================================
+/* =========================================================
    GREETING
-============================================================ */
+========================================================= */
 
 function showGreeting() {
 
     const chat =
         document.getElementById("chat");
 
-
-    if (
-        chat.children.length > 0
-    ) {
+    if (chat.children.length > 0) {
         return;
     }
 
@@ -1725,24 +1696,21 @@ function showGreeting() {
 }
 
 
-/* ============================================================
+/* =========================================================
    HATALAR
-============================================================ */
+========================================================= */
 
 async function openErrors() {
 
     closeSidebar();
-
 
     document
         .getElementById("errorModal")
         .classList
         .add("show");
 
-
     await loadErrors();
 }
-
 
 function closeErrors() {
 
@@ -1756,10 +1724,7 @@ function closeErrors() {
 async function loadErrors() {
 
     const list =
-        document.getElementById(
-            "errorList"
-        );
-
+        document.getElementById("errorList");
 
     list.innerHTML =
         "Yükleniyor...";
@@ -1772,18 +1737,14 @@ async function loadErrors() {
                 API + "/errors"
             );
 
-
         const data =
             await response.json();
-
 
         const errors =
             data.errors || [];
 
 
-        if (
-            errors.length === 0
-        ) {
+        if (errors.length === 0) {
 
             list.innerHTML =
                 "<div style='color:#6d8b8e;font-size:13px;'>Henüz hata kaydı yok.</div>";
@@ -1797,63 +1758,47 @@ async function loadErrors() {
 
         [...errors]
             .reverse()
-            .forEach(
-                error => {
+            .forEach(error => {
 
-                    const card =
-                        document.createElement(
-                            "div"
-                        );
+                const card =
+                    document.createElement("div");
 
-
-                    card.className =
-                        "error-card";
+                card.className =
+                    "error-card";
 
 
-                    card.innerHTML = `
+                card.innerHTML = `
 
-                        <div class="error-top">
+                    <div class="error-top">
 
-                            <span class="error-provider">
-                                ${escapeHtml(
-                                    error.provider
-                                )}
-                            </span>
+                        <span class="error-provider">
+                            ${escapeHtml(error.provider)}
+                        </span>
 
-                            <span class="error-type">
-                                ${escapeHtml(
-                                    error.type
-                                )}
-                            </span>
+                        <span class="error-type">
+                            ${escapeHtml(error.type)}
+                        </span>
 
-                            <span class="error-time">
-                                ${escapeHtml(
-                                    error.time
-                                )}
-                            </span>
+                        <span class="error-time">
+                            ${escapeHtml(error.time)}
+                        </span>
 
-                        </div>
+                    </div>
 
-                        <div class="error-message">
-                            ${escapeHtml(
-                                error.message || ""
-                            )}
-                        </div>
+                    <div class="error-message">
+                        ${escapeHtml(error.message || "")}
+                    </div>
 
-                        <div class="error-detail">
-                            ${escapeHtml(
-                                error.error || ""
-                            )}
-                        </div>
+                    <div class="error-detail">
+                        ${escapeHtml(error.error || "")}
+                    </div>
 
-                    `;
+                `;
 
 
-                    list.appendChild(
-                        card
-                    );
-                }
-            );
+                list.appendChild(card);
+
+            });
 
 
     } catch (error) {
@@ -1884,9 +1829,7 @@ async function clearErrors() {
             }
         );
 
-
         await loadErrors();
-
 
     } catch (error) {
 
@@ -1897,14 +1840,13 @@ async function clearErrors() {
 }
 
 
-/* ============================================================
+/* =========================================================
    PROFIL
-============================================================ */
+========================================================= */
 
 function openProfile() {
 
     closeSidebar();
-
 
     document
         .getElementById("profileModal")
@@ -1929,12 +1871,10 @@ async function loginProfile() {
             "profileUsername"
         );
 
-
     const passwordInput =
         document.getElementById(
             "profilePassword"
         );
-
 
     const errorBox =
         document.getElementById(
@@ -1948,9 +1888,7 @@ async function loginProfile() {
             .toLowerCase();
 
 
-    if (
-        username === "betül"
-    ) {
+    if (username === "betül") {
         username = "betul";
     }
 
@@ -1959,8 +1897,7 @@ async function loginProfile() {
         passwordInput.value;
 
 
-    errorBox.textContent =
-        "";
+    errorBox.textContent = "";
 
 
     try {
@@ -1991,8 +1928,8 @@ async function loginProfile() {
         if (!response.ok) {
 
             errorBox.textContent =
-                data.detail
-                || "Giriş başarısız.";
+                data.detail ||
+                "Giriş başarısız.";
 
             return;
         }
@@ -2018,7 +1955,6 @@ async function loginProfile() {
 
         closeProfile();
 
-
         showGreeting();
 
 
@@ -2030,22 +1966,18 @@ async function loginProfile() {
 }
 
 
-/* ============================================================
+/* =========================================================
    TEMA
-============================================================ */
+========================================================= */
 
 function applyUserTheme() {
 
     document.body
         .classList
-        .remove(
-            "sinem-mode"
-        );
+        .remove("sinem-mode");
 
 
-    if (
-        currentUser === "sinem"
-    ) {
+    if (currentUser === "sinem") {
 
         document.body
             .classList
@@ -2054,17 +1986,15 @@ function applyUserTheme() {
 }
 
 
-/* ============================================================
+/* =========================================================
    EGLENCE
-============================================================ */
+========================================================= */
 
 function toggleFunMode() {
 
     closeSidebar();
 
-
-    funMode =
-        !funMode;
+    funMode = !funMode;
 
 
     document.body
@@ -2082,7 +2012,6 @@ function toggleFunMode() {
             "jarvis"
         );
 
-
     } else {
 
         addMessage(
@@ -2093,44 +2022,24 @@ function toggleFunMode() {
 }
 
 
-/* ============================================================
+/* =========================================================
    GUVENLIK
-============================================================ */
+========================================================= */
 
 function escapeHtml(text) {
 
     return String(text)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
-/* ============================================================
+/* =========================================================
    BASLANGIC
-============================================================ */
+========================================================= */
 
 function initialize() {
 
@@ -2141,11 +2050,11 @@ function initialize() {
 
 
     if (
-        savedUser
-        && (
-            savedUser === "karahan"
-            || savedUser === "betul"
-            || savedUser === "sinem"
+        savedUser &&
+        (
+            savedUser === "karahan" ||
+            savedUser === "betul" ||
+            savedUser === "sinem"
         )
     ) {
 
@@ -2164,7 +2073,5 @@ initialize();
 
 </script>
 
-
 </body>
-
 </html>
