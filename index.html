@@ -1,1499 +1,633 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
-user-scalable=no">
-
-<title>J.A.R.V.I.S.</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>J.A.R.V.I.S. - Karahan INC.</title>
 <style>
+/* =========================
+   CSS DEĞİŞKENLERİ (TEMA)
+========================= */
+:root {
+    --bg-main: #01050b;
+    --bg-grad-1: rgba(0, 105, 170, .20);
+    --bg-grad-2: rgba(0, 45, 75, .12);
+    
+    --text-primary: #00d9ff;
+    --text-secondary: rgba(180, 240, 255, .8);
+    --text-glow: #00eaff;
+    
+    --hud-ring: rgba(0, 170, 255, .25);
+    --hud-ring-glow: rgba(0, 150, 255, .12);
+    
+    --menu-bg: rgba(3, 15, 25, 0.85);
+    --menu-border: #00bfff;
+    --menu-item-bg: rgba(0, 100, 150, .08);
+    
+    --chat-input-bg: rgba(2, 18, 30, .7);
+    --chat-user-bg: rgba(0, 120, 175, .35);
+    --chat-bot-bg: rgba(3, 19, 30, .85);
+}
+
+[data-theme="light"] {
+    --bg-main: #e8f1f8;
+    --bg-grad-1: rgba(0, 105, 170, .05);
+    --bg-grad-2: rgba(0, 45, 75, .02);
+    
+    --text-primary: #004d80;
+    --text-secondary: #006699;
+    --text-glow: #0099cc;
+    
+    --hud-ring: rgba(0, 100, 180, .3);
+    --hud-ring-glow: rgba(0, 100, 180, .1);
+    
+    --menu-bg: rgba(240, 248, 255, 0.9);
+    --menu-border: #006699;
+    --menu-item-bg: rgba(0, 100, 150, .05);
+    
+    --chat-input-bg: rgba(255, 255, 255, .8);
+    --chat-user-bg: rgba(0, 120, 175, .15);
+    --chat-bot-bg: rgba(255, 255, 255, .9);
+}
 
 /* =========================
    TEMEL
 ========================= */
-
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
-html,
-body {
+html, body {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-    background: #01050b;
-    color: #00d9ff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    transition: background 0.5s ease, color 0.5s ease;
 }
 
 body {
-
     position: relative;
-
-    background:
-
-        radial-gradient(
-            circle at 50% 42%,
-            rgba(0, 105, 170, .20) 0%,
-            rgba(0, 45, 75, .12) 22%,
-            transparent 48%
-        ),
-
-        radial-gradient(
-            circle at 50% 50%,
-            #06121d 0%,
-            #02070d 48%,
-            #010308 100%
-        );
+    background: 
+        radial-gradient(circle at 50% 42%, var(--bg-grad-1) 0%, var(--bg-grad-2) 22%, transparent 48%),
+        var(--bg-main);
 }
 
+/* Arka Plan Grid */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .20;
+    background-image:
+        linear-gradient(var(--text-primary) 1px, transparent 1px),
+        linear-gradient(90deg, var(--text-primary) 1px, transparent 1px);
+    background-size: 35px 35px;
+    mask-image: radial-gradient(circle, black 20%, transparent 75%);
+    pointer-events: none;
+    transition: background-image 0.5s ease;
+}
 
 /* =========================
-   ARKA PLAN GRID
+   ÖZEL SCROLLBAR
 ========================= */
-
-body::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    opacity: .20;
-
-    background-image:
-
-        linear-gradient(
-            rgba(0, 170, 255, .07) 1px,
-            transparent 1px
-        ),
-
-        linear-gradient(
-            90deg,
-            rgba(0, 170, 255, .07) 1px,
-            transparent 1px
-        );
-
-    background-size:
-        35px 35px;
-
-    mask-image:
-        radial-gradient(
-            circle,
-            black 20%,
-            transparent 75%
-        );
-
-    pointer-events: none;
+::-webkit-scrollbar {
+    width: 6px;
 }
-
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--hud-ring);
+    border-radius: 10px;
+}
 
 /* =========================
    KÖŞE ÇİZGİLERİ
 ========================= */
-
 .corner {
-
     position: absolute;
-
-    width: 75px;
-    height: 75px;
-
-    border-color:
-        rgba(0, 200, 255, .35);
-
+    width: 75px; height: 75px;
+    border-color: var(--hud-ring);
     pointer-events: none;
+    transition: border-color 0.5s ease;
 }
-
-.corner.tl {
-
-    top: 12px;
-    left: 12px;
-
-    border-top: 1px solid;
-    border-left: 1px solid;
-}
-
-.corner.tr {
-
-    top: 12px;
-    right: 12px;
-
-    border-top: 1px solid;
-    border-right: 1px solid;
-}
-
-.corner.bl {
-
-    bottom: 12px;
-    left: 12px;
-
-    border-bottom: 1px solid;
-    border-left: 1px solid;
-}
-
-.corner.br {
-
-    bottom: 12px;
-    right: 12px;
-
-    border-bottom: 1px solid;
-    border-right: 1px solid;
-}
-
+.corner.tl { top: 12px; left: 12px; border-top: 1px solid; border-left: 1px solid; }
+.corner.tr { top: 12px; right: 12px; border-top: 1px solid; border-right: 1px solid; }
+.corner.bl { bottom: 12px; left: 12px; border-bottom: 1px solid; border-left: 1px solid; }
+.corner.br { bottom: 12px; right: 12px; border-bottom: 1px solid; border-right: 1px solid; }
 
 /* =========================
-   ÜST BAR
+   ÜST BAR & MENÜ BUTONU
 ========================= */
-
 .top {
-
     position: absolute;
-
-    top: 22px;
-    left: 20px;
-    right: 20px;
-
+    top: 22px; left: 20px; right: 20px;
     display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
+    align-items: center; justify-content: space-between;
     z-index: 50;
 }
 
-
-/* =========================
-   MENÜ
-========================= */
-
 .menu-button {
-
-    width: 56px;
-    height: 56px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid #00cfff;
-
-    background:
-        rgba(0, 18, 30, .82);
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    gap: 5px;
-
-    box-shadow:
-
-        0 0 12px
-        rgba(0, 210, 255, .35),
-
-        inset 0 0 15px
-        rgba(0, 150, 255, .15);
-
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    border: 1px solid var(--text-primary);
+    background: var(--chat-input-bg);
+    backdrop-filter: blur(5px);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; gap: 6px;
+    box-shadow: 0 0 10px var(--hud-ring-glow);
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+    box-shadow: 0 0 15px var(--text-glow);
+    transform: scale(1.05);
 }
 
 .menu-button span {
-
-    width: 25px;
-    height: 2px;
-
+    width: 24px; height: 2px;
     border-radius: 4px;
-
-    background: #00d9ff;
-
-    box-shadow:
-        0 0 8px #00cfff;
+    background: var(--text-primary);
+    box-shadow: 0 0 5px var(--text-glow);
+    transition: all 0.3s ease;
 }
 
-
-/* =========================
-   ONLINE DURUMU
-========================= */
-
 .status {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        8px 13px;
-
-    border:
-        1px solid
-        rgba(0, 200, 255, .25);
-
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 15px;
+    border: 1px solid var(--hud-ring);
     border-radius: 20px;
-
-    background:
-        rgba(0, 20, 32, .55);
-
-    font-size: 9px;
-
-    letter-spacing: 2px;
-
-    color:
-        rgba(180, 240, 255, .8);
+    background: var(--chat-input-bg);
+    backdrop-filter: blur(5px);
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--text-secondary);
+    font-weight: bold;
 }
 
 .status-dot {
-
-    width: 7px;
-    height: 7px;
-
+    width: 8px; height: 8px;
     border-radius: 50%;
-
-    background: #00eaff;
-
-    box-shadow:
-        0 0 10px #00eaff;
-
-    animation:
-        onlinePulse 1.5s infinite;
+    background: var(--text-glow);
+    box-shadow: 0 0 10px var(--text-glow);
+    animation: onlinePulse 1.5s infinite;
 }
 
-
 /* =========================
-   ANA HUD
+   ANA HUD & LOGO
 ========================= */
-
 .hud {
-
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    width:
-        min(88vw, 390px);
-
-    height:
-        min(88vw, 390px);
-
-    transform:
-        translate(-50%, -54%);
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
+    position: absolute; top: 50%; left: 50%;
+    width: min(88vw, 390px); height: min(88vw, 390px);
+    transform: translate(-50%, -54%);
+    display: flex; justify-content: center; align-items: center;
 }
-
-
-/* =========================
-   DIŞ HALKA
-========================= */
 
 .outer-ring {
-
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-
+    position: absolute; width: 100%; height: 100%;
     border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(0, 170, 255, .25);
-
-    box-shadow:
-        0 0 35px
-        rgba(0, 150, 255, .12);
-
-    animation:
-        slowRotate 20s linear infinite;
+    border: 1px solid var(--hud-ring);
+    box-shadow: 0 0 35px var(--hud-ring-glow);
+    animation: slowRotate 20s linear infinite;
 }
-
-
-/* =========================
-   DIŞ SEGMENTLER
-========================= */
 
 .segment-ring {
-
-    position: absolute;
-
-    width: 92%;
-    height: 92%;
-
+    position: absolute; width: 92%; height: 92%;
     border-radius: 50%;
-
-    border:
-        3px dashed
-        rgba(0, 200, 255, .48);
-
-    animation:
-        reverseRotate 14s linear infinite;
+    border: 3px dashed var(--hud-ring);
+    animation: reverseRotate 14s linear infinite;
 }
-
-
-/* =========================
-   TEKNİK HALKA
-========================= */
-
-.tech-ring {
-
-    position: absolute;
-
-    width: 78%;
-    height: 78%;
-
-    border-radius: 50%;
-
-    border:
-
-        5px solid
-        transparent;
-
-    border-top-color:
-        #00d9ff;
-
-    border-right-color:
-        #008cff;
-
-    border-bottom-color:
-        rgba(0, 190, 255, .25);
-
-    box-shadow:
-
-        0 0 15px
-        rgba(0, 200, 255, .55),
-
-        inset 0 0 18px
-        rgba(0, 180, 255, .2);
-
-    animation:
-        rotate 5s linear infinite;
-}
-
-
-/* =========================
-   İÇ HALKA
-========================= */
-
-.inner-ring {
-
-    position: absolute;
-
-    width: 67%;
-    height: 67%;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, .8);
-
-    box-shadow:
-
-        0 0 25px
-        rgba(0, 200, 255, .35),
-
-        inset 0 0 25px
-        rgba(0, 150, 255, .25);
-
-    animation:
-        innerPulse 2.5s ease-in-out infinite;
-}
-
-
-/* =========================
-   TARAMA ÇİZGİSİ
-========================= */
-
-.scan {
-
-    position: absolute;
-
-    width: 50%;
-    height: 2px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            #00eaff,
-            transparent
-        );
-
-    filter:
-        drop-shadow(
-            0 0 8px #00eaff
-        );
-
-    animation:
-        scanRotate 4s linear infinite;
-
-    transform-origin:
-        left center;
-}
-
-
-/* =========================
-   K LOGOSU
-========================= */
 
 .logo {
-
-    position: relative;
-
-    width: 148px;
-    height: 148px;
-
+    position: relative; width: 140px; height: 140px;
     border-radius: 50%;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    background:
-
-        radial-gradient(
-            circle at 40% 35%,
-            #123c58,
-            #041521 58%,
-            #01070c 100%
-        );
-
-    border:
-        2px solid
-        #00d9ff;
-
-    box-shadow:
-
-        0 0 25px
-        #00bfff,
-
-        0 0 65px
-        rgba(0, 180, 255, .45),
-
-        inset 0 0 35px
-        rgba(0, 190, 255, .35);
-
+    display: flex; justify-content: center; align-items: center;
+    background: var(--chat-input-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--text-primary);
+    box-shadow: 0 0 25px var(--hud-ring-glow), inset 0 0 35px var(--hud-ring-glow);
     z-index: 5;
-
-    animation:
-        logoPulse 2.4s ease-in-out infinite;
-}
-
-.logo::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: -9px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(0, 220, 255, .45);
-
-    animation:
-        reverseRotate 7s linear infinite;
-}
-
-.logo::after {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 13px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(0, 200, 255, .25);
+    animation: logoPulse 3s ease-in-out infinite;
 }
 
 .logo span {
-
-    font-size: 92px;
-
-    font-weight: 700;
-
-    color: #00ddff;
-
+    font-size: 85px; font-weight: 700;
+    color: var(--text-primary);
     line-height: 1;
-
-    text-shadow:
-
-        0 0 8px #00eaff,
-        0 0 25px #008cff,
-        0 0 55px #008cff;
-
-    z-index: 2;
+    text-shadow: 0 0 10px var(--text-glow);
 }
-
-
-/* =========================
-   TEKNİK NOKTALAR
-========================= */
-
-.node {
-
-    position: absolute;
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #00d9ff;
-
-    box-shadow:
-        0 0 12px #00d9ff;
-
-    animation:
-        nodePulse 2s infinite;
-}
-
-.node.one {
-    top: 18%;
-    left: 30%;
-}
-
-.node.two {
-    top: 25%;
-    right: 20%;
-    animation-delay: .5s;
-}
-
-.node.three {
-    bottom: 22%;
-    left: 22%;
-    animation-delay: 1s;
-}
-
-.node.four {
-    bottom: 18%;
-    right: 28%;
-    animation-delay: 1.5s;
-}
-
-
-/* =========================
-   MARKA
-========================= */
 
 .brand {
-
-    position: absolute;
-
-    top:
-        calc(50% + 205px);
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    text-align: center;
-
-    white-space: nowrap;
-
-    z-index: 10;
+    position: absolute; top: calc(50% + 205px); left: 50%;
+    transform: translateX(-50%);
+    text-align: center; white-space: nowrap; z-index: 10;
 }
 
 .brand-title {
-
-    font-size: 27px;
-
-    font-weight: 500;
-
-    letter-spacing: 8px;
-
-    color: #00d9ff;
-
-    text-shadow:
-
-        0 0 10px #00d9ff,
-        0 0 25px
-        rgba(0, 200, 255, .65);
+    font-size: 24px; font-weight: 600; letter-spacing: 6px;
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--text-glow);
 }
 
 .brand-subtitle {
-
-    margin-top: 7px;
-
-    font-size: 10px;
-
-    letter-spacing: 5px;
-
-    color:
-        rgba(135, 220, 255, .65);
+    margin-top: 5px; font-size: 11px; letter-spacing: 4px;
+    color: var(--text-secondary);
+    font-weight: bold;
 }
-
 
 /* =========================
-   ALT DURUM
+   SOL MENÜ
 ========================= */
-
-.system-info {
-
-    position: absolute;
-
-    top:
-        calc(50% + 258px);
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    font-size: 8px;
-
-    letter-spacing: 3px;
-
-    color:
-        rgba(0, 210, 255, .45);
-
-    white-space: nowrap;
-}
-
-
-/* =========================
-   CHAT
-========================= */
-
-.chat {
-
-    position: absolute;
-
-    left: 15px;
-    right: 15px;
-
-    bottom: 18px;
-
-    height: 59px;
-
-    display: flex;
-
-    gap: 8px;
-
-    z-index: 40;
-}
-
-.chat input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 59px;
-
-    border-radius: 30px;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, .65);
-
-    outline: none;
-
-    padding:
-        0 20px;
-
-    font-size: 16px;
-
-    color: white;
-
-    background:
-        rgba(2, 18, 30, .92);
-
-    box-shadow:
-
-        0 0 18px
-        rgba(0, 180, 255, .16),
-
-        inset 0 0 15px
-        rgba(0, 150, 255, .08);
-}
-
-.chat input:focus {
-
-    border-color:
-        #00eaff;
-
-    box-shadow:
-
-        0 0 22px
-        rgba(0, 210, 255, .3);
-}
-
-.chat input::placeholder {
-
-    color:
-        rgba(180, 230, 255, .45);
-}
-
-
-/* =========================
-   GÖNDER
-========================= */
-
-.send {
-
-    width: 59px;
-    height: 59px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        #00d9ff;
-
-    background:
-        radial-gradient(
-            circle,
-            #00bfe8,
-            #007da5
-        );
-
-    color: white;
-
-    font-size: 23px;
-
-    box-shadow:
-
-        0 0 18px
-        rgba(0, 210, 255, .55);
-
-    cursor: pointer;
-
-    transition:
-        transform .15s;
-}
-
-.send:active {
-
-    transform:
-        scale(.9);
-}
-
-
-/* =========================
-   MESAJLAR
-========================= */
-
-.messages {
-
-    position: absolute;
-
-    top: 90px;
-
-    left: 15px;
-    right: 15px;
-
-    bottom: 92px;
-
-    overflow-y: auto;
-
-    padding: 10px;
-
-    z-index: 20;
-
-    pointer-events: none;
-}
-
-.message {
-
-    max-width: 84%;
-
-    margin: 8px 0;
-
-    padding:
-        11px 14px;
-
-    border-radius: 14px;
-
-    white-space: pre-wrap;
-
-    pointer-events: auto;
-
-    font-size: 14px;
-
-    line-height: 1.4;
-}
-
-.user {
-
-    margin-left: auto;
-
-    background:
-        rgba(0, 120, 175, .35);
-
-    border:
-        1px solid
-        rgba(0, 200, 255, .35);
-
-    color: white;
-}
-
-.jarvis {
-
-    margin-right: auto;
-
-    background:
-        rgba(3, 19, 30, .94);
-
-    border:
-        1px solid
-        rgba(0, 190, 255, .3);
-
-    color:
-        #c3f3ff;
-}
-
-
-/* =========================
-   MENÜ
-========================= */
-
 .menu {
-
-    position: fixed;
-
-    top: 0;
-    left: 0;
-
-    width: 290px;
-    height: 100%;
-
-    padding: 25px;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(3, 20, 35, .98),
-            rgba(1, 7, 15, .99)
-        );
-
-    border-right:
-        1px solid
-        #00bfff;
-
-    box-shadow:
-        8px 0 35px
-        rgba(0, 160, 255, .2);
-
-    transform:
-        translateX(-105%);
-
-    transition:
-        transform .35s ease;
-
+    position: fixed; top: 0; left: 0;
+    width: 320px; height: 100%;
+    padding: 0;
+    background: var(--menu-bg);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--menu-border);
+    box-shadow: 8px 0 35px rgba(0, 0, 0, 0.3);
+    transform: translateX(-105%);
+    transition: transform .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 100;
+    display: flex; flex-direction: column;
 }
 
 .menu.active {
-
-    transform:
-        translateX(0);
+    transform: translateX(0);
 }
 
 .menu-header {
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items: center;
-
-    margin-bottom: 35px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 25px;
+    border-bottom: 1px solid var(--hud-ring);
 }
 
 .menu-header h2 {
-
-    margin: 0;
-
-    font-size: 21px;
-
-    letter-spacing: 4px;
+    margin: 0; font-size: 18px; letter-spacing: 3px;
+    color: var(--text-primary);
+    text-shadow: 0 0 5px var(--text-glow);
 }
 
 .close-menu {
+    border: 0; background: transparent;
+    color: var(--text-primary);
+    font-size: 28px; cursor: pointer;
+    transition: transform 0.2s;
+}
+.close-menu:hover { transform: scale(1.2); }
 
-    border: 0;
-
-    background: transparent;
-
-    color: #00d9ff;
-
-    font-size: 30px;
+.menu-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 25px;
 }
 
-.menu-item {
+/* Menü Alt Başlıkları */
+.menu-section-title {
+    font-size: 12px; letter-spacing: 2px;
+    color: var(--text-secondary);
+    margin-bottom: 15px; margin-top: 10px;
+    border-bottom: 1px dashed var(--hud-ring);
+    padding-bottom: 5px;
+}
 
-    width: 100%;
+/* Geçmiş Sohbetler */
+.history-list {
+    list-style: none; padding: 0; margin: 0 0 30px 0;
+}
+.history-list li {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: var(--menu-item-bg);
+    border: 1px solid var(--hud-ring);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    display: flex; align-items: center; gap: 10px;
+}
+.history-list li::before {
+    content: "■"; font-size: 10px; color: var(--text-glow);
+}
+.history-list li:hover {
+    background: var(--hud-ring);
+    transform: translateX(5px);
+}
 
-    padding: 17px;
+/* Ayarlar / Toggle */
+.setting-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 15px;
+    background: var(--menu-item-bg);
+    border: 1px solid var(--hud-ring);
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
 
-    margin-bottom: 12px;
+.toggle-switch {
+    position: relative; display: inline-block;
+    width: 44px; height: 24px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    border: 1px solid var(--text-primary);
+    border-radius: 24px;
+    transition: .4s;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 16px; width: 16px;
+    left: 3px; bottom: 3px;
+    background-color: var(--text-glow);
+    border-radius: 50%;
+    transition: .4s;
+    box-shadow: 0 0 5px var(--text-glow);
+}
+input:checked + .slider {
+    background-color: var(--text-primary);
+}
+input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: #fff;
+}
 
-    border-radius: 12px;
-
-    border:
-        1px solid
-        rgba(0, 200, 255, .3);
-
-    background:
-        rgba(0, 100, 150, .08);
-
-    color: #d9faff;
-
-    text-align: left;
-
-    font-size: 16px;
+/* Geliştirici Footer */
+.menu-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid var(--hud-ring);
+    background: rgba(0, 0, 0, 0.1);
+}
+.menu-footer small {
+    display: block; font-size: 10px; letter-spacing: 2px; color: var(--text-secondary);
+}
+.menu-footer .dev-name {
+    margin-top: 5px; font-size: 16px; font-weight: bold; letter-spacing: 4px;
+    color: var(--text-primary);
+    text-shadow: 0 0 8px var(--text-glow);
 }
 
 .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none; transition: .3s; z-index: 90;
+}
+.overlay.active { opacity: 1; pointer-events: auto; }
 
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(0,0,0,.6);
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: .3s;
-
-    z-index: 90;
+/* =========================
+   SOHBET ALANI
+========================= */
+.messages {
+    position: absolute; top: 90px; left: 15px; right: 15px; bottom: 92px;
+    overflow-y: auto; padding: 10px; z-index: 20;
+    scroll-behavior: smooth;
 }
 
-.overlay.active {
-
-    opacity: 1;
-
-    pointer-events: auto;
+.message {
+    max-width: 84%; margin: 10px 0; padding: 12px 16px;
+    border-radius: 12px; font-size: 14px; line-height: 1.5;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
+.user {
+    margin-left: auto;
+    background: var(--chat-user-bg);
+    border: 1px solid var(--hud-ring);
+    color: var(--text-primary);
+    border-bottom-right-radius: 2px;
+}
+
+.jarvis {
+    margin-right: auto;
+    background: var(--chat-bot-bg);
+    border: 1px solid var(--hud-ring);
+    color: var(--text-secondary);
+    border-bottom-left-radius: 2px;
+}
+
+.chat {
+    position: absolute; left: 15px; right: 15px; bottom: 18px;
+    height: 60px; display: flex; gap: 10px; z-index: 40;
+}
+
+.chat input {
+    flex: 1; min-width: 0; height: 100%;
+    border-radius: 15px;
+    border: 1px solid var(--hud-ring);
+    outline: none; padding: 0 20px;
+    font-size: 15px; color: var(--text-primary);
+    background: var(--chat-input-bg);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px var(--hud-ring-glow);
+    transition: all 0.3s ease;
+}
+
+.chat input:focus {
+    border-color: var(--text-glow);
+    box-shadow: 0 0 20px var(--hud-ring);
+}
+
+.chat input::placeholder {
+    color: var(--text-secondary); opacity: 0.7;
+}
+
+.send {
+    width: 60px; height: 60px; flex-shrink: 0;
+    border-radius: 15px;
+    border: 1px solid var(--text-primary);
+    background: var(--chat-input-bg);
+    backdrop-filter: blur(10px);
+    color: var(--text-primary); font-size: 20px;
+    box-shadow: 0 0 15px var(--hud-ring-glow);
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.send:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+    box-shadow: 0 0 20px var(--text-glow);
+}
+.send:active { transform: scale(.92); }
 
 /* =========================
    ANİMASYONLAR
 ========================= */
-
-@keyframes rotate {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes slowRotate {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes reverseRotate {
-
-    from {
-        transform: rotate(360deg);
-    }
-
-    to {
-        transform: rotate(0deg);
-    }
-}
-
-@keyframes scanRotate {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes innerPulse {
-
-    0%, 100% {
-        transform: scale(.97);
-        opacity: .55;
-    }
-
-    50% {
-        transform: scale(1.03);
-        opacity: 1;
-    }
-}
-
+@keyframes slowRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes reverseRotate { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes onlinePulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 @keyframes logoPulse {
-
-    0%, 100% {
-
-        box-shadow:
-
-            0 0 25px #00bfff,
-            0 0 55px
-            rgba(0,180,255,.35),
-            inset 0 0 30px
-            rgba(0,180,255,.25);
-    }
-
-    50% {
-
-        box-shadow:
-
-            0 0 40px #00eaff,
-            0 0 90px
-            rgba(0,180,255,.65),
-            inset 0 0 45px
-            rgba(0,180,255,.4);
-    }
+    0%, 100% { box-shadow: 0 0 25px var(--hud-ring-glow), inset 0 0 20px var(--hud-ring-glow); }
+    50% { box-shadow: 0 0 40px var(--text-glow), inset 0 0 35px var(--text-glow); }
 }
-
-@keyframes onlinePulse {
-
-    0%, 100% {
-        opacity: .45;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-@keyframes nodePulse {
-
-    0%, 100% {
-        transform: scale(.7);
-        opacity: .4;
-    }
-
-    50% {
-        transform: scale(1.5);
-        opacity: 1;
-    }
-}
-
-
-/* =========================
-   KÜÇÜK EKRAN
-========================= */
 
 @media (max-height: 720px) {
-
-    .hud {
-
-        width: 290px;
-        height: 290px;
-
-        transform:
-            translate(-50%, -54%);
-    }
-
-    .logo {
-
-        width: 112px;
-        height: 112px;
-    }
-
-    .logo span {
-
-        font-size: 70px;
-    }
-
-    .brand {
-
-        top:
-            calc(50% + 158px);
-    }
-
-    .brand-title {
-
-        font-size: 22px;
-    }
-
-    .system-info {
-
-        top:
-            calc(50% + 205px);
-    }
+    .hud { width: 280px; height: 280px; }
+    .logo { width: 100px; height: 100px; }
+    .logo span { font-size: 60px; }
+    .brand { top: calc(50% + 165px); }
+    .brand-title { font-size: 20px; }
 }
-
 </style>
-
 </head>
-
-
 <body>
 
-
 <!-- KÖŞELER -->
-
 <div class="corner tl"></div>
 <div class="corner tr"></div>
 <div class="corner bl"></div>
 <div class="corner br"></div>
 
-
-<!-- MENÜ -->
-
-<div
-class="menu"
-id="menu">
-
+<!-- SOL YAN MENÜ -->
+<div class="menu" id="menu">
     <div class="menu-header">
-
-        <h2>JARVIS</h2>
-
-        <button
-        class="close-menu"
-        onclick="closeMenu()">
-
-            ×
-
-        </button>
-
+        <h2>SİSTEM AĞI</h2>
+        <button class="close-menu" onclick="closeMenu()">×</button>
     </div>
 
+    <div class="menu-content">
+        <!-- Ayarlar -->
+        <div class="menu-section-title">SİSTEM AYARLARI</div>
+        <div class="setting-item">
+            <span>Gündüz Modu</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-    <button class="menu-item">
+        <!-- Geçmiş Sohbetler -->
+        <div class="menu-section-title">GEÇMİŞ PROTOKOLLER</div>
+        <ul class="history-list">
+            <li>Sistem Optimizasyonu</li>
+            <li>Ağ Güvenliği Taraması</li>
+            <li>Mark 42 Analizi</li>
+            <li>Güç Aktarımı Raporu</li>
+        </ul>
+    </div>
 
-        ⚙️ &nbsp; Ayarlar
-
-    </button>
-
+    <!-- Karahan INC Imzası -->
+    <div class="menu-footer">
+        <small>SYSTEM DEVELOPED BY</small>
+        <div class="dev-name">KARAHAN INC.</div>
+    </div>
 </div>
 
-
-<div
-class="overlay"
-id="overlay"
-onclick="closeMenu()">
-</div>
-
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
 <!-- ÜST BAR -->
-
 <div class="top">
-
-    <button
-    class="menu-button"
-    onclick="openMenu()">
-
+    <button class="menu-button" onclick="openMenu()">
         <span></span>
         <span></span>
         <span></span>
-
     </button>
-
-
     <div class="status">
-
         <div class="status-dot"></div>
-
         SYSTEM ONLINE
-
     </div>
-
 </div>
-
 
 <!-- ANA HUD -->
-
 <div class="hud">
-
     <div class="outer-ring"></div>
-
     <div class="segment-ring"></div>
-
-    <div class="tech-ring"></div>
-
-    <div class="inner-ring"></div>
-
-    <div class="scan"></div>
-
-
-    <div class="node one"></div>
-    <div class="node two"></div>
-    <div class="node three"></div>
-    <div class="node four"></div>
-
-
     <div class="logo">
-
         <span>K</span>
-
     </div>
-
 </div>
-
 
 <!-- MARKA -->
-
 <div class="brand">
-
-    <div class="brand-title">
-        J.A.R.V.I.S.
-    </div>
-
-    <div class="brand-subtitle">
-        KARAHAN INC.
-    </div>
-
+    <div class="brand-title">J.A.R.V.I.S.</div>
+    <div class="brand-subtitle">KARAHAN INC. OS v2.0</div>
 </div>
-
-
-<div class="system-info">
-
-    NEURAL CORE • ONLINE • READY
-
-</div>
-
 
 <!-- MESAJLAR -->
-
-<div
-class="messages"
-id="messages">
+<div class="messages" id="messages">
+    <div class="message jarvis">Sistemlere erişim sağlandı. Karahan INC. protokolleri devrede. Size nasıl yardımcı olabilirim efendim?</div>
 </div>
 
-
-<!-- CHAT -->
-
+<!-- CHAT GİRİŞ -->
 <div class="chat">
-
-    <input
-    id="input"
-    type="text"
-    placeholder="JARVIS'e yaz..."
-    autocomplete="off">
-
-
-    <button
-    class="send"
-    onclick="sendMessage()">
-
-        ➤
-
-    </button>
-
+    <input id="input" type="text" placeholder="J.A.R.V.I.S.'e komut ver..." autocomplete="off">
+    <button class="send" onclick="sendMessage()">➤</button>
 </div>
-
 
 <script>
-
-
 /* =========================
-   MENÜ
+   MENÜ KONTROLÜ
 ========================= */
-
 function openMenu() {
-
-    document
-    .getElementById("menu")
-    .classList.add("active");
-
-    document
-    .getElementById("overlay")
-    .classList.add("active");
+    document.getElementById("menu").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
 }
-
 
 function closeMenu() {
-
-    document
-    .getElementById("menu")
-    .classList.remove("active");
-
-    document
-    .getElementById("overlay")
-    .classList.remove("active");
+    document.getElementById("menu").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
 }
-
 
 /* =========================
-   JARVIS
+   GECE / GÜNDÜZ MODU
 ========================= */
-
-async function sendMessage() {
-
-    const input =
-        document.getElementById("input");
-
-    const messages =
-        document.getElementById("messages");
-
-    const message =
-        input.value.trim();
-
-
-    if (!message)
-        return;
-
-
-    /* Kullanıcı */
-
-    const userMessage =
-        document.createElement("div");
-
-    userMessage.className =
-        "message user";
-
-    userMessage.textContent =
-        message;
-
-    messages.appendChild(
-        userMessage
-    );
-
-
-    input.value = "";
-
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-
-    /* Bekleme */
-
-    const loading =
-        document.createElement("div");
-
-    loading.className =
-        "message jarvis";
-
-    loading.textContent =
-        "JARVIS düşünüyor...";
-
-    messages.appendChild(
-        loading
-    );
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/chat",
-                {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            message:
-                                message
-                        })
-
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "HTTP " +
-                response.status
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        loading.textContent =
-            data.response ||
-            "Cevap alınamadı.";
-
-
+function toggleTheme() {
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle.checked) {
+        document.body.setAttribute('data-theme', 'light');
+    } else {
+        document.body.removeAttribute('data-theme');
     }
-    catch(error) {
-
-        console.error(error);
-
-        loading.textContent =
-            "Sunucuya bağlanılamadı.";
-
-    }
-
-
-    messages.scrollTop =
-        messages.scrollHeight;
 }
 
+/* =========================
+   MESAJ GÖNDERİMİ (SİMÜLASYON)
+========================= */
+function sendMessage() {
+    const input = document.getElementById("input");
+    const messages = document.getElementById("messages");
+    const message = input.value.trim();
 
-/* ENTER */
+    if (!message) return;
 
-document
-.getElementById("input")
-.addEventListener(
-    "keydown",
-    function(event) {
+    // Kullanıcı Mesajı
+    const userMessage = document.createElement("div");
+    userMessage.className = "message user";
+    userMessage.textContent = message;
+    messages.appendChild(userMessage);
 
-        if (
-            event.key === "Enter"
-        ) {
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
 
-            sendMessage();
+    // Bot Bekleme
+    const loading = document.createElement("div");
+    loading.className = "message jarvis";
+    loading.textContent = "Veriler işleniyor...";
+    messages.appendChild(loading);
+    messages.scrollTop = messages.scrollHeight;
 
-        }
+    // Sahte Gecikme (Sunucu Yokken Arayüzü Test Etmek İçin)
+    setTimeout(() => {
+        loading.textContent = "Karahan INC. veritabanında komutunuz işlendi: '" + message + "'";
+        messages.scrollTop = messages.scrollHeight;
+    }, 1000);
+}
 
-    }
-);
-
+// ENTER Tuşu Dinleyici
+document.getElementById("input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") sendMessage();
+});
 </script>
 
-
 </body>
-
 </html>
