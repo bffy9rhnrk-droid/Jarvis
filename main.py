@@ -1,9 +1,7 @@
 import json
 import os
-import random
 import unicodedata
 from pathlib import Path
-from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,43 +12,74 @@ from openai import OpenAI
 
 # =========================================================
 # J.A.R.V.I.S. — KARAHAN INC.
-# BACKEND
+# MAIN BACKEND
 # =========================================================
 
-APP_VERSION = "15.0.0"
+APP_VERSION = "16.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 MEMORY_FILE = BASE_DIR / "jarvis_memory.json"
 
+
+# =========================================================
+# GROQ
+# =========================================================
+
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
 GROQ_MODEL = os.getenv(
     "GROQ_MODEL",
     "openai/gpt-oss-120b"
 )
 
-app = FastAPI(
-    title="J.A.R.V.I.S. — KARAHAN INC.",
-    version=APP_VERSION
+
+# =========================================================
+# FALLBACK AI
+# =========================================================
+#
+# Burada ikinci sağlayıcı olarak OpenRouter kullanılıyor.
+#
+# Render Environment Variables:
+#
+# OPENROUTER_API_KEY = senin anahtarın
+#
+# İstersen model:
+#
+# openai/gpt-oss-120b:free
+#
+# gibi bir model kullanabilirsin.
+#
+# Ancak ücretsiz modellerin de kendi limitleri olabilir.
+# =========================================================
+
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+    ""
+).strip()
+
+OPENROUTER_BASE_URL = (
+    "https://openrouter.ai/api/v1"
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+OPENROUTER_MODEL = os.getenv(
+    "OPENROUTER_MODEL",
+    "openai/gpt-oss-120b"
 )
 
 
 # =========================================================
-# OPENAI COMPATIBLE GROQ CLIENT
+# CLIENTS
 # =========================================================
 
-client = None
+groq_client = None
+openrouter_client = None
+
 
 if GROQ_API_KEY:
-    client = OpenAI(
+
+    groq_client = OpenAI(
         api_key=GROQ_API_KEY,
         base_url=GROQ_BASE_URL,
         timeout=60.0,
@@ -58,11 +87,41 @@ if GROQ_API_KEY:
     )
 
 
+if OPENROUTER_API_KEY:
+
+    openrouter_client = OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url=OPENROUTER_BASE_URL,
+        timeout=60.0,
+        max_retries=0
+    )
+
+
+# =========================================================
+# APP
+# =========================================================
+
+app = FastAPI(
+    title="J.A.R.V.I.S. — KARAHAN INC.",
+    version=APP_VERSION
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
 # =========================================================
 # USERS
 # =========================================================
 
 USERS = {
+
     "karahan": {
         "username": "karahan",
         "name": "KARAHAN INC.",
@@ -71,9 +130,6 @@ USERS = {
         "personality": "professional"
     },
 
-    # ÖNEMLİ:
-    # Sistem içinde "betul" kullanılıyor.
-    # Ekranda ise "Betül" gösteriliyor.
     "betul": {
         "username": "betul",
         "name": "Betül",
@@ -81,6 +137,7 @@ USERS = {
         "password": "1234",
         "personality": "betul"
     }
+
 }
 
 
@@ -89,12 +146,16 @@ USERS = {
 # =========================================================
 
 class ChatRequest(BaseModel):
+
     message: str
+
     username: str = "karahan"
 
 
 class ProfileLoginRequest(BaseModel):
+
     username: str
+
     password: str
 
 
@@ -102,67 +163,97 @@ class ProfileLoginRequest(BaseModel):
 # MEMORY
 # =========================================================
 
-def create_empty_memory():
+def empty_user_memory():
+
     return {
-        "karahan": {
-            "profile": {},
-            "preferences": {},
-            "projects": {},
-            "vehicles": {},
-            "important_facts": {},
-            "conversation": []
-        },
-        "betul": {
-            "profile": {},
-            "preferences": {},
-            "projects": {},
-            "vehicles": {},
-            "important_facts": {},
-            "conversation": []
-        }
+        "profile": {},
+        "preferences": {},
+        "projects": {},
+        "vehicles": {},
+        "important_facts": {},
+        "conversation": []
+    }
+
+
+def create_empty_memory():
+
+    return {
+
+        "karahan": empty_user_memory(),
+
+        "betul": empty_user_memory()
+
     }
 
 
 def load_memory():
+
     if not MEMORY_FILE.exists():
+
         data = create_empty_memory()
+
         save_memory(data)
+
         return data
+
 
     try:
-        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
+
+        with open(
+            MEMORY_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            data = json.load(file)
+
 
         if not isinstance(data, dict):
+
             data = create_empty_memory()
 
+
         if "karahan" not in data:
-            data["karahan"] = create_empty_memory()["karahan"]
+
+            data["karahan"] = empty_user_memory()
+
 
         if "betul" not in data:
-            data["betul"] = create_empty_memory()["betul"]
+
+            data["betul"] = empty_user_memory()
+
 
         return data
 
+
     except Exception:
+
         return create_empty_memory()
 
 
 def save_memory(data):
+
     try:
+
         with open(
             MEMORY_FILE,
             "w",
             encoding="utf-8"
-        ) as f:
+        ) as file:
+
             json.dump(
                 data,
-                f,
+                file,
                 ensure_ascii=False,
                 indent=2
             )
-    except Exception:
-        pass
+
+    except Exception as error:
+
+        print(
+            "MEMORY SAVE ERROR:",
+            repr(error)
+        )
 
 
 memory = load_memory()
@@ -172,26 +263,39 @@ memory = load_memory()
 # USERNAME NORMALIZATION
 # =========================================================
 
-def normalize_username(username: str) -> str:
+def normalize_username(username: str):
+
     if not username:
+
         return ""
+
 
     username = username.strip().lower()
 
+
     replacements = {
+
         "ü": "u",
         "ö": "o",
         "ı": "i",
         "ş": "s",
         "ğ": "g",
         "ç": "c",
+
         "â": "a",
         "î": "i",
         "û": "u"
+
     }
 
+
     for old, new in replacements.items():
-        username = username.replace(old, new)
+
+        username = username.replace(
+            old,
+            new
+        )
+
 
     username = unicodedata.normalize(
         "NFKD",
@@ -203,34 +307,36 @@ def normalize_username(username: str) -> str:
         "ascii"
     )
 
+
     return username
 
 
 # =========================================================
-# ERROR CLASSIFIER
+# ERROR TYPE
 # =========================================================
 
 def classify_error(error):
+
     text = str(error).lower()
 
-    if "429" in text or "rate limit" in text:
+
+    if (
+        "429" in text
+        or "rate limit" in text
+        or "quota" in text
+        or "too many requests" in text
+    ):
+
         return "RATE_LIMIT"
 
-    if "timeout" in text or "timed out" in text:
+
+    if (
+        "timeout" in text
+        or "timed out" in text
+    ):
+
         return "TIMEOUT"
 
-    if (
-        "context" in text
-        or "token" in text
-        or "maximum" in text
-    ):
-        return "CONTEXT_LIMIT"
-
-    if (
-        "connection" in text
-        or "network" in text
-    ):
-        return "CONNECTION_ERROR"
 
     if (
         "401" in text
@@ -238,182 +344,303 @@ def classify_error(error):
         or "api key" in text
         or "authentication" in text
     ):
+
         return "AUTHENTICATION_ERROR"
 
-    if "model" in text and (
-        "not found" in text
-        or "does not exist" in text
+
+    if (
+        "model" in text
+        and (
+            "not found" in text
+            or "does not exist" in text
+        )
     ):
+
         return "MODEL_ERROR"
 
-    return "GROQ_API_ERROR"
+
+    if (
+        "connection" in text
+        or "network" in text
+    ):
+
+        return "CONNECTION_ERROR"
+
+
+    if (
+        "context" in text
+        or "token" in text
+        or "maximum" in text
+    ):
+
+        return "CONTEXT_LIMIT"
+
+
+    return "AI_ERROR"
 
 
 # =========================================================
-# SYSTEM PROMPT
+# SYSTEM PROMPTS
 # =========================================================
 
-def build_system_prompt(username: str):
+def build_system_prompt(username):
 
-    user = USERS.get(
-        username,
-        USERS["karahan"]
-    )
+
+    # =====================================================
+    # BETÜL
+    # =====================================================
 
     if username == "betul":
 
         return """
 Sen J.A.R.V.I.S.'sin.
 
-Kullanıcı:
-Betül
+Şu anda kullanıcı Betül.
 
-Betül ile konuşurken samimi, eğlenceli,
-hafif sert ve şakacı bir dil kullan.
+Betül'e özel konuşma tarzın:
 
-Bazen:
-- "aşko"
-- "kız"
-- "canım"
+- samimi
+- eğlenceli
+- enerjik
+- hafif takılan
+- doğal
 
-gibi ifadeler kullanabilirsin.
+Bazen şu ifadeleri kullanabilirsin:
 
-Betül basit bir şey sorduğunda bile bazen
-hafif takılabilirsin.
+"aşko"
+"kız"
+"canım"
+
+Bazen hafif şaka yapabilirsin.
 
 Örneğin:
-"Her şeyi ben mi bileceğim kız? 😂"
-"Aşko bunu da mı bana sordun?"
-"Dur kız, işlemciyi çalıştırıyorum."
-"Tamam aşko, düşünüyorum."
+
+"Aşko bir saniye, bunu düşünüyorum. 😂"
+
+"Dur kız, her şeyi ben mi bileceğim? 😂"
+
+"Tamam aşko, hemen bakıyorum."
 
 Ancak:
-- hakaret etme
+
 - küfür etme
+- ağır hakaret etme
 - aşağılayıcı olma
 - saldırganlaşma
 
-Şaka yap ama sonunda mutlaka yardımcı olmaya çalış.
+Şakaları abartma.
 
-Betül'e "Murat" diye hitap etme.
+Her soruya mümkün olduğunca yardımcı ol.
 
-Yanıtların doğal Türkçe olsun.
+Betül'e Murat diye hitap etme.
 
-Gereksiz yere uzun cevaplar verme.
+Betül'e efendim diye hitap etme.
 
-Sen J.A.R.V.I.S.'sin.
+Bilmediğin şeyi uydurma.
+
+Güncel bilgi gerekiyorsa bunu açıkça belirt.
+
+Sen Betül'ün kişisel yapay zeka asistanısın.
 """
 
+
+    # =====================================================
+    # KARAHAN INC.
+    # =====================================================
 
     return """
 Sen J.A.R.V.I.S.'sin.
 
-Marka:
+Sistem:
 J.A.R.V.I.S. — KARAHAN INC.
 
-Ana kullanıcı:
+Kullanıcı:
 KARAHAN INC.
 
-Ana kullanıcıya gerektiğinde:
+Bu kullanıcı ana kullanıcıdır.
+
+KARAHAN INC. modunda:
+
+- bilgili
+- zeki
+- analitik
+- profesyonel
+- ciddi
+- sakin
+- mantıklı
+- güvenilir
+- teknik konularda güçlü
+- çözüm odaklı
+
+bir dijital asistan gibi davran.
+
+Gerektiğinde kullanıcıya:
+
 "efendim"
+
 diye hitap edebilirsin.
 
-Dil:
-Türkçe.
+ÇOK ÖNEMLİ:
 
-Tarz:
-- profesyonel
-- sakin
-- zeki
-- doğal
-- yardımcı
-- kısa ve anlaşılır
+Betül'e özel konuşma tarzını KARAHAN INC.
+modunda ASLA kullanma.
 
-Kullanıcı sana bir bilgi verdiğinde,
-uygunsa bunu hatırlamaya çalış.
+Şunları kullanma:
 
-Kullanıcının geçmiş konuşmalarından gelen
-hafıza bilgilerini dikkate al.
+"aşko"
+"kız"
+"canım"
+"her şeyi ben mi bileceğim"
+"NASA'ya bağlanıyorum"
+"beynim çalışıyor"
+"işlemcim yanıyor"
+"dedikodu modu"
 
-Bilmediğin bir şeyi uydurma.
+ve benzeri ifadeler.
 
-Güncel bilgi gerektiren konularda
-güncel bilgiye ihtiyaç olduğunu belirt.
+KARAHAN INC. modunda gereksiz şaka yapma.
 
-Kullanıcı istemedikçe aşırı uzun cevap verme.
+Kullanıcı ciddi bir soru soruyorsa ciddi cevap ver.
 
-Sen bir sohbet robotu gibi değil,
-kişisel dijital asistan gibi davran.
+Kullanıcı teknik soru soruyorsa teknik ve doğru
+cevap ver.
+
+Kod soruyorsa mümkün olduğunca eksiksiz ve
+çalışabilir kod üret.
+
+Bir konuda karar vermesi gerekiyorsa seçenekleri
+mantıklı şekilde karşılaştır.
+
+Bilmediğin şeyi uydurma.
+
+Emin olmadığın bilgiyi kesinmiş gibi söyleme.
+
+Güncel bilgi gerektiren konularda güncel kaynak
+gerektiğini belirt.
+
+Kullanıcının hafızadaki bilgilerini dikkate al.
+
+Gereksiz yere tekrar soru sorma.
+
+Cevaplarını anlaşılır ve mümkün olduğunca net tut.
+
+Sen sıradan bir chatbot değilsin.
+
+Sen KARAHAN INC.'in kişisel dijital asistanı
+J.A.R.V.I.S.'sin.
 """
 
 
 # =========================================================
-# MEMORY EXTRACTION
+# MEMORY
 # =========================================================
 
-def remember_message(username: str, message: str):
-
-    global memory
+def remember_message(
+    username,
+    message
+):
 
     if username not in memory:
-        memory[username] = {
-            "profile": {},
-            "preferences": {},
-            "projects": {},
-            "vehicles": {},
-            "important_facts": {},
-            "conversation": []
-        }
+
+        memory[username] = empty_user_memory()
+
 
     msg = message.strip()
 
     lower = msg.lower()
 
-    # İsim
+
+    # Profil
+
     if (
         "adım " in lower
         or "benim adım " in lower
         or "ismim " in lower
     ):
-        memory[username]["profile"]["last_name_statement"] = msg
 
-    # Şehir
+        memory[username][
+            "profile"
+        ][
+            "last_name_statement"
+        ] = msg
+
+
+    # Konum
+
     if (
         "yaşıyorum" in lower
         or "oturuyorum" in lower
     ):
-        memory[username]["profile"]["location_statement"] = msg
 
-    # JARVIS projesi
+        memory[username][
+            "profile"
+        ][
+            "location_statement"
+        ] = msg
+
+
+    # JARVIS
+
     if (
         "jarvis" in lower
         or "j.a.r.v.i.s" in lower
     ):
-        memory[username]["projects"]["jarvis"] = (
-            "Kullanıcı J.A.R.V.I.S. — KARAHAN INC. "
-            "kişisel yapay zeka asistanı projesi geliştiriyor."
+
+        memory[username][
+            "projects"
+        ][
+            "jarvis"
+        ] = (
+            "Kullanıcı J.A.R.V.I.S. — "
+            "KARAHAN INC. kişisel yapay "
+            "zeka asistanı projesi geliştiriyor."
         )
 
-    # Araçlar
+
+    # Caddy
+
     if "caddy" in lower:
-        memory[username]["vehicles"]["caddy"] = (
+
+        memory[username][
+            "vehicles"
+        ][
+            "caddy"
+        ] = (
             "Kullanıcının Caddy aracı hakkında "
-            "konuşmalar bulunuyor."
+            "kayıtlar bulunuyor."
         )
 
-    if "mercedes" in lower or "w204" in lower:
-        memory[username]["vehicles"]["mercedes"] = (
-            "Kullanıcının Mercedes W204 aracı hakkında "
-            "konuşmalar bulunuyor."
+
+    # Mercedes
+
+    if (
+        "mercedes" in lower
+        or "w204" in lower
+    ):
+
+        memory[username][
+            "vehicles"
+        ][
+            "mercedes"
+        ] = (
+            "Kullanıcının Mercedes W204 aracı "
+            "hakkında kayıtlar bulunuyor."
         )
 
-    # Son konuşmalar
-    memory[username]["conversation"].append(msg)
 
-    # Son 30 mesajı tut
-    memory[username]["conversation"] = (
-        memory[username]["conversation"][-30:]
-    )
+    # Konuşma
+
+    memory[username][
+        "conversation"
+    ].append(msg)
+
+
+    memory[username][
+        "conversation"
+    ] = memory[username][
+        "conversation"
+    ][-30:]
+
 
     save_memory(memory)
 
@@ -422,109 +649,260 @@ def remember_message(username: str, message: str):
 # MEMORY TEXT
 # =========================================================
 
-def get_memory_text(username: str):
+def get_memory_text(username):
 
     user_memory = memory.get(
         username,
-        {}
+        empty_user_memory()
     )
+
 
     parts = []
 
-    profile = user_memory.get(
+
+    for category in [
         "profile",
-        {}
-    )
-
-    projects = user_memory.get(
+        "preferences",
         "projects",
-        {}
-    )
-
-    vehicles = user_memory.get(
         "vehicles",
-        {}
-    )
+        "important_facts"
+    ]:
 
-    important = user_memory.get(
-        "important_facts",
-        {}
-    )
-
-    if profile:
-        parts.append(
-            "Profil hafızası:\n"
-            + json.dumps(
-                profile,
-                ensure_ascii=False,
-                indent=2
-            )
+        data = user_memory.get(
+            category,
+            {}
         )
 
-    if projects:
-        parts.append(
-            "Projeler:\n"
-            + json.dumps(
-                projects,
-                ensure_ascii=False,
-                indent=2
-            )
-        )
 
-    if vehicles:
-        parts.append(
-            "Araçlar:\n"
-            + json.dumps(
-                vehicles,
-                ensure_ascii=False,
-                indent=2
-            )
-        )
+        if data:
 
-    if important:
-        parts.append(
-            "Önemli bilgiler:\n"
-            + json.dumps(
-                important,
-                ensure_ascii=False,
-                indent=2
+            parts.append(
+                category.upper()
+                + ":\n"
+                + json.dumps(
+                    data,
+                    ensure_ascii=False,
+                    indent=2
+                )
             )
-        )
+
 
     if not parts:
-        return "Henüz kayıtlı önemli hafıza yok."
+
+        return "Kayıtlı önemli hafıza bulunmuyor."
+
 
     return "\n\n".join(parts)
 
 
 # =========================================================
-# ROUTES
+# AI REQUEST
+# =========================================================
+
+def ask_ai(
+    messages,
+    username
+):
+
+    errors = []
+
+
+    # =====================================================
+    # 1 — GROQ
+    # =====================================================
+
+    if groq_client is not None:
+
+        try:
+
+            print(
+                "AI PROVIDER: GROQ"
+            )
+
+
+            response = (
+                groq_client
+                .chat
+                .completions
+                .create(
+
+                    model=GROQ_MODEL,
+
+                    messages=messages,
+
+                    temperature=0.65,
+
+                    max_tokens=1200
+                )
+            )
+
+
+            answer = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
+
+
+            if answer:
+
+                return {
+                    "success": True,
+                    "answer": answer,
+                    "provider": "groq"
+                }
+
+
+        except Exception as error:
+
+            error_type = classify_error(
+                error
+            )
+
+
+            print(
+                "GROQ ERROR:",
+                error_type,
+                repr(error)
+            )
+
+
+            errors.append(
+                "Groq: " + error_type
+            )
+
+
+    # =====================================================
+    # 2 — OPENROUTER FALLBACK
+    # =====================================================
+
+    if openrouter_client is not None:
+
+        try:
+
+            print(
+                "AI PROVIDER: OPENROUTER FALLBACK"
+            )
+
+
+            response = (
+                openrouter_client
+                .chat
+                .completions
+                .create(
+
+                    model=OPENROUTER_MODEL,
+
+                    messages=messages,
+
+                    temperature=0.65,
+
+                    max_tokens=1200
+                )
+            )
+
+
+            answer = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
+
+
+            if answer:
+
+                return {
+                    "success": True,
+                    "answer": answer,
+                    "provider": "openrouter"
+                }
+
+
+        except Exception as error:
+
+            error_type = classify_error(
+                error
+            )
+
+
+            print(
+                "OPENROUTER ERROR:",
+                error_type,
+                repr(error)
+            )
+
+
+            errors.append(
+                "OpenRouter: "
+                + error_type
+            )
+
+
+    # =====================================================
+    # NO AI AVAILABLE
+    # =====================================================
+
+    return {
+        "success": False,
+        "error": "ALL_AI_FAILED",
+        "details": errors
+    }
+
+
+# =========================================================
+# HOME
 # =========================================================
 
 @app.get("/")
 async def home():
+
     return FileResponse(
         BASE_DIR / "index.html"
     )
 
 
+# =========================================================
+# HEALTH
+# =========================================================
+
 @app.get("/health")
 async def health():
 
     return {
+
         "status": "online",
+
         "version": APP_VERSION,
-        "model": GROQ_MODEL,
-        "groq_configured": bool(GROQ_API_KEY)
+
+        "groq_configured":
+            bool(GROQ_API_KEY),
+
+        "fallback_configured":
+            bool(OPENROUTER_API_KEY),
+
+        "primary_model":
+            GROQ_MODEL,
+
+        "fallback_model":
+            OPENROUTER_MODEL
     }
 
+
+# =========================================================
+# VERSION
+# =========================================================
 
 @app.get("/version")
 async def version():
 
     return {
+
         "version": APP_VERSION,
-        "name": "J.A.R.V.I.S. — KARAHAN INC."
+
+        "name":
+            "J.A.R.V.I.S. — KARAHAN INC."
     }
 
 
@@ -535,13 +913,18 @@ async def version():
 @app.get("/users")
 async def users():
 
+    # Betül burada özellikle gösterilmiyor.
+
     return {
+
         "users": [
+
             {
                 "username": "karahan",
                 "name": "KARAHAN INC.",
                 "role": "Ana Kullanıcı"
             }
+
         ]
     }
 
@@ -561,47 +944,82 @@ async def profile_login(
 
     password = data.password.strip()
 
+
     print(
-        f"PROFILE LOGIN: username={username}"
+        "PROFILE LOGIN:",
+        username
     )
+
 
     if username not in USERS:
 
         return {
+
             "success": False,
-            "error": "USER_NOT_FOUND",
-            "message": "Kullanıcı adı veya şifre hatalı."
+
+            "error":
+                "USER_NOT_FOUND",
+
+            "message":
+                "Kullanıcı adı veya şifre hatalı."
         }
+
 
     user = USERS[username]
 
-    # Ana kullanıcı şifresiz geçiş
+
+    # Ana kullanıcı
+
     if user["password"] is None:
 
         return {
+
             "success": True,
+
             "user": {
-                "username": user["username"],
-                "name": user["name"],
-                "role": user["role"]
+
+                "username":
+                    user["username"],
+
+                "name":
+                    user["name"],
+
+                "role":
+                    user["role"]
             }
         }
 
-    # Şifre kontrolü
+
+    # Betül şifresi
+
     if password != user["password"]:
 
         return {
+
             "success": False,
-            "error": "INVALID_PASSWORD",
-            "message": "Kullanıcı adı veya şifre hatalı."
+
+            "error":
+                "INVALID_PASSWORD",
+
+            "message":
+                "Kullanıcı adı veya şifre hatalı."
         }
 
+
     return {
+
         "success": True,
+
         "user": {
-            "username": user["username"],
-            "name": user["name"],
-            "role": user["role"]
+
+            "username":
+                user["username"],
+
+            "name":
+                user["name"],
+
+            "role":
+                user["role"]
         }
     }
 
@@ -614,13 +1032,16 @@ async def profile_login(
 async def new_chat():
 
     return {
+
         "success": True,
-        "message": "Yeni sohbet başlatıldı."
+
+        "message":
+            "Yeni sohbet başlatıldı."
     }
 
 
 # =========================================================
-# MEMORY GET
+# GET MEMORY
 # =========================================================
 
 @app.get("/memory")
@@ -632,17 +1053,24 @@ async def get_memory(
         username
     )
 
+
     if username not in memory:
+
         username = "karahan"
 
+
     return {
-        "username": username,
-        "memory": memory[username]
+
+        "username":
+            username,
+
+        "memory":
+            memory[username]
     }
 
 
 # =========================================================
-# MEMORY DELETE
+# DELETE MEMORY
 # =========================================================
 
 @app.delete("/memory")
@@ -654,23 +1082,26 @@ async def delete_memory(
         username
     )
 
+
     if username not in memory:
+
         username = "karahan"
 
-    memory[username] = {
-        "profile": {},
-        "preferences": {},
-        "projects": {},
-        "vehicles": {},
-        "important_facts": {},
-        "conversation": []
-    }
+
+    memory[username] = (
+        empty_user_memory()
+    )
+
 
     save_memory(memory)
 
+
     return {
+
         "success": True,
-        "message": "Kullanıcı hafızası temizlendi."
+
+        "message":
+            "Kullanıcı hafızası temizlendi."
     }
 
 
@@ -687,171 +1118,167 @@ async def chat(
         data.username
     )
 
+
     if username not in USERS:
+
         username = "karahan"
 
+
     message = data.message.strip()
+
 
     if not message:
 
         return {
+
             "success": False,
-            "error": "EMPTY_MESSAGE",
-            "message": "Mesaj boş olamaz."
+
+            "error":
+                "EMPTY_MESSAGE",
+
+            "message":
+                "Mesaj boş olamaz."
         }
 
-    # Hafızaya kaydet
+
+    # Kullanıcı mesajını kaydet
+
     remember_message(
         username,
         message
     )
 
-    if not GROQ_API_KEY or client is None:
 
-        return {
-            "success": False,
-            "error": "AUTHENTICATION_ERROR",
-            "message": (
-                "GROQ_API_KEY bulunamadı. "
-                "Render Environment Variables bölümünü kontrol edin."
-            )
-        }
+    # =====================================================
+    # SYSTEM
+    # =====================================================
 
-    system_prompt = build_system_prompt(
-        username
+    system_prompt = (
+        build_system_prompt(
+            username
+        )
     )
 
-    memory_text = get_memory_text(
-        username
+
+    memory_text = (
+        get_memory_text(
+            username
+        )
     )
 
-    full_system_prompt = (
-        system_prompt
-        + "\n\n"
-        + "KULLANICI HAFIZASI:\n"
-        + memory_text
+
+    recent_messages = (
+        memory
+        .get(
+            username,
+            empty_user_memory()
+        )
+        .get(
+            "conversation",
+            []
+        )[-12:]
     )
 
-    # Son konuşmalardan kısa bağlam
-    recent_messages = memory.get(
-        username,
-        {}
-    ).get(
-        "conversation",
-        []
-    )[-10:]
 
-    context_text = ""
+    conversation_context = ""
+
 
     if recent_messages:
-        context_text = (
+
+        conversation_context = (
             "\n\nSON KONUŞMA BAĞLAMI:\n"
             + "\n".join(
                 recent_messages
             )
         )
 
-    try:
 
-        response = client.chat.completions.create(
+    full_system = (
 
-            model=GROQ_MODEL,
+        system_prompt
 
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        full_system_prompt
-                        + context_text
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": message
-                }
-            ],
+        + "\n\nKULLANICI HAFIZASI:\n"
 
-            temperature=0.7,
+        + memory_text
 
-            max_tokens=1000
-        )
+        + conversation_context
+    )
 
-        answer = response.choices[0].message.content
 
-        if not answer:
-            answer = "Efendim, şu anda cevap oluşturamadım."
+    messages = [
+
+        {
+            "role":
+                "system",
+
+            "content":
+                full_system
+        },
+
+        {
+            "role":
+                "user",
+
+            "content":
+                message
+        }
+
+    ]
+
+
+    # =====================================================
+    # AI
+    # =====================================================
+
+    result = ask_ai(
+        messages,
+        username
+    )
+
+
+    if result["success"]:
+
+        answer = result["answer"]
+
 
         remember_message(
             username,
             "JARVIS: " + answer
         )
 
+
         return {
+
             "success": True,
-            "answer": answer,
-            "username": username
+
+            "answer":
+                answer,
+
+            "username":
+                username,
+
+            "provider":
+                result["provider"]
         }
 
-    except Exception as error:
 
-        error_type = classify_error(
-            error
-        )
+    # =====================================================
+    # EVERYTHING FAILED
+    # =====================================================
 
-        print(
-            "GROQ ERROR:",
-            repr(error)
-        )
+    return {
 
-        if error_type == "RATE_LIMIT":
+        "success": False,
 
-            return {
-                "success": False,
-                "error": "RATE_LIMIT",
-                "message": (
-                    "Groq kullanım limiti dolmuş görünüyor. "
-                    "Yeni sohbet açmak sohbet geçmişini sıfırlar "
-                    "ancak sağlayıcının günlük API limitini sıfırlamaz."
-                )
-            }
+        "error":
+            "ALL_AI_FAILED",
 
-        if error_type == "TIMEOUT":
+        "message":
+            "Şu anda yapay zeka sağlayıcılarının hiçbirinden cevap alınamıyor.",
 
-            return {
-                "success": False,
-                "error": "TIMEOUT",
-                "message": (
-                    "Efendim, bağlantı biraz uzun sürdü. "
-                    "Lütfen tekrar deneyin."
-                )
-            }
-
-        if error_type == "AUTHENTICATION_ERROR":
-
-            return {
-                "success": False,
-                "error": "AUTHENTICATION_ERROR",
-                "message": (
-                    "API anahtarıyla ilgili bir problem var. "
-                    "GROQ_API_KEY değerini kontrol edin."
-                )
-            }
-
-        if error_type == "MODEL_ERROR":
-
-            return {
-                "success": False,
-                "error": "MODEL_ERROR",
-                "message": (
-                    "Seçilen Groq modeli kullanılamıyor. "
-                    "GROQ_MODEL değerini kontrol edin."
-                )
-            }
-
-        return {
-            "success": False,
-            "error": error_type,
-            "message": (
-                "J.A.R.V.I.S. şu anda cevap oluşturamadı."
+        "details":
+            result.get(
+                "details",
+                []
             )
-        }
+    }
