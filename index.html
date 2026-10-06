@@ -1,1573 +1,2506 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
-<meta name="theme-color" content="#050b10">
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>J.A.R.V.I.S. — KARAHAN INC.</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "SF Pro Display",
+                "Segoe UI",
+                sans-serif;
+            background: #02070b;
+            color: #dffcff;
+        }
+
+        body {
+            position: relative;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            outline: none;
+        }
+
+        /* =====================================================
+           BACKGROUND
+        ===================================================== */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            background:
+                radial-gradient(
+                    circle at 50% 42%,
+                    rgba(0, 221, 255, 0.09),
+                    transparent 32%
+                ),
+                radial-gradient(
+                    circle at 50% 100%,
+                    rgba(0, 140, 255, 0.05),
+                    transparent 40%
+                ),
+                #02070b;
+        }
+
+        .grid {
+            position: absolute;
+            inset: -100px;
+            opacity: 0.12;
+
+            background-image:
+                linear-gradient(
+                    rgba(0, 220, 255, 0.18) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(0, 220, 255, 0.18) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+
+            transform:
+                perspective(700px)
+                rotateX(58deg)
+                scale(1.5);
+
+            transform-origin: center bottom;
+        }
+
+        .scanline {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(0, 238, 255, 0.4),
+                    transparent
+                );
+
+            animation: scan 7s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scan {
+            0% {
+                top: -5%;
+            }
+
+            100% {
+                top: 105%;
+            }
+        }
+
+        /* =====================================================
+           APP
+        ===================================================== */
+
+        .app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+        }
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .topbar {
+            height: 78px;
+            min-height: 78px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding:
+                env(safe-area-inset-top)
+                18px
+                0
+                18px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(2, 12, 18, 0.94),
+                    rgba(2, 8, 12, 0.65)
+                );
+
+            border-bottom:
+                1px solid rgba(0, 221, 255, 0.13);
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #00eaff;
+
+            font-size: 17px;
+            font-weight: 800;
+
+            border:
+                1px solid rgba(0, 234, 255, 0.65);
+
+            box-shadow:
+                0 0 12px rgba(0, 234, 255, 0.2),
+                inset 0 0 10px rgba(0, 234, 255, 0.08);
+        }
+
+        .brand-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        .brand-subtitle {
+            margin-top: 2px;
+            font-size: 8px;
+            letter-spacing: 3px;
+            color: rgba(210, 248, 255, 0.42);
+        }
+
+        .menu-button {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+
+            background: rgba(0, 225, 255, 0.04);
+            border:
+                1px solid rgba(0, 225, 255, 0.15);
+            border-radius: 14px;
+
+            cursor: pointer;
+        }
+
+        .menu-button span {
+            width: 18px;
+            height: 1px;
+            background: #70efff;
+            box-shadow: 0 0 5px rgba(0, 225, 255, 0.5);
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+            flex: 1;
+            min-height: 0;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+        .status {
+            position: absolute;
+            top: 24px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 7px 12px;
+
+            border:
+                1px solid rgba(0, 225, 255, 0.14);
+
+            border-radius: 30px;
+
+            background:
+                rgba(0, 20, 28, 0.45);
+
+            backdrop-filter: blur(10px);
+
+            color: rgba(216, 250, 255, 0.58);
+
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00eaff;
+
+            box-shadow:
+                0 0 8px #00eaff;
+
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.25);
+            }
+        }
+
+        /* =====================================================
+           K CORE
+        ===================================================== */
+
+        .core-wrapper {
+            position: relative;
+
+            width: 260px;
+            height: 260px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-top: 10px;
+        }
+
+        .core-glow {
+            position: absolute;
+
+            width: 130px;
+            height: 130px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(0, 235, 255, 0.18),
+                    rgba(0, 235, 255, 0.02) 60%,
+                    transparent 70%
+                );
+
+            filter: blur(7px);
+
+            animation: coreGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes coreGlow {
+            0%,
+            100% {
+                transform: scale(0.9);
+                opacity: 0.55;
+            }
+
+            50% {
+                transform: scale(1.18);
+                opacity: 1;
+            }
+        }
+
+        /* Outer rotating ring */
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ring-one {
+            width: 230px;
+            height: 230px;
+
+            border:
+                1px solid rgba(0, 224, 255, 0.18);
+
+            border-top-color: #00eaff;
+            border-bottom-color: rgba(0, 234, 255, 0.04);
+
+            animation:
+                rotateClockwise 8s linear infinite;
+        }
+
+        .ring-two {
+            width: 205px;
+            height: 205px;
+
+            border:
+                1px dashed rgba(0, 224, 255, 0.3);
+
+            border-left-color: #00eaff;
+
+            animation:
+                rotateCounter 12s linear infinite;
+        }
+
+        .ring-three {
+            width: 178px;
+            height: 178px;
+
+            border:
+                2px solid transparent;
+
+            border-top-color: rgba(0, 234, 255, 0.8);
+            border-right-color: rgba(0, 234, 255, 0.2);
+
+            animation:
+                rotateClockwise 5s linear infinite;
+        }
+
+        @keyframes rotateClockwise {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotateCounter {
+            from {
+                transform: rotate(360deg);
+            }
+
+            to {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* =====================================================
+           RING MARKERS
+        ===================================================== */
+
+        .marker {
+            position: absolute;
+
+            width: 5px;
+            height: 5px;
+
+            background: #00eaff;
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 8px #00eaff;
+        }
+
+        .marker-one {
+            top: 15px;
+            left: 50%;
+        }
+
+        .marker-two {
+            right: 19px;
+            top: 50%;
+        }
+
+        .marker-three {
+            bottom: 15px;
+            left: 50%;
+        }
+
+        .marker-four {
+            left: 19px;
+            top: 50%;
+        }
+
+        /* =====================================================
+           K LOGO
+        ===================================================== */
+
+        .core {
+            position: relative;
+
+            width: 118px;
+            height: 118px;
+
+            border-radius: 50%;
 
-<title>J.A.R.V.I.S. — KARAHAN INC.</title>
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-<style>
+            border:
+                1px solid rgba(0, 235, 255, 0.65);
 
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(0, 55, 68, 0.7),
+                    rgba(2, 12, 18, 0.95)
+                );
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-}
+            box-shadow:
+                0 0 18px rgba(0, 234, 255, 0.3),
+                0 0 55px rgba(0, 234, 255, 0.11),
+                inset 0 0 25px rgba(0, 234, 255, 0.13);
 
-body {
+            animation:
+                coreFloat 4s ease-in-out infinite;
+        }
 
-    background:
-        radial-gradient(
-            circle at 50% 30%,
-            rgba(0, 238, 255, 0.09),
-            transparent 35%
-        ),
-        #03070a;
+        .core::before {
+            content: "";
 
-    color: #dffcff;
+            position: absolute;
+            inset: 7px;
 
-    overflow: hidden;
+            border-radius: 50%;
 
-    transition:
-        background 0.3s,
-        color 0.3s;
-}
+            border:
+                1px solid rgba(0, 234, 255, 0.22);
+        }
 
+        .core::after {
+            content: "";
 
-/* ============================================================
-   BACKGROUND
-   ============================================================ */
+            position: absolute;
 
-body::before {
+            width: 3px;
+            height: 3px;
 
-    content: "";
+            background: #dfffff;
+            border-radius: 50%;
 
-    position: fixed;
+            box-shadow:
+                0 0 12px #00eaff,
+                0 0 30px #00eaff;
+        }
 
-    inset: 0;
+        @keyframes coreFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
 
-    pointer-events: none;
+            50% {
+                transform: translateY(-4px);
+            }
+        }
 
-    background-image:
-        linear-gradient(
-            rgba(0, 220, 255, 0.025) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(0, 220, 255, 0.025) 1px,
-            transparent 1px
-        );
+        .k-logo {
+            position: relative;
 
-    background-size: 35px 35px;
+            font-size: 66px;
+            line-height: 1;
 
-    opacity: 0.5;
-}
+            font-weight: 200;
 
+            color: #cfffff;
 
-/* ============================================================
-   APP
-   ============================================================ */
+            text-shadow:
+                0 0 5px rgba(0, 238, 255, 0.9),
+                0 0 18px rgba(0, 238, 255, 0.65),
+                0 0 35px rgba(0, 238, 255, 0.35);
 
-.app {
+            z-index: 2;
+        }
 
-    position: relative;
+        /* =====================================================
+           CORE LABEL
+        ===================================================== */
 
-    width: 100%;
-    height: 100dvh;
+        .hero-title {
+            margin-top: 18px;
 
-    display: flex;
-    flex-direction: column;
-}
+            font-size: 24px;
+            font-weight: 500;
 
+            letter-spacing: 7px;
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+            text-shadow:
+                0 0 15px rgba(0, 225, 255, 0.25);
+        }
 
-.header {
+        .hero-subtitle {
+            margin-top: 7px;
 
-    height: 75px;
+            font-size: 8px;
+            letter-spacing: 5px;
 
-    display: flex;
-    align-items: center;
+            color: rgba(212, 249, 255, 0.38);
+        }
 
-    padding: 0 18px;
+        .greeting {
+            margin-top: 22px;
 
-    border-bottom:
-        1px solid rgba(0, 238, 255, 0.15);
+            min-height: 20px;
 
-    background:
-        rgba(3, 10, 14, 0.88);
+            font-size: 13px;
 
-    backdrop-filter: blur(16px);
+            color:
+                rgba(217, 250, 255, 0.66);
 
-    z-index: 20;
-}
+            text-align: center;
+        }
 
-.menu-button {
+        /* =====================================================
+           MINI DATA HUD
+        ===================================================== */
 
-    width: 45px;
-    height: 45px;
+        .data-hud {
+            position: absolute;
 
-    border:
-        1px solid rgba(0, 238, 255, 0.3);
+            left: 18px;
+            right: 18px;
+            bottom: 16px;
 
-    border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
 
-    background:
-        rgba(0, 238, 255, 0.05);
+            gap: 8px;
+        }
 
-    color: #00eaff;
+        .data-card {
+            min-height: 48px;
 
-    font-size: 22px;
+            padding: 9px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            border:
+                1px solid rgba(0, 225, 255, 0.09);
 
-    cursor: pointer;
-}
+            border-radius: 12px;
 
-.brand {
+            background:
+                rgba(0, 18, 25, 0.38);
 
-    margin-left: 14px;
-}
+            backdrop-filter: blur(10px);
+        }
 
-.brand-main {
+        .data-label {
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            color: rgba(206, 248, 255, 0.35);
+        }
 
-    font-size: 19px;
+        .data-value {
+            margin-top: 5px;
 
-    letter-spacing: 4px;
+            font-size: 10px;
 
-    font-weight: 700;
+            color:
+                rgba(215, 252, 255, 0.78);
+        }
 
-    color: #e9fdff;
-}
+        /* =====================================================
+           CHAT
+        ===================================================== */
 
-.brand-sub {
+        .chat-panel {
+            position: absolute;
 
-    margin-top: 3px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
 
-    font-size: 9px;
+            height: 0;
 
-    letter-spacing: 3px;
+            display: flex;
+            flex-direction: column;
 
-    color: #00eaff;
+            opacity: 0;
+            pointer-events: none;
 
-    opacity: 0.8;
-}
+            transform: translateY(20px);
 
-.status {
+            transition:
+                height 0.35s ease,
+                opacity 0.25s ease,
+                transform 0.35s ease;
 
-    margin-left: auto;
+            border:
+                1px solid rgba(0, 225, 255, 0.12);
 
-    display: flex;
+            border-radius: 20px;
 
-    align-items: center;
+            background:
+                rgba(2, 12, 17, 0.92);
 
-    gap: 7px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
 
-    font-size: 10px;
+            overflow: hidden;
+        }
 
-    letter-spacing: 1px;
+        .chat-panel.active {
+            height: calc(100% - 24px);
 
-    color: #72ffb2;
-}
+            opacity: 1;
+            pointer-events: auto;
 
-.status-dot {
+            transform: translateY(0);
+        }
 
-    width: 7px;
-    height: 7px;
+        .chat-header {
+            height: 48px;
+            min-height: 48px;
 
-    border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-    background: #72ffb2;
+            padding: 0 14px;
 
-    box-shadow:
-        0 0 10px #72ffb2;
-}
+            border-bottom:
+                1px solid rgba(0, 225, 255, 0.1);
+        }
 
+        .chat-header-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: rgba(218, 250, 255, 0.7);
+        }
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+        .close-chat {
+            width: 30px;
+            height: 30px;
 
-.main {
+            border-radius: 50%;
 
-    flex: 1;
+            background:
+                rgba(0, 225, 255, 0.06);
 
-    position: relative;
+            color: #7defff;
 
-    overflow: hidden;
+            cursor: pointer;
+        }
 
-    display: flex;
-    flex-direction: column;
-}
+        .messages {
+            flex: 1;
+            min-height: 0;
 
+            overflow-y: auto;
 
-/* ============================================================
-   HUD
-   ============================================================ */
+            padding: 15px;
 
-.hud {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
 
-    height: 260px;
+            scrollbar-width: none;
+        }
 
-    display: flex;
+        .messages::-webkit-scrollbar {
+            display: none;
+        }
 
-    align-items: center;
-    justify-content: center;
+        .message {
+            max-width: 84%;
 
-    flex-shrink: 0;
-}
+            padding: 11px 13px;
 
-.hud-circle {
+            border-radius: 14px;
 
-    position: relative;
+            font-size: 13px;
+            line-height: 1.5;
 
-    width: 180px;
-    height: 180px;
+            white-space: pre-wrap;
 
-    border-radius: 50%;
+            animation:
+                messageIn 0.25s ease;
+        }
 
-    border:
-        1px solid rgba(0, 238, 255, 0.35);
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
 
-    box-shadow:
-        0 0 35px rgba(0, 238, 255, 0.08),
-        inset 0 0 30px rgba(0, 238, 255, 0.04);
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    display: flex;
+        .message.jarvis {
+            align-self: flex-start;
 
-    align-items: center;
-    justify-content: center;
+            background:
+                rgba(0, 225, 255, 0.06);
 
-    animation:
-        hudPulse 4s ease-in-out infinite;
-}
+            border:
+                1px solid rgba(0, 225, 255, 0.1);
 
-.hud-circle::before {
+            color:
+                rgba(223, 251, 255, 0.84);
+        }
 
-    content: "";
+        .message.user {
+            align-self: flex-end;
 
-    position: absolute;
+            background:
+                rgba(0, 110, 130, 0.22);
 
-    inset: 13px;
+            border:
+                1px solid rgba(0, 225, 255, 0.13);
 
-    border-radius: 50%;
+            color:
+                rgba(232, 253, 255, 0.9);
+        }
 
-    border:
-        1px dashed rgba(0, 238, 255, 0.45);
+        .typing {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 10px 13px;
+        }
 
-    animation:
-        rotateHud 18s linear infinite;
-}
+        .typing span {
+            width: 5px;
+            height: 5px;
 
-.hud-circle::after {
+            background: #00eaff;
+            border-radius: 50%;
 
-    content: "";
+            animation:
+                typing 1.2s infinite;
+        }
 
-    position: absolute;
+        .typing span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
 
-    inset: 30px;
+        .typing span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
 
-    border-radius: 50%;
+        @keyframes typing {
+            0%,
+            60%,
+            100% {
+                opacity: 0.25;
+                transform: translateY(0);
+            }
 
-    border:
-        1px solid rgba(0, 238, 255, 0.18);
-}
+            30% {
+                opacity: 1;
+                transform: translateY(-3px);
+            }
+        }
 
-.k-logo {
+        /* =====================================================
+           INPUT
+        ===================================================== */
 
-    position: relative;
+        .input-area {
+            padding: 10px;
 
-    z-index: 2;
+            border-top:
+                1px solid rgba(0, 225, 255, 0.1);
 
-    font-size: 64px;
+            display: flex;
+            gap: 8px;
+        }
 
-    font-weight: 800;
+        .message-input {
+            flex: 1;
 
-    color: #00eaff;
+            min-width: 0;
 
-    text-shadow:
-        0 0 10px rgba(0, 238, 255, 0.8),
-        0 0 35px rgba(0, 238, 255, 0.35);
-}
+            height: 44px;
 
-@keyframes rotateHud {
+            padding: 0 14px;
 
-    from {
-        transform: rotate(0deg);
-    }
+            border-radius: 14px;
 
-    to {
-        transform: rotate(360deg);
-    }
-}
+            border:
+                1px solid rgba(0, 225, 255, 0.14);
 
-@keyframes hudPulse {
+            outline: none;
 
-    0%,
-    100% {
-        transform: scale(1);
-    }
+            background:
+                rgba(0, 225, 255, 0.035);
 
-    50% {
-        transform: scale(1.025);
-    }
-}
+            color: #e7fcff;
 
+            font-size: 16px;
+        }
 
-/* ============================================================
-   CHAT
-   ============================================================ */
+        .message-input::placeholder {
+            color:
+                rgba(210, 247, 255, 0.27);
+        }
 
-.chat {
+        .send-button {
+            width: 44px;
+            height: 44px;
 
-    flex: 1;
+            border-radius: 14px;
 
-    overflow-y: auto;
+            background:
+                rgba(0, 225, 255, 0.1);
 
-    padding:
-        5px 15px 15px;
+            border:
+                1px solid rgba(0, 225, 255, 0.2);
 
-    scroll-behavior: smooth;
-}
+            color: #6fefff;
 
-.chat::-webkit-scrollbar {
+            cursor: pointer;
 
-    width: 4px;
-}
+            box-shadow:
+                0 0 12px rgba(0, 225, 255, 0.08);
+        }
 
-.chat::-webkit-scrollbar-thumb {
+        .send-button:active {
+            transform: scale(0.94);
+        }
 
-    background:
-        rgba(0, 238, 255, 0.25);
+        /* =====================================================
+           BOTTOM BUTTONS
+        ===================================================== */
 
-    border-radius: 10px;
-}
+        .bottom-bar {
+            height: 68px;
+            min-height: 68px;
 
+            padding:
+                0
+                18px
+                env(safe-area-inset-bottom)
+                18px;
 
-/* ============================================================
-   MESSAGE
-   ============================================================ */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.message {
+        .talk-button {
+            width: 64px;
+            height: 42px;
 
-    max-width: 88%;
+            border-radius: 22px;
 
-    margin-bottom: 13px;
+            background:
+                rgba(0, 225, 255, 0.07);
 
-    padding: 13px 15px;
+            border:
+                1px solid rgba(0, 225, 255, 0.18);
 
-    border-radius: 15px;
+            color: #8af4ff;
 
-    font-size: 14px;
+            font-size: 10px;
+            letter-spacing: 1px;
 
-    line-height: 1.55;
+            box-shadow:
+                0 0 18px rgba(0, 225, 255, 0.07);
 
-    white-space: pre-wrap;
+            cursor: pointer;
 
-    word-break: break-word;
+            transition:
+                transform 0.2s,
+                background 0.2s;
+        }
 
-    animation:
-        messageIn 0.25s ease;
-}
+        .talk-button:active {
+            transform: scale(0.94);
+        }
 
-@keyframes messageIn {
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
 
-    from {
-        opacity: 0;
-        transform: translateY(7px);
-    }
+        .overlay {
+            position: fixed;
+            inset: 0;
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+            background:
+                rgba(0, 0, 0, 0.5);
 
-.message.user {
+            opacity: 0;
+            pointer-events: none;
 
-    margin-left: auto;
+            transition: opacity 0.3s;
 
-    background:
-        rgba(0, 238, 255, 0.10);
+            z-index: 20;
+        }
 
-    border:
-        1px solid rgba(0, 238, 255, 0.18);
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    color: #e9fdff;
-}
+        .sidebar {
+            position: fixed;
 
-.message.jarvis {
+            top: 0;
+            left: 0;
+            bottom: 0;
 
-    margin-right: auto;
+            width: min(310px, 84vw);
 
-    background:
-        rgba(255, 255, 255, 0.035);
+            padding:
+                calc(env(safe-area-inset-top) + 20px)
+                18px
+                20px;
 
-    border:
-        1px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(3, 14, 20, 0.98),
+                    rgba(1, 7, 11, 0.99)
+                );
 
-    color: #dffcff;
-}
+            border-right:
+                1px solid rgba(0, 225, 255, 0.15);
 
-.message.error {
+            box-shadow:
+                15px 0 60px rgba(0, 0, 0, 0.45);
 
-    margin-right: auto;
+            transform: translateX(-105%);
 
-    background:
-        rgba(255, 55, 75, 0.08);
+            transition:
+                transform 0.35s cubic-bezier(
+                    0.22,
+                    1,
+                    0.36,
+                    1
+                );
 
-    border:
-        1px solid rgba(255, 55, 75, 0.5);
+            z-index: 30;
+        }
 
-    color: #ff9ca8;
+        .sidebar.active {
+            transform: translateX(0);
+        }
 
-    box-shadow:
-        0 0 20px rgba(255, 55, 75, 0.08);
-}
+        .sidebar-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
+            margin-bottom: 28px;
+        }
 
-/* ============================================================
-   INPUT
-   ============================================================ */
+        .sidebar-title {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #a8f7ff;
+        }
 
-.input-area {
+        .sidebar-close {
+            width: 35px;
+            height: 35px;
 
-    padding:
-        10px 12px calc(12px + env(safe-area-inset-bottom));
+            border-radius: 11px;
 
-    border-top:
-        1px solid rgba(0, 238, 255, 0.12);
+            background:
+                rgba(0, 225, 255, 0.05);
 
-    background:
-        rgba(3, 10, 14, 0.94);
+            color: #75efff;
 
-    backdrop-filter: blur(16px);
+            cursor: pointer;
+        }
 
-    display: flex;
+        .menu-section {
+            margin-bottom: 25px;
+        }
 
-    gap: 9px;
+        .section-title {
+            margin-bottom: 9px;
 
-    z-index: 10;
-}
+            font-size: 8px;
+            letter-spacing: 2px;
 
-.input {
+            color:
+                rgba(211, 250, 255, 0.27);
+        }
 
-    flex: 1;
+        .side-item {
+            width: 100%;
 
-    min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
 
-    height: 48px;
+            padding: 13px 12px;
 
-    padding: 0 15px;
+            margin-bottom: 5px;
 
-    border:
-        1px solid rgba(0, 238, 255, 0.2);
+            border-radius: 12px;
 
-    border-radius: 14px;
+            background:
+                rgba(0, 225, 255, 0.025);
 
-    outline: none;
+            color:
+                rgba(218, 250, 255, 0.65);
 
-    background:
-        rgba(0, 238, 255, 0.04);
+            text-align: left;
 
-    color: white;
+            cursor: pointer;
+        }
 
-    font-size: 16px;
+        .side-item:active {
+            background:
+                rgba(0, 225, 255, 0.09);
+        }
 
-    -webkit-appearance: none;
-}
+        .side-icon {
+            width: 28px;
+            height: 28px;
 
-.input::placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    color:
-        rgba(220, 250, 255, 0.38);
-}
+            border-radius: 8px;
 
-.input:focus {
+            background:
+                rgba(0, 225, 255, 0.06);
 
-    border-color:
-        rgba(0, 238, 255, 0.55);
+            color: #67eafa;
 
-    box-shadow:
-        0 0 18px rgba(0, 238, 255, 0.08);
-}
+            font-size: 12px;
+        }
 
-.send {
+        .side-text {
+            font-size: 11px;
+        }
 
-    width: 48px;
-    height: 48px;
+        /* =====================================================
+           SETTINGS MODAL
+        ===================================================== */
 
-    flex-shrink: 0;
+        .modal {
+            position: fixed;
+            inset: 0;
 
-    border: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
 
-    border-radius: 14px;
+            background:
+                rgba(0, 0, 0, 0.58);
 
-    background:
-        #00dff5;
+            opacity: 0;
+            pointer-events: none;
 
-    color: #001014;
+            transition: opacity 0.25s;
 
-    font-size: 19px;
+            z-index: 40;
+        }
 
-    font-weight: 800;
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    cursor: pointer;
+        .settings {
+            width: 100%;
+            max-width: 600px;
 
-    box-shadow:
-        0 0 18px rgba(0, 238, 255, 0.18);
-}
+            padding:
+                18px
+                18px
+                calc(18px + env(safe-area-inset-bottom));
 
-.send:disabled {
+            border-radius:
+                24px
+                24px
+                0
+                0;
 
-    opacity: 0.45;
+            background:
+                #061117;
 
-    cursor: default;
-}
+            border-top:
+                1px solid rgba(0, 225, 255, 0.15);
 
+            transform: translateY(100%);
 
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
+            transition:
+                transform 0.35s cubic-bezier(
+                    0.22,
+                    1,
+                    0.36,
+                    1
+                );
+        }
 
-.sidebar {
+        .modal.active .settings {
+            transform: translateY(0);
+        }
 
-    position: fixed;
+        .settings-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-    top: 0;
-    left: 0;
+            margin-bottom: 20px;
+        }
 
-    width: 285px;
-    height: 100dvh;
+        .settings-title {
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
 
-    z-index: 100;
+        .setting {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-    transform:
-        translateX(-105%);
+            padding: 14px 0;
 
-    transition:
-        transform 0.3s ease;
+            border-bottom:
+                1px solid rgba(0, 225, 255, 0.06);
+        }
 
-    background:
-        rgba(4, 12, 17, 0.97);
+        .setting-name {
+            font-size: 12px;
+            color:
+                rgba(223, 250, 255, 0.7);
+        }
 
-    border-right:
-        1px solid rgba(0, 238, 255, 0.2);
+        .setting-desc {
+            margin-top: 3px;
 
-    backdrop-filter: blur(20px);
+            font-size: 8px;
 
-    padding: 25px 18px;
-}
+            color:
+                rgba(215, 247, 255, 0.28);
+        }
 
-.sidebar.open {
+        .switch {
+            width: 42px;
+            height: 24px;
 
-    transform:
-        translateX(0);
-}
+            border-radius: 20px;
 
-.sidebar-title {
+            background:
+                rgba(255, 255, 255, 0.08);
 
-    font-size: 11px;
+            border:
+                1px solid rgba(0, 225, 255, 0.1);
 
-    letter-spacing: 3px;
+            position: relative;
 
-    color: #00eaff;
+            cursor: pointer;
+        }
 
-    margin-bottom: 25px;
-}
+        .switch::after {
+            content: "";
 
-.sidebar-item {
+            position: absolute;
 
-    width: 100%;
+            width: 18px;
+            height: 18px;
 
-    padding: 14px;
+            left: 2px;
+            top: 2px;
 
-    margin-bottom: 9px;
+            border-radius: 50%;
 
-    border:
-        1px solid rgba(0, 238, 255, 0.1);
+            background:
+                rgba(220, 250, 255, 0.55);
 
-    border-radius: 12px;
+            transition:
+                transform 0.25s,
+                background 0.25s;
+        }
 
-    background:
-        rgba(0, 238, 255, 0.035);
+        .switch.active {
+            background:
+                rgba(0, 225, 255, 0.15);
+        }
 
-    color: #dffcff;
+        .switch.active::after {
+            transform: translateX(18px);
 
-    text-align: left;
+            background:
+                #00eaff;
 
-    font-size: 13px;
+            box-shadow:
+                0 0 8px rgba(0, 225, 255, 0.6);
+        }
 
-    cursor: pointer;
-}
+        /* =====================================================
+           LIGHT MODE
+        ===================================================== */
 
-.sidebar-item:hover {
+        body.light {
+            background: #eaf7fa;
+            color: #06222a;
+        }
 
-    border-color:
-        rgba(0, 238, 255, 0.4);
-}
+        body.light .background {
+            background:
+                radial-gradient(
+                    circle at 50% 42%,
+                    rgba(0, 180, 210, 0.13),
+                    transparent 35%
+                ),
+                #eaf7fa;
+        }
 
-.overlay {
+        body.light .topbar {
+            background:
+                rgba(239, 251, 253, 0.85);
 
-    position: fixed;
+            border-color:
+                rgba(0, 130, 155, 0.15);
+        }
 
-    inset: 0;
+        body.light .hero-title,
+        body.light .brand-title {
+            color: #06343d;
+        }
 
-    z-index: 90;
+        body.light .hero-subtitle,
+        body.light .brand-subtitle {
+            color: rgba(0, 40, 50, 0.45);
+        }
 
-    background:
-        rgba(0, 0, 0, 0.55);
+        body.light .core {
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(0, 180, 210, 0.2),
+                    rgba(230, 250, 253, 0.95)
+                );
+        }
 
-    opacity: 0;
+        body.light .sidebar,
+        body.light .settings {
+            background: #effbfd;
+        }
 
-    pointer-events: none;
+        body.light .message.jarvis {
+            color: #07343c;
+            background: rgba(0, 170, 200, 0.07);
+        }
 
-    transition:
-        opacity 0.3s;
-}
+        body.light .message.user {
+            color: #07343c;
+            background: rgba(0, 170, 200, 0.12);
+        }
 
-.overlay.show {
+        /* =====================================================
+           MOBILE
+        ===================================================== */
 
-    opacity: 1;
+        @media (max-height: 700px) {
 
-    pointer-events: auto;
-}
+            .core-wrapper {
+                transform: scale(0.82);
+                margin-top: -15px;
+                margin-bottom: -15px;
+            }
 
+            .hero-title {
+                margin-top: 3px;
+            }
 
-/* ============================================================
-   LIGHT MODE
-   ============================================================ */
+            .greeting {
+                margin-top: 10px;
+            }
 
-body.light {
+            .data-hud {
+                bottom: 5px;
+            }
+        }
 
-    background:
-        #eef7f9;
+        @media (max-width: 360px) {
 
-    color: #092027;
-}
+            .core-wrapper {
+                transform: scale(0.86);
+            }
 
-body.light .header {
+            .data-card {
+                padding: 7px;
+            }
 
-    background:
-        rgba(245, 252, 253, 0.92);
-}
+            .hero-title {
+                font-size: 21px;
+            }
+        }
 
-body.light .brand-main {
-
-    color: #092027;
-}
-
-body.light .message.jarvis {
-
-    color: #092027;
-
-    background:
-        rgba(0, 0, 0, 0.04);
-}
-
-body.light .input-area {
-
-    background:
-        rgba(245, 252, 253, 0.95);
-}
-
-body.light .input {
-
-    color: #092027;
-
-    background:
-        rgba(0, 0, 0, 0.03);
-}
-
-body.light .sidebar {
-
-    background:
-        rgba(245, 252, 253, 0.98);
-
-    color: #092027;
-}
-
-
-/* ============================================================
-   THINKING
-   ============================================================ */
-
-.thinking {
-
-    display: inline-flex;
-
-    gap: 5px;
-
-    align-items: center;
-}
-
-.thinking span {
-
-    width: 5px;
-    height: 5px;
-
-    border-radius: 50%;
-
-    background: #00eaff;
-
-    animation:
-        thinking 1.2s infinite;
-}
-
-.thinking span:nth-child(2) {
-
-    animation-delay: 0.15s;
-}
-
-.thinking span:nth-child(3) {
-
-    animation-delay: 0.3s;
-}
-
-@keyframes thinking {
-
-    0%,
-    70%,
-    100% {
-        opacity: 0.25;
-        transform: translateY(0);
-    }
-
-    35% {
-        opacity: 1;
-        transform: translateY(-3px);
-    }
-}
-
-</style>
+    </style>
 </head>
-
 
 <body>
 
-<div class="app">
-
-    <!-- SIDEBAR -->
-
-    <aside
-        id="sidebar"
-        class="sidebar"
-    >
-
-        <div class="sidebar-title">
-            SİSTEM AĞI
-        </div>
-
-        <button
-            class="sidebar-item"
-            onclick="showMemory()"
-        >
-            🧠 Bellek
-        </button>
-
-        <button
-            class="sidebar-item"
-            onclick="checkHealth()"
-        >
-            ◉ Sistem Durumu
-        </button>
-
-        <button
-            class="sidebar-item"
-            onclick="toggleTheme()"
-        >
-            ◐ Gece / Gündüz
-        </button>
-
-        <button
-            class="sidebar-item"
-            onclick="clearChat()"
-        >
-            × Sohbeti Temizle
-        </button>
-
-    </aside>
-
-    <div
-        id="overlay"
-        class="overlay"
-        onclick="closeMenu()"
-    ></div>
+    <div class="background">
+        <div class="grid"></div>
+        <div class="scanline"></div>
+    </div>
 
 
-    <!-- HEADER -->
+    <div class="app">
 
-    <header class="header">
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
 
-        <button
-            class="menu-button"
-            onclick="toggleMenu()"
-        >
-            ☰
-        </button>
+        <header class="topbar">
 
-        <div class="brand">
+            <div class="brand">
 
-            <div class="brand-main">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="brand-sub">
-                KARAHAN INC. OS v9.0
-            </div>
-
-        </div>
-
-        <div class="status">
-
-            <span class="status-dot" id="statusDot"></span>
-
-            <span id="statusText">
-                ONLINE
-            </span>
-
-        </div>
-
-    </header>
-
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-        <section class="hud">
-
-            <div class="hud-circle">
-
-                <div class="k-logo">
+                <div class="brand-mark">
                     K
+                </div>
+
+                <div>
+                    <div class="brand-title">
+                        J.A.R.V.I.S.
+                    </div>
+
+                    <div class="brand-subtitle">
+                        KARAHAN INC.
+                    </div>
                 </div>
 
             </div>
 
-        </section>
-
-
-        <!-- CHAT -->
-
-        <section
-            id="chat"
-            class="chat"
-        >
-
-            <div class="message jarvis">
-                Merhaba efendim. Ben J.A.R.V.I.S. Nasıl yardımcı olabilirim?
-            </div>
-
-        </section>
-
-
-        <!-- INPUT -->
-
-        <div class="input-area">
-
-            <input
-                id="messageInput"
-                class="input"
-                type="text"
-                autocomplete="off"
-                autocorrect="on"
-                spellcheck="true"
-                placeholder="J.A.R.V.I.S.'e bir şey sorun..."
-                onkeydown="handleKey(event)"
-            >
 
             <button
-                id="sendButton"
-                class="send"
-                onclick="sendMessage()"
+                class="menu-button"
+                onclick="openSidebar()"
+                aria-label="Menü"
             >
-                ↑
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+             MAIN
+        ================================================== -->
+
+        <main class="main">
+
+            <section class="hero">
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    <span id="statusText">
+                        SYSTEM ONLINE
+                    </span>
+
+                </div>
+
+
+                <!-- CORE -->
+
+                <div class="core-wrapper">
+
+                    <div class="core-glow"></div>
+
+                    <div class="ring ring-one"></div>
+                    <div class="ring ring-two"></div>
+                    <div class="ring ring-three"></div>
+
+                    <div class="marker marker-one"></div>
+                    <div class="marker marker-two"></div>
+                    <div class="marker marker-three"></div>
+                    <div class="marker marker-four"></div>
+
+
+                    <div class="core">
+
+                        <div class="k-logo">
+                            K
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hero-title">
+                    J.A.R.V.I.S.
+                </div>
+
+                <div class="hero-subtitle">
+                    KARAHAN INTELLIGENCE SYSTEM
+                </div>
+
+                <div
+                    class="greeting"
+                    id="greeting"
+                >
+                    Merhaba efendim
+                </div>
+
+
+                <!-- DATA HUD -->
+
+                <div class="data-hud">
+
+                    <div class="data-card">
+
+                        <div class="data-label">
+                            SYSTEM
+                        </div>
+
+                        <div
+                            class="data-value"
+                            id="systemStatus"
+                        >
+                            ONLINE
+                        </div>
+
+                    </div>
+
+
+                    <div class="data-card">
+
+                        <div class="data-label">
+                            MEMORY
+                        </div>
+
+                        <div
+                            class="data-value"
+                            id="memoryStatus"
+                        >
+                            READY
+                        </div>
+
+                    </div>
+
+
+                    <div class="data-card">
+
+                        <div class="data-label">
+                            AI CORE
+                        </div>
+
+                        <div
+                            class="data-value"
+                            id="modelStatus"
+                        >
+                            GPT-OSS
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CHAT PANEL
+            ================================================== -->
+
+            <section
+                class="chat-panel"
+                id="chatPanel"
+            >
+
+                <div class="chat-header">
+
+                    <div class="chat-header-title">
+                        J.A.R.V.I.S. COMMUNICATION
+                    </div>
+
+                    <button
+                        class="close-chat"
+                        onclick="closeChat()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="messages"
+                    id="messages"
+                >
+
+                    <div class="message jarvis">
+                        Merhaba efendim. Sistemler hazır.
+                    </div>
+
+                </div>
+
+
+                <div class="input-area">
+
+                    <input
+                        id="messageInput"
+                        class="message-input"
+                        type="text"
+                        placeholder="J.A.R.V.I.S.'e bir şey söyleyin..."
+                        autocomplete="off"
+                        enterkeyhint="send"
+                    >
+
+                    <button
+                        class="send-button"
+                        onclick="sendMessage()"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <footer class="bottom-bar">
+
+            <button
+                class="talk-button"
+                onclick="openChat()"
+            >
+                CHAT
+            </button>
+
+        </footer>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR OVERLAY
+    ====================================================== -->
+
+    <div
+        class="overlay"
+        id="overlay"
+        onclick="closeSidebar()"
+    ></div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="sidebar-head">
+
+            <div class="sidebar-title">
+                J.A.R.V.I.S.
+            </div>
+
+            <button
+                class="sidebar-close"
+                onclick="closeSidebar()"
+            >
+                ×
             </button>
 
         </div>
 
-    </main>
 
-</div>
+        <div class="menu-section">
 
-
-<script>
-
-/* ============================================================
-   ELEMENTS
-   ============================================================ */
-
-const chat = document.getElementById("chat");
-
-const input = document.getElementById(
-    "messageInput"
-);
-
-const sendButton = document.getElementById(
-    "sendButton"
-);
-
-const sidebar = document.getElementById(
-    "sidebar"
-);
-
-const overlay = document.getElementById(
-    "overlay"
-);
-
-const statusText = document.getElementById(
-    "statusText"
-);
-
-const statusDot = document.getElementById(
-    "statusDot"
-);
-
-let isSending = false;
+            <div class="section-title">
+                SYSTEM
+            </div>
 
 
-/* ============================================================
-   MENU
-   ============================================================ */
+            <button
+                class="side-item"
+                onclick="openChat(); closeSidebar();"
+            >
 
-function toggleMenu() {
+                <div class="side-icon">
+                    ◉
+                </div>
 
-    sidebar.classList.toggle("open");
+                <div class="side-text">
+                    J.A.R.V.I.S. ile konuş
+                </div>
 
-    overlay.classList.toggle(
-        "show"
-    );
-}
-
-function closeMenu() {
-
-    sidebar.classList.remove(
-        "open"
-    );
-
-    overlay.classList.remove(
-        "show"
-    );
-}
+            </button>
 
 
-/* ============================================================
-   MESSAGE
-   ============================================================ */
+            <button
+                class="side-item"
+                onclick="checkHealth()"
+            >
 
-function addMessage(
-    text,
-    type = "jarvis"
-) {
+                <div class="side-icon">
+                    ◌
+                </div>
 
-    const message =
-        document.createElement("div");
+                <div class="side-text">
+                    Sistem durumu
+                </div>
 
-    message.className =
-        "message " + type;
-
-    message.textContent =
-        text;
-
-    chat.appendChild(message);
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-    return message;
-}
+            </button>
 
 
-/* ============================================================
-   THINKING
-   ============================================================ */
+            <button
+                class="side-item"
+                onclick="showMemory()"
+            >
 
-function addThinking() {
+                <div class="side-icon">
+                    ◇
+                </div>
 
-    const message =
-        document.createElement("div");
+                <div class="side-text">
+                    Hafıza
+                </div>
 
-    message.className =
-        "message jarvis";
+            </button>
 
-    message.id =
-        "thinkingMessage";
-
-    message.innerHTML = `
-        <div class="thinking">
-            <span></span>
-            <span></span>
-            <span></span>
         </div>
-    `;
-
-    chat.appendChild(message);
-
-    chat.scrollTop =
-        chat.scrollHeight;
-}
 
 
-function removeThinking() {
+        <div class="menu-section">
 
-    const thinking =
-        document.getElementById(
-            "thinkingMessage"
-        );
-
-    if (thinking) {
-        thinking.remove();
-    }
-}
+            <div class="section-title">
+                AYARLAR
+            </div>
 
 
-/* ============================================================
-   STATUS
-   ============================================================ */
+            <button
+                class="side-item"
+                onclick="openSettings()"
+            >
 
-function setOnline() {
+                <div class="side-icon">
+                    ⚙
+                </div>
 
-    statusText.textContent =
-        "ONLINE";
+                <div class="side-text">
+                    Ayarlar
+                </div>
 
-    statusDot.style.background =
-        "#72ffb2";
-
-    statusDot.style.boxShadow =
-        "0 0 10px #72ffb2";
-}
-
-
-function setOffline() {
-
-    statusText.textContent =
-        "ERROR";
-
-    statusDot.style.background =
-        "#ff566b";
-
-    statusDot.style.boxShadow =
-        "0 0 10px #ff566b";
-}
+            </button>
 
 
-/* ============================================================
-   SEND
-   ============================================================ */
+            <button
+                class="side-item"
+                onclick="toggleTheme()"
+            >
 
-async function sendMessage() {
+                <div class="side-icon">
+                    ☼
+                </div>
 
-    if (isSending) {
-        return;
-    }
+                <div class="side-text">
+                    Tema değiştir
+                </div>
 
-    const message =
-        input.value.trim();
+            </button>
 
-    if (!message) {
-        return;
-    }
-
-    isSending = true;
-
-    sendButton.disabled = true;
-
-    addMessage(
-        message,
-        "user"
-    );
-
-    input.value = "";
-
-    addThinking();
-
-    try {
-
-        const response =
-            await fetch(
-                "/chat",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        message: message
-                    })
-                }
-            );
-
-        removeThinking();
+        </div>
 
 
-        /* ====================================================
-           HTTP ERROR
-           ==================================================== */
+        <div class="menu-section">
 
-        if (!response.ok) {
+            <div class="section-title">
+                KARAHAN INC.
+            </div>
 
-            let errorData = null;
+            <div
+                style="
+                    font-size:9px;
+                    line-height:1.6;
+                    color:rgba(210,250,255,.28);
+                    padding:10px 3px;
+                "
+            >
+                Personal Intelligence System
+                <br>
+                J.A.R.V.I.S. Core
+            </div>
 
-            try {
-                errorData =
-                    await response.json();
-            } catch (_) {
-                errorData = null;
-            }
+        </div>
 
-            let errorText =
-                "⚠️ J.A.R.V.I.S. HATA\n\n";
+    </aside>
 
-            errorText +=
-                "HTTP Hata Kodu: " +
-                response.status +
-                "\n\n";
 
-            if (
-                errorData &&
-                errorData.response
-            ) {
+    <!-- =====================================================
+         SETTINGS MODAL
+    ====================================================== -->
 
-                errorText +=
-                    errorData.response;
+    <div
+        class="modal"
+        id="settingsModal"
+        onclick="closeSettingsOutside(event)"
+    >
 
-            } else {
+        <div class="settings">
 
-                errorText +=
-                    "Sunucu HTTP " +
-                    response.status +
-                    " hatası döndürdü.";
-            }
+            <div class="settings-head">
 
-            addMessage(
-                errorText,
-                "error"
-            );
+                <div class="settings-title">
+                    AYARLAR
+                </div>
 
-            setOffline();
+                <button
+                    class="sidebar-close"
+                    onclick="closeSettings()"
+                >
+                    ×
+                </button>
 
-            return;
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <div class="setting-name">
+                        Gece modu
+                    </div>
+
+                    <div class="setting-desc">
+                        Koyu J.A.R.V.I.S. arayüzünü kullan
+                    </div>
+
+                </div>
+
+                <div
+                    class="switch active"
+                    id="themeSwitch"
+                    onclick="toggleTheme()"
+                ></div>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <div class="setting-name">
+                        Animasyonlar
+                    </div>
+
+                    <div class="setting-desc">
+                        K çekirdeği ve HUD animasyonları
+                    </div>
+
+                </div>
+
+                <div
+                    class="switch active"
+                    id="animationSwitch"
+                    onclick="toggleAnimations()"
+                ></div>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <div class="setting-name">
+                        Hafıza
+                    </div>
+
+                    <div class="setting-desc">
+                        Kayıtlı J.A.R.V.I.S. hafızasını temizle
+                    </div>
+
+                </div>
+
+                <button
+                    onclick="clearMemory()"
+                    style="
+                        padding:8px 12px;
+                        border-radius:10px;
+                        background:rgba(255,70,70,.08);
+                        border:1px solid rgba(255,90,90,.15);
+                        color:#ff9b9b;
+                        font-size:9px;
+                    "
+                >
+                    TEMİZLE
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =====================================================
+           ELEMENTS
+        ===================================================== */
+
+        const chatPanel =
+            document.getElementById("chatPanel");
+
+        const messages =
+            document.getElementById("messages");
+
+        const input =
+            document.getElementById("messageInput");
+
+        const statusText =
+            document.getElementById("statusText");
+
+        const systemStatus =
+            document.getElementById("systemStatus");
+
+        const memoryStatus =
+            document.getElementById("memoryStatus");
+
+        const modelStatus =
+            document.getElementById("modelStatus");
+
+        const greeting =
+            document.getElementById("greeting");
+
+        const sidebar =
+            document.getElementById("sidebar");
+
+        const overlay =
+            document.getElementById("overlay");
+
+        const settingsModal =
+            document.getElementById("settingsModal");
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        function openSidebar() {
+
+            sidebar.classList.add("active");
+            overlay.classList.add("active");
         }
 
 
-        /* ====================================================
-           JSON
-           ==================================================== */
+        function closeSidebar() {
 
-        let data;
-
-        try {
-
-            data =
-                await response.json();
-
-        } catch (error) {
-
-            addMessage(
-                "⚠️ J.A.R.V.I.S. HATA\n\n" +
-                "Hata kodu: INVALID_JSON\n\n" +
-                "Sunucudan geçerli JSON alınamadı.\n\n" +
-                "Detay: " +
-                error.message,
-                "error"
-            );
-
-            setOffline();
-
-            return;
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
         }
 
 
-        /* ====================================================
-           BACKEND ERROR
-           ==================================================== */
+        /* =====================================================
+           CHAT
+        ===================================================== */
 
-        if (
-            data.status === "error"
+        function openChat() {
+
+            chatPanel.classList.add("active");
+
+            setTimeout(() => {
+                input.focus();
+            }, 350);
+        }
+
+
+        function closeChat() {
+
+            chatPanel.classList.remove("active");
+        }
+
+
+        function addMessage(
+            text,
+            type
         ) {
 
-            let errorText =
-                data.response ||
-                "⚠️ J.A.R.V.I.S. HATA";
+            const element =
+                document.createElement("div");
 
-            /*
-             * Backend zaten hata kodunu gönderiyorsa
-             * aynen göster.
-             */
+            element.className =
+                "message " + type;
 
-            if (
-                data.error_code &&
-                !errorText.includes(
-                    data.error_code
-                )
-            ) {
+            element.textContent = text;
 
-                errorText +=
-                    "\n\nHata kodu: " +
-                    data.error_code;
+            messages.appendChild(element);
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+            return element;
+        }
+
+
+        function showTyping() {
+
+            const element =
+                document.createElement("div");
+
+            element.className =
+                "message jarvis typing";
+
+            element.id =
+                "typingIndicator";
+
+            element.innerHTML =
+                "<span></span><span></span><span></span>";
+
+            messages.appendChild(element);
+
+            messages.scrollTop =
+                messages.scrollHeight;
+        }
+
+
+        function removeTyping() {
+
+            const element =
+                document.getElementById(
+                    "typingIndicator"
+                );
+
+            if (element) {
+                element.remove();
             }
-
-            if (
-                data.error_detail &&
-                !errorText.includes(
-                    data.error_detail
-                )
-            ) {
-
-                errorText +=
-                    "\n\nTeknik detay:\n" +
-                    data.error_detail;
-            }
-
-            addMessage(
-                errorText,
-                "error"
-            );
-
-            setOffline();
-
-            return;
         }
 
 
-        /* ====================================================
-           SUCCESS
-           ==================================================== */
+        /* =====================================================
+           SEND MESSAGE
+        ===================================================== */
 
-        if (
-            typeof data.response !==
-            "string"
-        ) {
+        async function sendMessage() {
 
-            addMessage(
-                "⚠️ J.A.R.V.I.S. HATA\n\n" +
-                "Hata kodu: INVALID_RESPONSE\n\n" +
-                "Sunucu geçerli bir cevap göndermedi.",
-                "error"
-            );
+            const text =
+                input.value.trim();
 
-            setOffline();
-
-            return;
-        }
-
-        addMessage(
-            data.response,
-            "jarvis"
-        );
-
-        setOnline();
-
-    } catch (error) {
-
-        removeThinking();
-
-        /*
-         * FETCH gerçekten başarısız olduysa
-         * gerçek JavaScript hata bilgisini göster.
-         */
-
-        addMessage(
-            "⚠️ J.A.R.V.I.S. HATA\n\n" +
-            "Hata kodu: FRONTEND_FETCH_ERROR\n\n" +
-            "Detay:\n" +
-            error.message,
-            "error"
-        );
-
-        setOffline();
-
-        console.error(
-            "JARVIS FETCH ERROR:",
-            error
-        );
-
-    } finally {
-
-        isSending = false;
-
-        sendButton.disabled =
-            false;
-
-        input.focus();
-    }
-}
-
-
-/* ============================================================
-   ENTER
-   ============================================================ */
-
-function handleKey(event) {
-
-    if (
-        event.key === "Enter"
-        && !event.shiftKey
-    ) {
-
-        event.preventDefault();
-
-        sendMessage();
-    }
-}
-
-
-/* ============================================================
-   HEALTH
-   ============================================================ */
-
-async function checkHealth() {
-
-    closeMenu();
-
-    try {
-
-        const response =
-            await fetch("/health");
-
-        const data =
-            await response.json();
-
-        if (
-            data.status === "online"
-        ) {
-
-            addMessage(
-                "🟢 SİSTEM DURUMU\n\n" +
-                "Sunucu: ONLINE\n" +
-                "J.A.R.V.I.S. sürümü: " +
-                data.version +
-                "\n" +
-                "Model: " +
-                data.model +
-                "\n" +
-                "Groq API: " +
-                (
-                    data.groq_configured
-                    ? "BAĞLI"
-                    : "BAĞLI DEĞİL"
-                ),
-                "jarvis"
-            );
-
-            setOnline();
-
-        } else {
-
-            addMessage(
-                "⚠️ J.A.R.V.I.S. HATA\n\n" +
-                "Health endpoint beklenmeyen cevap verdi:\n" +
-                JSON.stringify(data),
-                "error"
-            );
-
-            setOffline();
-        }
-
-    } catch (error) {
-
-        addMessage(
-            "⚠️ J.A.R.V.I.S. HATA\n\n" +
-            "Hata kodu: HEALTH_CHECK_ERROR\n\n" +
-            "Detay:\n" +
-            error.message,
-            "error"
-        );
-
-        setOffline();
-    }
-}
-
-
-/* ============================================================
-   MEMORY
-   ============================================================ */
-
-async function showMemory() {
-
-    closeMenu();
-
-    try {
-
-        const response =
-            await fetch("/memory");
-
-        const data =
-            await response.json();
-
-        if (
-            data.status !== "success"
-        ) {
-
-            throw new Error(
-                JSON.stringify(data)
-            );
-        }
-
-        const memory =
-            data.memory || {};
-
-        addMessage(
-            "🧠 J.A.R.V.I.S. BELLEĞİ\n\n" +
-            JSON.stringify(
-                memory,
-                null,
-                2
-            ),
-            "jarvis"
-        );
-
-    } catch (error) {
-
-        addMessage(
-            "⚠️ J.A.R.V.I.S. HATA\n\n" +
-            "Hata kodu: MEMORY_ERROR\n\n" +
-            "Detay:\n" +
-            error.message,
-            "error"
-        );
-    }
-}
-
-
-/* ============================================================
-   CLEAR CHAT
-   ============================================================ */
-
-function clearChat() {
-
-    closeMenu();
-
-    chat.innerHTML = "";
-
-    addMessage(
-        "Sohbet ekranı temizlendi efendim.",
-        "jarvis"
-    );
-}
-
-
-/* ============================================================
-   THEME
-   ============================================================ */
-
-function toggleTheme() {
-
-    document.body.classList.toggle(
-        "light"
-    );
-
-    const light =
-        document.body.classList.contains(
-            "light"
-        );
-
-    localStorage.setItem(
-        "jarvis-theme",
-        light
-            ? "light"
-            : "dark"
-    );
-
-    closeMenu();
-}
-
-
-function loadTheme() {
-
-    const theme =
-        localStorage.getItem(
-            "jarvis-theme"
-        );
-
-    if (theme === "light") {
-
-        document.body.classList.add(
-            "light"
-        );
-    }
-}
-
-
-/* ============================================================
-   INITIAL HEALTH CHECK
-   ============================================================ */
-
-async function initialHealthCheck() {
-
-    try {
-
-        const response =
-            await fetch(
-                "/health",
-                {
-                    cache: "no-store"
-                }
-            );
-
-        if (response.ok) {
-
-            const data =
-                await response.json();
-
-            if (
-                data.status === "online"
-            ) {
-
-                setOnline();
-
+            if (!text) {
                 return;
             }
+
+
+            openChat();
+
+            addMessage(
+                text,
+                "user"
+            );
+
+            input.value = "";
+
+            showTyping();
+
+            statusText.textContent =
+                "PROCESSING";
+
+            systemStatus.textContent =
+                "BUSY";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/chat",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                message: text
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                removeTyping();
+
+
+                if (
+                    data.status === "error"
+                ) {
+
+                    addMessage(
+                        data.response ||
+                        "J.A.R.V.I.S. bir hata ile karşılaştı.",
+                        "jarvis"
+                    );
+
+                } else {
+
+                    addMessage(
+                        data.response ||
+                        "Cevap alınamadı.",
+                        "jarvis"
+                    );
+
+                }
+
+
+                if (data.model) {
+
+                    modelStatus.textContent =
+                        data.model
+                        .replace("openai/", "")
+                        .toUpperCase();
+                }
+
+
+            } catch (error) {
+
+                removeTyping();
+
+                addMessage(
+                    "Bağlantı hatası: " +
+                    error.message,
+                    "jarvis"
+                );
+
+            }
+
+
+            statusText.textContent =
+                "SYSTEM ONLINE";
+
+            systemStatus.textContent =
+                "ONLINE";
+
         }
 
-    } catch (_) {}
 
-    setOffline();
-}
+        input.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    sendMessage();
+                }
+
+            }
+        );
 
 
-/* ============================================================
-   START
-   ============================================================ */
+        /* =====================================================
+           HEALTH
+        ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+        async function checkHealth() {
 
-        loadTheme();
+            closeSidebar();
 
-        initialHealthCheck();
+            try {
 
-        input.focus();
-    }
-);
+                const response =
+                    await fetch("/health");
 
-</script>
+                const data =
+                    await response.json();
+
+
+                if (
+                    data.status === "online"
+                ) {
+
+                    statusText.textContent =
+                        "SYSTEM ONLINE";
+
+                    systemStatus.textContent =
+                        "ONLINE";
+
+                    modelStatus.textContent =
+                        data.model
+                        .replace("openai/", "")
+                        .toUpperCase();
+
+                    memoryStatus.textContent =
+                        data.memory
+                        ? "READY"
+                        : "OFFLINE";
+
+                    greeting.textContent =
+                        "Tüm sistemler çalışıyor efendim.";
+
+                } else {
+
+                    statusText.textContent =
+                        "SYSTEM ERROR";
+
+                    systemStatus.textContent =
+                        "ERROR";
+                }
+
+
+            } catch (error) {
+
+                statusText.textContent =
+                    "OFFLINE";
+
+                systemStatus.textContent =
+                    "OFFLINE";
+
+                greeting.textContent =
+                    "Sunucuya ulaşılamıyor efendim.";
+            }
+        }
+
+
+        /* =====================================================
+           MEMORY
+        ===================================================== */
+
+        async function showMemory() {
+
+            closeSidebar();
+
+            try {
+
+                const response =
+                    await fetch("/memory");
+
+                const data =
+                    await response.json();
+
+
+                const memory =
+                    data.memory || {};
+
+                const profile =
+                    memory.profile || {};
+
+                if (profile.name) {
+
+                    greeting.textContent =
+                        "Hoş geldiniz "
+                        + profile.name
+                        + " efendim.";
+
+                } else {
+
+                    greeting.textContent =
+                        "Hafıza sistemi aktif efendim.";
+                }
+
+
+                memoryStatus.textContent =
+                    "ACTIVE";
+
+
+            } catch (error) {
+
+                memoryStatus.textContent =
+                    "ERROR";
+            }
+        }
+
+
+        /* =====================================================
+           CLEAR MEMORY
+        ===================================================== */
+
+        async function clearMemory() {
+
+            const confirmed =
+                confirm(
+                    "J.A.R.V.I.S. hafızası temizlensin mi?"
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                await fetch(
+                    "/memory",
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+                memoryStatus.textContent =
+                    "CLEARED";
+
+                greeting.textContent =
+                    "Hafıza temizlendi efendim.";
+
+            } catch (error) {
+
+                memoryStatus.textContent =
+                    "ERROR";
+            }
+        }
+
+
+        /* =====================================================
+           SETTINGS
+        ===================================================== */
+
+        function openSettings() {
+
+            closeSidebar();
+
+            settingsModal.classList.add(
+                "active"
+            );
+        }
+
+
+        function closeSettings() {
+
+            settingsModal.classList.remove(
+                "active"
+            );
+        }
+
+
+        function closeSettingsOutside(event) {
+
+            if (
+                event.target ===
+                settingsModal
+            ) {
+
+                closeSettings();
+            }
+        }
+
+
+        /* =====================================================
+           THEME
+        ===================================================== */
+
+        function toggleTheme() {
+
+            document.body.classList.toggle(
+                "light"
+            );
+
+            const isLight =
+                document.body.classList.contains(
+                    "light"
+                );
+
+            const switchElement =
+                document.getElementById(
+                    "themeSwitch"
+                );
+
+            if (switchElement) {
+
+                switchElement.classList.toggle(
+                    "active",
+                    !isLight
+                );
+            }
+
+
+            localStorage.setItem(
+                "jarvis_theme",
+                isLight
+                    ? "light"
+                    : "dark"
+            );
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        function toggleAnimations() {
+
+            const switchElement =
+                document.getElementById(
+                    "animationSwitch"
+                );
+
+            const enabled =
+                switchElement.classList.toggle(
+                    "active"
+                );
+
+
+            document.documentElement.style
+                .setProperty(
+                    "--animation-state",
+                    enabled
+                        ? "running"
+                        : "paused"
+                );
+
+
+            document
+                .querySelectorAll("*")
+                .forEach(
+                    element => {
+
+                        element.style.animationPlayState =
+                            enabled
+                                ? "running"
+                                : "paused";
+                    }
+                );
+
+
+            localStorage.setItem(
+                "jarvis_animations",
+                enabled
+                    ? "on"
+                    : "off"
+            );
+        }
+
+
+        /* =====================================================
+           LOAD SETTINGS
+        ===================================================== */
+
+        function loadSettings() {
+
+            const theme =
+                localStorage.getItem(
+                    "jarvis_theme"
+                );
+
+            if (theme === "light") {
+
+                document.body.classList.add(
+                    "light"
+                );
+
+                const themeSwitch =
+                    document.getElementById(
+                        "themeSwitch"
+                    );
+
+                if (themeSwitch) {
+                    themeSwitch.classList.remove(
+                        "active"
+                    );
+                }
+            }
+
+
+            const animations =
+                localStorage.getItem(
+                    "jarvis_animations"
+                );
+
+            if (animations === "off") {
+
+                const animationSwitch =
+                    document.getElementById(
+                        "animationSwitch"
+                    );
+
+                if (animationSwitch) {
+                    animationSwitch.classList.remove(
+                        "active"
+                    );
+                }
+
+                document
+                    .querySelectorAll("*")
+                    .forEach(
+                        element => {
+                            element.style.animationPlayState =
+                                "paused";
+                        }
+                    );
+            }
+        }
+
+
+        /* =====================================================
+           INITIALIZE
+        ===================================================== */
+
+        loadSettings();
+
+        checkHealth();
+
+    </script>
 
 </body>
 </html>
