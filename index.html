@@ -372,6 +372,10 @@ button {
     outline: none;
 }
 
+.modal input:focus {
+    border-color: rgba(0,229,255,0.6);
+}
+
 .modal-button {
     width: 100%;
     height: 46px;
@@ -462,13 +466,11 @@ body.fun-mode .core {
 
 </div>
 
-
 <div
     id="overlay"
     class="overlay"
     onclick="closeSidebar()"
 ></div>
-
 
 <div
     id="sidebar"
@@ -576,7 +578,6 @@ body.fun-mode .core {
 
 </div>
 
-
 <div
     id="profileModal"
     class="modal"
@@ -589,12 +590,15 @@ body.fun-mode .core {
     <input
         id="usernameInput"
         placeholder="Kullanıcı adı"
+        autocomplete="username"
     >
 
     <input
         id="passwordInput"
         type="password"
         placeholder="Şifre"
+        autocomplete="current-password"
+        onkeydown="handleLoginKey(event)"
     >
 
     <button
@@ -612,7 +616,6 @@ body.fun-mode .core {
     </button>
 
 </div>
-
 
 <div
     id="errorModal"
@@ -635,7 +638,6 @@ body.fun-mode .core {
     </button>
 
 </div>
-
 
 <div class="main">
 
@@ -688,7 +690,6 @@ body.fun-mode .core {
 
 </div>
 
-
 <script>
 
 const API = "";
@@ -698,7 +699,6 @@ let currentMode = "normal";
 let funMode = false;
 let sending = false;
 
-
 const waitMessages = [
     "Bir saniye efendim...",
     "Tamam, bir bakıyorum...",
@@ -707,11 +707,9 @@ const waitMessages = [
     "Tamam, hemen ilgileniyorum..."
 ];
 
-
 function $(id) {
     return document.getElementById(id);
 }
-
 
 function addMessage(text, type = "ai") {
 
@@ -729,7 +727,6 @@ function addMessage(text, type = "ai") {
     chat.scrollTop = chat.scrollHeight;
 }
 
-
 function formatText(text) {
 
     let safe = String(text)
@@ -739,12 +736,11 @@ function formatText(text) {
 
     safe = safe.replace(
         /(https?:\/\/[^\s]+)/g,
-        '<a href="$1" target="_blank">$1</a>'
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
     );
 
     return safe;
 }
-
 
 function openSidebar() {
 
@@ -752,13 +748,11 @@ function openSidebar() {
     $("overlay").classList.add("show");
 }
 
-
 function closeSidebar() {
 
     $("sidebar").classList.remove("open");
     $("overlay").classList.remove("show");
 }
-
 
 function closeModals() {
 
@@ -769,15 +763,35 @@ function closeModals() {
         });
 }
 
-
 function openProfile() {
 
     closeSidebar();
 
     $("profileModal")
         .classList.add("show");
+
+    setTimeout(function() {
+
+        $("usernameInput").focus();
+
+    }, 100);
 }
 
+function handleLoginKey(event) {
+
+    if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        login();
+    }
+}
+
+/*
+====================================================
+PROFİL GİRİŞ SİSTEMİ
+====================================================
+*/
 
 async function login() {
 
@@ -790,7 +804,11 @@ async function login() {
         $("passwordInput").value;
 
     if (!username) {
+
         alert("Kullanıcı adı girin.");
+
+        $("usernameInput").focus();
+
         return;
     }
 
@@ -800,9 +818,11 @@ async function login() {
             API + "/profile-login",
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
                     username: username,
                     password: password
@@ -810,21 +830,97 @@ async function login() {
             }
         );
 
-        const data = await response.json();
+        let data;
 
-        if (!response.ok) {
-            alert(
-                data.detail ||
-                "Giriş başarısız."
+        try {
+
+            data = await response.json();
+
+        } catch (jsonError) {
+
+            throw new Error(
+                "Sunucudan geçersiz yanıt geldi."
             );
+        }
+
+        console.log(
+            "K.A.R.V.I.S. profil giriş cevabı:",
+            data
+        );
+
+        /*
+        Backend başarısız girişte:
+        {
+            success: false,
+            message: "..."
+        }
+
+        Başarılı girişte:
+        {
+            success: true,
+            user: {
+                username: "...",
+                name: "...",
+                role: "...",
+                personality: "..."
+            }
+        }
+        */
+
+        if (
+            !response.ok ||
+            data.success !== true
+        ) {
+
+            alert(
+                data.message ||
+                data.detail ||
+                "Kullanıcı adı veya şifre hatalı."
+            );
+
             return;
         }
 
-        currentUser = data.username;
+        /*
+        Backend'den gelen kullanıcıyı alıyoruz.
+        */
 
-        currentMode =
-            data.default_mode ||
-            "normal";
+        let loggedUser = username;
+
+        if (
+            data.user &&
+            data.user.username
+        ) {
+
+            loggedUser =
+                String(
+                    data.user.username
+                )
+                .trim()
+                .toLowerCase();
+        }
+
+        currentUser = loggedUser;
+
+        /*
+        Öğretmen hesabı:
+        Ders Asistanı ile başlar.
+        */
+
+        if (
+            currentUser === "ilknur"
+        ) {
+
+            currentMode = "lesson";
+
+        } else {
+
+            currentMode = "normal";
+        }
+
+        /*
+        Profil bilgisini telefonda sakla.
+        */
 
         localStorage.setItem(
             "karvis_user",
@@ -836,20 +932,60 @@ async function login() {
             currentMode
         );
 
+        /*
+        Giriş kutularını temizle.
+        */
+
+        $("usernameInput").value = "";
+
+        $("passwordInput").value = "";
+
+        /*
+        Profil penceresini kapat.
+        */
+
         closeModals();
 
+        /*
+        Kullanıcı arayüzünü güncelle.
+        */
+
         applyUserTheme();
+
         updateSidebar();
+
         showGreeting();
+
+        /*
+        Durum yazısını güncelle.
+        */
+
+        if (
+            currentUser === "ilknur"
+        ) {
+
+            $("status").textContent =
+                "AKADEMİK ASİSTAN HAZIR";
+
+        } else {
+
+            $("status").textContent =
+                "K.A.R.V.I.S. HAZIR";
+        }
 
     } catch (error) {
 
+        console.error(
+            "Profil giriş hatası:",
+            error
+        );
+
         alert(
-            "Sunucuya bağlanılamadı."
+            "Sunucuya bağlanılamadı.\n\n" +
+            error.message
         );
     }
 }
-
 
 function applyUserTheme() {
 
@@ -857,13 +993,15 @@ function applyUserTheme() {
         "sinem-mode"
     );
 
-    if (currentUser === "sinem") {
+    if (
+        currentUser === "sinem"
+    ) {
+
         document.body.classList.add(
             "sinem-mode"
         );
     }
 }
-
 
 function updateSidebar() {
 
@@ -873,7 +1011,9 @@ function updateSidebar() {
     const funButton =
         $("funButton");
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         teacherMenu.style.display =
             "block";
@@ -905,10 +1045,12 @@ function updateSidebar() {
         });
 }
 
-
 function selectAcademicMode(mode) {
 
-    if (currentUser !== "ilknur") {
+    if (
+        currentUser !== "ilknur"
+    ) {
+
         return;
     }
 
@@ -920,9 +1062,11 @@ function selectAcademicMode(mode) {
     );
 
     updateSidebar();
+
     closeSidebar();
 
     const names = {
+
         research:
             "🔬 Araştırma Modu aktif. Hocam, güncel araştırmalara hazırım.",
 
@@ -949,33 +1093,40 @@ function selectAcademicMode(mode) {
     );
 }
 
-
 function showGreeting() {
 
     $("chat").innerHTML = "";
 
-    if (currentUser === "karahan") {
+    if (
+        currentUser === "karahan"
+    ) {
 
         addMessage(
             "Merhaba efendim. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    } else if (currentUser === "betul") {
+    } else if (
+        currentUser === "betul"
+    ) {
 
         addMessage(
             "Merhaba Betül. 😏 K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    } else if (currentUser === "sinem") {
+    } else if (
+        currentUser === "sinem"
+    ) {
 
         addMessage(
             "Hoş geldiniz prenses. 💗 K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    } else if (currentUser === "ilknur") {
+    } else if (
+        currentUser === "ilknur"
+    ) {
 
         addMessage(
             "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır. 🎓",
@@ -989,12 +1140,14 @@ function showGreeting() {
     }
 }
 
-
 function getWaitingMessage() {
 
-    if (currentUser === "ilknur") {
+    if (
+        currentUser === "ilknur"
+    ) {
 
         const messages = {
+
             research:
                 "Hocam, güncel araştırmaları inceliyorum...",
 
@@ -1026,10 +1179,10 @@ function getWaitingMessage() {
     ];
 }
 
-
 async function sendMessage() {
 
     if (sending) {
+
         return;
     }
 
@@ -1040,6 +1193,7 @@ async function sendMessage() {
         input.value.trim();
 
     if (!message) {
+
         return;
     }
 
@@ -1052,9 +1206,10 @@ async function sendMessage() {
         "user"
     );
 
-    const waiting = document.createElement(
-        "div"
-    );
+    const waiting =
+        document.createElement(
+            "div"
+        );
 
     waiting.className =
         "message ai";
@@ -1088,15 +1243,21 @@ async function sendMessage() {
                     API + "/chat",
                     {
                         method: "POST",
+
                         headers: {
                             "Content-Type":
                                 "application/json"
                         },
+
                         body:
                             JSON.stringify({
-                                message: message,
+
+                                message:
+                                    message,
+
                                 username:
                                     currentUser,
+
                                 mode:
                                     currentMode
                             })
@@ -1107,8 +1268,10 @@ async function sendMessage() {
                 await response.json();
 
             if (!response.ok) {
+
                 throw new Error(
                     data.detail ||
+                    data.message ||
                     "Yanıt alınamadı."
                 );
             }
@@ -1139,7 +1302,6 @@ async function sendMessage() {
     }
 }
 
-
 async function createPresentation(
     topic,
     waiting
@@ -1150,17 +1312,26 @@ async function createPresentation(
             API + "/presentation",
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type":
                         "application/json"
                 },
+
                 body:
                     JSON.stringify({
-                        topic: topic,
+
+                        topic:
+                            topic,
+
                         username:
                             currentUser,
-                        slide_count: 10,
-                        include_visuals: true
+
+                        slide_count:
+                            10,
+
+                        include_visuals:
+                            true
                     })
             }
         );
@@ -1172,6 +1343,7 @@ async function createPresentation(
 
         throw new Error(
             data.detail ||
+            data.message ||
             "Sunum oluşturulamadı."
         );
     }
@@ -1197,7 +1369,7 @@ async function createPresentation(
         '<a href="' +
         API +
         data.file_url +
-        '" target="_blank">' +
+        '" target="_blank" rel="noopener noreferrer">' +
         "📥 Profesyonel PDF Sunumu Aç" +
         "</a>";
 
@@ -1209,17 +1381,17 @@ async function createPresentation(
         $("chat").scrollHeight;
 }
 
-
 function handleKey(event) {
 
-    if (event.key === "Enter") {
+    if (
+        event.key === "Enter"
+    ) {
 
         event.preventDefault();
 
         sendMessage();
     }
 }
-
 
 async function newChat() {
 
@@ -1228,7 +1400,8 @@ async function newChat() {
     try {
 
         await fetch(
-            API + "/new-chat?username=" +
+            API +
+            "/new-chat?username=" +
             encodeURIComponent(
                 currentUser
             ),
@@ -1242,7 +1415,6 @@ async function newChat() {
 
     showGreeting();
 }
-
 
 async function openErrors() {
 
@@ -1278,7 +1450,9 @@ async function openErrors() {
         $("errorContent").textContent =
             errors
                 .map(function(item) {
+
                     return item.message;
+
                 })
                 .join("\n\n");
 
@@ -1288,7 +1462,6 @@ async function openErrors() {
             "Hatalar alınamadı.";
     }
 }
-
 
 function toggleFunMode() {
 
@@ -1317,7 +1490,6 @@ function toggleFunMode() {
     }
 }
 
-
 function initialize() {
 
     const savedUser =
@@ -1336,9 +1508,23 @@ function initialize() {
             savedUser;
     }
 
-    if (currentUser === "ilknur") {
+    /*
+    Öğretmen hesabı için
+    kayıtlı mod kullanılabilir.
+    */
 
-        currentMode = "lesson";
+    if (
+        currentUser === "ilknur"
+    ) {
+
+        const savedMode =
+            localStorage.getItem(
+                "karvis_mode"
+            );
+
+        currentMode =
+            savedMode ||
+            "lesson";
 
     } else {
 
@@ -1346,12 +1532,13 @@ function initialize() {
     }
 
     applyUserTheme();
+
     updateSidebar();
+
     showGreeting();
 
     $("messageInput").focus();
 }
-
 
 initialize();
 
