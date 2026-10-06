@@ -584,7 +584,7 @@ function toggleTheme() {
 }
 
 /* =========================
-   JARVIS (İLK KODUNUZDAKİ ORİJİNAL FETCH MANTIĞI)
+   JARVIS (İLK KODUNUZDAKİ ORİJİNAL FETCH MANTIĞI + YARATICI KONTROLÜ)
 ========================= */
 async function sendMessage() {
     const input = document.getElementById("input");
@@ -602,11 +602,32 @@ async function sendMessage() {
     input.value = "";
     messages.scrollTop = messages.scrollHeight;
 
+    /* KİMLİK KONTROLÜ (Hardcoded Karahan INC Cevabı) */
+    const lowerMessage = message.toLowerCase();
+    if (
+        lowerMessage.includes("kim tarafından yapıldın") ||
+        lowerMessage.includes("seni kim yaptı") ||
+        lowerMessage.includes("kim geliştirdi") ||
+        lowerMessage.includes("yaratıcın kim") ||
+        lowerMessage.includes("sahibin kim") ||
+        lowerMessage.includes("kimin eserisin")
+    ) {
+        setTimeout(() => {
+            const botMessage = document.createElement("div");
+            botMessage.className = "message jarvis";
+            botMessage.textContent = "Ben, gelişmiş yapay zeka sistemlerine entegre edilmiş bir modelim. Karahan INC. tarafından geliştirildim ve kodlandım.";
+            messages.appendChild(botMessage);
+            messages.scrollTop = messages.scrollHeight;
+        }, 500); // 0.5 saniye gerçekçilik gecikmesi
+        return; // İşlemi burada kes, sunucuya gitme.
+    }
+
     /* Bekleme */
     const loading = document.createElement("div");
     loading.className = "message jarvis";
     loading.textContent = "JARVIS düşünüyor...";
     messages.appendChild(loading);
+    messages.scrollTop = messages.scrollHeight;
 
     try {
         const response = await fetch("/chat", {
