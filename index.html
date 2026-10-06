@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
 
 <meta charset="UTF-8">
+
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<title>J.A.R.V.I.S. — KARAHAN INC.</title>
+<title>
+J.A.R.V.I.S. — KARAHAN INC.
+</title>
+
 
 <style>
 
@@ -17,1083 +22,1532 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+
 html,
 body {
+
     margin: 0;
-    padding: 0;
+
     width: 100%;
+
     height: 100%;
+
     overflow: hidden;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
+
     background: #02060a;
+
     color: #ffffff;
 }
 
+
 body.light {
+
     background: #eef5f8;
-    color: #111;
+
+    color: #111111;
 }
+
 
 button,
 input,
 textarea {
+
     font-family: inherit;
 }
 
+
 button {
+
     cursor: pointer;
 }
 
+
 .app {
-    width: 100%;
-    height: 100%;
+
     position: relative;
+
+    width: 100%;
+
+    height: 100%;
+
     overflow: hidden;
 }
 
 
 /* =====================================================
-   BACKGROUND
+BACKGROUND
 ===================================================== */
 
 .background {
+
     position: absolute;
+
     inset: 0;
+
     pointer-events: none;
+
     overflow: hidden;
 }
 
+
 .grid {
+
     position: absolute;
+
     inset: -50%;
+
     background-image:
+
         linear-gradient(
-            rgba(0, 220, 255, 0.035) 1px,
+            rgba(0,220,255,.035) 1px,
             transparent 1px
         ),
+
         linear-gradient(
             90deg,
-            rgba(0, 220, 255, 0.035) 1px,
+            rgba(0,220,255,.035) 1px,
             transparent 1px
         );
+
     background-size: 45px 45px;
-    transform: perspective(500px) rotateX(55deg);
-    transform-origin: center;
+
+    transform:
+        perspective(500px)
+        rotateX(55deg);
 }
 
+
 .glow {
+
     position: absolute;
+
     width: 450px;
+
     height: 450px;
-    border-radius: 50%;
-    background: rgba(0, 210, 255, 0.08);
-    filter: blur(90px);
+
     left: 50%;
+
     top: 40%;
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%,-50%);
+
+    border-radius: 50%;
+
+    background:
+        rgba(0,210,255,.08);
+
+    filter: blur(90px);
 }
 
 
 /* =====================================================
-   HEADER
+HEADER
 ===================================================== */
 
 .header {
+
     position: absolute;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 82px;
+
     z-index: 20;
+
     display: flex;
+
     align-items: center;
+
     padding: 15px 18px;
-    border-bottom: 1px solid rgba(0, 220, 255, 0.12);
-    background: rgba(2, 7, 11, 0.72);
-    backdrop-filter: blur(18px);
+
+    border-bottom:
+        1px solid
+        rgba(0,220,255,.12);
+
+    background:
+        rgba(2,7,11,.72);
+
+    backdrop-filter:
+        blur(18px);
 }
+
 
 body.light .header {
-    background: rgba(240, 248, 250, 0.8);
-    border-bottom-color: rgba(0, 100, 130, 0.15);
+
+    background:
+        rgba(240,248,250,.85);
 }
 
+
 .menu-btn {
+
     width: 48px;
+
     height: 48px;
-    border: 1px solid rgba(0, 220, 255, 0.28);
-    background: rgba(0, 220, 255, 0.05);
+
+    border:
+        1px solid
+        rgba(0,220,255,.28);
+
+    background:
+        rgba(0,220,255,.05);
+
     color: #00d9ff;
+
     border-radius: 15px;
+
     font-size: 23px;
 }
 
+
 .brand {
+
     margin-left: 14px;
+
     line-height: 1;
 }
 
+
 .brand-title {
+
     font-size: 22px;
+
     font-weight: 700;
+
     letter-spacing: 2px;
 }
 
+
 .brand-subtitle {
+
     margin-top: 6px;
+
     font-size: 9px;
+
     letter-spacing: 3px;
+
     color: #00d9ff;
-    opacity: 0.85;
 }
 
+
 .user-mini {
+
     margin-left: auto;
+
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 }
 
+
 .user-dot {
+
     width: 9px;
+
     height: 9px;
+
     border-radius: 50%;
+
     background: #00e5ff;
-    box-shadow: 0 0 12px #00e5ff;
+
+    box-shadow:
+        0 0 12px #00e5ff;
 }
 
+
 .user-mini-name {
+
     max-width: 115px;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
+
     white-space: nowrap;
+
     font-size: 11px;
+
     color: #8ca4ad;
 }
 
 
 /* =====================================================
-   MAIN
+MAIN
 ===================================================== */
 
 .main {
+
     position: relative;
+
     z-index: 2;
+
     width: 100%;
+
     height: 100%;
+
     padding-top: 82px;
+
     padding-bottom: 94px;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
 }
 
+
 .logo-area {
+
     flex: 0 0 auto;
-    margin-top: 45px;
+
+    margin-top: 42px;
+
     text-align: center;
 }
 
+
 .logo {
+
     position: relative;
+
     width: 145px;
+
     height: 145px;
+
     margin: auto;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
 }
+
 
 .logo-core {
+
     width: 76px;
+
     height: 76px;
-    border: 2px solid #00ddff;
+
+    border:
+        2px solid #00ddff;
+
     border-radius: 50%;
+
     display: flex;
-    justify-content: center;
+
     align-items: center;
+
+    justify-content: center;
+
     color: #00ddff;
+
     font-size: 35px;
+
     font-weight: 700;
+
     box-shadow:
-        0 0 15px rgba(0, 220, 255, 0.6),
-        inset 0 0 18px rgba(0, 220, 255, 0.15);
-    animation: pulse 2.6s infinite;
+        0 0 15px rgba(0,220,255,.6),
+
+        inset 0 0 18px
+        rgba(0,220,255,.15);
+
+    animation:
+        pulse 2.6s infinite;
 }
+
 
 .ring {
+
     position: absolute;
-    border: 1px solid rgba(0, 220, 255, 0.35);
+
+    border:
+        1px solid
+        rgba(0,220,255,.35);
+
     border-radius: 50%;
 }
 
+
 .ring1 {
+
     inset: 18px;
-    animation: spin 8s linear infinite;
+
+    animation:
+        spin 8s linear infinite;
 }
+
 
 .ring2 {
+
     inset: 4px;
+
     border-style: dashed;
-    animation: spinReverse 12s linear infinite;
+
+    animation:
+        spinReverse 12s linear infinite;
 }
 
+
 .ring3 {
+
     inset: -10px;
-    border-color: rgba(0, 220, 255, 0.12);
+
+    border-color:
+        rgba(0,220,255,.12);
 }
+
 
 @keyframes pulse {
 
     0%,
     100% {
+
         box-shadow:
-            0 0 15px rgba(0, 220, 255, 0.45),
-            inset 0 0 18px rgba(0, 220, 255, 0.1);
+            0 0 15px
+            rgba(0,220,255,.45),
+
+            inset 0 0 18px
+            rgba(0,220,255,.1);
     }
 
     50% {
+
         box-shadow:
-            0 0 35px rgba(0, 220, 255, 0.8),
-            inset 0 0 25px rgba(0, 220, 255, 0.2);
+            0 0 35px
+            rgba(0,220,255,.8),
+
+            inset 0 0 25px
+            rgba(0,220,255,.2);
     }
 }
 
+
 @keyframes spin {
+
     to {
         transform: rotate(360deg);
     }
 }
 
+
 @keyframes spinReverse {
+
     to {
         transform: rotate(-360deg);
     }
 }
 
+
 .status {
+
     margin-top: 23px;
+
     font-size: 10px;
+
     letter-spacing: 3px;
+
     color: #00d9ff;
 }
 
+
 .greeting {
+
     margin-top: 8px;
+
     font-size: 18px;
+
     font-weight: 500;
 }
 
+
+/* =====================================================
+CHAT
+===================================================== */
+
 .chat {
+
     width: 100%;
+
     max-width: 850px;
+
     flex: 1;
+
     overflow-y: auto;
-    padding: 25px 18px 20px;
+
+    padding:
+        20px 18px;
+
     scroll-behavior: smooth;
 }
 
+
 .chat::-webkit-scrollbar {
+
     width: 3px;
 }
 
+
 .chat::-webkit-scrollbar-thumb {
-    background: rgba(0, 220, 255, 0.3);
+
+    background:
+        rgba(0,220,255,.3);
 }
 
+
 .message {
+
     max-width: 86%;
+
     margin-bottom: 14px;
-    padding: 13px 16px;
+
+    padding:
+        13px 16px;
+
     border-radius: 18px;
+
     line-height: 1.5;
+
     font-size: 14px;
+
     white-space: pre-wrap;
+
     word-break: break-word;
 }
 
+
 .message.jarvis {
+
     margin-right: auto;
-    border: 1px solid rgba(0, 220, 255, 0.14);
-    background: rgba(0, 220, 255, 0.055);
+
+    border:
+        1px solid
+        rgba(0,220,255,.14);
+
+    background:
+        rgba(0,220,255,.055);
+
     color: #d7faff;
 }
 
+
 .message.user {
+
     margin-left: auto;
-    background: rgba(0, 220, 255, 0.12);
-    border: 1px solid rgba(0, 220, 255, 0.2);
+
+    background:
+        rgba(0,220,255,.12);
+
+    border:
+        1px solid
+        rgba(0,220,255,.2);
 }
 
 
 /* =====================================================
-   INPUT
+INPUT
 ===================================================== */
 
 .input-area {
+
     position: absolute;
+
     bottom: 15px;
+
     left: 12px;
+
     right: 12px;
+
     z-index: 10;
+
     max-width: 850px;
+
     margin: auto;
 }
 
+
 .input-box {
+
     min-height: 62px;
+
     display: flex;
+
     align-items: center;
+
     gap: 8px;
-    padding: 8px 9px 8px 17px;
-    border: 1px solid rgba(0, 220, 255, 0.22);
+
+    padding:
+        8px 9px
+        8px 17px;
+
+    border:
+        1px solid
+        rgba(0,220,255,.22);
+
     border-radius: 22px;
-    background: rgba(5, 13, 18, 0.88);
-    backdrop-filter: blur(18px);
-    box-shadow:
-        0 10px 35px rgba(0, 0, 0, 0.25);
+
+    background:
+        rgba(5,13,18,.88);
+
+    backdrop-filter:
+        blur(18px);
 }
 
-body.light .input-box {
-    background: rgba(255, 255, 255, 0.9);
-}
 
 #messageInput {
+
     flex: 1;
+
     min-width: 0;
+
     border: none;
+
     outline: none;
+
     resize: none;
+
     background: transparent;
+
     color: inherit;
+
     font-size: 16px;
+
     line-height: 1.4;
+
     max-height: 100px;
 }
 
+
 #messageInput::placeholder {
+
     color: #6d8088;
 }
 
+
 .send-btn {
+
     width: 46px;
+
     height: 46px;
+
     flex-shrink: 0;
+
     border: none;
+
     border-radius: 15px;
+
     background: #00d9ff;
+
     color: #001015;
+
     font-size: 20px;
+
     font-weight: 700;
 }
 
 
 /* =====================================================
-   SIDEBAR
+SIDEBAR
 ===================================================== */
 
 .overlay {
+
     position: fixed;
+
     inset: 0;
+
     z-index: 50;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(3px);
+
+    background:
+        rgba(0,0,0,.55);
+
+    backdrop-filter:
+        blur(3px);
+
     display: none;
 }
 
+
 .overlay.active {
+
     display: block;
 }
 
+
 .sidebar {
+
     position: fixed;
+
     top: 0;
+
     left: 0;
+
     z-index: 60;
-    width: min(320px, 88vw);
+
+    width:
+        min(320px,88vw);
+
     height: 100%;
+
     padding: 25px 18px;
-    transform: translateX(-105%);
-    transition: transform 0.3s ease;
-    background: rgba(3, 10, 14, 0.97);
-    border-right: 1px solid rgba(0, 220, 255, 0.16);
-    backdrop-filter: blur(25px);
+
+    transform:
+        translateX(-105%);
+
+    transition:
+        transform .3s ease;
+
+    background:
+        rgba(3,10,14,.97);
+
+    border-right:
+        1px solid
+        rgba(0,220,255,.16);
+
+    backdrop-filter:
+        blur(25px);
 }
+
 
 .sidebar.active {
-    transform: translateX(0);
+
+    transform:
+        translateX(0);
 }
 
+
 .sidebar-head {
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
     margin-bottom: 30px;
 }
 
+
 .sidebar-title {
+
     font-size: 18px;
+
     letter-spacing: 2px;
 }
 
+
 .close-btn {
+
     width: 40px;
+
     height: 40px;
-    border: 1px solid rgba(0, 220, 255, 0.18);
+
+    border:
+        1px solid
+        rgba(0,220,255,.18);
+
     background: transparent;
+
     color: #00d9ff;
+
     border-radius: 12px;
+
     font-size: 20px;
 }
 
+
 .profile-card {
+
     padding: 16px;
-    border: 1px solid rgba(0, 220, 255, 0.13);
+
+    border:
+        1px solid
+        rgba(0,220,255,.13);
+
     border-radius: 17px;
-    background: rgba(0, 220, 255, 0.04);
+
+    background:
+        rgba(0,220,255,.04);
+
     margin-bottom: 20px;
 }
 
+
 .profile-name {
+
     font-weight: 600;
 }
 
+
 .profile-role {
+
     margin-top: 5px;
+
     color: #71878e;
+
     font-size: 12px;
 }
 
+
 .menu-item {
+
     width: 100%;
+
     padding: 15px;
+
     margin-bottom: 10px;
+
     text-align: left;
-    border: 1px solid rgba(0, 220, 255, 0.11);
+
+    border:
+        1px solid
+        rgba(0,220,255,.11);
+
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.025);
+
+    background:
+        rgba(255,255,255,.025);
+
     color: #ffffff;
 }
 
+
 .menu-item-title {
+
     font-size: 14px;
 }
 
+
 .menu-item-sub {
+
     margin-top: 5px;
+
     color: #72868d;
+
     font-size: 11px;
 }
+
 
 .settings {
+
     margin-top: 25px;
+
     padding-top: 20px;
-    border-top: 1px solid rgba(0, 220, 255, 0.1);
+
+    border-top:
+        1px solid
+        rgba(0,220,255,.1);
 }
 
+
 .setting-title {
+
     margin-bottom: 12px;
+
     font-size: 11px;
+
     letter-spacing: 2px;
+
     color: #00d9ff;
 }
 
+
 .setting-row {
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
     margin-bottom: 13px;
+
     font-size: 13px;
 }
 
+
 .toggle {
+
     width: 48px;
+
     height: 27px;
+
     border-radius: 20px;
-    border: 1px solid rgba(0, 220, 255, 0.2);
+
+    border:
+        1px solid
+        rgba(0,220,255,.2);
+
     background: #172126;
+
     position: relative;
 }
 
+
 .toggle span {
+
     position: absolute;
+
     width: 21px;
+
     height: 21px;
+
     border-radius: 50%;
+
     top: 2px;
+
     left: 3px;
+
     background: #68787d;
-    transition: 0.25s;
+
+    transition: .25s;
 }
+
 
 .toggle.active {
-    background: rgba(0, 220, 255, 0.2);
+
+    background:
+        rgba(0,220,255,.2);
 }
 
+
 .toggle.active span {
+
     left: 22px;
+
     background: #00d9ff;
-    box-shadow: 0 0 10px rgba(0, 220, 255, 0.7);
+
+    box-shadow:
+        0 0 10px
+        rgba(0,220,255,.7);
 }
 
 
 /* =====================================================
-   MODAL
+MODAL
 ===================================================== */
 
 .modal {
+
     position: fixed;
+
     inset: 0;
+
     z-index: 100;
+
     display: none;
+
     justify-content: center;
+
     align-items: center;
+
     padding: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(12px);
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:
+        blur(12px);
 }
+
 
 .modal.active {
+
     display: flex;
 }
+
 
 .modal-box {
-    width: min(390px, 100%);
+
+    width:
+        min(390px,100%);
+
     padding: 28px 22px;
+
     border-radius: 25px;
-    border: 1px solid rgba(0, 220, 255, 0.22);
+
+    border:
+        1px solid
+        rgba(0,220,255,.22);
+
     background: #071116;
-    box-shadow:
-        0 20px 70px rgba(0, 0, 0, 0.5);
 }
 
+
 .modal-logo {
+
     width: 60px;
+
     height: 60px;
-    margin: 0 auto 18px;
+
+    margin:
+        0 auto 18px;
+
     border-radius: 50%;
-    border: 1px solid #00d9ff;
+
+    border:
+        1px solid
+        #00d9ff;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     color: #00d9ff;
+
     font-size: 25px;
 }
 
+
 .modal-title {
+
     text-align: center;
+
     font-size: 19px;
+
     letter-spacing: 1px;
 }
 
+
 .modal-subtitle {
+
     margin-top: 8px;
+
     margin-bottom: 25px;
+
     text-align: center;
+
     color: #71858d;
+
     font-size: 12px;
 }
 
+
 .field {
+
     margin-bottom: 13px;
 }
 
+
 .field label {
+
     display: block;
+
     margin-bottom: 7px;
+
     color: #7c929a;
+
     font-size: 11px;
 }
 
+
 .field input {
+
     width: 100%;
+
     height: 49px;
-    padding: 0 14px;
+
+    padding:
+        0 14px;
+
     border-radius: 14px;
+
     outline: none;
-    border: 1px solid rgba(0, 220, 255, 0.16);
-    background: rgba(255, 255, 255, 0.04);
+
+    border:
+        1px solid
+        rgba(0,220,255,.16);
+
+    background:
+        rgba(255,255,255,.04);
+
     color: #fff;
+
     font-size: 16px;
 }
 
+
 .login-btn {
+
     width: 100%;
+
     height: 50px;
+
     margin-top: 8px;
+
     border: none;
+
     border-radius: 15px;
+
     background: #00d9ff;
+
     color: #001015;
+
     font-weight: 700;
 }
 
+
 .modal-error {
+
     min-height: 18px;
+
     margin-top: 12px;
+
     text-align: center;
+
     color: #ff6674;
+
     font-size: 12px;
 }
 
 
 /* =====================================================
-   RATE LIMIT
-===================================================== */
-
-.rate-panel {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    padding: 22px;
-    background: rgba(0, 0, 0, 0.78);
-    backdrop-filter: blur(15px);
-}
-
-.rate-panel.active {
-    display: flex;
-}
-
-.rate-box {
-    width: min(390px, 100%);
-    padding: 28px;
-    text-align: center;
-    border: 1px solid rgba(255, 160, 80, 0.3);
-    border-radius: 25px;
-    background: #091116;
-}
-
-.rate-icon {
-    font-size: 40px;
-    margin-bottom: 15px;
-}
-
-.rate-title {
-    font-size: 19px;
-    font-weight: 700;
-}
-
-.rate-text {
-    margin-top: 10px;
-    color: #82949b;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.new-chat-btn {
-    width: 100%;
-    height: 50px;
-    margin-top: 22px;
-    border: none;
-    border-radius: 15px;
-    background: #00d9ff;
-    color: #001015;
-    font-weight: 700;
-}
-
-
-/* =====================================================
-   BETUL MODE
+BETÜL
 ===================================================== */
 
 body.betul-mode .logo-core {
+
     color: #ff5275;
+
     border-color: #ff5275;
+
     box-shadow:
-        0 0 30px rgba(255, 82, 117, 0.7);
+        0 0 30px
+        rgba(255,82,117,.7);
 }
+
 
 body.betul-mode .status {
+
     color: #ff5275;
 }
 
+
 body.betul-mode .ring {
-    border-color: rgba(255, 82, 117, 0.4);
+
+    border-color:
+        rgba(255,82,117,.4);
 }
 
 
 /* =====================================================
-   RESPONSIVE
+RESPONSIVE
 ===================================================== */
 
 @media (max-height: 700px) {
 
     .logo-area {
-        margin-top: 15px;
+
+        margin-top: 12px;
     }
 
+
     .logo {
+
         width: 115px;
+
         height: 115px;
     }
 
+
     .logo-core {
+
         width: 62px;
+
         height: 62px;
+
         font-size: 28px;
     }
 
+
     .ring1 {
+
         inset: 14px;
     }
 
+
     .ring2 {
+
         inset: 2px;
     }
 
+
     .ring3 {
+
         inset: -8px;
     }
 
-    .chat {
-        padding-top: 10px;
-    }
 }
 
 </style>
 
 </head>
 
+
 <body>
 
 <div class="app">
 
-    <div class="background">
-        <div class="grid"></div>
-        <div class="glow"></div>
+
+<div class="background">
+
+    <div class="grid"></div>
+
+    <div class="glow"></div>
+
+</div>
+
+
+<!-- =====================================================
+HEADER
+===================================================== -->
+
+<header class="header">
+
+
+<button
+    class="menu-btn"
+    onclick="openSidebar()"
+>
+    ☰
+</button>
+
+
+<div class="brand">
+
+    <div class="brand-title">
+        J.A.R.V.I.S.
     </div>
 
+    <div class="brand-subtitle">
+        KARAHAN INC.
+    </div>
 
-    <!-- HEADER -->
-
-    <header class="header">
-
-        <button
-            class="menu-btn"
-            onclick="openSidebar()"
-        >
-            ☰
-        </button>
-
-        <div class="brand">
-
-            <div class="brand-title">
-                J.A.R.V.I.S.
-            </div>
-
-            <div class="brand-subtitle">
-                KARAHAN INC.
-            </div>
-
-        </div>
-
-        <div class="user-mini">
-
-            <div class="user-dot"></div>
-
-            <div
-                class="user-mini-name"
-                id="miniUserName"
-            >
-                KARAHAN INC.
-            </div>
-
-        </div>
-
-    </header>
+</div>
 
 
-    <!-- MAIN -->
+<div class="user-mini">
 
-    <main class="main">
-
-        <div class="logo-area">
-
-            <div class="logo">
-
-                <div class="ring ring3"></div>
-                <div class="ring ring2"></div>
-                <div class="ring ring1"></div>
-
-                <div class="logo-core">
-                    K
-                </div>
-
-            </div>
-
-            <div
-                class="status"
-                id="statusText"
-            >
-                SYSTEM ONLINE
-            </div>
-
-            <div
-                class="greeting"
-                id="greeting"
-            >
-                Merhaba efendim
-            </div>
-
-        </div>
-
-
-        <div
-            class="chat"
-            id="chat"
-        ></div>
-
-
-        <div class="input-area">
-
-            <div class="input-box">
-
-                <textarea
-                    id="messageInput"
-                    rows="1"
-                    placeholder="J.A.R.V.I.S.'e bir şey sorun..."
-                    autocomplete="off"
-                ></textarea>
-
-                <button
-                    class="send-btn"
-                    onclick="sendMessage()"
-                >
-                    ➤
-                </button>
-
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- OVERLAY -->
+    <div class="user-dot"></div>
 
     <div
-        class="overlay"
-        id="overlay"
+        class="user-mini-name"
+        id="miniUserName"
+    >
+        KARAHAN INC.
+    </div>
+
+</div>
+
+
+</header>
+
+
+<!-- =====================================================
+MAIN
+===================================================== -->
+
+<main class="main">
+
+
+<div class="logo-area">
+
+
+<div class="logo">
+
+    <div class="ring ring3"></div>
+
+    <div class="ring ring2"></div>
+
+    <div class="ring ring1"></div>
+
+    <div class="logo-core">
+        K
+    </div>
+
+</div>
+
+
+<div
+    class="status"
+    id="statusText"
+>
+    SYSTEM ONLINE
+</div>
+
+
+<div
+    class="greeting"
+    id="greeting"
+>
+    Merhaba efendim
+</div>
+
+
+</div>
+
+
+<div
+    class="chat"
+    id="chat"
+></div>
+
+
+<div class="input-area">
+
+
+<div class="input-box">
+
+
+<textarea
+    id="messageInput"
+    rows="1"
+    placeholder="J.A.R.V.I.S.'e bir şey sorun..."
+    autocomplete="off"
+></textarea>
+
+
+<button
+    class="send-btn"
+    onclick="sendMessage()"
+>
+    ➤
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</main>
+
+
+<!-- =====================================================
+OVERLAY
+===================================================== -->
+
+<div
+    class="overlay"
+    id="overlay"
+    onclick="closeSidebar()"
+></div>
+
+
+<!-- =====================================================
+SIDEBAR
+===================================================== -->
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+
+<div class="sidebar-head">
+
+    <div class="sidebar-title">
+        J.A.R.V.I.S.
+    </div>
+
+    <button
+        class="close-btn"
         onclick="closeSidebar()"
-    ></div>
-
-
-    <!-- SIDEBAR -->
-
-    <aside
-        class="sidebar"
-        id="sidebar"
     >
+        ×
+    </button>
 
-        <div class="sidebar-head">
-
-            <div class="sidebar-title">
-                J.A.R.V.I.S.
-            </div>
-
-            <button
-                class="close-btn"
-                onclick="closeSidebar()"
-            >
-                ×
-            </button>
-
-        </div>
+</div>
 
 
-        <div class="profile-card">
-
-            <div
-                class="profile-name"
-                id="sideProfileName"
-            >
-                KARAHAN INC.
-            </div>
-
-            <div
-                class="profile-role"
-                id="sideProfileRole"
-            >
-                Ana Kullanıcı
-            </div>
-
-        </div>
-
-
-        <!-- BETÜL SIDEBAR'DA GÖSTERİLMİYOR -->
-
-        <button
-            class="menu-item"
-            onclick="openProfileModal()"
-        >
-
-            <div class="menu-item-title">
-                👤 Kullanıcı / Profil Değiştir
-            </div>
-
-            <div class="menu-item-sub">
-                Başka bir kullanıcıya geç
-            </div>
-
-        </button>
-
-
-        <div class="settings">
-
-            <div class="setting-title">
-                AYARLAR
-            </div>
-
-            <div class="setting-row">
-
-                <span>
-                    Gece / Gündüz
-                </span>
-
-                <button
-                    class="toggle"
-                    id="themeToggle"
-                    onclick="toggleTheme()"
-                >
-                    <span></span>
-                </button>
-
-            </div>
-
-
-            <div class="setting-row">
-
-                <span>
-                    Eğlence Modu
-                </span>
-
-                <button
-                    class="toggle"
-                    id="funToggle"
-                    onclick="toggleFunMode()"
-                >
-                    <span></span>
-                </button>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- PROFILE MODAL -->
+<div class="profile-card">
 
     <div
-        class="modal"
-        id="profileModal"
+        class="profile-name"
+        id="sideProfileName"
     >
-
-        <div class="modal-box">
-
-            <div class="modal-logo">
-                K
-            </div>
-
-            <div class="modal-title">
-                Kullanıcı Girişi
-            </div>
-
-            <div class="modal-subtitle">
-                J.A.R.V.I.S. profil değişikliği
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    KULLANICI ADI
-                </label>
-
-                <input
-                    id="usernameInput"
-                    type="text"
-                    placeholder="Kullanıcı adı"
-                    autocomplete="username"
-                >
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    ŞİFRE
-                </label>
-
-                <input
-                    id="passwordInput"
-                    type="password"
-                    placeholder="Şifre"
-                    autocomplete="current-password"
-                >
-
-            </div>
-
-
-            <button
-                class="login-btn"
-                onclick="loginProfile()"
-            >
-                GİRİŞ YAP
-            </button>
-
-
-            <div
-                class="modal-error"
-                id="modalError"
-            ></div>
-
-        </div>
-
+        KARAHAN INC.
     </div>
-
-
-    <!-- RATE LIMIT -->
 
     <div
-        class="rate-panel"
-        id="ratePanel"
+        class="profile-role"
+        id="sideProfileRole"
+    >
+        Ana Kullanıcı
+    </div>
+
+</div>
+
+
+<button
+    class="menu-item"
+    onclick="openProfileModal()"
+>
+
+    <div class="menu-item-title">
+        👤 Kullanıcı / Profil Değiştir
+    </div>
+
+    <div class="menu-item-sub">
+        Başka bir kullanıcıya geç
+    </div>
+
+</button>
+
+
+<div class="settings">
+
+
+<div class="setting-title">
+    AYARLAR
+</div>
+
+
+<div class="setting-row">
+
+    <span>
+        Gece / Gündüz
+    </span>
+
+    <button
+        class="toggle"
+        id="themeToggle"
+        onclick="toggleTheme()"
     >
 
-        <div class="rate-box">
+        <span></span>
 
-            <div class="rate-icon">
-                ⚡
-            </div>
+    </button>
 
-            <div class="rate-title">
-                API Kullanım Limiti
-            </div>
+</div>
 
-            <div class="rate-text">
-                J.A.R.V.I.S. sağlayıcının günlük
-                kullanım limitine ulaşmış olabilir.
-                Yeni sohbet başlatabilirsiniz.
-            </div>
 
-            <button
-                class="new-chat-btn"
-                onclick="startNewChat()"
-            >
-                ＋ YENİ SOHBET BAŞLAT
-            </button>
+<div class="setting-row">
 
-        </div>
+    <span>
+        Eğlence Arayüzü
+    </span>
 
-    </div>
+    <button
+        class="toggle"
+        id="funToggle"
+        onclick="toggleFunMode()"
+    >
+
+        <span></span>
+
+    </button>
+
+</div>
+
+
+</div>
+
+
+</aside>
+
+
+<!-- =====================================================
+PROFILE MODAL
+===================================================== -->
+
+<div
+    class="modal"
+    id="profileModal"
+>
+
+
+<div class="modal-box">
+
+
+<div class="modal-logo">
+    K
+</div>
+
+
+<div class="modal-title">
+    Kullanıcı Girişi
+</div>
+
+
+<div class="modal-subtitle">
+    J.A.R.V.I.S. profil değişikliği
+</div>
+
+
+<div class="field">
+
+<label>
+    KULLANICI ADI
+</label>
+
+
+<input
+    id="usernameInput"
+    type="text"
+    placeholder="Kullanıcı adı"
+    autocomplete="username"
+>
+
+
+</div>
+
+
+<div class="field">
+
+<label>
+    ŞİFRE
+</label>
+
+
+<input
+    id="passwordInput"
+    type="password"
+    placeholder="Şifre"
+    autocomplete="current-password"
+>
+
+
+</div>
+
+
+<button
+    class="login-btn"
+    onclick="loginProfile()"
+>
+    GİRİŞ YAP
+</button>
+
+
+<div
+    class="modal-error"
+    id="modalError"
+></div>
+
+
+</div>
+
+
+</div>
+
 
 </div>
 
@@ -1101,14 +1555,19 @@ body.betul-mode .ring {
 <script>
 
 /* =====================================================
-   STATE
+STATE
 ===================================================== */
 
 let currentUser = {
+
     username: "karahan",
+
     name: "KARAHAN INC.",
+
     role: "Ana Kullanıcı"
+
 };
+
 
 let funMode = false;
 
@@ -1116,7 +1575,7 @@ let waitingTimer = null;
 
 
 /* =====================================================
-   BETUL WAITING MESSAGES
+BETÜL WAITING
 ===================================================== */
 
 const betulWaitingMessages = [
@@ -1125,13 +1584,13 @@ const betulWaitingMessages = [
 
     "Dur kız, bunu da hemen bilmemi bekleme. 😂",
 
-    "Bir dakika aşko, işlemcim dedikodu modundan çıkıyor...",
+    "Bir dakika aşko, işlemcim çalışıyor...",
 
-    "Tamam tamam, düşünüyorum kız. Sabırsızlanma. 😂",
+    "Tamam tamam, düşünüyorum kız. 😂",
 
-    "Aşko bekle, J.A.R.V.I.S. şu an beyninin son kalan hücresini kullanıyor...",
+    "Aşko bekle, J.A.R.V.I.S. şu an düşünüyor...",
 
-    "Bir saniye canım, NASA'ya bağlanıp geliyorum. 😂",
+    "Bir saniye canım, bunu da çözüyorum. 😂",
 
     "Dur kız, her şeyi ben mi bileceğim? 😭",
 
@@ -1139,55 +1598,85 @@ const betulWaitingMessages = [
 
     "Düşünüyorum kız, üstüme gelme. 😂",
 
-    "Tamam aşko, beynimin fanları şu an son hız dönüyor..."
+    "Tamam aşko, fanlar çalışıyor..."
 ];
 
 
 /* =====================================================
-   ELEMENTS
+ELEMENTS
 ===================================================== */
 
 const chat =
     document.getElementById("chat");
 
+
 const input =
-    document.getElementById("messageInput");
+    document.getElementById(
+        "messageInput"
+    );
+
 
 const sidebar =
-    document.getElementById("sidebar");
+    document.getElementById(
+        "sidebar"
+    );
+
 
 const overlay =
-    document.getElementById("overlay");
+    document.getElementById(
+        "overlay"
+    );
+
 
 const profileModal =
-    document.getElementById("profileModal");
+    document.getElementById(
+        "profileModal"
+    );
+
 
 const modalError =
-    document.getElementById("modalError");
+    document.getElementById(
+        "modalError"
+    );
+
 
 const greeting =
-    document.getElementById("greeting");
+    document.getElementById(
+        "greeting"
+    );
+
 
 const miniUserName =
-    document.getElementById("miniUserName");
+    document.getElementById(
+        "miniUserName"
+    );
+
 
 const sideProfileName =
-    document.getElementById("sideProfileName");
+    document.getElementById(
+        "sideProfileName"
+    );
+
 
 const sideProfileRole =
-    document.getElementById("sideProfileRole");
+    document.getElementById(
+        "sideProfileRole"
+    );
+
 
 const statusText =
-    document.getElementById("statusText");
+    document.getElementById(
+        "statusText"
+    );
 
 
 /* =====================================================
-   START
+START
 ===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function() {
 
         updateUserInterface();
 
@@ -1197,12 +1686,13 @@ document.addEventListener(
         );
 
         input.focus();
+
     }
 );
 
 
 /* =====================================================
-   SIDEBAR
+SIDEBAR
 ===================================================== */
 
 function openSidebar() {
@@ -1230,7 +1720,7 @@ function closeSidebar() {
 
 
 /* =====================================================
-   PROFILE MODAL
+PROFILE MODAL
 ===================================================== */
 
 function openProfileModal() {
@@ -1262,7 +1752,7 @@ function closeProfileModal() {
 
 
 /* =====================================================
-   PROFILE LOGIN
+LOGIN
 ===================================================== */
 
 async function loginProfile() {
@@ -1272,10 +1762,12 @@ async function loginProfile() {
             "usernameInput"
         ).value.trim();
 
+
     const password =
         document.getElementById(
             "passwordInput"
         ).value;
+
 
     modalError.textContent =
         "Kontrol ediliyor...";
@@ -1287,6 +1779,7 @@ async function loginProfile() {
             await fetch(
                 "/profile-login",
                 {
+
                     method: "POST",
 
                     headers: {
@@ -1294,10 +1787,17 @@ async function loginProfile() {
                             "application/json"
                     },
 
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
+                    body:
+                        JSON.stringify({
+
+                            username:
+                                username,
+
+                            password:
+                                password
+
+                        })
+
                 }
             );
 
@@ -1322,13 +1822,16 @@ async function loginProfile() {
 
         closeProfileModal();
 
+
         updateUserInterface();
+
 
         clearChat();
 
 
         if (
-            currentUser.username === "betul"
+            currentUser.username ===
+            "betul"
         ) {
 
             addMessage(
@@ -1344,16 +1847,18 @@ async function loginProfile() {
             );
         }
 
+
     } catch (error) {
 
         modalError.textContent =
             "Sunucuya bağlanılamadı.";
     }
+
 }
 
 
 /* =====================================================
-   UPDATE USER UI
+UPDATE UI
 ===================================================== */
 
 function updateUserInterface() {
@@ -1361,26 +1866,32 @@ function updateUserInterface() {
     miniUserName.textContent =
         currentUser.name;
 
+
     sideProfileName.textContent =
         currentUser.name;
+
 
     sideProfileRole.textContent =
         currentUser.role;
 
 
     if (
-        currentUser.username === "betul"
+        currentUser.username ===
+        "betul"
     ) {
 
         document.body.classList.add(
             "betul-mode"
         );
 
+
         greeting.textContent =
             "Hoş geldin Betül 😏";
 
+
         statusText.textContent =
             "BETÜL MODE";
+
 
     } else {
 
@@ -1388,17 +1899,20 @@ function updateUserInterface() {
             "betul-mode"
         );
 
+
         greeting.textContent =
             "Merhaba efendim";
+
 
         statusText.textContent =
             "SYSTEM ONLINE";
     }
+
 }
 
 
 /* =====================================================
-   CHAT
+MESSAGE
 ===================================================== */
 
 function addMessage(
@@ -1411,34 +1925,59 @@ function addMessage(
             "div"
         );
 
+
     div.className =
         "message " + type;
+
 
     div.textContent =
         text;
 
+
     chat.appendChild(
         div
     );
+
 
     chat.scrollTop =
         chat.scrollHeight;
 }
 
 
+/* =====================================================
+CLEAR CHAT
+===================================================== */
+
 function clearChat() {
+
+    stopWaitingMessage();
 
     chat.innerHTML = "";
 }
 
 
 /* =====================================================
-   WAITING MESSAGE
+WAITING
 ===================================================== */
 
 function startWaitingMessage() {
 
     stopWaitingMessage();
+
+
+    /*
+     * Sadece Betül için özel
+     * bekleme mesajları.
+     */
+
+    if (
+        currentUser.username !==
+        "betul"
+    ) {
+
+        return;
+    }
+
 
     let index =
         Math.floor(
@@ -1453,22 +1992,25 @@ function startWaitingMessage() {
     );
 
 
-    if (
-        currentUser.username !== "betul"
-    ) {
-        return;
-    }
-
-
     waitingTimer =
         setInterval(
-            () => {
+            function() {
+
+                if (
+                    currentUser.username !==
+                    "betul"
+                ) {
+
+                    return;
+                }
+
 
                 index =
                     Math.floor(
                         Math.random()
                         * betulWaitingMessages.length
                     );
+
 
                 addMessage(
                     "jarvis",
@@ -1495,7 +2037,7 @@ function stopWaitingMessage() {
 
 
 /* =====================================================
-   SEND MESSAGE
+SEND MESSAGE
 ===================================================== */
 
 async function sendMessage() {
@@ -1505,6 +2047,7 @@ async function sendMessage() {
 
 
     if (!message) {
+
         return;
     }
 
@@ -1530,20 +2073,27 @@ async function sendMessage() {
             await fetch(
                 "/chat",
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message: message,
+                            message:
+                                message,
 
-                        username:
-                            currentUser.username
-                    })
+                            username:
+                                currentUser.username
+
+                        })
+
                 }
             );
 
@@ -1555,31 +2105,12 @@ async function sendMessage() {
         stopWaitingMessage();
 
 
-        if (
-            !data.success
-        ) {
-
-            if (
-                data.error ===
-                "RATE_LIMIT"
-            ) {
-
-                document
-                    .getElementById(
-                        "ratePanel"
-                    )
-                    .classList.add(
-                        "active"
-                    );
-
-                return;
-            }
-
+        if (!data.success) {
 
             addMessage(
                 "jarvis",
                 data.message ||
-                "Bir hata oluştu."
+                "Şu anda cevap oluşturamadım."
             );
 
             return;
@@ -1596,16 +2127,18 @@ async function sendMessage() {
 
         stopWaitingMessage();
 
+
         addMessage(
             "jarvis",
             "Sunucuya bağlanırken bir problem oluştu."
         );
     }
+
 }
 
 
 /* =====================================================
-   ENTER
+ENTER
 ===================================================== */
 
 input.addEventListener(
@@ -1614,19 +2147,21 @@ input.addEventListener(
 
         if (
             event.key === "Enter"
-            && !event.shiftKey
+            &&
+            !event.shiftKey
         ) {
 
             event.preventDefault();
 
             sendMessage();
         }
+
     }
 );
 
 
 /* =====================================================
-   TEXTAREA AUTO HEIGHT
+TEXTAREA
 ===================================================== */
 
 input.addEventListener(
@@ -1635,6 +2170,7 @@ input.addEventListener(
 
         this.style.height =
             "auto";
+
 
         this.style.height =
             Math.min(
@@ -1646,58 +2182,7 @@ input.addEventListener(
 
 
 /* =====================================================
-   NEW CHAT
-===================================================== */
-
-async function startNewChat() {
-
-    document
-        .getElementById(
-            "ratePanel"
-        )
-        .classList.remove(
-            "active"
-        );
-
-
-    clearChat();
-
-
-    try {
-
-        await fetch(
-            "/new-chat",
-            {
-                method: "POST"
-            }
-        );
-
-    } catch (error) {
-        // Sorun değil.
-    }
-
-
-    if (
-        currentUser.username === "betul"
-    ) {
-
-        addMessage(
-            "jarvis",
-            "Tamam aşko, yeni sohbet açıldı. Hadi sor bakalım. 😂"
-        );
-
-    } else {
-
-        addMessage(
-            "jarvis",
-            "Yeni sohbet hazır efendim."
-        );
-    }
-}
-
-
-/* =====================================================
-   THEME
+THEME
 ===================================================== */
 
 function toggleTheme() {
@@ -1705,6 +2190,7 @@ function toggleTheme() {
     document.body.classList.toggle(
         "light"
     );
+
 
     document
         .getElementById(
@@ -1717,13 +2203,14 @@ function toggleTheme() {
 
 
 /* =====================================================
-   FUN MODE
+FUN MODE
 ===================================================== */
 
 function toggleFunMode() {
 
     funMode =
         !funMode;
+
 
     document
         .getElementById(
@@ -1734,25 +2221,58 @@ function toggleFunMode() {
         );
 
 
-    if (funMode) {
+    /*
+     * KARAHAN INC.:
+     *
+     * Bu ayar sadece arayüzü etkiler.
+     * AI karakteri profesyonel kalır.
+     */
+
+    if (
+        currentUser.username ===
+        "karahan"
+    ) {
 
         addMessage(
             "jarvis",
-            "Eğlence modu aktif. 😏"
+
+            funMode
+
+                ? "Eğlence arayüzü aktif efendim. Yanıt karakterim profesyonel kalacaktır."
+
+                : "Profesyonel moda geri dönüldü."
         );
 
-    } else {
+
+        return;
+    }
+
+
+    /*
+     * BETÜL
+     */
+
+    if (
+        currentUser.username ===
+        "betul"
+    ) {
 
         addMessage(
             "jarvis",
-            "Profesyonel moda geri döndüm."
+
+            funMode
+
+                ? "Tamam aşko, eğlenceyi açtık. 😂"
+
+                : "Tamam kız, biraz ciddileşiyoruz."
         );
     }
+
 }
 
 
 /* =====================================================
-   ESC
+ESC
 ===================================================== */
 
 document.addEventListener(
@@ -1760,17 +2280,20 @@ document.addEventListener(
     function(event) {
 
         if (
-            event.key === "Escape"
+            event.key ===
+            "Escape"
         ) {
 
             closeSidebar();
 
             closeProfileModal();
         }
+
     }
 );
 
 </script>
 
 </body>
+
 </html>
