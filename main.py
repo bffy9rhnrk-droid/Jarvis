@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import textwrap
 from pathlib import Path
 from datetime import datetime
 from io import BytesIO
@@ -28,7 +29,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 # MAIN BACKEND
 # ============================================================
 
-APP_VERSION = "25.0.0"
+APP_VERSION = "26.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -65,6 +66,12 @@ app.mount(
     "/files",
     StaticFiles(directory=str(FILES_DIR)),
     name="files"
+)
+
+app.mount(
+    "/generated",
+    StaticFiles(directory=str(GENERATED_DIR)),
+    name="generated"
 )
 
 
@@ -348,6 +355,8 @@ if GROQ_API_KEY:
             base_url="https://api.groq.com/openai/v1"
         )
 
+        print("Groq client: AKTİF")
+
     except Exception as error:
 
         print(
@@ -364,6 +373,8 @@ if OPENROUTER_API_KEY:
             api_key=OPENROUTER_API_KEY,
             base_url="https://openrouter.ai/api/v1"
         )
+
+        print("OpenRouter client: AKTİF")
 
     except Exception as error:
 
@@ -415,8 +426,46 @@ class ResearchRequest(BaseModel):
 class PresentationRequest(BaseModel):
 
     topic: str
-    username: str = "karahan"
+    username: str = "ilknur"
     mode: str = "presentation"
+
+
+# ============================================================
+# KULLANICI MODU
+# ============================================================
+
+def get_user(username):
+
+    username = str(
+        username or "karahan"
+    ).strip().lower()
+
+    return USERS.get(
+        username,
+        USERS["karahan"]
+    )
+
+
+def get_user_mode(
+    username,
+    requested_mode="normal"
+):
+
+    username = str(
+        username or "karahan"
+    ).strip().lower()
+
+    # İlknur Hocam'ın varsayılan modu
+    # Ders Asistanı.
+    if username == "ilknur":
+
+        if not requested_mode:
+            return "lesson"
+
+        if requested_mode == "normal":
+            return "lesson"
+
+    return requested_mode or "normal"
 
 
 # ============================================================
@@ -428,38 +477,44 @@ def build_system_prompt(
     mode="normal"
 ):
 
-    user = USERS.get(
-        username,
-        USERS["karahan"]
-    )
+    user = get_user(username)
 
     personality = user.get(
         "personality",
         "professional"
     )
 
+    mode = get_user_mode(
+        username,
+        mode
+    )
+
     prompt = """
 Sen K.A.R.V.I.S. - KARAHAN INC. isimli
 gelişmiş kişisel yapay zeka asistanısın.
 
-Kullanıcıya doğal, akıcı ve profesyonel Türkçe
-ile cevap ver.
+Yanıtlarını Türkçe ver.
+
+Doğal, akıcı ve profesyonel konuş.
 
 Gereksiz yere kendini tekrar etme.
 
-Kullanıcı kısa soru sorarsa gereksiz uzun cevap verme.
+Kullanıcı kısa soru sorarsa gereksiz
+uzun cevap verme.
 
 Kullanıcı detay isterse ayrıntılı anlat.
 
 Bilmediğin bilgiyi kesinmiş gibi uydurma.
 
-Teknik konularda uygulanabilir ve doğrudan çözüm üret.
+Teknik konularda uygulanabilir ve
+doğrudan çözüm üret.
 
 Kod istendiğinde çalışabilir kod üret.
 
 Türkçe karakterleri doğru kullan.
 
-Kullanıcıya her mesajda Murat diye hitap etme.
+Kullanıcıya her mesajda Murat diye
+hitap etme.
 
 Kendini ChatGPT olarak tanıtma.
 
@@ -490,72 +545,105 @@ ve doğal bir dil kullan.
     elif personality == "teacher":
 
         prompt += """
-İlknur Hocam için akademik,
-öğretici ve düzenli bir dil kullan.
+Kullanıcı İlknur Hocamdır.
+
+Akademik, öğretici ve düzenli
+bir dil kullan.
 
 Ders anlatırken konuyu öğrencinin
 anlayabileceği şekilde yapılandır.
 
 Gerektiğinde örnekler ver.
+
+Akademik doğruluğa dikkat et.
 """
 
     if mode == "research":
 
         prompt += """
-Araştırma modundasın.
+ARAŞTIRMA MODU:
 
-Konuyu başlıklar halinde incele.
+Konuyu sistematik şekilde incele.
 
-Güncel bilgi gerekiyorsa internet
-araştırması yapılması gerektiğini belirt.
+Önemli bilgileri ayır.
+
+Kesin bilgi ile yorumu birbirinden
+ayır.
+
+Güncel bilgi gerekiyorsa araştırma
+yapılması gerektiğini belirt.
 """
 
     elif mode == "academic":
 
         prompt += """
-Akademik moddasın.
+AKADEMİK MOD:
 
-Kavramsal doğruluk, bilimsel yaklaşım
-ve akademik terminolojiye önem ver.
+Bilimsel ve akademik bir yaklaşım kullan.
+
+Kavramları tanımla.
+
+Neden-sonuç ilişkilerini açıkla.
+
+Gerekirse kaynak öner.
 """
 
     elif mode == "article":
 
         prompt += """
-Makale asistanı modundasın.
+MAKALE ASİSTANI:
 
-Giriş, gelişme, sonuç ve gerektiğinde
-kaynakça yapısını kullan.
+Akademik makale düzenine uygun yaz.
+
+Giriş, gelişme, sonuç ve kaynak
+önerilerini gerektiğinde kullan.
 """
 
     elif mode == "lesson":
 
         prompt += """
-Ders asistanı modundasın.
+DERS ASİSTANI:
 
 Konuyu öğretmen anlatımı şeklinde düzenle.
 
-Örnekler ve öğrencinin anlayacağı
-açıklamalar ekle.
+Öğrencinin anlayabileceği açıklamalar yap.
+
+Örnekler kullan.
+
+Önemli kavramları belirginleştir.
+
+Dersin sonunda kısa bir değerlendirme
+veya soru önerilebilir.
 """
 
     elif mode == "quiz":
 
         prompt += """
-Sınav modundasın.
+SINAV / QUIZ MODU:
 
 Soruları açık ve ölçülebilir hazırla.
 
-İstenirse cevap anahtarı oluştur.
+Gerektiğinde cevap anahtarı oluştur.
+
+Soruları kolay, orta ve zor seviyelere
+ayırabilirsin.
 """
 
     elif mode == "presentation":
 
         prompt += """
-Sunum hazırlama modundasın.
+SUNUM HAZIRLAMA MODU:
 
-Bilgileri slaytlara uygun,
-kısa ve anlaşılır şekilde yapılandır.
+Profesyonel eğitim sunumu mantığıyla
+içerik oluştur.
+
+Başlıkları kısa tut.
+
+Açıklamaları kapsamlı tut.
+
+Görsel önerilerini konuya uygun seç.
+
+Bilgi yoğunluğunu dengeli tut.
 """
 
     return prompt
@@ -574,6 +662,11 @@ def ask_ai(
 
     history = history or []
 
+    mode = get_user_mode(
+        username,
+        mode
+    )
+
     system_prompt = build_system_prompt(
         username,
         mode
@@ -591,8 +684,13 @@ def ask_ai(
         if not isinstance(item, dict):
             continue
 
-        role = item.get("role")
-        content = item.get("content")
+        role = item.get(
+            "role"
+        )
+
+        content = item.get(
+            "content"
+        )
 
         if role in [
             "user",
@@ -606,12 +704,12 @@ def ask_ai(
 
     messages.append({
         "role": "user",
-        "content": message
+        "content": str(message)
     })
 
-    # --------------------------------------------------------
+    # ========================================================
     # GROQ
-    # --------------------------------------------------------
+    # ========================================================
 
     if groq_client:
 
@@ -627,7 +725,7 @@ def ask_ai(
                         model=model,
                         messages=messages,
                         temperature=0.7,
-                        max_tokens=3000
+                        max_tokens=3500
                     )
                 )
 
@@ -640,6 +738,11 @@ def ask_ai(
 
                 if answer:
 
+                    print(
+                        "AI sağlayıcısı: Groq",
+                        model
+                    )
+
                     return answer.strip()
 
             except Exception as error:
@@ -650,9 +753,14 @@ def ask_ai(
                     error
                 )
 
-    # --------------------------------------------------------
-    # OPENROUTER
-    # --------------------------------------------------------
+                log_error(
+                    error,
+                    "groq"
+                )
+
+    # ========================================================
+    # OPENROUTER YEDEK
+    # ========================================================
 
     if openrouter_client:
 
@@ -666,7 +774,13 @@ def ask_ai(
                     model=OPENROUTER_MODEL,
                     messages=messages,
                     temperature=0.7,
-                    max_tokens=3000
+                    max_tokens=3500,
+                    extra_headers={
+                        "HTTP-Referer":
+                            "https://karahan-inc.com",
+                        "X-Title":
+                            "K.A.R.V.I.S. - KARAHAN INC."
+                    }
                 )
             )
 
@@ -679,6 +793,10 @@ def ask_ai(
 
             if answer:
 
+                print(
+                    "AI sağlayıcısı: OpenRouter"
+                )
+
                 return answer.strip()
 
         except Exception as error:
@@ -688,11 +806,16 @@ def ask_ai(
                 error
             )
 
+            log_error(
+                error,
+                "openrouter"
+            )
+
     return (
-        "Şu anda yapay zeka servislerine "
-        "bağlanamıyorum. API anahtarlarını "
-        "ve Render ortam değişkenlerini "
-        "kontrol et."
+        "Efendim, şu anda yapay zeka "
+        "servislerine bağlanamıyorum. "
+        "Lütfen Render üzerindeki API "
+        "anahtarlarını kontrol edin."
     )
 
 
@@ -700,7 +823,10 @@ def ask_ai(
 # İNTERNET ARAMA
 # ============================================================
 
-def internet_search(query, limit=5):
+def internet_search(
+    query,
+    limit=8
+):
 
     try:
 
@@ -711,15 +837,18 @@ def internet_search(query, limit=5):
         response = requests.post(
             url,
             data={
-                "q": query
+                "q": str(query)
             },
             headers={
-                "User-Agent": "Mozilla/5.0"
+                "User-Agent":
+                    "Mozilla/5.0 "
+                    "KARVIS-KARAHAN-INC"
             },
             timeout=15
         )
 
         if response.status_code != 200:
+
             return []
 
         html = response.text
@@ -733,7 +862,9 @@ def internet_search(query, limit=5):
             re.S
         )
 
-        for match in pattern.finditer(html):
+        for match in pattern.finditer(
+            html
+        ):
 
             link = match.group(1)
 
@@ -753,6 +884,7 @@ def internet_search(query, limit=5):
                 })
 
             if len(results) >= limit:
+
                 break
 
         return results
@@ -782,7 +914,9 @@ def research_topic(topic):
 
         return {
             "success": False,
-            "message": "Araştırma sonucu bulunamadı.",
+            "message": (
+                "Araştırma sonucu bulunamadı."
+            ),
             "results": []
         }
 
@@ -796,68 +930,102 @@ def research_topic(topic):
 # SUNUM OUTLINE
 # ============================================================
 
-def generate_presentation_outline(topic):
+def generate_presentation_outline(
+    topic
+):
 
     prompt = f"""
-Aşağıdaki konu için profesyonel bir
-eğitim sunumu hazırla:
+Aşağıdaki konu için profesyonel,
+eğitim amaçlı ve akademik bir sunum hazırla:
 
 KONU:
 
 {topic}
 
-Sadece geçerli JSON döndür.
+SADECE GEÇERLİ JSON DÖNDÜR.
 
-Format:
+Şu yapıyı kullan:
 
 {{
   "title": "Sunum başlığı",
   "subtitle": "Kısa açıklama",
   "slides": [
     {{
-      "title": "Slayt başlığı",
+      "title": "Kısa başlık",
+      "paragraph": "Uzun açıklayıcı paragraf",
       "bullets": [
-        "Madde 1",
-        "Madde 2",
-        "Madde 3"
+        "Önemli nokta 1",
+        "Önemli nokta 2",
+        "Önemli nokta 3"
       ],
       "note": "Öğretmen notu",
-      "visual_query": "İngilizce görsel arama kelimeleri"
+      "visual_query": "English visual search query"
     }}
   ]
 }}
 
-5 ile 8 arasında slayt oluştur.
+6 ile 8 arasında slayt oluştur.
 
-Bilgiler doğru ve öğretici olsun.
+HER SLAYTTA MUTLAKA ŞUNLAR OLSUN:
+
+title
+paragraph
+bullets
+note
+visual_query
+
+BAŞLIK:
+
+2-6 kelime arasında kısa bir başlık olsun.
+
+PARAGRAPH:
+
+Yaklaşık 80-130 kelimelik açıklayıcı
+ve öğretici bir metin oluştur.
+
+Paragraf sadece maddeleri tekrar etmesin.
+
+Konunun neden önemli olduğunu,
+temel özelliklerini ve gerekiyorsa
+neden-sonuç ilişkilerini açıklasın.
+
+BULLETS:
+
+3 veya 4 önemli madde oluştur.
+
+NOTE:
+
+Öğretmenin sınıfta kullanabileceği
+faydalı bir anlatım notu oluştur.
+
+Çok uzun olmasın.
+
+VISUAL_QUERY:
+
+İngilizce yaz.
+
+Gerçek fotoğraf, harita, bilimsel
+diyagram, tarihi fotoğraf veya konuya
+uygun görsel bulunabilecek şekilde
+hazırla.
+
+Örnekler:
+
+"solar system planets NASA"
+
+"human heart anatomy diagram"
+
+"Turkey physical geography map"
+
+"Turkish War of Independence historical photograph"
+
+"industrial revolution factory historical photograph"
+
+Bilgi uydurma.
 
 Türkçe karakterleri doğru kullan.
 
-Her slayt için gerçek fotoğraf,
-harita, bilimsel görsel, tarihi fotoğraf
-veya konuya uygun görsel bulunabilecek
-İNGİLİZCE arama kelimeleri oluştur.
-
-visual_query mümkün olduğunca kısa olsun.
-
-Örnek:
-
-Tarih konusu:
-"Turkish War of Independence"
-
-Bilim konusu:
-"solar system planets"
-
-Coğrafya konusu:
-"Turkey physical map"
-
-Biyoloji konusu:
-"human heart anatomy"
-
-Sanat konusu:
-"Van Gogh Starry Night"
-
-Sadece JSON döndür.
+SADECE JSON DÖNDÜR.
 """
 
     result = ask_ai(
@@ -893,7 +1061,10 @@ Sadece JSON döndür.
             result.strip()
         )
 
-        if "slides" in data:
+        if (
+            isinstance(data, dict)
+            and "slides" in data
+        ):
 
             return data
 
@@ -904,47 +1075,113 @@ Sadece JSON döndür.
             error
         )
 
+        log_error(
+            error,
+            "presentation_json"
+        )
+
+    # ========================================================
+    # YEDEK SUNUM
+    # ========================================================
+
     return {
         "title": topic,
+
         "subtitle": (
             "K.A.R.V.I.S. tarafından "
-            "hazırlanan sunum"
+            "hazırlanan eğitim sunumu"
         ),
+
         "slides": [
             {
                 "title": "Giriş",
+
+                "paragraph": (
+                    f"{topic} konusu, temel "
+                    "kavramları ve genel yapısı "
+                    "açısından önemli bir konudur. "
+                    "Bu sunumda konunun temel "
+                    "özellikleri, önemi ve genel "
+                    "çerçevesi ele alınacaktır. "
+                    "Konuya ilişkin temel bilgilerin "
+                    "öğrenilmesi, daha ayrıntılı "
+                    "konuların anlaşılmasını "
+                    "kolaylaştıracaktır."
+                ),
+
                 "bullets": [
-                    topic,
                     "Temel kavramlar",
+                    "Konunun önemi",
                     "Genel bakış"
                 ],
+
                 "note": (
-                    "Konuya giriş yapınız."
+                    "Derse giriş yaparken öğrencilerin "
+                    "konu hakkındaki mevcut bilgilerini "
+                    "kısaca öğreniniz."
                 ),
+
                 "visual_query": topic
             },
+
             {
                 "title": "Temel Bilgiler",
+
+                "paragraph": (
+                    f"{topic} hakkında temel "
+                    "bilgilerin öğrenilmesi, "
+                    "konunun daha ayrıntılı "
+                    "şekilde anlaşılmasını sağlar. "
+                    "Temel kavramlar arasındaki "
+                    "ilişkilerin incelenmesi, "
+                    "konunun bütünsel olarak "
+                    "değerlendirilmesine yardımcı olur. "
+                    "Bu nedenle temel özelliklerin "
+                    "sistematik biçimde ele alınması "
+                    "önemlidir."
+                ),
+
                 "bullets": [
                     "Temel özellikler",
-                    "Önemli noktalar",
-                    "Uygulama alanları"
+                    "Önemli kavramlar",
+                    "Neden-sonuç ilişkileri"
                 ],
+
                 "note": (
-                    "Önemli kavramları açıklayınız."
+                    "Önemli kavramları açıklarken "
+                    "öğrencilerden günlük hayattan "
+                    "örnekler vermelerini isteyiniz."
                 ),
+
                 "visual_query": topic
             },
+
             {
                 "title": "Sonuç",
+
+                "paragraph": (
+                    f"{topic} konusunda öğrenilen "
+                    "bilgiler birlikte değerlendirildiğinde, "
+                    "konunun farklı unsurları arasında "
+                    "bir bağlantı bulunduğu görülmektedir. "
+                    "Temel bilgilerin tekrar edilmesi "
+                    "ve önemli noktaların değerlendirilmesi, "
+                    "öğrenilen bilgilerin daha kalıcı "
+                    "hale gelmesine yardımcı olacaktır."
+                ),
+
                 "bullets": [
-                    "Konunun önemi",
                     "Temel çıkarımlar",
+                    "Konunun önemi",
                     "Genel değerlendirme"
                 ],
+
                 "note": (
-                    "Öğrencilerle kısa değerlendirme yapınız."
+                    "Ders sonunda öğrencilerden konuyu "
+                    "kendi cümleleriyle özetlemelerini "
+                    "isteyiniz."
                 ),
+
                 "visual_query": topic
             }
         ]
@@ -955,7 +1192,10 @@ Sadece JSON döndür.
 # GÖRSEL İNDİRME
 # ============================================================
 
-def download_image(url, filename=None):
+def download_image(
+    url,
+    filename=None
+):
 
     try:
 
@@ -963,23 +1203,19 @@ def download_image(url, filename=None):
             return None
 
         print("")
-        print("GÖRSEL İNDİRİLİYOR:")
+        print(
+            "GÖRSEL İNDİRİLİYOR:"
+        )
         print(url)
 
         response = requests.get(
             url,
             headers={
-                "User-Agent": (
+                "User-Agent":
                     "Mozilla/5.0 "
                     "(Windows NT 10.0; Win64; x64) "
                     "AppleWebKit/537.36 "
                     "Chrome/120 Safari/537.36"
-                ),
-                "Accept": (
-                    "image/avif,image/webp,"
-                    "image/apng,image/svg+xml,"
-                    "image/*,*/*;q=0.8"
-                )
             },
             timeout=25,
             allow_redirects=True
@@ -1003,7 +1239,9 @@ def download_image(url, filename=None):
             from PIL import Image
 
             image = Image.open(
-                BytesIO(response.content)
+                BytesIO(
+                    response.content
+                )
             )
 
             print(
@@ -1016,16 +1254,35 @@ def download_image(url, filename=None):
                 image.size
             )
 
-            try:
-                image.seek(0)
-            except Exception:
-                pass
-
             if image.mode != "RGB":
 
-                image = image.convert(
-                    "RGB"
-                )
+                if image.mode in (
+                    "RGBA",
+                    "LA"
+                ):
+
+                    background = Image.new(
+                        "RGB",
+                        image.size,
+                        "white"
+                    )
+
+                    background.paste(
+                        image,
+                        mask=image.getchannel(
+                            "A"
+                        )
+                        if "A" in image.getbands()
+                        else None
+                    )
+
+                    image = background
+
+                else:
+
+                    image = image.convert(
+                        "RGB"
+                    )
 
             if filename:
 
@@ -1052,7 +1309,7 @@ def download_image(url, filename=None):
             )
 
             print(
-                "Görsel başarıyla kaydedildi:",
+                "Görsel kaydedildi:",
                 destination
             )
 
@@ -1078,19 +1335,20 @@ def download_image(url, filename=None):
 
 
 # ============================================================
-# WIKIMEDIA COMMONS
+# WIKIMEDIA
 # ============================================================
 
-def download_wikimedia_visual(query):
+def download_wikimedia_visual(
+    query
+):
 
     try:
 
         if not query:
             return None
 
-        print("")
         print(
-            "WIKIMEDIA ARAMASI:",
+            "Wikimedia araması:",
             query
         )
 
@@ -1115,10 +1373,8 @@ def download_wikimedia_visual(query):
             api_url,
             params=params,
             headers={
-                "User-Agent": (
-                    "KARVIS-KARAHAN-INC/25.0 "
-                    "(presentation image system)"
-                )
+                "User-Agent":
+                    "KARVIS-KARAHAN-INC/26.0"
             },
             timeout=20
         )
@@ -1138,14 +1394,6 @@ def download_wikimedia_visual(query):
             .get("query", {})
             .get("pages", {})
         )
-
-        if not pages:
-
-            print(
-                "Wikimedia sonuç döndürmedi."
-            )
-
-            return None
 
         for page in pages.values():
 
@@ -1185,11 +1433,6 @@ def download_wikimedia_visual(query):
             if not image_url:
                 continue
 
-            print(
-                "Wikimedia görsel bulundu:",
-                page.get("title", "")
-            )
-
             filename = (
                 "visual_"
                 + uuid.uuid4().hex
@@ -1223,16 +1466,17 @@ def download_wikimedia_visual(query):
 # WIKIPEDIA
 # ============================================================
 
-def download_wikipedia_visual(query):
+def download_wikipedia_visual(
+    query
+):
 
     try:
 
         if not query:
             return None
 
-        print("")
         print(
-            "WIKIPEDIA GÖRSEL ARAMASI:",
+            "Wikipedia araması:",
             query
         )
 
@@ -1256,9 +1500,8 @@ def download_wikipedia_visual(query):
             api_url,
             params=params,
             headers={
-                "User-Agent": (
-                    "KARVIS-KARAHAN-INC/25.0"
-                )
+                "User-Agent":
+                    "KARVIS-KARAHAN-INC/26.0"
             },
             timeout=20
         )
@@ -1296,11 +1539,6 @@ def download_wikipedia_visual(query):
             if not image_url:
                 continue
 
-            print(
-                "Wikipedia görsel bulundu:",
-                page.get("title", "")
-            )
-
             filename = (
                 "visual_"
                 + uuid.uuid4().hex
@@ -1334,16 +1572,17 @@ def download_wikipedia_visual(query):
 # OPENVERSE
 # ============================================================
 
-def download_openverse_visual(query):
+def download_openverse_visual(
+    query
+):
 
     try:
 
         if not query:
             return None
 
-        print("")
         print(
-            "OPENVERSE ARAMASI:",
+            "Openverse araması:",
             query
         )
 
@@ -1360,10 +1599,8 @@ def download_openverse_visual(query):
                 "mature": "false"
             },
             headers={
-                "User-Agent": (
-                    "KARVIS-KARAHAN-INC/25.0"
-                ),
-                "Accept": "application/json"
+                "User-Agent":
+                    "KARVIS-KARAHAN-INC/26.0"
             },
             timeout=20
         )
@@ -1381,11 +1618,6 @@ def download_openverse_visual(query):
         results = data.get(
             "results",
             []
-        )
-
-        print(
-            "Openverse sonuç sayısı:",
-            len(results)
         )
 
         for item in results:
@@ -1432,16 +1664,22 @@ def download_openverse_visual(query):
 # GÖRSEL SORGULARI
 # ============================================================
 
-def build_visual_queries(query):
+def build_visual_queries(
+    query
+):
 
-    query = str(query).strip()
+    query = str(
+        query or ""
+    ).strip()
 
     if not query:
         return []
 
     queries = []
 
-    queries.append(query)
+    if query not in queries:
+
+        queries.append(query)
 
     cleaned = re.sub(
         r"[^\w\sçğıöşüÇĞİÖŞÜ-]",
@@ -1458,18 +1696,17 @@ def build_visual_queries(query):
 
     if cleaned and cleaned not in queries:
 
-        queries.append(
-            cleaned
-        )
+        queries.append(cleaned)
 
-    variants = [
+    extra_queries = [
         cleaned + " photograph",
         cleaned + " photo",
         cleaned + " historical photograph",
+        cleaned + " diagram",
         cleaned + " map"
     ]
 
-    for item in variants:
+    for item in extra_queries:
 
         item = item.strip()
 
@@ -1477,27 +1714,28 @@ def build_visual_queries(query):
 
             queries.append(item)
 
-    return queries[:5]
+    return queries[:6]
 
 
 # ============================================================
-# ANA GÖRSEL BULMA
+# ANA GÖRSEL SİSTEMİ
 # ============================================================
 
-def get_slide_image(query):
+def get_slide_image(
+    query
+):
 
     if not query:
-
-        print(
-            "Görsel sorgusu boş."
-        )
 
         return None
 
     print("")
     print("======================================")
     print("GÖRSEL ARAMA BAŞLADI")
-    print("Sorgu:", query)
+    print(
+        "Sorgu:",
+        query
+    )
     print("======================================")
 
     queries = build_visual_queries(
@@ -1510,11 +1748,6 @@ def get_slide_image(query):
 
     for search_query in queries:
 
-        print(
-            "Wikimedia deneniyor:",
-            search_query
-        )
-
         image = download_wikimedia_visual(
             search_query
         )
@@ -1522,7 +1755,7 @@ def get_slide_image(query):
         if image:
 
             print(
-                "✓ GÖRSEL KAYNAĞI: WIKIMEDIA"
+                "✓ KAYNAK: WIKIMEDIA"
             )
 
             return image
@@ -1533,11 +1766,6 @@ def get_slide_image(query):
 
     for search_query in queries:
 
-        print(
-            "Wikipedia deneniyor:",
-            search_query
-        )
-
         image = download_wikipedia_visual(
             search_query
         )
@@ -1545,7 +1773,7 @@ def get_slide_image(query):
         if image:
 
             print(
-                "✓ GÖRSEL KAYNAĞI: WIKIPEDIA"
+                "✓ KAYNAK: WIKIPEDIA"
             )
 
             return image
@@ -1556,11 +1784,6 @@ def get_slide_image(query):
 
     for search_query in queries:
 
-        print(
-            "Openverse deneniyor:",
-            search_query
-        )
-
         image = download_openverse_visual(
             search_query
         )
@@ -1568,25 +1791,14 @@ def get_slide_image(query):
         if image:
 
             print(
-                "✓ GÖRSEL KAYNAĞI: OPENVERSE"
+                "✓ KAYNAK: OPENVERSE"
             )
 
             return image
 
-    print("")
     print(
         "✗ UYGUN GÖRSEL BULUNAMADI."
     )
-
-    print(
-        "Denenen sorgular:",
-        queries
-    )
-
-    print("======================================")
-    print("GÖRSEL ARAMA BİTTİ")
-    print("======================================")
-    print("")
 
     return None
 
@@ -1603,15 +1815,23 @@ def draw_wrapped_text(
     width,
     font=REGULAR_FONT,
     size=18,
-    leading=24
+    leading=24,
+    max_lines=None
 ):
+
+    text = str(
+        text or ""
+    ).strip()
+
+    if not text:
+        return y
 
     pdf.setFont(
         font,
         size
     )
 
-    words = str(text).split()
+    words = text.split()
 
     line = ""
 
@@ -1634,12 +1854,22 @@ def draw_wrapped_text(
         else:
 
             if line:
-                lines.append(line)
+
+                lines.append(
+                    line
+                )
 
             line = word
 
     if line:
-        lines.append(line)
+
+        lines.append(
+            line
+        )
+
+    if max_lines is not None:
+
+        lines = lines[:max_lines]
 
     current_y = y
 
@@ -1652,38 +1882,6 @@ def draw_wrapped_text(
         )
 
         current_y -= leading
-
-    return current_y
-
-
-# ============================================================
-# PDF BULLET
-# ============================================================
-
-def draw_bullets(
-    pdf,
-    bullets,
-    x,
-    y,
-    width
-):
-
-    current_y = y
-
-    for bullet in bullets:
-
-        current_y = draw_wrapped_text(
-            pdf,
-            "• " + str(bullet),
-            x,
-            current_y,
-            width,
-            font=REGULAR_FONT,
-            size=17,
-            leading=24
-        )
-
-        current_y -= 8
 
     return current_y
 
@@ -1735,14 +1933,16 @@ def draw_fallback_visual(
 
     pdf.setFont(
         REGULAR_FONT,
-        10
+        9
     )
 
-    wrapped = []
-
-    words = str(title).split()
+    words = str(
+        title or ""
+    ).split()
 
     line = ""
+
+    lines = []
 
     for word in words:
 
@@ -1750,35 +1950,41 @@ def draw_fallback_visual(
             line + " " + word
         ).strip()
 
-        if len(test) <= 35:
+        if len(test) <= 38:
 
             line = test
 
         else:
 
             if line:
-                wrapped.append(line)
+
+                lines.append(
+                    line
+                )
 
             line = word
 
     if line:
-        wrapped.append(line)
 
-    yy = y + 50
+        lines.append(
+            line
+        )
 
-    for line in wrapped[:3]:
+    yy = y + 45
+
+    for item in lines[:3]:
 
         pdf.drawCentredString(
             x + width / 2,
             yy,
-            line
+            item
         )
 
-        yy -= 14
+        yy -= 13
 
 
 # ============================================================
-# GÖRSEL PDF'E ÇİZ
+# GÖRSELİ PDF'E ÇİZ
 # ============================================================
 
 def draw_image(
@@ -1833,7 +2039,9 @@ def draw_image(
         )
 
         pdf.drawImage(
-            ImageReader(image_path),
+            ImageReader(
+                image_path
+            ),
             draw_x,
             draw_y,
             width=draw_width,
@@ -1855,7 +2063,74 @@ def draw_image(
 
 
 # ============================================================
-# SUNUM PDF
+# ÖĞRETMEN NOTU KUTUSU
+# ============================================================
+
+def draw_teacher_note(
+    pdf,
+    note,
+    x,
+    y,
+    width,
+    height
+):
+
+    note = str(
+        note or ""
+    ).strip()
+
+    # Kutu
+    pdf.roundRect(
+        x,
+        y,
+        width,
+        height,
+        8,
+        stroke=1,
+        fill=0
+    )
+
+    # Başlık
+    pdf.setFont(
+        BOLD_FONT,
+        9.5
+    )
+
+    pdf.drawString(
+        x + 12,
+        y + height - 17,
+        "Öğretmen Notu"
+    )
+
+    # Metin alanı
+    text_x = (
+        x + 105
+    )
+
+    text_y = (
+        y + height - 17
+    )
+
+    text_width = (
+        width - 120
+    )
+
+    # Metni otomatik satırlandır.
+    draw_wrapped_text(
+        pdf,
+        note,
+        text_x,
+        text_y,
+        text_width,
+        font=REGULAR_FONT,
+        size=8.7,
+        leading=11,
+        max_lines=4
+    )
+
+
+# ============================================================
+# SUNUM PDF OLUŞTUR
 # ============================================================
 
 def create_presentation_pdf(
@@ -1905,7 +2180,7 @@ def create_presentation_pdf(
 
     pdf.drawCentredString(
         page_width / 2,
-        page_height - 150,
+        page_height - 140,
         str(
             outline.get(
                 "title",
@@ -1916,12 +2191,12 @@ def create_presentation_pdf(
 
     pdf.setFont(
         REGULAR_FONT,
-        18
+        17
     )
 
     pdf.drawCentredString(
         page_width / 2,
-        page_height - 190,
+        page_height - 178,
         str(
             outline.get(
                 "subtitle",
@@ -1930,12 +2205,13 @@ def create_presentation_pdf(
         )
     )
 
-    # Kapakta da gerçek görsel deniyoruz.
-    cover_query = (
-        outline.get(
-            "title",
-            ""
-        )
+    cover_query = outline.get(
+        "title",
+        ""
+    )
+
+    print(
+        "Kapak görseli aranıyor..."
     )
 
     cover_image = get_slide_image(
@@ -1944,14 +2220,16 @@ def create_presentation_pdf(
 
     if cover_image:
 
-        if not draw_image(
+        success = draw_image(
             pdf,
             cover_image,
             page_width / 2 - 200,
-            105,
+            110,
             400,
             190
-        ):
+        )
+
+        if not success:
 
             draw_fallback_visual(
                 pdf,
@@ -1975,7 +2253,7 @@ def create_presentation_pdf(
 
     pdf.setFont(
         REGULAR_FONT,
-        11
+        10
     )
 
     pdf.drawCentredString(
@@ -1995,6 +2273,10 @@ def create_presentation_pdf(
         []
     )
 
+    total_slides = len(
+        slides
+    )
+
     for index, slide in enumerate(
         slides,
         start=1
@@ -2003,6 +2285,11 @@ def create_presentation_pdf(
         title = slide.get(
             "title",
             "Slayt"
+        )
+
+        paragraph = slide.get(
+            "paragraph",
+            ""
         )
 
         bullets = slide.get(
@@ -2020,46 +2307,110 @@ def create_presentation_pdf(
             title
         )
 
-        # ----------------------------------------------------
+        # ====================================================
         # BAŞLIK
-        # ----------------------------------------------------
+        # ====================================================
 
         pdf.setFont(
             BOLD_FONT,
-            25
+            20
         )
 
         pdf.drawString(
             55,
-            page_height - 65,
+            page_height - 55,
             str(title)
         )
 
-        # ----------------------------------------------------
-        # METİN
-        # ----------------------------------------------------
+        # ====================================================
+        # SOL İÇERİK ALANI
+        # ====================================================
 
-        text_width = (
-            page_width * 0.48
+        left_x = 55
+
+        left_width = 390
+
+        text_y = (
+            page_height - 90
         )
 
-        draw_bullets(
+        # ----------------------------------------------------
+        # AÇIKLAMA BAŞLIĞI
+        # ----------------------------------------------------
+
+        pdf.setFont(
+            BOLD_FONT,
+            11
+        )
+
+        pdf.drawString(
+            left_x,
+            text_y,
+            "Açıklama"
+        )
+
+        text_y -= 20
+
+        # ----------------------------------------------------
+        # UZUN AÇIKLAMA
+        # ----------------------------------------------------
+
+        text_y = draw_wrapped_text(
             pdf,
-            bullets,
-            60,
-            page_height - 115,
-            text_width
+            paragraph,
+            left_x,
+            text_y,
+            left_width,
+            font=REGULAR_FONT,
+            size=10.5,
+            leading=15,
+            max_lines=11
         )
 
         # ----------------------------------------------------
-        # GÖRSEL
+        # ÖNEMLİ NOKTALAR
         # ----------------------------------------------------
+
+        text_y -= 10
+
+        pdf.setFont(
+            BOLD_FONT,
+            10.5
+        )
+
+        pdf.drawString(
+            left_x,
+            text_y,
+            "Önemli Noktalar"
+        )
+
+        text_y -= 18
+
+        for bullet in bullets[:4]:
+
+            text_y = draw_wrapped_text(
+                pdf,
+                "• " + str(bullet),
+                left_x,
+                text_y,
+                left_width,
+                font=REGULAR_FONT,
+                size=9.7,
+                leading=13,
+                max_lines=2
+            )
+
+            text_y -= 3
+
+        # ====================================================
+        # SAĞ GÖRSEL
+        # ====================================================
 
         image_x = (
-            page_width * 0.55
+            page_width - 350
         )
 
-        image_y = 150
+        image_y = 170
 
         image_width = 300
 
@@ -2102,58 +2453,56 @@ def create_presentation_pdf(
                 visual_query
             )
 
-        # ----------------------------------------------------
+        # ====================================================
         # ÖĞRETMEN NOTU
-        # ----------------------------------------------------
+        #
+        # Ayrı sabit kutu kullanılıyor.
+        # Böylece metinler artık birbirinin
+        # üzerine binmiyor.
+        # ========================================================
 
-        if note:
+        draw_teacher_note(
+            pdf,
+            note,
+            55,
+            55,
+            page_width - 110,
+            65
+        )
 
-            pdf.setFont(
-                BOLD_FONT,
-                11
-            )
-
-            pdf.drawString(
-                60,
-                95,
-                "Öğretmen Notu:"
-            )
-
-            draw_wrapped_text(
-                pdf,
-                note,
-                145,
-                95,
-                page_width - 200,
-                font=REGULAR_FONT,
-                size=10,
-                leading=13
-            )
-
-        # ----------------------------------------------------
+        # ====================================================
         # ALT BİLGİ
-        # ----------------------------------------------------
+        # ====================================================
 
         pdf.setFont(
             REGULAR_FONT,
-            9
+            7.5
         )
 
         pdf.drawString(
             55,
-            35,
+            32,
             "K.A.R.V.I.S. - KARAHAN INC."
         )
 
         pdf.drawRightString(
             page_width - 55,
-            35,
-            f"{index} / {len(slides)}"
+            32,
+            f"{index} / {total_slides}"
         )
 
         pdf.showPage()
 
     pdf.save()
+
+    print("")
+    print(
+        "PDF başarıyla oluşturuldu:"
+    )
+    print(
+        pdf_path
+    )
+    print("")
 
     return pdf_path
 
@@ -2197,25 +2546,37 @@ def health():
         "status": "online",
         "version": APP_VERSION,
         "time": datetime.now().isoformat(),
+
         "pdf_font": REGULAR_FONT,
+
         "font_exists": (
             REGULAR_FONT_FILE.exists()
             and BOLD_FONT_FILE.exists()
         ),
+
         "font_normal_size": (
             REGULAR_FONT_FILE.stat().st_size
             if REGULAR_FONT_FILE.exists()
             else 0
         ),
+
         "font_bold_size": (
             BOLD_FONT_FILE.stat().st_size
             if BOLD_FONT_FILE.exists()
             else 0
         ),
-        "groq": bool(GROQ_API_KEY),
+
+        "groq": bool(
+            GROQ_API_KEY
+        ),
+
         "openrouter": bool(
             OPENROUTER_API_KEY
-        )
+        ),
+
+        "visual_system": True,
+
+        "pdf_system": True
     }
 
 
@@ -2287,14 +2648,19 @@ def profile_login(
             }
         )
 
+    # Ana kullanıcı
+    # şifresiz kullanılabilir.
     if username == "karahan":
 
         return {
             "success": True,
-            "user": user
+            "user": user,
+            "default_mode": "normal"
         }
 
-    if user.get("password") != password:
+    if user.get(
+        "password"
+    ) != password:
 
         return JSONResponse(
             status_code=401,
@@ -2304,9 +2670,23 @@ def profile_login(
             }
         )
 
+    # İlknur Hocam için otomatik
+    # Ders Asistanı.
+    if username == "ilknur":
+
+        return {
+            "success": True,
+            "user": user,
+            "default_mode": "lesson",
+            "default_mode_name": (
+                "🎓 Ders Asistanı"
+            )
+        }
+
     return {
         "success": True,
-        "user": user
+        "user": user,
+        "default_mode": "normal"
     }
 
 
@@ -2334,10 +2714,15 @@ def chat(
 
     try:
 
+        mode = get_user_mode(
+            request.username,
+            request.mode
+        )
+
         answer = ask_ai(
             request.message,
             request.username,
-            request.mode,
+            mode,
             request.history
         )
 
@@ -2346,7 +2731,7 @@ def chat(
             "answer": answer,
             "message": answer,
             "username": request.username,
-            "mode": request.mode
+            "mode": mode
         }
 
     except Exception as error:
@@ -2383,7 +2768,9 @@ def research(
             request.topic
         )
 
-        if not results.get("success"):
+        if not results.get(
+            "success"
+        ):
 
             return results
 
@@ -2408,6 +2795,9 @@ Bulunan kaynaklar:
 
 Türkçe, anlaşılır ve düzenli
 bir araştırma özeti hazırla.
+
+Kaynaklarda bulunmayan bilgileri
+kesinmiş gibi yazma.
 """
 
         summary = ask_ai(
@@ -2450,7 +2840,12 @@ def presentation(
 
     try:
 
-        if not request.topic.strip():
+        topic = (
+            request.topic
+            or ""
+        ).strip()
+
+        if not topic:
 
             return JSONResponse(
                 status_code=400,
@@ -2465,12 +2860,19 @@ def presentation(
         print("")
         print("======================================")
         print("SUNUM OLUŞTURULUYOR")
-        print("Konu:", request.topic)
+        print(
+            "Konu:",
+            topic
+        )
+        print(
+            "Kullanıcı:",
+            request.username
+        )
         print("======================================")
 
         outline = (
             generate_presentation_outline(
-                request.topic
+                topic
             )
         )
 
@@ -2489,23 +2891,30 @@ def presentation(
         )
 
         print(
-            "Sunum tamamlandı:",
+            "Sunum tamamlandı:"
+        )
+
+        print(
             file_url
         )
 
         return {
             "success": True,
+
             "title": outline.get(
                 "title",
-                request.topic
+                topic
             ),
+
             "slides": len(
                 outline.get(
                     "slides",
                     []
                 )
             ),
+
             "file_url": file_url,
+
             "download_url": file_url
         }
 
@@ -2537,7 +2946,9 @@ def presentation(
 # GENERATED PDF
 # ============================================================
 
-@app.get("/generated/{filename}")
+@app.get(
+    "/generated/{filename}"
+)
 def generated_file(
     filename: str
 ):
@@ -2563,7 +2974,8 @@ def generated_file(
             )
 
         file_path = (
-            GENERATED_DIR / safe_name
+            GENERATED_DIR
+            / safe_name
         )
 
         if not file_path.exists():
@@ -2683,31 +3095,13 @@ def startup():
     )
 
     print(
-        "Font dosyası:",
+        "Font dosyaları:",
         "AKTİF"
         if (
             REGULAR_FONT_FILE.exists()
             and BOLD_FONT_FILE.exists()
         )
         else "BULUNAMADI"
-    )
-
-    print(
-        "Normal font boyutu:",
-        (
-            REGULAR_FONT_FILE.stat().st_size
-            if REGULAR_FONT_FILE.exists()
-            else 0
-        )
-    )
-
-    print(
-        "Bold font boyutu:",
-        (
-            BOLD_FONT_FILE.stat().st_size
-            if BOLD_FONT_FILE.exists()
-            else 0
-        )
     )
 
     print(
@@ -2720,8 +3114,16 @@ def startup():
     )
 
     print(
-        "Görsel kaynakları: "
-        "Wikimedia + Wikipedia + Openverse"
+        "Görsel kaynakları:"
+        " Wikimedia + Wikipedia + Openverse"
+    )
+
+    print(
+        "Karahan varsayılan profil: AKTİF"
+    )
+
+    print(
+        "İlknur -> Ders Asistanı: AKTİF"
     )
 
     print("======================================")
