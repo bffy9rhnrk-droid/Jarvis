@@ -1523,7 +1523,7 @@ let sending = false;
 let presentationPolling = null;
 let dotsTimer = null;
 let karvisVoice = null;
-let karvisSpeechStop = null;
+window.karvisSpeechStop = null;
 let voiceTimer = null;
 let speechSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
@@ -2058,7 +2058,7 @@ function speakKarvis(text){
     speakNext();
 
     // stopKarvisVoice tarafından kullanılabilmesi için kuyruk durdurucusunu sakla.
-    karvisSpeechStop=()=>{
+    window.karvisSpeechStop=()=>{
         stopped=true;
         speechSynthesis.cancel();
         document.body.classList.remove("voice-speaking");
@@ -2070,9 +2070,9 @@ function speakKarvis(text){
 function stopKarvisVoice(){
     if(!speechSupported) return;
 
-    if(karvisSpeechStop){
-        const stop=karvisSpeechStop;
-        karvisSpeechStop=null;
+    if(window.karvisSpeechStop){
+        const stop=window.karvisSpeechStop;
+        window.karvisSpeechStop=null;
         stop();
         return;
     }
