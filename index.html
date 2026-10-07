@@ -42,9 +42,9 @@ button:active{
     transform:scale(.97)
 }
 
-/* =====================================================
+/* ============================================================
    HEADER
-===================================================== */
+   ============================================================ */
 
 .header{
     height:72px;
@@ -111,9 +111,9 @@ button:active{
     font-size:22px
 }
 
-/* =====================================================
-   MAIN
-===================================================== */
+/* ============================================================
+   MAIN HUD
+   ============================================================ */
 
 .main{
     height:calc(100vh - 72px);
@@ -202,9 +202,9 @@ button:active{
     text-shadow:0 0 10px rgba(0,229,255,.5)
 }
 
-/* =====================================================
+/* ============================================================
    CHAT
-===================================================== */
+   ============================================================ */
 
 .chat{
     position:absolute;
@@ -268,9 +268,9 @@ button:active{
     font-size:11px
 }
 
-/* =====================================================
-   PRESENTATION LIVE PANEL
-===================================================== */
+/* ============================================================
+   PRESENTATION
+   ============================================================ */
 
 .presentation-box{
     min-width:min(340px,82vw);
@@ -401,12 +401,11 @@ button:active{
     height:100%;
     width:0%;
     border-radius:99px;
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0,229,255,.45),
-            #00e5ff
-        );
+    background:linear-gradient(
+        90deg,
+        rgba(0,229,255,.45),
+        #00e5ff
+    );
     box-shadow:0 0 10px rgba(0,229,255,.55);
     transition:width .45s ease
 }
@@ -418,9 +417,9 @@ button:active{
     letter-spacing:.4px
 }
 
-/* =====================================================
+/* ============================================================
    INPUT
-===================================================== */
+   ============================================================ */
 
 .input-area{
     position:absolute;
@@ -468,9 +467,9 @@ button:active{
     cursor:default
 }
 
-/* =====================================================
+/* ============================================================
    SIDEBAR
-===================================================== */
+   ============================================================ */
 
 .sidebar{
     position:fixed;
@@ -537,10 +536,6 @@ button:active{
     font-size:24px
 }
 
-/* =====================================================
-   OVERLAY / MODALS
-===================================================== */
-
 .overlay{
     position:fixed;
     inset:0;
@@ -553,6 +548,10 @@ button:active{
 .overlay.show{
     display:block
 }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
 
 .modal{
     position:fixed;
@@ -626,9 +625,104 @@ button:active{
     word-break:break-word
 }
 
-/* =====================================================
+/* ============================================================
+   BETÜL
+   ============================================================ */
+
+.betul-analysis-box{
+    min-width:min(350px,84vw);
+    padding:14px;
+    border-radius:17px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,82,170,.10),
+            rgba(0,229,255,.035)
+        );
+    border:1px solid rgba(255,82,170,.25);
+    box-shadow:0 0 24px rgba(255,82,170,.06)
+}
+
+.betul-analysis-title{
+    color:#ff71c2;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:10px
+}
+
+.betul-analysis-stage{
+    padding:9px 10px;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    color:rgba(255,255,255,.78);
+    font-size:11px
+}
+
+.betul-analysis-progress{
+    height:5px;
+    border-radius:99px;
+    background:rgba(255,255,255,.08);
+    overflow:hidden;
+    margin-top:10px
+}
+
+.betul-analysis-progress>div{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#ff71c2,#00e5ff);
+    transition:width .35s ease
+}
+
+.betul-result{
+    margin-top:12px
+}
+
+.betul-score{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:6px 0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:12px
+}
+
+.betul-comment{
+    margin-top:12px;
+    padding:10px;
+    border-radius:11px;
+    background:rgba(255,113,194,.07);
+    border:1px solid rgba(255,113,194,.16);
+    color:#fff;
+    font-size:12px
+}
+
+.betul-disclaimer{
+    margin-top:10px;
+    color:rgba(255,255,255,.4);
+    font-size:9px;
+    line-height:1.4
+}
+
+.betul-modal-note{
+    color:rgba(255,255,255,.5);
+    font-size:11px;
+    line-height:1.5;
+    margin-bottom:12px
+}
+
+.betul-photo-input{
+    width:100%;
+    padding:12px;
+    border:1px dashed rgba(255,113,194,.35);
+    border-radius:12px;
+    background:rgba(255,255,255,.03);
+    color:rgba(255,255,255,.7);
+    margin-bottom:10px
+}
+
+/* ============================================================
    THEMES
-===================================================== */
+   ============================================================ */
 
 body.sinem-mode .ring{
     border-color:rgba(255,80,180,.45)
@@ -658,9 +752,9 @@ body.fun-mode .status{
     color:#ff4444
 }
 
-/* =====================================================
+/* ============================================================
    ANIMATIONS
-===================================================== */
+   ============================================================ */
 
 @keyframes spin{
     from{transform:rotate(0)}
@@ -716,7 +810,6 @@ body.fun-mode .status{
 }
 
 @media(max-width:480px){
-
     .presentation-box{
         min-width:0;
         width:100%
@@ -735,6 +828,10 @@ body.fun-mode .status{
 
 <body>
 
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+
 <div class="header">
 
     <div class="logo-small">K</div>
@@ -750,8 +847,7 @@ body.fun-mode .status{
 
     <button
         class="menu-button"
-        onclick="openSidebar()"
-    >
+        onclick="openSidebar()">
         ☰
     </button>
 
@@ -760,15 +856,18 @@ body.fun-mode .status{
 <div
     id="overlay"
     class="overlay"
-    onclick="closeSidebar()"
-></div>
+    onclick="closeSidebar()">
+</div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
 
 <div id="sidebar" class="sidebar">
 
     <button
         class="close-sidebar"
-        onclick="closeSidebar()"
-    >
+        onclick="closeSidebar()">
         ×
     </button>
 
@@ -778,37 +877,74 @@ body.fun-mode .status{
 
     <button
         class="menu-item"
-        onclick="newChat()"
-    >
+        onclick="newChat()">
         ＋ Yeni Sohbet
     </button>
 
     <button
         class="menu-item"
-        onclick="openErrors()"
-    >
+        onclick="openErrors()">
         ⚠ Hatalar
     </button>
 
     <button
         class="menu-item"
-        onclick="openProfile()"
-    >
+        onclick="openProfile()">
         ◉ Profil Değiştir
     </button>
 
     <button
         id="funButton"
         class="menu-item"
-        onclick="toggleFunMode()"
-    >
+        onclick="toggleFunMode()">
         ◈ Eğlence Modu
     </button>
 
+    <!-- ========================================================
+         SADECE BETÜL
+         ======================================================== -->
+
+    <div
+        id="betulMenu"
+        style="display:none;">
+
+        <div class="academic-title">
+            BETÜL EĞLENCE MERKEZİ
+        </div>
+
+        <button
+            class="menu-item"
+            onclick="openBetulInstagram()">
+            📱 Instagram Analizi
+        </button>
+
+        <button
+            class="menu-item"
+            onclick="openBetulTarot()">
+            🔮 Tarot Falı
+        </button>
+
+        <button
+            class="menu-item"
+            onclick="openBetulFortune()">
+            🃏 Fal Bak
+        </button>
+
+        <button
+            class="menu-item"
+            onclick="openBetulPhoto()">
+            📸 Fotoğraf Analizi
+        </button>
+
+    </div>
+
+    <!-- ========================================================
+         SADECE İLKNUR
+         ======================================================== -->
+
     <div
         id="teacherMenu"
-        style="display:none;"
-    >
+        style="display:none;">
 
         <div class="academic-title">
             AKADEMİK ASİSTAN
@@ -817,48 +953,42 @@ body.fun-mode .status{
         <button
             class="menu-item academic-menu-item"
             data-mode="research"
-            onclick="selectAcademicMode('research')"
-        >
+            onclick="selectAcademicMode('research')">
             🔬 Araştırma Modu
         </button>
 
         <button
             class="menu-item academic-menu-item"
             data-mode="academic"
-            onclick="selectAcademicMode('academic')"
-        >
+            onclick="selectAcademicMode('academic')">
             📚 Akademik Mod
         </button>
 
         <button
             class="menu-item academic-menu-item"
             data-mode="article"
-            onclick="selectAcademicMode('article')"
-        >
+            onclick="selectAcademicMode('article')">
             📝 Makale Asistanı
         </button>
 
         <button
             class="menu-item academic-menu-item"
             data-mode="lesson"
-            onclick="selectAcademicMode('lesson')"
-        >
+            onclick="selectAcademicMode('lesson')">
             🎓 Ders Asistanı
         </button>
 
         <button
             class="menu-item academic-menu-item"
             data-mode="quiz"
-            onclick="selectAcademicMode('quiz')"
-        >
+            onclick="selectAcademicMode('quiz')">
             🧪 Sınav / Quiz
         </button>
 
         <button
             class="menu-item academic-menu-item"
             data-mode="presentation"
-            onclick="selectAcademicMode('presentation')"
-        >
+            onclick="selectAcademicMode('presentation')">
             📊 Sunum Hazırlama
         </button>
 
@@ -866,12 +996,13 @@ body.fun-mode .status{
 
 </div>
 
-<!-- PROFILE -->
+<!-- ============================================================
+     PROFILE MODAL
+     ============================================================ -->
 
 <div
     id="profileModal"
-    class="modal"
->
+    class="modal">
 
     <h2>
         Profil Değiştir
@@ -880,39 +1011,36 @@ body.fun-mode .status{
     <input
         id="usernameInput"
         placeholder="Kullanıcı adı"
-        autocomplete="username"
-    >
+        autocomplete="username">
 
     <input
         id="passwordInput"
         type="password"
         placeholder="Şifre"
         autocomplete="current-password"
-        onkeydown="handleLoginKey(event)"
-    >
+        onkeydown="handleLoginKey(event)">
 
     <button
         class="modal-button"
-        onclick="login()"
-    >
+        onclick="login()">
         Giriş Yap
     </button>
 
     <button
         class="modal-button secondary-button"
-        onclick="closeModals()"
-    >
+        onclick="closeModals()">
         Vazgeç
     </button>
 
 </div>
 
-<!-- ERROR MODAL -->
+<!-- ============================================================
+     ERROR MODAL
+     ============================================================ -->
 
 <div
     id="errorModal"
-    class="modal"
->
+    class="modal">
 
     <h2>
         Hatalar
@@ -920,21 +1048,43 @@ body.fun-mode .status{
 
     <div
         id="errorContent"
-        class="error-list"
-    >
+        class="error-list">
         Yükleniyor...
     </div>
 
     <button
         class="modal-button secondary-button"
-        onclick="closeModals()"
-    >
+        onclick="closeModals()">
         Kapat
     </button>
 
 </div>
 
-<!-- MAIN -->
+<!-- ============================================================
+     BETÜL MODAL
+     ============================================================ -->
+
+<div
+    id="betulInputModal"
+    class="modal">
+
+    <h2 id="betulModalTitle">
+        Betül Eğlence Merkezi 💅
+    </h2>
+
+    <div id="betulModalBody"></div>
+
+    <button
+        class="modal-button secondary-button"
+        onclick="closeModals()">
+        Vazgeç
+    </button>
+
+</div>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
 
 <div class="main">
 
@@ -954,15 +1104,14 @@ body.fun-mode .status{
 
         <div
             id="status"
-            class="status"
-        >
+            class="status">
             K.A.R.V.I.S. HAZIR
         </div>
 
         <div
             id="chat"
-            class="chat"
-        ></div>
+            class="chat">
+        </div>
 
         <div class="input-area">
 
@@ -971,14 +1120,12 @@ body.fun-mode .status{
                 class="input"
                 autocomplete="off"
                 placeholder="Mesajınızı yazın..."
-                onkeydown="handleKey(event)"
-            >
+                onkeydown="handleKey(event)">
 
             <button
                 id="sendButton"
                 class="send"
-                onclick="sendMessage()"
-            >
+                onclick="sendMessage()">
                 ➤
             </button>
 
@@ -990,13 +1137,16 @@ body.fun-mode .status{
 
 <script>
 
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+
 const API = "";
 
 let currentUser = "karahan";
 let currentMode = "normal";
 let funMode = false;
 let sending = false;
-
 let presentationPolling = null;
 let dotsTimer = null;
 
@@ -1007,6 +1157,19 @@ const waitMessages = [
     "Yanıt hazırlanıyor...",
     "K.A.R.V.I.S. analiz ediyor..."
 ];
+
+const betulLoading = [
+    "😭 Biraz bekle aşko, sistemlerimi çökertiyorsun.",
+    "💀 Aşko bu kadar analiz isteme, işlemcim ağlıyor.",
+    "💅 Dur aşko... K.A.R.V.I.S. şu an dedikodu moduna geçti.",
+    "😂 Aşko sakin ol, daha hesabı yeni açtım.",
+    "🤨 Hmm... burada bir şeyler var aşko.",
+    "😭 Sistemlerim bunu görmeye hazır değildi."
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
 function $(id){
     return document.getElementById(id);
@@ -1026,99 +1189,77 @@ function formatText(text){
 
     let safe = escapeHTML(text);
 
-    safe = safe.replace(
+    return safe.replace(
         /(https?:\/\/[^\s<]+)/g,
         '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
     );
-
-    return safe;
 }
 
-function addMessage(
-    text,
-    type="ai"
-){
+function addMessage(text,type="ai"){
 
-    const chat = $("chat");
+    const div = document.createElement("div");
 
-    const div =
-        document.createElement("div");
+    div.className = "message " + type;
 
-    div.className =
-        "message " + type;
+    div.innerHTML = formatText(text);
 
-    div.innerHTML =
-        formatText(text);
+    $("chat").appendChild(div);
 
-    chat.appendChild(div);
-
-    /*
-     * Normal mesaj geldiğinde aşağı kaydır.
-     * Sunum durum güncellemelerinde bu fonksiyon
-     * kullanılmadığı için ekran sürekli hareket etmez.
-     */
-    chat.scrollTop =
-        chat.scrollHeight;
+    $("chat").scrollTop = $("chat").scrollHeight;
 
     return div;
 }
 
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
 function openSidebar(){
 
-    $("sidebar")
-        .classList.add("open");
+    $("sidebar").classList.add("open");
 
-    $("overlay")
-        .classList.add("show");
+    $("overlay").classList.add("show");
 }
 
 function closeSidebar(){
 
-    $("sidebar")
-        .classList.remove("open");
+    $("sidebar").classList.remove("open");
 
-    $("overlay")
-        .classList.remove("show");
+    $("overlay").classList.remove("show");
 }
 
 function closeModals(){
 
     document
         .querySelectorAll(".modal")
-        .forEach(
-            modal =>
-                modal.classList.remove("show")
-        );
+        .forEach(m => m.classList.remove("show"));
 }
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
 
 function openProfile(){
 
     closeSidebar();
 
-    $("profileModal")
-        .classList.add("show");
+    $("profileModal").classList.add("show");
 
     setTimeout(
-        () => {
-            $("usernameInput").focus();
-        },
+        () => $("usernameInput").focus(),
         100
     );
 }
 
-function handleLoginKey(event){
+function handleLoginKey(e){
 
-    if(event.key === "Enter"){
+    if(e.key === "Enter"){
 
-        event.preventDefault();
+        e.preventDefault();
 
         login();
     }
 }
-
-/* =====================================================
-   LOGIN
-===================================================== */
 
 async function login(){
 
@@ -1133,48 +1274,29 @@ async function login(){
 
     if(!username){
 
-        alert(
-            "Kullanıcı adı girin."
-        );
-
-        $("usernameInput").focus();
+        alert("Kullanıcı adı girin.");
 
         return;
     }
 
     try{
 
-        const response =
-            await fetch(
-                API + "/login",
-                {
-                    method:"POST",
+        const response = await fetch(
+            API + "/login",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    username,
+                    password
+                })
+            }
+        );
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-                        username:username,
-                        password:password
-                    })
-                }
-            );
-
-        let data;
-
-        try{
-
-            data =
-                await response.json();
-
-        }catch{
-
-            throw new Error(
-                "Sunucudan geçersiz yanıt geldi."
-            );
-        }
+        const data =
+            await response.json();
 
         if(
             !response.ok ||
@@ -1192,8 +1314,7 @@ async function login(){
 
         currentUser =
             String(
-                (data.user &&
-                 data.user.username) ||
+                (data.user && data.user.username) ||
                 data.username ||
                 username
             )
@@ -1209,25 +1330,16 @@ async function login(){
             ].includes(currentUser)
         ){
 
-            currentUser =
-                username;
+            currentUser = username;
         }
 
-        if(
+        currentMode =
             currentUser === "ilknur"
-        ){
-
-            currentMode =
-                localStorage.getItem(
-                    "karvis_mode"
-                ) ||
-                "lesson";
-
-        }else{
-
-            currentMode =
-                "normal";
-        }
+                ? (
+                    localStorage.getItem("karvis_mode") ||
+                    "lesson"
+                )
+                : "normal";
 
         localStorage.setItem(
             "karvis_user",
@@ -1246,10 +1358,9 @@ async function login(){
 
         funMode = false;
 
-        document.body
-            .classList.remove(
-                "fun-mode"
-            );
+        document.body.classList.remove(
+            "fun-mode"
+        );
 
         applyUserTheme();
         updateSidebar();
@@ -1258,11 +1369,6 @@ async function login(){
 
     }catch(error){
 
-        console.error(
-            "Profil giriş hatası:",
-            error
-        );
-
         alert(
             "Profil değiştirilemedi.\n\n" +
             error.message
@@ -1270,21 +1376,21 @@ async function login(){
     }
 }
 
+/* ============================================================
+   USER THEME
+   ============================================================ */
+
 function applyUserTheme(){
 
-    document.body
-        .classList.remove(
+    document.body.classList.remove(
+        "sinem-mode"
+    );
+
+    if(currentUser === "sinem"){
+
+        document.body.classList.add(
             "sinem-mode"
         );
-
-    if(
-        currentUser === "sinem"
-    ){
-
-        document.body
-            .classList.add(
-                "sinem-mode"
-            );
     }
 }
 
@@ -1298,19 +1404,15 @@ function updateStatus(){
         return;
     }
 
-    if(
+    $("status").textContent =
         currentUser === "ilknur"
-    ){
-
-        $("status").textContent =
-            "AKADEMİK ASİSTAN HAZIR";
-
-    }else{
-
-        $("status").textContent =
-            "K.A.R.V.I.S. HAZIR";
-    }
+            ? "AKADEMİK ASİSTAN HAZIR"
+            : "K.A.R.V.I.S. HAZIR";
 }
+
+/* ============================================================
+   SIDEBAR USER CONTROL
+   ============================================================ */
 
 function updateSidebar(){
 
@@ -1320,49 +1422,69 @@ function updateSidebar(){
     const funButton =
         $("funButton");
 
-    if(
-        currentUser === "ilknur"
-    ){
+    const betulMenu =
+        $("betulMenu");
 
-        teacherMenu.style.display =
-            "block";
+    /*
+       SADECE BETÜL
+    */
 
-        funButton.style.display =
-            "none";
+    if(currentUser === "betul"){
 
-    }else{
+        teacherMenu.style.display = "none";
 
-        teacherMenu.style.display =
-            "none";
+        funButton.style.display = "none";
 
-        funButton.style.display =
-            "block";
+        betulMenu.style.display = "block";
+
+    }
+
+    /*
+       SADECE İLKNUR
+    */
+
+    else if(currentUser === "ilknur"){
+
+        teacherMenu.style.display = "block";
+
+        funButton.style.display = "none";
+
+        betulMenu.style.display = "none";
+
+    }
+
+    /*
+       KARAHAN + SİNEM
+    */
+
+    else{
+
+        teacherMenu.style.display = "none";
+
+        funButton.style.display = "block";
+
+        betulMenu.style.display = "none";
     }
 
     document
-        .querySelectorAll(
-            ".academic-menu-item"
-        )
+        .querySelectorAll(".academic-menu-item")
         .forEach(
-            button => {
-
-                button.classList.toggle(
+            b =>
+                b.classList.toggle(
                     "active",
-                    button.dataset.mode ===
-                    currentMode
-                );
-            }
+                    b.dataset.mode === currentMode
+                )
         );
 }
 
+/* ============================================================
+   İLKNUR AKADEMİK MODLARI
+   ============================================================ */
+
 function selectAcademicMode(mode){
 
-    if(
-        currentUser !== "ilknur"
-    ){
-
+    if(currentUser !== "ilknur")
         return;
-    }
 
     currentMode = mode;
 
@@ -1384,16 +1506,16 @@ function selectAcademicMode(mode){
             "Akademik Mod aktif. Hocam, akademik çalışmalarınızda yardımcı olmaya hazırım.",
 
         article:
-            "Makale Asistanı aktif. Hocam, makale hazırlama, düzenleme ve akademik yazım süreçlerinde yardımcı olabilirim.",
+            "Makale Asistanı aktif. Hocam, akademik makale çalışmalarınıza hazırım.",
 
         lesson:
-            "Ders Asistanı aktif. Hocam, ders içeriklerini sistematik ve akademik biçimde hazırlamaya hazırım.",
+            "Ders Asistanı aktif. Hocam, ders anlatımı ve konu çalışmalarına hazırım.",
 
         quiz:
-            "Sınav / Quiz modu aktif. Hocam, sınav ve ölçme-değerlendirme materyalleri hazırlayabilirim.",
+            "Sınav / Quiz modu aktif. Hocam, sınav çalışmalarınızı başlatabiliriz.",
 
         presentation:
-            "Sunum Hazırlama modu aktif. Hocam, sunum talebinizi iletebilirsiniz."
+            "Sunum Hazırlama modu aktif. Hocam, akademik sunumunuzu hazırlayabilirim."
     };
 
     addMessage(
@@ -1405,84 +1527,69 @@ function selectAcademicMode(mode){
     updateStatus();
 }
 
+/* ============================================================
+   GREETING
+   ============================================================ */
+
 function showGreeting(){
 
     $("chat").innerHTML = "";
 
-    if(
-        currentUser === "karahan"
-    ){
+    if(currentUser === "karahan"){
 
         addMessage(
             "Merhaba efendim. K.A.R.V.I.S. hazır.",
             "ai"
         );
 
-    }else if(
-        currentUser === "betul"
-    ){
+    }
+
+    else if(currentUser === "betul"){
 
         addMessage(
-            "Merhaba Betül. K.A.R.V.I.S. hazır.",
+            "Aşkooo hoş geldin 💅 K.A.R.V.I.S. dedikodu ve eğlence sistemlerini açtı. Bugün kimi analiz ediyoruz? 😭",
             "ai"
         );
 
-    }else if(
-        currentUser === "sinem"
-    ){
+    }
+
+    else if(currentUser === "sinem"){
 
         addMessage(
-            "Hoş geldiniz prenses. K.A.R.V.I.S. hazır.",
+            "Hoş geldiniz prenses. K.A.R.V.I.S. hazır. 💗",
             "ai"
         );
 
-    }else if(
-        currentUser === "ilknur"
-    ){
+    }
+
+    else if(currentUser === "ilknur"){
 
         addMessage(
-            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız olarak hazır.",
-            "ai"
-        );
-
-        addMessage(
-            "Varsayılan olarak Ders Asistanı aktif.",
+            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız hazır. Ders, araştırma, makale, quiz ve sunum çalışmalarında yardımcı olabilirim.",
             "ai"
         );
     }
 }
 
+/* ============================================================
+   WAITING MESSAGE
+   ============================================================ */
+
 function getWaitingMessage(){
 
-    if(
-        currentUser === "ilknur"
-    ){
+    if(currentUser === "ilknur"){
 
-        const messages = {
+        return "Hocam, akademik yanıt hazırlanıyor...";
+    }
 
-            research:
-                "Hocam, konuyu akademik açıdan inceliyorum...",
+    if(currentUser === "betul"){
 
-            academic:
-                "Hocam, akademik değerlendirme yapıyorum...",
-
-            article:
-                "Hocam, akademik metnin yapısını hazırlıyorum...",
-
-            lesson:
-                "Hocam, ders içeriğini hazırlıyorum...",
-
-            quiz:
-                "Hocam, ölçme-değerlendirme içeriğini hazırlıyorum...",
-
-            presentation:
-                "Hocam, sunum içeriğini hazırlıyorum..."
-        };
-
-        return (
-            messages[currentMode] ||
-            "Hocam, talebinizi değerlendiriyorum..."
-        );
+        return betulLoading[
+            Math.floor(
+                Math.random() *
+                betulLoading.length
+            )
+        ];
     }
 
     return waitMessages[
@@ -1493,30 +1600,43 @@ function getWaitingMessage(){
     ];
 }
 
+/* ============================================================
+   BUSY
+   ============================================================ */
+
 function setBusy(value){
 
-    $("status")
-        .classList.toggle(
-            "busy",
-            value
-        );
+    sending = value;
 
     $("sendButton").disabled =
         value;
 
     $("messageInput").disabled =
         value;
+
+    if(value){
+
+        $("status").classList.add(
+            "busy"
+        );
+
+    }else{
+
+        $("status").classList.remove(
+            "busy"
+        );
+    }
 }
 
-function isPresentationRequest(
-    message
-){
+/* ============================================================
+   PRESENTATION DETECTION
+   ============================================================ */
+
+function isPresentationRequest(message){
 
     const text =
         String(message)
-        .toLocaleLowerCase(
-            "tr-TR"
-        )
+        .toLocaleLowerCase("tr-TR")
         .trim();
 
     const words = [
@@ -1543,32 +1663,963 @@ function isPresentationRequest(
         "sunum istiyorum"
     ];
 
-    for(
-        const word of words
-    ){
-
-        if(
-            text.includes(word)
-        ){
-
-            return true;
-        }
-    }
-
-    return /\b\d+\s*slayt\b/i
-        .test(text);
+    return (
+        words.some(
+            w => text.includes(w)
+        )
+        ||
+        /\b\d+\s*slayt\b/i.test(text)
+    );
 }
 
-/* =====================================================
-   SEND
-===================================================== */
+/* ============================================================
+   BETÜL DETERMINISTIC SYSTEM
+   ============================================================ */
 
-async function sendMessage(){
+function deterministicNumber(seed){
 
-    if(sending){
+    let h = 2166136261;
+
+    for(
+        let i = 0;
+        i < seed.length;
+        i++
+    ){
+
+        h ^= seed.charCodeAt(i);
+
+        h = Math.imul(
+            h,
+            16777619
+        );
+    }
+
+    return h >>> 0;
+}
+
+function deterministicScores(
+    seed,
+    categories
+){
+
+    let state =
+        deterministicNumber(seed);
+
+    let raw =
+        categories.map(
+            (_,i) => {
+
+                state =
+                    (
+                        state * 1664525 +
+                        1013904223 +
+                        i
+                    ) >>> 0;
+
+                return 10 +
+                    (state % 91);
+            }
+        );
+
+    const total =
+        raw.reduce(
+            (a,b) => a+b,
+            0
+        );
+
+    const floors =
+        raw.map(
+            v =>
+                Math.floor(
+                    v / total * 100
+                )
+        );
+
+    let remain =
+        100 -
+        floors.reduce(
+            (a,b) => a+b,
+            0
+        );
+
+    const fractions =
+        raw.map(
+            (v,i) => ({
+                i,
+                f:
+                    v / total * 100 -
+                    Math.floor(
+                        v / total * 100
+                    )
+            })
+        )
+        .sort(
+            (a,b) =>
+                b.f - a.f
+        );
+
+    for(
+        let i=0;
+        i<remain;
+        i++
+    ){
+
+        floors[
+            fractions[
+                i % fractions.length
+            ].i
+        ]++;
+    }
+
+    return floors;
+}
+
+/* ============================================================
+   BETÜL COMMENTS
+   ============================================================ */
+
+function betulComment(
+    scores,
+    cats
+){
+
+    const max =
+        Math.max(...scores);
+
+    const i =
+        scores.indexOf(max);
+
+    const name =
+        cats[i].label;
+
+    if(name.includes("Komik")){
+
+        return "AşKOOO bu hesap iyiymiş, ben analiz yaparken bile güldüm 😭😂";
+    }
+
+    if(name.includes("Romantik")){
+
+        return "Aşko burada aşk kokusu aldım... burnuma bildirim geldi resmen 💅💕";
+    }
+
+    if(name.includes("Kaotik")){
+
+        return "AŞKOOO BU NE?! Sistemlerimi yeniden başlatmam gerekti 💀";
+    }
+
+    if(name.includes("Gizemli")){
+
+        return "Aşkoo burada bir şeyler dönüyor... K.A.R.V.I.S. radarları susmuyor 🤨";
+    }
+
+    if(name.includes("Havalı")){
+
+        return "Aşkoo bu hesap kendini fazla ciddiye alıyor ama hakkını da yemeyelim 😎";
+    }
+
+    if(name.includes("Sıkıcı")){
+
+        return "Aşkoo bu hesap biraz fazla sıkıcı çıktı ya... işlemci bile esnedi 😭";
+    }
+
+    return "AŞKOOO BU HESAP ÇOK İYİYMİŞ. K.A.R.V.I.S. olarak onaylıyorum 💅";
+}
+
+const betulCategories = [
+
+    {
+        label:"💕 Romantik"
+    },
+
+    {
+        label:"😂 Komik"
+    },
+
+    {
+        label:"🥱 Sıkıcı"
+    },
+
+    {
+        label:"😎 Havalı"
+    },
+
+    {
+        label:"🤪 Kaotik"
+    },
+
+    {
+        label:"🧠 Gizemli"
+    }
+
+];
+
+/* ============================================================
+   BETÜL ANALYSIS BOX
+   ============================================================ */
+
+function betulBox(title){
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "message ai waiting-message";
+
+    div.innerHTML = `
+
+        <div class="betul-analysis-box">
+
+            <div class="betul-analysis-title">
+                ${title}
+            </div>
+
+            <div
+                class="betul-analysis-stage"
+                id="betulStage">
+                K.A.R.V.I.S. hazırlanıyor...
+            </div>
+
+            <div class="betul-analysis-progress">
+                <div id="betulProgress"></div>
+            </div>
+
+            <div
+                id="betulResult"
+                class="betul-result">
+            </div>
+
+        </div>
+
+    `;
+
+    $("chat").appendChild(div);
+
+    return div;
+}
+
+/* ============================================================
+   BETÜL LOADING STAGES
+   ============================================================ */
+
+function runBetulStages(
+    box,
+    stages,
+    finalize
+){
+
+    const stage =
+        box.querySelector(
+            "#betulStage"
+        );
+
+    const bar =
+        box.querySelector(
+            "#betulProgress"
+        );
+
+    let i = 0;
+
+    return new Promise(
+        resolve => {
+
+            const next = () => {
+
+                if(i >= stages.length){
+
+                    finalize();
+
+                    resolve();
+
+                    return;
+                }
+
+                stage.textContent =
+                    stages[i];
+
+                bar.style.width =
+                    Math.round(
+                        (i+1) /
+                        stages.length *
+                        100
+                    ) + "%";
+
+                i++;
+
+                setTimeout(
+                    next,
+                    650 +
+                    Math.floor(
+                        Math.random() *
+                        350
+                    )
+                );
+            };
+
+            next();
+        }
+    );
+}
+
+/* ============================================================
+   BETÜL INSTAGRAM
+   ============================================================ */
+
+function showBetulInstagramResult(
+    box,
+    username
+){
+
+    const scores =
+        deterministicScores(
+            username.toLowerCase(),
+            betulCategories
+        );
+
+    const result =
+        box.querySelector(
+            "#betulResult"
+        );
+
+    let html = `
+
+        <div
+            style="
+                font-weight:800;
+                color:#ff71c2;
+                margin-bottom:7px;
+            ">
+            📱 @${escapeHTML(username)}
+            eğlence analizi
+        </div>
+
+    `;
+
+    scores.forEach(
+        (s,i) => {
+
+            html += `
+
+                <div class="betul-score">
+
+                    <span>
+                        ${betulCategories[i].label}
+                    </span>
+
+                    <strong>
+                        %${s}
+                    </strong>
+
+                </div>
+
+            `;
+        }
+    );
+
+    html += `
+
+        <div class="betul-comment">
+            ${betulComment(
+                scores,
+                betulCategories
+            )}
+        </div>
+
+        <div class="betul-disclaimer">
+            Bu analiz gerçek Instagram verilerini incelemez;
+            tamamen eğlence amaçlı bir simülasyondur
+            ve yanılma payı vardır.
+        </div>
+
+    `;
+
+    result.innerHTML =
+        html;
+}
+
+function openBetulInstagram(){
+
+    if(currentUser !== "betul")
+        return;
+
+    closeSidebar();
+
+    $("betulModalTitle").textContent =
+        "📱 Instagram Analizi";
+
+    $("betulModalBody").innerHTML = `
+
+        <div class="betul-modal-note">
+
+            Aşko kullanıcı adını ver,
+            K.A.R.V.I.S. dedikodu algoritmasını
+            çalıştırsın. 😭💅
+
+            <br><br>
+
+            Gerçek Instagram hesabına erişilmez;
+            sonuç tamamen eğlence amaçlıdır.
+
+        </div>
+
+        <input
+            id="betulInstagramInput"
+            placeholder="@kullaniciadi">
+
+        <button
+            class="modal-button"
+            onclick="startBetulInstagram()">
+
+            Analizi Başlat 💅
+
+        </button>
+
+    `;
+
+    $("betulInputModal")
+        .classList
+        .add("show");
+
+    setTimeout(
+        () =>
+            $("betulInstagramInput").focus(),
+        100
+    );
+}
+
+async function startBetulInstagram(){
+
+    let u =
+        $("betulInstagramInput")
+        .value
+        .trim()
+        .replace(/^@/,"")
+        .replace(/\s+/g,"");
+
+    if(!u){
+
+        alert(
+            "Aşko kullanıcı adını yaz 😭"
+        );
 
         return;
     }
+
+    closeModals();
+
+    const box =
+        betulBox(
+            "📱 INSTAGRAM ANALİZİ"
+        );
+
+    await runBetulStages(
+        box,
+        [
+
+            "😭 Biraz bekle aşko, sisteme kullanıcı adı giriliyor...",
+
+            "💅 Öne çıkanlar kontrol ediliyor...",
+
+            "🤨 Profil enerjisi hesaplanıyor...",
+
+            "😂 K.A.R.V.I.S. dedikodu moduna geçti...",
+
+            "💀 İşlemcim bu hesabı sindirmeye çalışıyor...",
+
+            "✨ Son yüzdeler hazırlanıyor..."
+
+        ],
+        () =>
+            showBetulInstagramResult(
+                box,
+                u
+            )
+    );
+}
+
+/* ============================================================
+   BETÜL TAROT
+   ============================================================ */
+
+function openBetulTarot(){
+
+    if(currentUser !== "betul")
+        return;
+
+    closeSidebar();
+
+    const box =
+        betulBox(
+            "🔮 TAROT FALI"
+        );
+
+    runBetulStages(
+        box,
+        [
+
+            "💅 Dur aşko... kartlar karıştırılıyor...",
+
+            "🔮 Evrenle bağlantı kuruluyor...",
+
+            "😭 Bir kart ters geldi, panik yok...",
+
+            "🤨 Hmm... burada bir şeyler var...",
+
+            "✨ Kartların mesajı hazırlanıyor..."
+
+        ],
+        () => {
+
+            const cards = [
+
+                "Güneş ☀️",
+
+                "Aşıklar 💕",
+
+                "Ay 🌙",
+
+                "Kader Çarkı 🎡",
+
+                "İmparatoriçe 👑",
+
+                "Yıldız ⭐"
+
+            ];
+
+            const card =
+                cards[
+                    deterministicNumber(
+                        String(Date.now())
+                    ) % cards.length
+                ];
+
+            box.querySelector(
+                "#betulResult"
+            ).innerHTML = `
+
+                <div
+                    style="
+                        font-weight:800;
+                        color:#ff71c2;
+                    ">
+                    ${card}
+                </div>
+
+                <div class="betul-comment">
+
+                    Aşkoo kart konuştu,
+                    ben sadece tercüme ediyorum 😭💅
+
+                    Bugün biraz akışına bırak
+                    ama gelen işaretleri de
+                    tamamen görmezden gelme.
+
+                </div>
+
+                <div class="betul-disclaimer">
+
+                    Bu tarot yorumu tamamen
+                    eğlence amaçlıdır;
+                    gerçek gelecek tahmini değildir.
+
+                </div>
+
+            `;
+        }
+    );
+}
+
+/* ============================================================
+   BETÜL FAL
+   ============================================================ */
+
+function openBetulFortune(){
+
+    if(currentUser !== "betul")
+        return;
+
+    closeSidebar();
+
+    const box =
+        betulBox(
+            "🃏 FAL BAKILIYOR"
+        );
+
+    runBetulStages(
+        box,
+        [
+
+            "☕ Fincan açılıyor aşko...",
+
+            "👀 Şekiller taranıyor...",
+
+            "🤨 Bir kalp görüyorum gibi ama sistem emin değil...",
+
+            "💅 Dedikodu katmanı aktive edildi...",
+
+            "✨ Fal yorumu hazırlanıyor..."
+
+        ],
+        () => {
+
+            const texts = [
+
+                "Yakında beklemediğin bir mesaj var. Telefonu sessize alma aşko 😭",
+
+                "Bir süredir ertelediğin bir konu yeniden önüne gelecek. Bu kez kaçış yok 💀",
+
+                "Çevrende seni uzaktan takip eden meraklı biri var gibi... ama isim vermiyorum, sistemlerim ifşa istemiyor 🤨",
+
+                "Önünde küçük ama güzel bir fırsat görünüyor. Bu kez 'sonra bakarım' deme 💅"
+
+            ];
+
+            const t =
+                texts[
+                    deterministicNumber(
+                        new Date()
+                        .toISOString()
+                        .slice(0,10)
+                    ) % texts.length
+                ];
+
+            box.querySelector(
+                "#betulResult"
+            ).innerHTML = `
+
+                <div class="betul-comment">
+                    ${t}
+                </div>
+
+                <div class="betul-disclaimer">
+
+                    Bu fal tamamen eğlence amaçlıdır
+                    ve gerçek gelecek tahmini değildir.
+
+                </div>
+
+            `;
+        }
+    );
+}
+
+/* ============================================================
+   BETÜL FOTOĞRAF
+   ============================================================ */
+
+function openBetulPhoto(){
+
+    if(currentUser !== "betul")
+        return;
+
+    closeSidebar();
+
+    $("betulModalTitle").textContent =
+        "📸 Fotoğraf Analizi";
+
+    $("betulModalBody").innerHTML = `
+
+        <div class="betul-modal-note">
+
+            Aşko fotoğrafı seç. 💅
+
+            <br><br>
+
+            K.A.R.V.I.S. bunu gerçek kişilik,
+            psikoloji veya karakter çıkarımı
+            olarak kullanmaz.
+
+            <br><br>
+
+            Sadece eğlence amaçlı görsel
+            simülasyon yapılır.
+
+        </div>
+
+        <input
+            id="betulPhotoInput"
+            class="betul-photo-input"
+            type="file"
+            accept="image/*">
+
+        <button
+            class="modal-button"
+            onclick="startBetulPhoto()">
+
+            Analizi Başlat 📸
+
+        </button>
+
+    `;
+
+    $("betulInputModal")
+        .classList
+        .add("show");
+}
+
+async function startBetulPhoto(){
+
+    const f =
+        $("betulPhotoInput")
+        .files[0];
+
+    if(!f){
+
+        alert(
+            "Aşko önce fotoğraf seç 😭"
+        );
+
+        return;
+    }
+
+    closeModals();
+
+    const seed =
+        f.name +
+        "|" +
+        f.size +
+        "|" +
+        f.type;
+
+    const box =
+        betulBox(
+            "📸 FOTOĞRAF EĞLENCE ANALİZİ"
+        );
+
+    await runBetulStages(
+        box,
+        [
+
+            "📸 Görsel sisteme alınıyor...",
+
+            "🔎 Görsel özellikleri taranıyor...",
+
+            "🤨 Yüz hatları inceleniyor...",
+
+            "💅 Betül eğlence algoritması devrede...",
+
+            "😂 K.A.R.V.I.S. yorum üretiyor..."
+
+        ],
+        () => {
+
+            const cats = [
+
+                {
+                    label:"✨ Tatlı Enerji"
+                },
+
+                {
+                    label:"😎 Havalı Vibe"
+                },
+
+                {
+                    label:"😂 Komik Aura"
+                },
+
+                {
+                    label:"🌪️ Kaotik Enerji"
+                },
+
+                {
+                    label:"🧠 Gizemli Vibe"
+                },
+
+                {
+                    label:"💅 Sosyal Enerji"
+                }
+
+            ];
+
+            const scores =
+                deterministicScores(
+                    seed,
+                    cats
+                );
+
+            const r =
+                box.querySelector(
+                    "#betulResult"
+                );
+
+            let h = `
+
+                <div
+                    style="
+                        font-weight:800;
+                        color:#ff71c2;
+                        margin-bottom:7px;
+                    ">
+                    📸 Eğlence skoru
+                </div>
+
+            `;
+
+            scores.forEach(
+                (s,i) => {
+
+                    h += `
+
+                        <div class="betul-score">
+
+                            <span>
+                                ${cats[i].label}
+                            </span>
+
+                            <strong>
+                                %${s}
+                            </strong>
+
+                        </div>
+
+                    `;
+                }
+            );
+
+            h += `
+
+                <div class="betul-comment">
+
+                    Aşkoo sonuçlar geldi 😭
+
+                    Bu fotoğrafın algoritmik
+                    eğlence enerjisi bayağı
+                    hareketli çıktı.
+
+                </div>
+
+                <div class="betul-disclaimer">
+
+                    Bu sonuçlar fotoğraftaki kişinin
+                    gerçek kişiliğini, psikolojisini
+                    veya romantik özelliklerini belirlemez;
+                    tamamen eğlence amaçlı simülasyondur.
+
+                </div>
+
+            `;
+
+            r.innerHTML = h;
+        }
+    );
+}
+
+/* ============================================================
+   BETÜL CHAT COMMANDS
+   ============================================================ */
+
+function handleBetulCommand(message){
+
+    if(currentUser !== "betul")
+        return false;
+
+    const t =
+        message.toLocaleLowerCase(
+            "tr-TR"
+        );
+
+    /*
+       INSTAGRAM
+    */
+
+    if(t.includes("instagram")){
+
+        const m =
+            message.match(
+                /@?([a-zA-Z0-9._]{2,30})/
+            );
+
+        if(
+            m &&
+            m[1].toLowerCase() !== "instagram"
+        ){
+
+            closeSidebar();
+
+            const u =
+                m[1];
+
+            const box =
+                betulBox(
+                    "📱 INSTAGRAM ANALİZİ"
+                );
+
+            runBetulStages(
+                box,
+                [
+
+                    "😭 Kullanıcı adı sisteme giriliyor...",
+
+                    "💅 Öne çıkanlar kontrol ediliyor...",
+
+                    "🤨 Profil enerjisi hesaplanıyor...",
+
+                    "😂 K.A.R.V.I.S. dedikodu moduna geçti...",
+
+                    "✨ Sonuçlar hazırlanıyor..."
+
+                ],
+                () =>
+                    showBetulInstagramResult(
+                        box,
+                        u
+                    )
+            );
+
+            return true;
+        }
+
+        openBetulInstagram();
+
+        return true;
+    }
+
+    /*
+       TAROT
+    */
+
+    if(t.includes("tarot")){
+
+        openBetulTarot();
+
+        return true;
+    }
+
+    /*
+       FAL
+    */
+
+    if(t.includes("fal")){
+
+        openBetulFortune();
+
+        return true;
+    }
+
+    /*
+       FOTOĞRAF
+    */
+
+    if(
+        t.includes("fotoğraf") ||
+        t.includes("fotograf")
+    ){
+
+        openBetulPhoto();
+
+        return true;
+    }
+
+    return false;
+}
+
+/* ============================================================
+   SEND MESSAGE
+   ============================================================ */
+
+async function sendMessage(){
+
+    if(sending)
+        return;
 
     const input =
         $("messageInput");
@@ -1576,10 +2627,8 @@ async function sendMessage(){
     const message =
         input.value.trim();
 
-    if(!message){
-
+    if(!message)
         return;
-    }
 
     sending = true;
 
@@ -1592,10 +2641,30 @@ async function sendMessage(){
         "user"
     );
 
+    /*
+       BETÜL ÖZEL SİSTEMLERİ
+    */
+
+    if(
+        currentUser === "betul" &&
+        handleBetulCommand(message)
+    ){
+
+        sending = false;
+
+        setBusy(false);
+
+        input.focus();
+
+        return;
+    }
+
+    /*
+       NORMAL AI
+    */
+
     const waiting =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     waiting.className =
         "message ai";
@@ -1637,30 +2706,23 @@ async function sendMessage(){
                         },
 
                         body:JSON.stringify({
-                            message:message,
-                            username:currentUser,
-                            mode:currentMode
+
+                            message,
+
+                            username:
+                                currentUser,
+
+                            mode:
+                                currentMode
+
                         })
                     }
                 );
 
-            let data;
+            const data =
+                await response.json();
 
-            try{
-
-                data =
-                    await response.json();
-
-            }catch{
-
-                throw new Error(
-                    "Sunucudan geçersiz JSON yanıtı geldi."
-                );
-            }
-
-            if(
-                !response.ok
-            ){
+            if(!response.ok){
 
                 throw new Error(
                     data.detail ||
@@ -1672,25 +2734,17 @@ async function sendMessage(){
 
             waiting.remove();
 
-            const answer =
+            addMessage(
                 data.response ||
                 data.reply ||
                 data.answer ||
                 data.message ||
-                "K.A.R.V.I.S. yanıt oluşturamadı.";
-
-            addMessage(
-                answer,
+                "K.A.R.V.I.S. yanıt oluşturamadı.",
                 "ai"
             );
         }
 
     }catch(error){
-
-        console.error(
-            "Mesaj gönderme hatası:",
-            error
-        );
 
         waiting.remove();
 
@@ -1710,9 +2764,9 @@ async function sendMessage(){
     }
 }
 
-/* =====================================================
+/* ============================================================
    PRESENTATION
-===================================================== */
+   ============================================================ */
 
 async function createPresentation(
     topic,
@@ -1743,8 +2797,7 @@ async function createPresentation(
 
                 <div
                     id="presentationPercent"
-                    class="presentation-percent"
-                >
+                    class="presentation-percent">
                     0%
                 </div>
 
@@ -1752,99 +2805,51 @@ async function createPresentation(
 
             <div
                 id="presentationCurrent"
-                class="presentation-current"
-            >
-                K.A.R.V.I.S. konu üzerinde çalışmaya hazırlanıyor...
+                class="presentation-current">
+
+                K.A.R.V.I.S. konu üzerinde
+                çalışmaya hazırlanıyor...
+
             </div>
 
             <div
                 id="presentationSteps"
-                class="presentation-steps"
-            >
+                class="presentation-steps">
 
-                <div
-                    class="presentation-step active"
-                    data-step="analysis"
-                >
-                    <div class="presentation-step-icon">
-                        ●
-                    </div>
-                    <div>
-                        Konu analiz ediliyor
-                    </div>
-                </div>
+                ${[
+                    ["analysis","Konu analiz ediliyor"],
+                    ["research","Güvenilir kaynaklar araştırılıyor"],
+                    ["content","Akademik içerik hazırlanıyor"],
+                    ["visuals","Fotoğraflar araştırılıyor"],
+                    ["design","Görseller slaytlara yerleştiriliyor"],
+                    ["pdf","PDF oluşturuluyor"],
+                    ["finish","Son kontroller yapılıyor"]
+                ]
+                .map(
+                    (x,i) => `
 
-                <div
-                    class="presentation-step"
-                    data-step="research"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        Güvenilir kaynaklar araştırılıyor
-                    </div>
-                </div>
+                        <div
+                            class="
+                                presentation-step
+                                ${i===0 ? "active" : ""}
+                            "
+                            data-step="${x[0]}">
 
-                <div
-                    class="presentation-step"
-                    data-step="content"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        Akademik içerik hazırlanıyor
-                    </div>
-                </div>
+                            <div class="presentation-step-icon">
 
-                <div
-                    class="presentation-step"
-                    data-step="visuals"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        Fotoğraflar araştırılıyor
-                    </div>
-                </div>
+                                ${i===0 ? "●" : "○"}
 
-                <div
-                    class="presentation-step"
-                    data-step="design"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        Görseller slaytlara yerleştiriliyor
-                    </div>
-                </div>
+                            </div>
 
-                <div
-                    class="presentation-step"
-                    data-step="pdf"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        PDF oluşturuluyor
-                    </div>
-                </div>
+                            <div>
+                                ${x[1]}
+                            </div>
 
-                <div
-                    class="presentation-step"
-                    data-step="finish"
-                >
-                    <div class="presentation-step-icon">
-                        ○
-                    </div>
-                    <div>
-                        Son kontroller yapılıyor
-                    </div>
-                </div>
+                        </div>
+
+                    `
+                )
+                .join("")}
 
             </div>
 
@@ -1852,19 +2857,22 @@ async function createPresentation(
 
                 <div
                     id="presentationProgressInner"
-                    class="presentation-progress-inner"
-                ></div>
+                    class="presentation-progress-inner">
+                </div>
 
             </div>
 
             <div
                 id="presentationLiveFooter"
-                class="presentation-live-footer"
-            >
-                K.A.R.V.I.S. sunumunuzu profesyonel biçimde hazırlıyor.
+                class="presentation-live-footer">
+
+                K.A.R.V.I.S. sunumunuzu
+                profesyonel biçimde hazırlıyor.
+
             </div>
 
         </div>
+
     `;
 
     waiting.remove();
@@ -1872,11 +2880,6 @@ async function createPresentation(
     $("chat").appendChild(
         progressMessage
     );
-
-    /*
-     * Burada artık otomatik scroll YOK.
-     * Sunum paneli mevcut konumunda kalır.
-     */
 
     startPresentationAnimation();
 
@@ -1894,45 +2897,27 @@ async function createPresentation(
                     },
 
                     body:JSON.stringify({
-                        topic:topic,
-                        username:currentUser,
+
+                        topic,
+
+                        username:
+                            currentUser,
+
                         slide_count:7
+
                     })
                 }
             );
 
-        let data;
+        const data =
+            await response.json();
 
-        try{
-
-            data =
-                await response.json();
-
-        }catch{
-
-            throw new Error(
-                "Sunum sunucusundan geçersiz yanıt geldi."
-            );
-        }
-
-        if(
-            !response.ok
-        ){
+        if(!response.ok){
 
             throw new Error(
                 data.detail ||
                 data.message ||
-                data.error ||
                 "Sunum başlatılamadı."
-            );
-        }
-
-        if(
-            !data.job_id
-        ){
-
-            throw new Error(
-                "Sunum işi başlatıldı fakat job_id alınamadı."
             );
         }
 
@@ -1962,11 +2947,11 @@ async function createPresentation(
 
 async function pollPresentation(
     jobId,
-    progressElement
+    el
 ){
 
     return new Promise(
-        function(resolve,reject){
+        (resolve,reject) => {
 
             let attempts = 0;
 
@@ -1974,7 +2959,7 @@ async function pollPresentation(
 
             presentationPolling =
                 setInterval(
-                    async function(){
+                    async () => {
 
                         attempts++;
 
@@ -2010,9 +2995,7 @@ async function pollPresentation(
                                     )
                                 );
 
-                            if(
-                                !response.ok
-                            ){
+                            if(!response.ok){
 
                                 throw new Error(
                                     "Sunum durumu alınamadı."
@@ -2024,7 +3007,7 @@ async function pollPresentation(
 
                             updatePresentationUI(
                                 data,
-                                progressElement
+                                el
                             );
 
                             if(
@@ -2053,7 +3036,7 @@ async function pollPresentation(
 
                                 if(fileUrl){
 
-                                    progressElement.remove();
+                                    el.remove();
 
                                     showPresentationResult(
                                         fileUrl
@@ -2063,7 +3046,7 @@ async function pollPresentation(
 
                                 }else{
 
-                                    progressElement.remove();
+                                    el.remove();
 
                                     reject(
                                         new Error(
@@ -2073,10 +3056,9 @@ async function pollPresentation(
                                     );
                                 }
 
-                                return;
                             }
 
-                            if(
+                            else if(
                                 data.status ===
                                 "error"
                             ){
@@ -2090,7 +3072,7 @@ async function pollPresentation(
 
                                 stopPresentationAnimation();
 
-                                progressElement.remove();
+                                el.remove();
 
                                 reject(
                                     new Error(
@@ -2099,8 +3081,6 @@ async function pollPresentation(
                                         "Sunum oluşturulamadı."
                                     )
                                 );
-
-                                return;
                             }
 
                         }catch(error){
@@ -2122,112 +3102,88 @@ async function pollPresentation(
     );
 }
 
-/* =====================================================
-   LIVE PRESENTATION UI
-===================================================== */
+/* ============================================================
+   PRESENTATION STATUS
+   ============================================================ */
 
-function getPresentationStage(
-    data
-){
+function getPresentationStage(data){
 
-    const progress =
-        Number(data.progress || 0);
+    const p =
+        Number(
+            data.progress || 0
+        );
 
-    const message =
+    const m =
         String(
             data.message || ""
-        ).toLocaleLowerCase(
+        )
+        .toLocaleLowerCase(
             "tr-TR"
         );
 
     if(
-        data.status === "completed"
-    ){
-
+        data.status ===
+        "completed"
+    )
         return "finish";
-    }
 
     if(
-        message.includes("son kontroller") ||
-        message.includes("bitirmek")
-    ){
-
+        m.includes("son kontroller") ||
+        m.includes("bitirmek")
+    )
         return "finish";
-    }
 
     if(
-        message.includes("pdf") ||
-        message.includes("oluşturuluyor")
-    ){
-
-        if(progress >= 88){
-            return "pdf";
-        }
-    }
-
-    if(
-        message.includes("slayt") ||
-        message.includes("tasarım") ||
-        message.includes("profesyonel")
-    ){
-
-        if(progress >= 76){
-            return "design";
-        }
-
-        if(progress >= 35){
-            return "content";
-        }
-    }
-
-    if(
-        message.includes("görsel") ||
-        message.includes("fotoğraf")
-    ){
-
-        return "visuals";
-    }
-
-    if(
-        message.includes("doğrula") ||
-        message.includes("kaynak") ||
-        message.includes("araştır")
-    ){
-
-        if(progress >= 28){
-            return "content";
-        }
-
-        return "research";
-    }
-
-    if(
-        message.includes("analiz") ||
-        progress <= 8
-    ){
-
-        return "analysis";
-    }
-
-    if(progress < 30){
-        return "research";
-    }
-
-    if(progress < 40){
-        return "content";
-    }
-
-    if(progress < 76){
-        return "visuals";
-    }
-
-    if(progress < 88){
-        return "design";
-    }
-
-    if(progress < 98){
+        m.includes("pdf") &&
+        p >= 88
+    )
         return "pdf";
-    }
+
+    if(
+        (
+            m.includes("slayt") ||
+            m.includes("tasarım") ||
+            m.includes("profesyonel")
+        ) &&
+        p >= 76
+    )
+        return "design";
+
+    if(
+        m.includes("görsel") ||
+        m.includes("fotoğraf")
+    )
+        return "visuals";
+
+    if(
+        m.includes("doğrula") ||
+        m.includes("kaynak") ||
+        m.includes("araştır")
+    )
+        return p >= 28
+            ? "content"
+            : "research";
+
+    if(
+        m.includes("analiz") ||
+        p <= 8
+    )
+        return "analysis";
+
+    if(p < 30)
+        return "research";
+
+    if(p < 40)
+        return "content";
+
+    if(p < 76)
+        return "visuals";
+
+    if(p < 88)
+        return "design";
+
+    if(p < 98)
+        return "pdf";
 
     return "finish";
 }
@@ -2237,6 +3193,7 @@ function updatePresentationSteps(
 ){
 
     const order = [
+
         "analysis",
         "research",
         "content",
@@ -2244,9 +3201,10 @@ function updatePresentationSteps(
         "design",
         "pdf",
         "finish"
+
     ];
 
-    const currentIndex =
+    const ci =
         order.indexOf(
             currentStage
         );
@@ -2258,12 +3216,9 @@ function updatePresentationSteps(
         .forEach(
             step => {
 
-                const stepName =
-                    step.dataset.step;
-
-                const stepIndex =
+                const si =
                     order.indexOf(
-                        stepName
+                        step.dataset.step
                     );
 
                 const icon =
@@ -2276,10 +3231,7 @@ function updatePresentationSteps(
                     "active"
                 );
 
-                if(
-                    stepIndex <
-                    currentIndex
-                ){
+                if(si < ci){
 
                     step.classList.add(
                         "done"
@@ -2289,8 +3241,7 @@ function updatePresentationSteps(
                         "✓";
 
                 }else if(
-                    stepIndex ===
-                    currentIndex
+                    si === ci
                 ){
 
                     step.classList.add(
@@ -2313,77 +3264,46 @@ function getFriendlyPresentationMessage(
     data
 ){
 
-    const message =
-        String(
-            data.message || ""
+    if(data.message)
+        return String(
+            data.message
         );
 
-    if(message){
-        return message;
-    }
-
-    const progress =
+    const p =
         Number(
             data.progress || 0
         );
 
-    if(progress < 10){
+    if(p < 10)
         return "Konu analiz ediliyor...";
-    }
 
-    if(progress < 35){
+    if(p < 35)
         return "Güvenilir kaynaklar araştırılıyor...";
-    }
 
-    if(progress < 40){
+    if(p < 40)
         return "Bilgiler doğrulanıyor...";
-    }
 
-    if(progress < 76){
+    if(p < 76)
         return "Fotoğraflar araştırılıyor...";
-    }
 
-    if(progress < 88){
+    if(p < 88)
         return "Slayt tasarımı hazırlanıyor...";
-    }
 
-    if(progress < 98){
+    if(p < 98)
         return "PDF oluşturuluyor...";
-    }
 
     return "Bitirmek üzereyim...";
 }
 
 function updatePresentationUI(
     data,
-    progressElement
+    el
 ){
 
-    if(!progressElement){
+    if(!el)
         return;
-    }
 
-    const percent =
-        progressElement.querySelector(
-            "#presentationPercent"
-        );
-
-    const progressInner =
-        progressElement.querySelector(
-            "#presentationProgressInner"
-        );
-
-    const current =
-        progressElement.querySelector(
-            "#presentationCurrent"
-        );
-
-    const footer =
-        progressElement.querySelector(
-            "#presentationLiveFooter"
-        );
-
-    const progress =
+    const p =
         Math.max(
             0,
             Math.min(
@@ -2394,86 +3314,63 @@ function updatePresentationUI(
             )
         );
 
-    if(percent){
-
-        percent.textContent =
-            Math.round(progress) + "%";
-    }
-
-    if(progressInner){
-
-        progressInner.style.width =
-            progress + "%";
-    }
-
-    const stage =
-        getPresentationStage(
-            data
+    const percent =
+        el.querySelector(
+            "#presentationPercent"
         );
+
+    const inner =
+        el.querySelector(
+            "#presentationProgressInner"
+        );
+
+    const cur =
+        el.querySelector(
+            "#presentationCurrent"
+        );
+
+    const footer =
+        el.querySelector(
+            "#presentationLiveFooter"
+        );
+
+    if(percent)
+        percent.textContent =
+            Math.round(p) + "%";
+
+    if(inner)
+        inner.style.width =
+            p + "%";
 
     updatePresentationSteps(
-        stage
+        getPresentationStage(data)
     );
 
-    const friendly =
-        getFriendlyPresentationMessage(
-            data
-        );
+    if(cur){
 
-    if(current){
-
-        current.innerHTML =
+        cur.innerHTML =
             "<strong>CANLI DURUM</strong><br>" +
-            escapeHTML(friendly);
+            escapeHTML(
+                getFriendlyPresentationMessage(
+                    data
+                )
+            );
     }
 
     if(footer){
 
-        if(
+        footer.textContent =
             data.status === "completed"
-        ){
-
-            footer.textContent =
-                "Sunum başarıyla tamamlandı.";
-
-        }else if(
-            data.status === "error"
-        ){
-
-            footer.textContent =
-                "Sunum oluşturulurken bir hata meydana geldi.";
-
-        }else{
-
-            footer.textContent =
-                "K.A.R.V.I.S. işlemi arka planda sürdürüyor...";
-        }
+                ? "Sunum başarıyla tamamlandı."
+                : data.status === "error"
+                    ? "Sunum oluşturulurken bir hata meydana geldi."
+                    : "K.A.R.V.I.S. işlemi arka planda sürdürüyor...";
     }
-
-    /*
-     * ÇOK ÖNEMLİ:
-     *
-     * Burada artık:
-     *
-     * $("chat").scrollTop =
-     *     $("chat").scrollHeight;
-     *
-     * YOK.
-     *
-     * Böylece 600 ms'de bir ekran aşağı atlamaz.
-     */
 }
 
 function startPresentationAnimation(){
 
     stopPresentationAnimation();
-
-    /*
-     * Eski sistemde burada her 450 ms'de
-     * durum metnine müdahale ediliyordu.
-     *
-     * Artık gerçek backend mesajını değiştirmiyoruz.
-     */
 
     dotsTimer = null;
 }
@@ -2490,9 +3387,9 @@ function stopPresentationAnimation(){
     }
 }
 
-/* =====================================================
+/* ============================================================
    PRESENTATION RESULT
-===================================================== */
+   ============================================================ */
 
 function showPresentationResult(
     fileUrl
@@ -2511,31 +3408,38 @@ function showPresentationResult(
 
     div.innerHTML = `
 
-        <div style="
-            color:#00e5ff;
-            font-weight:800;
-            font-size:15px;
-            margin-bottom:8px;
-        ">
+        <div
+            style="
+                color:#00e5ff;
+                font-weight:800;
+                font-size:15px;
+                margin-bottom:8px;
+            ">
+
             📊 Sunum hazır.
+
         </div>
 
-        <div style="
-            color:rgba(255,255,255,.65);
-            font-size:12px;
-            line-height:1.5;
-            margin-bottom:14px;
-        ">
+        <div
+            style="
+                color:rgba(255,255,255,.65);
+                font-size:12px;
+                line-height:1.5;
+                margin-bottom:14px;
+            ">
+
             K.A.R.V.I.S. sunumu başarıyla oluşturdu.
             PDF dosyasını aşağıdaki butonlardan
             açabilir veya indirebilirsiniz.
+
         </div>
 
-        <div style="
-            display:flex;
-            gap:8px;
-            flex-wrap:wrap;
-        ">
+        <div
+            style="
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+            ">
 
             <a
                 href="${escapeHTML(fullUrl)}"
@@ -2550,9 +3454,10 @@ function showPresentationResult(
                     color:#001014;
                     font-weight:800;
                     text-decoration:none;
-                "
-            >
+                ">
+
                 📥 PDF'Yİ İNDİR
+
             </a>
 
             <a
@@ -2570,30 +3475,25 @@ function showPresentationResult(
                     color:#00e5ff;
                     font-weight:700;
                     text-decoration:none;
-                "
-            >
+                ">
+
                 👁 PDF'Yİ AÇ
+
             </a>
 
         </div>
+
     `;
 
-    $("chat").appendChild(
-        div
-    );
+    $("chat").appendChild(div);
 
-    /*
-     * Sonuç geldiğinde sadece bir kez aşağıya getiriyoruz.
-     * Bu, normal bir kullanıcı hareketidir ve sürekli
-     * scroll problemi oluşturmaz.
-     */
     $("chat").scrollTop =
         $("chat").scrollHeight;
 }
 
-/* =====================================================
-   OTHER
-===================================================== */
+/* ============================================================
+   NEW CHAT
+   ============================================================ */
 
 async function newChat(){
 
@@ -2613,14 +3513,20 @@ async function newChat(){
     showGreeting();
 }
 
+/* ============================================================
+   ERRORS
+   ============================================================ */
+
 async function openErrors(){
 
     closeSidebar();
 
     $("errorModal")
-        .classList.add("show");
+        .classList
+        .add("show");
 
-    $("errorContent").textContent =
+    $("errorContent")
+        .textContent =
         "Yükleniyor...";
 
     try{
@@ -2638,7 +3544,8 @@ async function openErrors(){
 
         if(!errors.length){
 
-            $("errorContent").textContent =
+            $("errorContent")
+                .textContent =
                 "Kayıtlı hata bulunmuyor.";
 
             return;
@@ -2669,8 +3576,7 @@ async function openErrors(){
                     div.textContent =
                         (
                             item.time
-                                ? item.time +
-                                  "\n"
+                                ? item.time + "\n"
                                 : ""
                         ) +
                         (
@@ -2685,61 +3591,63 @@ async function openErrors(){
                 }
             );
 
-        $("errorContent").innerHTML =
-            "";
+        $("errorContent")
+            .innerHTML = "";
 
         $("errorContent")
-            .appendChild(
-                wrapper
-            );
+            .appendChild(wrapper);
 
     }catch(error){
 
-        $("errorContent").textContent =
+        $("errorContent")
+            .textContent =
             "Hatalar alınamadı:\n" +
             error.message;
     }
 }
 
+/* ============================================================
+   NORMAL EĞLENCE MODU
+   ============================================================ */
+
 function toggleFunMode(){
 
     funMode = !funMode;
 
-    document.body
-        .classList.toggle(
-            "fun-mode",
-            funMode
-        );
+    document.body.classList.toggle(
+        "fun-mode",
+        funMode
+    );
 
     closeSidebar();
 
-    if(funMode){
-
-        addMessage(
-            "Eğlence Modu aktif. 😈",
-            "ai"
-        );
-
-    }else{
-
-        addMessage(
-            "Profesyonel Moda geri döndüm.",
-            "ai"
-        );
-    }
+    addMessage(
+        funMode
+            ? "Eğlence Modu aktif. 😈"
+            : "Profesyonel Moda geri döndüm.",
+        "ai"
+    );
 
     updateStatus();
 }
 
-function handleKey(event){
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
 
-    if(event.key === "Enter"){
+function handleKey(e){
 
-        event.preventDefault();
+    if(e.key === "Enter"){
+
+        e.preventDefault();
 
         sendMessage();
     }
 }
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
 
 function initialize(){
 
@@ -2761,34 +3669,26 @@ function initialize(){
             savedUser;
     }
 
-    if(
+    currentMode =
         currentUser === "ilknur"
-    ){
-
-        currentMode =
-            localStorage.getItem(
-                "karvis_mode"
-            ) ||
-            "lesson";
-
-    }else{
-
-        currentMode =
-            "normal";
-    }
+            ? (
+                localStorage.getItem(
+                    "karvis_mode"
+                ) || "lesson"
+            )
+            : "normal";
 
     applyUserTheme();
+
     updateSidebar();
+
     showGreeting();
+
     updateStatus();
 
     setTimeout(
-        () => {
-
-            $("messageInput")
-                .focus();
-
-        },
+        () =>
+            $("messageInput").focus(),
         150
     );
 }
