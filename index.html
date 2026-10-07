@@ -753,6 +753,261 @@ body.fun-mode .status{
 }
 
 /* ============================================================
+   SETTINGS
+   ============================================================ */
+
+.settings-modal{
+    max-height:88vh;
+}
+
+.settings-section{
+    padding:13px 0;
+    border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.settings-label{
+    color:#00e5ff;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.8px;
+    margin-bottom:9px;
+}
+
+.theme-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.theme-option,
+.settings-choice,
+.settings-action{
+    min-height:42px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:11px;
+    background:rgba(255,255,255,.04);
+    color:white;
+    padding:9px 10px;
+    font-size:12px;
+    text-align:left;
+}
+
+.theme-option.active,
+.settings-choice.active{
+    border-color:rgba(0,229,255,.65);
+    background:rgba(0,229,255,.10);
+}
+
+.theme-dot{
+    display:inline-block;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    margin-right:7px;
+    box-shadow:0 0 8px currentColor;
+}
+
+.theme-cyan{color:#00e5ff;background:#00e5ff}
+.theme-pink{color:#ff5ab4;background:#ff5ab4}
+.theme-purple{color:#a66cff;background:#a66cff}
+.theme-red{color:#ff4444;background:#ff4444}
+
+.settings-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.settings-row strong{
+    display:block;
+    font-size:12px;
+}
+
+.settings-row small{
+    display:block;
+    margin-top:3px;
+    color:rgba(255,255,255,.42);
+    font-size:9px;
+    line-height:1.35;
+}
+
+.settings-toggle{
+    min-width:65px;
+    height:34px;
+    border:1px solid rgba(0,229,255,.35);
+    border-radius:10px;
+    background:rgba(0,229,255,.09);
+    color:#00e5ff;
+    font-size:10px;
+    font-weight:800;
+}
+
+.settings-toggle.off{
+    color:rgba(255,255,255,.45);
+    border-color:rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04);
+}
+
+.settings-inline{
+    display:flex;
+    gap:7px;
+}
+
+.settings-choice{
+    flex:1;
+    text-align:center;
+    min-height:38px;
+}
+
+.settings-action{
+    color:#ff7777;
+    border-color:rgba(255,90,90,.25);
+}
+
+.settings-subrow{
+    margin-top:13px;
+}
+
+.voice-select{
+    max-width:145px;
+    height:36px;
+    border-radius:10px;
+    border:1px solid rgba(0,229,255,.2);
+    background:#071116;
+    color:white;
+    padding:0 7px;
+    font-size:10px;
+}
+
+.voice-range{
+    width:110px;
+    accent-color:#00e5ff;
+}
+
+.settings-system{
+    padding:12px 0;
+    color:rgba(255,255,255,.38);
+    font-size:9px;
+    line-height:1.7;
+}
+
+body.theme-pink{
+    --accent:#ff5ab4;
+    --accent-rgb:255,90,180;
+}
+body.theme-purple{
+    --accent:#a66cff;
+    --accent-rgb:166,108,255;
+}
+body.theme-red{
+    --accent:#ff4444;
+    --accent-rgb:255,68,68;
+}
+
+body.theme-pink,
+body.theme-purple,
+body.theme-red{
+    background:
+        radial-gradient(circle at center,rgba(var(--accent-rgb),.09),transparent 38%),
+        radial-gradient(circle at 50% 100%,rgba(var(--accent-rgb),.035),transparent 45%),
+        #02070a;
+}
+
+body.theme-pink .logo-small,
+body.theme-purple .logo-small,
+body.theme-red .logo-small{
+    color:var(--accent);
+    border-color:var(--accent);
+    box-shadow:0 0 12px rgba(var(--accent-rgb),.5),inset 0 0 12px rgba(var(--accent-rgb),.12);
+}
+
+body.theme-pink .ring,
+body.theme-purple .ring,
+body.theme-red .ring{
+    border-color:rgba(var(--accent-rgb),.42);
+}
+body.theme-pink .ring.three,
+body.theme-purple .ring.three,
+body.theme-red .ring.three{
+    border-color:rgba(var(--accent-rgb),.7);
+}
+body.theme-pink .core,
+body.theme-purple .core,
+body.theme-red .core{
+    color:var(--accent);
+    border-color:var(--accent);
+    box-shadow:0 0 25px rgba(var(--accent-rgb),.7),inset 0 0 20px rgba(var(--accent-rgb),.2);
+}
+body.theme-pink .status,
+body.theme-purple .status,
+body.theme-red .status{
+    color:var(--accent);
+}
+body.theme-pink .input,
+body.theme-purple .input,
+body.theme-red .input{
+    border-color:rgba(var(--accent-rgb),.25);
+}
+body.theme-pink .send,
+body.theme-purple .send,
+body.theme-red .send{
+    background:var(--accent);
+    box-shadow:0 0 15px rgba(var(--accent-rgb),.25);
+}
+body.theme-pink .message.ai,
+body.theme-purple .message.ai,
+body.theme-red .message.ai{
+    background:rgba(var(--accent-rgb),.08);
+    border-color:rgba(var(--accent-rgb),.18);
+}
+body.theme-pink .message a,
+body.theme-purple .message a,
+body.theme-red .message a{
+    color:var(--accent);
+}
+
+body.animations-off *,
+body.animations-off *::before,
+body.animations-off *::after{
+    animation:none !important;
+    transition:none !important;
+}
+
+body.text-small .message{font-size:12px}
+body.text-small .input{font-size:14px}
+body.text-large .message{font-size:16px}
+body.text-large .input{font-size:17px}
+
+body.voice-speaking .core{
+    animation:coreSpeak .72s ease-in-out infinite;
+}
+body.voice-speaking .ring.one{
+    animation:voiceRing 1.5s ease-in-out infinite;
+}
+body.voice-speaking .ring.two{
+    animation:voiceRing 1.05s ease-in-out infinite reverse;
+}
+body.voice-speaking .ring.three{
+    animation:voiceRing .8s ease-in-out infinite;
+}
+
+@keyframes coreSpeak{
+    0%,100%{
+        transform:scale(1);
+        box-shadow:0 0 25px rgba(0,229,255,.7),inset 0 0 20px rgba(0,229,255,.2);
+    }
+    50%{
+        transform:scale(1.13);
+        box-shadow:0 0 55px rgba(0,229,255,1),inset 0 0 30px rgba(0,229,255,.45);
+    }
+}
+@keyframes voiceRing{
+    0%,100%{transform:scale(1);opacity:.65}
+    50%{transform:scale(1.09);opacity:1}
+}
+
+/* ============================================================
    ANIMATIONS
    ============================================================ */
 
@@ -894,6 +1149,12 @@ body.fun-mode .status{
     </button>
 
     <button
+        class="menu-item"
+        onclick="openSettings()">
+        ⚙ Ayarlar
+    </button>
+
+    <button
         id="funButton"
         class="menu-item"
         onclick="toggleFunMode()">
@@ -928,12 +1189,6 @@ body.fun-mode .status{
             class="menu-item"
             onclick="openBetulFortune()">
             🃏 Fal Bak
-        </button>
-
-        <button
-            class="menu-item"
-            onclick="openBetulPhoto()">
-            📸 Fotoğraf Analizi
         </button>
 
     </div>
@@ -1061,6 +1316,124 @@ body.fun-mode .status{
 </div>
 
 <!-- ============================================================
+     SETTINGS MODAL
+     ============================================================ -->
+
+<div
+    id="settingsModal"
+    class="modal settings-modal">
+
+    <h2>⚙ K.A.R.V.I.S. Ayarları</h2>
+
+    <div class="settings-section">
+        <div class="settings-label">🎨 K.A.R.V.I.S. Rengi</div>
+
+        <div class="theme-grid">
+            <button class="theme-option" data-theme="default" onclick="setKarvisTheme('default')">
+                <span class="theme-dot theme-cyan"></span>
+                Orijinal
+            </button>
+
+            <button class="theme-option" data-theme="pink" onclick="setKarvisTheme('pink')">
+                <span class="theme-dot theme-pink"></span>
+                Pembe
+            </button>
+
+            <button class="theme-option" data-theme="purple" onclick="setKarvisTheme('purple')">
+                <span class="theme-dot theme-purple"></span>
+                Mor
+            </button>
+
+            <button class="theme-option" data-theme="red" onclick="setKarvisTheme('red')">
+                <span class="theme-dot theme-red"></span>
+                Kırmızı
+            </button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-row">
+            <div>
+                <strong>✨ Animasyonlar</strong>
+                <small>HUD hareketlerini ve efektleri kullan</small>
+            </div>
+            <button id="animationToggle" class="settings-toggle" onclick="toggleAnimations()">AÇIK</button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-label">🔤 Yazı Boyutu</div>
+        <div class="settings-inline">
+            <button class="settings-choice" data-size="small" onclick="setTextSize('small')">Küçük</button>
+            <button class="settings-choice" data-size="normal" onclick="setTextSize('normal')">Normal</button>
+            <button class="settings-choice" data-size="large" onclick="setTextSize('large')">Büyük</button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-label">🗣️ Yanıt Tarzı</div>
+        <div class="settings-inline">
+            <button class="settings-choice" data-style="professional" onclick="setResponseStyle('professional')">Profesyonel</button>
+            <button class="settings-choice" data-style="friendly" onclick="setResponseStyle('friendly')">Samimi</button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-label">📏 Cevap Uzunluğu</div>
+        <div class="settings-inline">
+            <button class="settings-choice" data-length="short" onclick="setResponseLength('short')">Kısa</button>
+            <button class="settings-choice" data-length="normal" onclick="setResponseLength('normal')">Normal</button>
+            <button class="settings-choice" data-length="long" onclick="setResponseLength('long')">Detaylı</button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-row">
+            <div>
+                <strong>🔊 K.A.R.V.I.S. Sesi</strong>
+                <small>Yanıtları sesli olarak oku</small>
+            </div>
+            <button id="voiceToggle" class="settings-toggle" onclick="toggleVoice()">AÇIK</button>
+        </div>
+
+        <div class="settings-row settings-subrow">
+            <div>
+                <strong>🎙️ Ses karakteri</strong>
+                <small>Sakin, derin ve teknolojik K.A.R.V.I.S. tonu</small>
+            </div>
+            <select id="voiceSelect" class="voice-select" onchange="setVoice(this.value)">
+                <option value="">Otomatik</option>
+            </select>
+        </div>
+
+        <div class="settings-row settings-subrow">
+            <div>
+                <strong>🔉 Ses seviyesi</strong>
+                <small>K.A.R.V.I.S. ses yüksekliği</small>
+            </div>
+            <input id="voiceVolume" class="voice-range" type="range" min="0" max="1" step="0.05" value="0.9" oninput="setVoiceVolume(this.value)">
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-row">
+            <div>
+                <strong>🧹 Sohbet</strong>
+                <small>Mevcut sohbet ekranını temizle</small>
+            </div>
+            <button class="settings-action" onclick="clearChatFromSettings()">Temizle</button>
+        </div>
+    </div>
+
+    <div class="settings-system">
+        <div>K.A.R.V.I.S. <strong>v32.1</strong></div>
+        <div id="settingsVoiceStatus">Ses sistemi hazırlanıyor...</div>
+    </div>
+
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<!-- ============================================================
      BETÜL MODAL
      ============================================================ -->
 
@@ -1149,6 +1522,20 @@ let funMode = false;
 let sending = false;
 let presentationPolling = null;
 let dotsTimer = null;
+let karvisVoice = null;
+let voiceTimer = null;
+let speechSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+
+const karvisSettings = {
+    theme: localStorage.getItem("karvis_theme") || "default",
+    animations: localStorage.getItem("karvis_animations") !== "off",
+    textSize: localStorage.getItem("karvis_text_size") || "normal",
+    responseStyle: localStorage.getItem("karvis_response_style") || "professional",
+    responseLength: localStorage.getItem("karvis_response_length") || "normal",
+    voice: localStorage.getItem("karvis_voice") !== "off",
+    voiceName: localStorage.getItem("karvis_voice_name") || "",
+    voiceVolume: Number(localStorage.getItem("karvis_voice_volume") || "0.9")
+};
 
 const waitMessages = [
     "Bir saniye efendim...",
@@ -1206,6 +1593,10 @@ function addMessage(text,type="ai"){
     $("chat").appendChild(div);
 
     $("chat").scrollTop = $("chat").scrollHeight;
+
+    if(type === "ai" && karvisSettings.voice && !String(text).includes("hazırlanıyor")){
+        speakKarvis(text);
+    }
 
     return div;
 }
@@ -1356,6 +1747,8 @@ async function login(){
 
         closeModals();
 
+        stopKarvisVoice();
+
         funMode = false;
 
         document.body.classList.remove(
@@ -1377,21 +1770,242 @@ async function login(){
 }
 
 /* ============================================================
+   SETTINGS
+   ============================================================ */
+
+function applyKarvisSettings(){
+    document.body.classList.remove("theme-pink","theme-purple","theme-red","animations-off","text-small","text-large");
+
+    if(karvisSettings.theme === "pink")
+        document.body.classList.add("theme-pink");
+    else if(karvisSettings.theme === "purple")
+        document.body.classList.add("theme-purple");
+    else if(karvisSettings.theme === "red")
+        document.body.classList.add("theme-red");
+
+    if(!karvisSettings.animations)
+        document.body.classList.add("animations-off");
+
+    if(karvisSettings.textSize === "small")
+        document.body.classList.add("text-small");
+    if(karvisSettings.textSize === "large")
+        document.body.classList.add("text-large");
+}
+
+function openSettings(){
+    closeSidebar();
+    populateVoiceList();
+    refreshSettingsUI();
+    $("settingsModal").classList.add("show");
+}
+
+function refreshSettingsUI(){
+    document.querySelectorAll(".theme-option").forEach(b =>
+        b.classList.toggle("active", b.dataset.theme === karvisSettings.theme)
+    );
+    document.querySelectorAll(".settings-choice[data-size]").forEach(b =>
+        b.classList.toggle("active", b.dataset.size === karvisSettings.textSize)
+    );
+    document.querySelectorAll(".settings-choice[data-style]").forEach(b =>
+        b.classList.toggle("active", b.dataset.style === karvisSettings.responseStyle)
+    );
+    document.querySelectorAll(".settings-choice[data-length]").forEach(b =>
+        b.classList.toggle("active", b.dataset.length === karvisSettings.responseLength)
+    );
+
+    const a=$("animationToggle");
+    if(a){
+        a.textContent=karvisSettings.animations ? "AÇIK" : "KAPALI";
+        a.classList.toggle("off",!karvisSettings.animations);
+    }
+
+    const v=$("voiceToggle");
+    if(v){
+        v.textContent=karvisSettings.voice ? "AÇIK" : "KAPALI";
+        v.classList.toggle("off",!karvisSettings.voice);
+    }
+
+    const vol=$("voiceVolume");
+    if(vol) vol.value=karvisSettings.voiceVolume;
+
+    const status=$("settingsVoiceStatus");
+    if(status){
+        status.textContent = speechSupported
+            ? "Ses sistemi hazır."
+            : "Bu tarayıcı sesli konuşmayı desteklemiyor.";
+    }
+}
+
+function setKarvisTheme(theme){
+    karvisSettings.theme=theme;
+    localStorage.setItem("karvis_theme",theme);
+    applyKarvisSettings();
+    refreshSettingsUI();
+}
+
+function toggleAnimations(){
+    karvisSettings.animations=!karvisSettings.animations;
+    localStorage.setItem("karvis_animations",karvisSettings.animations ? "on" : "off");
+    applyKarvisSettings();
+    refreshSettingsUI();
+}
+
+function setTextSize(size){
+    karvisSettings.textSize=size;
+    localStorage.setItem("karvis_text_size",size);
+    applyKarvisSettings();
+    refreshSettingsUI();
+}
+
+function setResponseStyle(style){
+    karvisSettings.responseStyle=style;
+    localStorage.setItem("karvis_response_style",style);
+    refreshSettingsUI();
+}
+
+function setResponseLength(length){
+    karvisSettings.responseLength=length;
+    localStorage.setItem("karvis_response_length",length);
+    refreshSettingsUI();
+}
+
+function toggleVoice(){
+    karvisSettings.voice=!karvisSettings.voice;
+    localStorage.setItem("karvis_voice",karvisSettings.voice ? "on" : "off");
+
+    if(!karvisSettings.voice){
+        stopKarvisVoice();
+    }
+
+    refreshSettingsUI();
+}
+
+function setVoice(name){
+    karvisSettings.voiceName=name;
+    localStorage.setItem("karvis_voice_name",name);
+}
+
+function setVoiceVolume(value){
+    karvisSettings.voiceVolume=Number(value);
+    localStorage.setItem("karvis_voice_volume",String(value));
+}
+
+function populateVoiceList(){
+    const select=$("voiceSelect");
+    if(!select || !speechSupported) return;
+
+    const voices=speechSynthesis.getVoices();
+    const current=karvisSettings.voiceName;
+
+    select.innerHTML='<option value="">Otomatik</option>';
+
+    voices
+        .filter(v => /tr[-_]/i.test(v.lang) || /turkish|türkçe|turk/i.test(v.name))
+        .forEach(v=>{
+            const o=document.createElement("option");
+            o.value=v.name;
+            o.textContent=v.name;
+            select.appendChild(o);
+        });
+
+    if(current && [...select.options].some(o=>o.value===current))
+        select.value=current;
+}
+
+if(speechSupported){
+    speechSynthesis.onvoiceschanged=populateVoiceList;
+}
+
+function chooseKarvisVoice(){
+    if(!speechSupported) return null;
+
+    const voices=speechSynthesis.getVoices();
+    if(!voices.length) return null;
+
+    if(karvisSettings.voiceName){
+        const exact=voices.find(v=>v.name===karvisSettings.voiceName);
+        if(exact) return exact;
+    }
+
+    // Öncelik Türkçe seslerde; mümkünse erkek/derin isimli sesleri tercih et.
+    const tr=voices.filter(v => /^tr[-_]/i.test(v.lang));
+    return tr.find(v=>/male|erkek|cem|emel|yusuf|ali|ahmet/i.test(v.name))
+        || tr[0]
+        || voices.find(v=>/^en[-_]/i.test(v.lang))
+        || voices[0];
+}
+
+function speakKarvis(text){
+    if(!speechSupported || !karvisSettings.voice) return;
+
+    stopKarvisVoice();
+
+    const clean=String(text)
+        .replace(/https?:\/\/\S+/g,"")
+        .replace(/[#*_`]/g,"")
+        .replace(/\s+/g," ")
+        .trim();
+
+    if(!clean) return;
+
+    const utterance=new SpeechSynthesisUtterance(clean);
+    const voice=chooseKarvisVoice();
+
+    if(voice) utterance.voice=voice;
+    utterance.lang=voice ? voice.lang : "tr-TR";
+    utterance.rate=0.88;
+    utterance.pitch=0.72;
+    utterance.volume=karvisSettings.voiceVolume;
+
+    utterance.onstart=()=>{
+        document.body.classList.add("voice-speaking");
+        $("status").classList.add("busy");
+    };
+
+    utterance.onend=()=>{
+        document.body.classList.remove("voice-speaking");
+        $("status").classList.remove("busy");
+    };
+
+    utterance.onerror=()=>{
+        document.body.classList.remove("voice-speaking");
+        $("status").classList.remove("busy");
+    };
+
+    karvisVoice=utterance;
+    speechSynthesis.speak(utterance);
+}
+
+function stopKarvisVoice(){
+    if(!speechSupported) return;
+    speechSynthesis.cancel();
+    karvisVoice=null;
+    document.body.classList.remove("voice-speaking");
+    if($("status")) $("status").classList.remove("busy");
+}
+
+function clearChatFromSettings(){
+    stopKarvisVoice();
+    $("chat").innerHTML="";
+    closeModals();
+    addMessage("Sohbet temizlendi efendim. K.A.R.V.I.S. hazır.","ai");
+}
+
+/* ============================================================
    USER THEME
    ============================================================ */
 
 function applyUserTheme(){
 
-    document.body.classList.remove(
-        "sinem-mode"
-    );
+    document.body.classList.remove("sinem-mode");
 
-    if(currentUser === "sinem"){
-
-        document.body.classList.add(
-            "sinem-mode"
-        );
+    // Sinem'in mevcut pembe görünümünü koru,
+    // ancak Ayarlar'dan başka renk seçilmişse onu kullan.
+    if(currentUser === "sinem" && !localStorage.getItem("karvis_theme")){
+        document.body.classList.add("sinem-mode");
     }
+
+    applyKarvisSettings();
 }
 
 function updateStatus(){
@@ -2279,204 +2893,6 @@ function openBetulFortune(){
 }
 
 /* ============================================================
-   BETÜL FOTOĞRAF
-   ============================================================ */
-
-function openBetulPhoto(){
-
-    if(currentUser !== "betul")
-        return;
-
-    closeSidebar();
-
-    $("betulModalTitle").textContent =
-        "📸 Fotoğraf Analizi";
-
-    $("betulModalBody").innerHTML = `
-
-        <div class="betul-modal-note">
-
-            Aşko fotoğrafı seç. 💅
-
-            <br><br>
-
-            K.A.R.V.I.S. bunu gerçek kişilik,
-            psikoloji veya karakter çıkarımı
-            olarak kullanmaz.
-
-            <br><br>
-
-            Sadece eğlence amaçlı görsel
-            simülasyon yapılır.
-
-        </div>
-
-        <input
-            id="betulPhotoInput"
-            class="betul-photo-input"
-            type="file"
-            accept="image/*">
-
-        <button
-            class="modal-button"
-            onclick="startBetulPhoto()">
-
-            Analizi Başlat 📸
-
-        </button>
-
-    `;
-
-    $("betulInputModal")
-        .classList
-        .add("show");
-}
-
-async function startBetulPhoto(){
-
-    const f =
-        $("betulPhotoInput")
-        .files[0];
-
-    if(!f){
-
-        alert(
-            "Aşko önce fotoğraf seç 😭"
-        );
-
-        return;
-    }
-
-    closeModals();
-
-    const seed =
-        f.name +
-        "|" +
-        f.size +
-        "|" +
-        f.type;
-
-    const box =
-        betulBox(
-            "📸 FOTOĞRAF EĞLENCE ANALİZİ"
-        );
-
-    await runBetulStages(
-        box,
-        [
-
-            "📸 Görsel sisteme alınıyor...",
-
-            "🔎 Görsel özellikleri taranıyor...",
-
-            "🤨 Yüz hatları inceleniyor...",
-
-            "💅 Betül eğlence algoritması devrede...",
-
-            "😂 K.A.R.V.I.S. yorum üretiyor..."
-
-        ],
-        () => {
-
-            const cats = [
-
-                {
-                    label:"✨ Tatlı Enerji"
-                },
-
-                {
-                    label:"😎 Havalı Vibe"
-                },
-
-                {
-                    label:"😂 Komik Aura"
-                },
-
-                {
-                    label:"🌪️ Kaotik Enerji"
-                },
-
-                {
-                    label:"🧠 Gizemli Vibe"
-                },
-
-                {
-                    label:"💅 Sosyal Enerji"
-                }
-
-            ];
-
-            const scores =
-                deterministicScores(
-                    seed,
-                    cats
-                );
-
-            const r = box;
-
-            let h = `
-
-                <div
-                    style="
-                        font-weight:800;
-                        color:#ff71c2;
-                        margin-bottom:7px;
-                    ">
-                    📸 Eğlence skoru
-                </div>
-
-            `;
-
-            scores.forEach(
-                (s,i) => {
-
-                    h += `
-
-                        <div class="betul-score">
-
-                            <span>
-                                ${cats[i].label}
-                            </span>
-
-                            <strong>
-                                %${s}
-                            </strong>
-
-                        </div>
-
-                    `;
-                }
-            );
-
-            h += `
-
-                <div class="betul-comment">
-
-                    Aşkoo sonuçlar geldi 😭
-
-                    Bu fotoğrafın algoritmik
-                    eğlence enerjisi bayağı
-                    hareketli çıktı.
-
-                </div>
-
-                <div class="betul-disclaimer">
-
-                    Bu sonuçlar fotoğraftaki kişinin
-                    gerçek kişiliğini, psikolojisini
-                    veya romantik özelliklerini belirlemez;
-                    tamamen eğlence amaçlı simülasyondur.
-
-                </div>
-
-            `;
-
-            r.innerHTML = h;
-        }
-    );
-}
-
-/* ============================================================
    BETÜL CHAT COMMANDS
    ============================================================ */
 
@@ -2564,20 +2980,6 @@ function handleBetulCommand(message){
     if(t.includes("fal")){
 
         openBetulFortune();
-
-        return true;
-    }
-
-    /*
-       FOTOĞRAF
-    */
-
-    if(
-        t.includes("fotoğraf") ||
-        t.includes("fotograf")
-    ){
-
-        openBetulPhoto();
 
         return true;
     }
@@ -2686,7 +3088,13 @@ async function sendMessage(){
                                 currentUser,
 
                             mode:
-                                currentMode
+                                currentMode,
+
+                            response_style:
+                                karvisSettings.responseStyle,
+
+                            response_length:
+                                karvisSettings.responseLength
 
                         })
                     }
