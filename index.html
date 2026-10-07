@@ -1935,49 +1935,147 @@ function chooseKarvisVoice(){
         || voices[0];
 }
 
+function cleanKarvisSpeech(text){
+    let clean=String(text || "");
+
+    // Linkleri, markdown işaretlerini ve kod biçimlendirmesini kaldır.
+    clean=clean.replace(/https?:\/\/\S+/g," ");
+    clean=clean.replace(/```[\s\S]*?```/g," ");
+    clean=clean.replace(/[`*_#~>]/g," ");
+
+    // Emoji ve sembol karakterlerini seslendirmeden önce temizle.
+    clean=clean.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu," ");
+
+    // Liste işaretleri, gereksiz noktalama ve tekrar eden boşluklar.
+    clean=clean.replace(/(^|\s)[•●▪◦‣►▶→➜➤]+(?=\s)/g," ");
+    clean=clean.replace(/\s+/g," ").trim();
+
+    return clean;
+}
+
+function splitSpeechText(text){
+    let clean=cleanKarvisSpeech(text);
+
+    // BETÜL: fal / dedikodu anlatımı. Metni daha masalsı ve
+    // sohbet eder gibi küçük duraklamalarla seslendir.
+    if(currentUser === "betul"){
+        clean=clean
+            .replace(/\b3 vakte\b/gi,"üç vakte")
+            .replace(/\b2 vakte\b/gi,"iki vakte")
+            .replace(/\b1 vakte\b/gi,"bir vakte")
+            .replace(/\b3\b(?=\s+vakte)/gi,"üç")
+            .replace(/\b2\b(?=\s+vakte)/gi,"iki")
+            .replace(/\b1\b(?=\s+vakte)/gi,"bir");
+
+        // Fal bakıyormuş gibi doğal sözlü duraklamalar.
+        clean=clean.replace(/\bama\b/gi,"ama... ");
+        clean=clean.replace(/\bşimdi\b/gi,"şimdi... ");
+        clean=clean.replace(/\bbak\b/gi,"bak... ");
+        clean=clean.replace(/\bbir dakika\b/gi,"bir dakika... ");
+        clean=clean.replace(/\bkız\b/gi,"kız...");
+    }
+    if(!clean) return [];
+
+    // Uzun yanıtları doğal cümle gruplarına böl; her parça yaklaşık 220 karakteri geçmesin.
+    const sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
+    const chunks=[];
+    let current="";
+
+    for(const sentenceRaw of sentences){
+        const sentence=sentenceRaw.trim();
+        if(!sentence) continue;
+
+        if((current + " " + sentence).trim().length <= 220){
+            current=(current + " " + sentence).trim();
+        }else{
+            if(current) chunks.push(current);
+            current=sentence;
+        }
+    }
+
+    if(current) chunks.push(current);
+    return chunks;
+}
+
 function speakKarvis(text){
     if(!speechSupported || !karvisSettings.voice) return;
 
     stopKarvisVoice();
 
-    const clean=String(text)
-        .replace(/https?:\/\/\S+/g,"")
-        .replace(/[#*_`]/g,"")
-        .replace(/\s+/g," ")
-        .trim();
+    const queue=splitSpeechText(text);
+    if(!queue.length) return;
 
-    if(!clean) return;
-
-    const utterance=new SpeechSynthesisUtterance(clean);
     const voice=chooseKarvisVoice();
+    let index=0;
+    let stopped=false;
 
-    if(voice) utterance.voice=voice;
-    utterance.lang=voice ? voice.lang : "tr-TR";
-    utterance.rate=0.88;
-    utterance.pitch=0.72;
-    utterance.volume=karvisSettings.voiceVolume;
+    document.body.classList.add("voice-speaking");
+    $("status").classList.add("busy");
 
-    utterance.onstart=()=>{
-        document.body.classList.add("voice-speaking");
-        $("status").classList.add("busy");
-    };
+    function speakNext(){
+        if(stopped || index>=queue.length){
+            document.body.classList.remove("voice-speaking");
+            $("status").classList.remove("busy");
+            karvisVoice=null;
+            return;
+        }
 
-    utterance.onend=()=>{
+        const utterance=new SpeechSynthesisUtterance(queue[index++]);
+
+        if(voice) utterance.voice=voice;
+        utterance.lang=voice ? voice.lang : "tr-TR";
+
+        // Betül ayrı bir ses karakterine sahip: fal / dedikodu
+        // anlatır gibi daha sıcak, canlı ve ritmik.
+        if(currentUser === "betul"){
+            utterance.rate=0.96;
+            utterance.pitch=0.88;
+        }else{
+            // Karahan / Sinem / İlknur: sakin, akıcı ve profesyonel.
+            utterance.rate=0.91;
+            utterance.pitch=0.68;
+        }
+        utterance.volume=karvisSettings.voiceVolume;
+
+        utterance.onstart=()=>{
+            document.body.classList.add("voice-speaking");
+            $("status").classList.add("busy");
+        };
+
+        utterance.onend=()=>{
+            if(!stopped) speakNext();
+        };
+
+        utterance.onerror=()=>{
+            if(!stopped) speakNext();
+        };
+
+        karvisVoice=utterance;
+        speechSynthesis.speak(utterance);
+    }
+
+    speakNext();
+
+    // stopKarvisVoice tarafından kullanılabilmesi için kuyruk durdurucusunu sakla.
+    karvisSpeechStop=()=>{
+        stopped=true;
+        speechSynthesis.cancel();
         document.body.classList.remove("voice-speaking");
-        $("status").classList.remove("busy");
+        if($("status")) $("status").classList.remove("busy");
+        karvisVoice=null;
     };
-
-    utterance.onerror=()=>{
-        document.body.classList.remove("voice-speaking");
-        $("status").classList.remove("busy");
-    };
-
-    karvisVoice=utterance;
-    speechSynthesis.speak(utterance);
 }
 
 function stopKarvisVoice(){
     if(!speechSupported) return;
+
+    if(karvisSpeechStop){
+        const stop=karvisSpeechStop;
+        karvisSpeechStop=null;
+        stop();
+        return;
+    }
+
     speechSynthesis.cancel();
     karvisVoice=null;
     document.body.classList.remove("voice-speaking");
