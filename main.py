@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "33.3.0"
+APP_VERSION = "33.4.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -427,7 +427,8 @@ metin üret.
 def call_groq(
     prompt,
     model,
-    system_prompt=PROFESSIONAL_SYSTEM
+    system_prompt=PROFESSIONAL_SYSTEM,
+    max_tokens=5000
 ):
 
     if not groq_client:
@@ -463,7 +464,7 @@ def call_groq(
                 ],
 
                 temperature=0.20,
-                max_tokens=5000
+                max_tokens=max_tokens
             )
         )
 
@@ -487,7 +488,8 @@ def call_groq(
 def call_openrouter(
     prompt,
     model,
-    system_prompt=PROFESSIONAL_SYSTEM
+    system_prompt=PROFESSIONAL_SYSTEM,
+    max_tokens=5000
 ):
 
     if not openrouter_client:
@@ -523,7 +525,7 @@ def call_openrouter(
                 ],
 
                 temperature=0.20,
-                max_tokens=5000
+                max_tokens=max_tokens
             )
         )
 
@@ -546,15 +548,23 @@ def call_openrouter(
 
 def ask_ai(
     prompt,
-    system_prompt=PROFESSIONAL_SYSTEM
+    system_prompt=PROFESSIONAL_SYSTEM,
+    fast=False
 ):
 
-    for model in GROQ_MODELS:
+    groq_models = (
+        ["openai/gpt-oss-20b", "openai/gpt-oss-120b"]
+        if fast else GROQ_MODELS
+    )
+    max_tokens = 900 if fast else 5000
+
+    for model in groq_models:
 
         result = call_groq(
             prompt,
             model,
-            system_prompt
+            system_prompt,
+            max_tokens=max_tokens
         )
 
         if result:
@@ -565,7 +575,8 @@ def ask_ai(
         result = call_openrouter(
             prompt,
             model,
-            system_prompt
+            system_prompt,
+            max_tokens=max_tokens
         )
 
         if result:
@@ -1376,21 +1387,50 @@ def fetch_denizli_weather():
 
 
 def weather_context_for_ai(weather):
+    """AI'ya ham saatlik liste yerine kısa, kullanılabilir hava özeti verir."""
     if not weather:
         return ""
 
+    temp = weather.get("current_temperature")
+    feels = weather.get("apparent_temperature")
+    condition = clean_text(weather.get("current_condition") or "değişken").lower()
+    upcoming = weather.get("upcoming") or []
+
     lines = [
         "CANLI DENİZLİ HAVA VERİSİ",
-        f"Şu an: {weather.get('current_temperature')}°C, hissedilen {weather.get('apparent_temperature')}°C, {weather.get('current_condition')}, rüzgar {weather.get('current_wind')} km/sa.",
-        "Önümüzdeki saatler:"
+        f"Şu an: {temp}°C, {condition}."
     ]
-    for item in weather.get("upcoming", [])[:8]:
-        lines.append(
-            f"{item.get('time')}: {item.get('temperature')}°C, {item.get('condition')}, yağış ihtimali %{item.get('rain_probability')}, rüzgar {item.get('wind')} km/sa."
-        )
-    lines.append(
-        "Bu veriyi kullanıcıya doğal bir hava durumu değerlendirmesi olarak aktar; URL veya ham API verisi gösterme."
-    )
+    if temp is not None and feels is not None:
+        try:
+            if abs(float(temp) - float(feels)) >= 3:
+                lines.append(f"Hissedilen: {feels}°C.")
+        except Exception:
+            pass
+
+    rain_values = [x.get("rain_probability") for x in upcoming[:8] if x.get("rain_probability") is not None]
+    try:
+        max_rain = max(float(x) for x in rain_values) if rain_values else None
+    except Exception:
+        max_rain = None
+
+    if max_rain is not None and max_rain >= 50:
+        lines.append("Yakın saatlerde yağış ihtimali yüksek.")
+    elif max_rain is not None and max_rain >= 30:
+        lines.append("Yakın saatlerde yağış ihtimali var.")
+
+    temps = [x.get("temperature") for x in upcoming[:8] if x.get("temperature") is not None]
+    try:
+        numeric_temps = [float(x) for x in temps]
+        if numeric_temps and temp is not None:
+            delta = numeric_temps[-1] - float(temp)
+            if delta <= -4:
+                lines.append("Akşama doğru sıcaklık belirgin şekilde düşecek.")
+            elif delta >= 4:
+                lines.append("Gün içinde sıcaklık belirgin şekilde artacak.")
+    except Exception:
+        pass
+
+    lines.append("Kullanıcıya yalnızca kısa ve doğal bir özet ver; saat saat sıcaklık listesi, rüzgar, ham veri, URL veya kaynak listesi verme.")
     return "\n".join(lines)
 
 
@@ -5306,7 +5346,8 @@ Bilmediğin bilgileri uydurma.
 
     result = ask_ai(
         prompt,
-        system_prompt
+        system_prompt,
+        fast=True
     )
 
     if not result:
