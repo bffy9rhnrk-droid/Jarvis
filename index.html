@@ -2643,8 +2643,18 @@ function betulPick(seed,arr){
     return arr[deterministicNumber(seed)%arr.length];
 }
 
+let betulReadingCounter = 0;
+
+function betulRandomSeed(type){
+    betulReadingCounter++;
+    const randomPart = (typeof crypto !== "undefined" && crypto.getRandomValues)
+        ? Array.from(crypto.getRandomValues(new Uint32Array(2))).join("-")
+        : String(Math.random()) + "-" + String(Date.now());
+    return type + "-" + Date.now() + "-" + betulReadingCounter + "-" + randomPart;
+}
+
 function buildBetulTarotReading(){
-    const seed="tarot-"+new Date().toISOString().slice(0,10)+"-"+Math.floor(Date.now()/3600000);
+    const seed=betulRandomSeed("tarot");
     const cards=[
         "Güneş ☀️","Aşıklar 💕","Ay 🌙","Kader Çarkı 🎡","İmparatoriçe 👑","Yıldız ⭐",
         "Büyücü 🪄","Kule ⚡","Dünya 🌍","Güç 🦁","Adalet ⚖️","Ermiş 🕯️"
@@ -2711,7 +2721,7 @@ function openBetulTarot(){
 }
 
 function buildBetulFortuneReading(){
-    const seed="fortune-"+new Date().toISOString().slice(0,10)+"-"+Math.floor(Date.now()/3600000);
+    const seed=betulRandomSeed("fortune");
     const openings=[
         "OHA KIZ bir dakika, fincanı biraz daha çevir...",
         "AŞKOOO burada normal bir fal yok, fincan resmen konuşuyor. 😭",
