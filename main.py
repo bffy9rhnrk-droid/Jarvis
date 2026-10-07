@@ -38,7 +38,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "32.0.0"
+APP_VERSION = "32.1.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -274,6 +274,11 @@ class PresentationRequest(BaseModel):
     topic: str
     slide_count: int = 7
     username: str = "karahan"
+
+
+class BetulInstagramRequest(BaseModel):
+
+    username: str
 
 
 # ============================================================
@@ -625,6 +630,200 @@ def extract_json(text):
             pass
 
     return None
+
+
+# ============================================================
+# BETÜL ENTERTAINMENT - INSTAGRAM SIMULATION
+# ============================================================
+
+def betul_deterministic_scores(
+    seed: str,
+    count: int = 6
+):
+
+    """
+    Aynı kullanıcı adı için her zaman aynı
+    eğlence sonuçlarını üretir.
+
+    Bu gerçek Instagram verisi değildir.
+    Tamamen deterministik bir simülasyondur.
+    """
+
+    seed = (
+        str(seed or "")
+        .strip()
+        .lower()
+        .lstrip("@")
+    )
+
+    digest = hashlib.sha256(
+        seed.encode("utf-8")
+    ).digest()
+
+    raw = []
+
+    for i in range(count):
+
+        raw.append(
+            10 + (
+                digest[i] % 91
+            )
+        )
+
+    total = sum(raw)
+
+    exact = [
+        value / total * 100
+        for value in raw
+    ]
+
+    scores = [
+        int(value)
+        for value in exact
+    ]
+
+    remainder = 100 - sum(scores)
+
+    order = sorted(
+        range(count),
+        key=lambda i:
+            exact[i] - scores[i],
+        reverse=True
+    )
+
+    for i in range(remainder):
+
+        scores[
+            order[
+                i % len(order)
+            ]
+        ] += 1
+
+    return scores
+
+
+def betul_instagram_comment(
+    categories,
+    scores
+):
+
+    if not categories or not scores:
+
+        return (
+            "Aşkoo sistem ne diyeceğini "
+            "bilemedi 😭"
+        )
+
+    highest_index = max(
+        range(len(scores)),
+        key=lambda i:
+            scores[i]
+    )
+
+    highest = categories[
+        highest_index
+    ]
+
+    comments = {
+
+        "Romantik":
+            (
+                "Aşko burada aşk kokusu aldım... "
+                "burnuma bildirim geldi resmen 💅💕"
+            ),
+
+        "Komik":
+            (
+                "AŞKOOO bu hesap iyiymiş 😭😂 "
+                "K.A.R.V.I.S. analiz yaparken bile güldü."
+            ),
+
+        "Sıkıcı":
+            (
+                "Aşkoo bu hesap biraz fazla sakin çıktı ya... "
+                "işlemci bile esnedi 😭"
+            ),
+
+        "Havalı":
+            (
+                "Aşkoo bu hesap kendini biraz fazla "
+                "ciddiye alıyor ama hakkını da yemeyelim 😎"
+            ),
+
+        "Kaotik":
+            (
+                "AŞKOOO BU NE?! 💀 "
+                "Sistemleri yeniden başlatmam gerekti."
+            ),
+
+        "Gizemli":
+            (
+                "Aşkoo burada bir şeyler dönüyor... "
+                "K.A.R.V.I.S. radarları susmuyor 🤨"
+            )
+    }
+
+    return comments.get(
+        highest,
+        "Aşkoo bu hesap enteresan çıktı 😭"
+    )
+
+
+@app.post(
+    "/betul/instagram-analysis"
+)
+async def betul_instagram_analysis(
+    request: BetulInstagramRequest
+):
+
+    username = (
+        request.username
+        or ""
+    ).strip().lstrip("@")
+
+    if not username:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Instagram kullanıcı adı boş olamaz."
+        )
+
+    # Bu endpoint yalnızca Betül profili için kullanılabilir.
+    # Gerçek Instagram verisi çekilmez.
+    categories = [
+        "Romantik",
+        "Komik",
+        "Sıkıcı",
+        "Havalı",
+        "Kaotik",
+        "Gizemli"
+    ]
+
+    scores = betul_deterministic_scores(
+        username
+    )
+
+    return {
+        "success": True,
+        "username": username,
+        "entertainment_only": True,
+        "categories": [
+            {
+                "name": categories[i],
+                "percent": scores[i]
+            }
+            for i in range(len(categories))
+        ],
+        "comment": betul_instagram_comment(
+            categories,
+            scores
+        ),
+        "disclaimer": (
+            "Bu analiz gerçek Instagram verilerini "
+            "incelemez; tamamen eğlence amaçlı bir "
+            "simülasyondur ve yanılma payı vardır."
+        )
+    }
 
 
 # ============================================================
@@ -5000,6 +5199,15 @@ async def startup():
 
     print(
         "Profile Login: ENABLED"
+    )
+
+
+    print(
+        "Betül Entertainment Mode: ENABLED"
+    )
+
+    print(
+        "Betül Instagram Simulation: ENABLED"
     )
 
     print(
