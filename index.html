@@ -1862,37 +1862,27 @@ function betulBox(title){
     const div =
         document.createElement("div");
 
+    /*
+       BETÜL MODUNDA ARTIK AYRI BİR
+       YÜKLEME KUTUSU YOK.
+
+       K.A.R.V.I.S. normal sohbet mesajı
+       gönderiyormuş gibi aynı mesajın
+       içindeki yazıyı sürekli değiştirir.
+    */
+
     div.className =
-        "message ai waiting-message";
+        "message ai";
 
-    div.innerHTML = `
-
-        <div class="betul-analysis-box">
-
-            <div class="betul-analysis-title">
-                ${title}
-            </div>
-
-            <div
-                class="betul-analysis-stage"
-                id="betulStage">
-                K.A.R.V.I.S. hazırlanıyor...
-            </div>
-
-            <div class="betul-analysis-progress">
-                <div id="betulProgress"></div>
-            </div>
-
-            <div
-                id="betulResult"
-                class="betul-result">
-            </div>
-
-        </div>
-
-    `;
+    div.textContent =
+        title +
+        "\n\n" +
+        "K.A.R.V.I.S. hazırlanıyor...";
 
     $("chat").appendChild(div);
+
+    $("chat").scrollTop =
+        $("chat").scrollHeight;
 
     return div;
 }
@@ -1906,16 +1896,6 @@ function runBetulStages(
     stages,
     finalize
 ){
-
-    const stage =
-        box.querySelector(
-            "#betulStage"
-        );
-
-    const bar =
-        box.querySelector(
-            "#betulProgress"
-        );
 
     let i = 0;
 
@@ -1933,24 +1913,27 @@ function runBetulStages(
                     return;
                 }
 
-                stage.textContent =
-                    stages[i];
+                /*
+                   Aynı chat mesajının içeriğini
+                   değiştiriyoruz. Böylece ekran
+                   aşağı doğru yeni kutularla
+                   dolmuyor.
+                */
 
-                bar.style.width =
-                    Math.round(
-                        (i+1) /
-                        stages.length *
-                        100
-                    ) + "%";
+                box.textContent =
+                    stages[i];
 
                 i++;
 
+                $("chat").scrollTop =
+                    $("chat").scrollHeight;
+
                 setTimeout(
                     next,
-                    650 +
+                    800 +
                     Math.floor(
                         Math.random() *
-                        350
+                        500
                     )
                 );
             };
@@ -1975,10 +1958,7 @@ function showBetulInstagramResult(
             betulCategories
         );
 
-    const result =
-        box.querySelector(
-            "#betulResult"
-        );
+    const result = box;
 
     let html = `
 
@@ -2192,9 +2172,7 @@ function openBetulTarot(){
                     ) % cards.length
                 ];
 
-            box.querySelector(
-                "#betulResult"
-            ).innerHTML = `
+            box.innerHTML = `
 
                 <div
                     style="
@@ -2282,9 +2260,7 @@ function openBetulFortune(){
                     ) % texts.length
                 ];
 
-            box.querySelector(
-                "#betulResult"
-            ).innerHTML = `
+            box.innerHTML = `
 
                 <div class="betul-comment">
                     ${t}
@@ -2436,10 +2412,7 @@ async function startBetulPhoto(){
                     cats
                 );
 
-            const r =
-                box.querySelector(
-                    "#betulResult"
-                );
+            const r = box;
 
             let h = `
 
