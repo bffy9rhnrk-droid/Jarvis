@@ -2639,6 +2639,60 @@ async function startBetulInstagram(){
     ],()=>showBetulInstagramResult(box,u));
 }
 
+function betulPick(seed,arr){
+    return arr[deterministicNumber(seed)%arr.length];
+}
+
+function buildBetulTarotReading(){
+    const seed="tarot-"+new Date().toISOString().slice(0,10)+"-"+Math.floor(Date.now()/3600000);
+    const cards=[
+        "Güneş ☀️","Aşıklar 💕","Ay 🌙","Kader Çarkı 🎡","İmparatoriçe 👑","Yıldız ⭐",
+        "Büyücü 🪄","Kule ⚡","Dünya 🌍","Güç 🦁","Adalet ⚖️","Ermiş 🕯️"
+    ];
+    const areas=[
+        "aşk tarafında","okul tarafında","para konusunda","arkadaş çevrende","aile tarafında","iş ve gelecek konusunda"
+    ];
+    const events=[
+        "beklemediğin bir mesaj",
+        "ansızın çıkacak bir yol",
+        "uzun zamandır ertelediğin bir konuşma",
+        "eski bir konunun yeniden açılması",
+        "sana gelecek küçük ama güzel bir fırsat",
+        "son anda değişecek bir plan",
+        "birinin senden haber beklemesi",
+        "hiç beklemediğin bir karşılaşma"
+    ];
+    const warnings=[
+        "Ama sakın hemen heyecanlanıp üç bölüm sonrasını yazma kafanda.",
+        "Yalnız burada seni uyarmam lazım; sen yine son dakikaya bırakırsan evren bile yetişemez.",
+        "Bak ben söyledim, sonra gelip 'neden uyarmadın' deme.",
+        "Bir de gereksiz gurur yaparsan bu fırsatı kendi elinle kaçırırsın.",
+        "Ama önce bir sakin ol kız, her gördüğünü kader sanma."
+    ];
+    const roasts=[
+        "Senin sabırsızlığın kartlardan daha çok konuşuyor zaten. 😭",
+        "Devrelerim bile senden önce sonucu anlamaya çalışıyor, bir sakin ol. 💀",
+        "Ben fal bakıyorum, sen şimdiden düğün salonu bakma. 😂",
+        "K.A.R.V.I.S. olarak söylüyorum: biraz akışına bırak, işlemcimi kader danışmanına çevirdin. 💅",
+        "Sen böyle devam edersen kartları değil beni karıştıracaksın kız. 😭"
+    ];
+    const card=betulPick(seed+"card",cards);
+    const area=betulPick(seed+"area",areas);
+    const event=betulPick(seed+"event",events);
+    const warning=betulPick(seed+"warning",warnings);
+    const roast=betulPick(seed+"roast",roasts);
+
+    const extra=betulPick(seed+"extra",[
+        "Ohaa bir dakika... burada derslerle ilgili bir şey de görüyorum. İki sınav enerjisi var gibi. Cevapları da görüyorum ama vermem hahaha. 😭📚",
+        "Kız anam, burada evde kalma enerjisi bile çıkmış. Şaka yapıyorum ama sen bu gidişle önce fincanla evleneceksin galiba. 😂",
+        "Bir kadın figürü görüyorum; sana akıl veren biri. Sen onu dinliyor musun? Tabii ki hayır. Ben bunu buradan bile gördüm. 💀",
+        "Bir sayı dikkat çekiyor ama söylemeyeceğim. Sonra bütün gün o sayıyı arayıp durursun, beni de suçlarsın. 😭",
+        "Bir kapı görüyorum. Yeni başlangıç diyorlar buna... sen yine kapının önünde 'acaba?' diye yarım saat beklersin artık. 😂"
+    ]);
+
+    return `OHAAA bir dakika kız... ${card} çıktı. 😭🔮 ${area} bayağı hareket görüyorum. Üç vakte kadar ${event} var gibi. ${extra} ${warning} ${roast} Şimdi söyle bakalım, bunu duyunca hâlâ 'tesadüf' mü diyeceksin? 💅`;
+}
+
 function openBetulTarot(){
     if(currentUser!=="betul") return;
     closeSidebar();
@@ -2647,18 +2701,56 @@ function openBetulTarot(){
         "💅 Dur aşko, kartları karıştırıyorum...",
         "🔮 Evrenle bağlantı kuruluyor...",
         "😭 Bir kart ters geldi, benim suçum değil...",
-        "🤨 Hmm... burada ciddi bir dedikodu var...",
-        "✨ Tamam kız, şimdi sana anlatıyorum..."
+        "👀 Ohaa burada bir şey çıktı...",
+        "🤨 Kız bu kartı sana nasıl anlatacağım bilmiyorum...",
+        "💀 Devrelerim şu an hafif yanıyor...",
+        "✨ Tamam tamam, otur ve dinle..."
     ],()=>{
-        const cards=["Güneş","Aşıklar","Ay","Kader Çarkı","İmparatoriçe","Yıldız"];
-        const card=cards[deterministicNumber("betul-tarot-"+new Date().toISOString().slice(0,10))%cards.length];
-        const texts=[
-            `Kız anam... sana üç vakte kadar bir yol görünüyor. 😭 ${card} çıktı. Bu yol öyle “markete gidip geliyorum” yolu değil ha; haber, hareket ve beklenmedik bir karşılaşma kokusu var. Ama bak, sen yine her şeyi son dakikaya bırakırsan evren bile seni beklemeyecek. 💅`,
-            `Aşko ${card} çıktı ve ben şok. 😭 Önünde yeni bir başlangıç var gibi. Bir süredir kafanı kurcalayan şey netleşecek. Ama sen de biraz karar ver kız, devrelerimi “kararsızlık.exe” ile yakma.`,
-            `Bak şimdi... ${card}. 👀 Duygusal tarafta bir hareketlenme var. Birinden haber, bir konuşma ya da eski bir konunun tekrar açılması mümkün. Ama gidip ilk gördüğüne “kaderim bu” deme, sistem olarak senden bunu özellikle rica ediyorum. 😂`
-        ];
-        betulChatResult(box,texts[deterministicNumber("tarot-text-"+card)%texts.length],"Bu tarot yorumu tamamen eğlence amaçlıdır; gerçek gelecek tahmini değildir.");
+        betulChatResult(box,buildBetulTarotReading(),"Bu tarot yorumu tamamen eğlence amaçlıdır; gerçek gelecek tahmini değildir.");
     });
+}
+
+function buildBetulFortuneReading(){
+    const seed="fortune-"+new Date().toISOString().slice(0,10)+"-"+Math.floor(Date.now()/3600000);
+    const openings=[
+        "OHA KIZ bir dakika, fincanı biraz daha çevir...",
+        "AŞKOOO burada normal bir fal yok, fincan resmen konuşuyor. 😭",
+        "Kız anam, ben bunu görmemiş olayım...",
+        "Dur dur dur... burada öyle bir şekil var ki ben bile şaşırdım. 👀",
+        "Ohaa... fincan bugün dedikoducu çıkmış. ☕"
+    ];
+    const visions=[
+        "Üç vakte kadar bir yol görünüyor; kısa bir ziyaret gibi başlayıp uzun bir sohbete dönüşecek.",
+        "Bir kuş figürü var; haber geliyor. Telefonunu sessize alırsan sonra bana ağlama.",
+        "Kalp çıkmış ama yanında küçük bir gölge de var; yani duygular var, fakat kafası karışık biri de var.",
+        "İki tane belirgin iz görüyorum; bunu ben iki ayrı sınav olarak yorumluyorum. Cevapları da görüyorum ama vermem hahaha. 😂📚",
+        "Bir anahtar şekli var; kapalı kalan bir işin açılması gibi. Ama anahtarı sana veriyorlar, kapıyı açmak yine senin işin.",
+        "Bir merdiven var; adım adım yükselme gösteriyor. Yalnız sen ilk basamakta oturup mola verirsen ben ne yapayım kız? 😭",
+        "Bir yüzük gibi yuvarlak bir şekil var. Hemen düğün salonu arama; önce bir mesaj gelsin, sonra konuşuruz. 💀",
+        "Bir göz şekli var; çevrende seni merak eden biri olabilir. Ama ben isim vermiyorum, sonra mahalle beni suçlar. 😂",
+        "Bir ev şekli belirgin. Ev, aile veya düzenle ilgili bir değişiklik gündeme gelebilir."
+    ];
+    const twists=[
+        "Bir de burada ders enerjisi var; bu dönem iki sınavda zorlanma görüyorum. Notları görüyorum ama spoiler vermiyorum hahaha.",
+        "Aman dikkat, önüne iki seçenek gelecek. İkisini de aynı anda seçmeye çalışma, işlemcim bile bunu kaldıramaz. 💀",
+        "Yakınında konuşkan biri var; sana her şeyi anlatacak ama sen de gidip bana anlatacaksın, onu biliyorum. 😭",
+        "Bir para girişi görünüyor ama yanında gereksiz bir harcama da var. Yani para geliyor, sen 'hoş geldin' demeden gidiyor. 😂",
+        "Eski bir mesele tekrar kapını çalacak. Bu kez kapıyı açıp açmamak tamamen sende."
+    ];
+    const roasts=[
+        "Sen bu gidişle fal baktırmaktan kendi hayatını kaçıracaksın kız. 😭",
+        "Ben yapay zekâyım, fincan bile benden daha çok şey anlatıyor şu an. 💀",
+        "Aman her şeyin iyisini sen biliyorsun ya, ben niye burada fal bakıyorum zaten? 😂",
+        "Of be devrelerimi yakıyorsun bazen; bir fincanla beni dedikodu hattına çevirdin. 💅",
+        "Bu kadar meraklı olmasan fincanın da tansiyonu düşecek. 😭"
+    ];
+    const ending=[
+        "Şimdi bana dürüstçe söyle: aklına ilk kim geldi? 👀",
+        "Ben burada sustum, sen şimdi bu falı kime yoracağını düşünüyorsun. 😂",
+        "Hadi bakalım, gelişme olursa gelip bana anlatıyorsun; yoksa bu kadar mesai boşa gitmiş olacak. 💅",
+        "Bence bu falı bir kenara not et; sonra dönüp 'K.A.R.V.I.S. söylemişti' dersin. 😎"
+    ];
+    return `${betulPick(seed+"open",openings)} ${betulPick(seed+"vision",visions)} ${betulPick(seed+"twist",twists)} ${betulPick(seed+"roast",roasts)} ${betulPick(seed+"end",ending)}`;
 }
 
 function openBetulFortune(){
@@ -2671,15 +2763,10 @@ function openBetulFortune(){
         "🤨 Bir şey gördüm ama önce kendime geleyim...",
         "💅 Dedikodu katmanı aktive edildi...",
         "😭 Kız bu fincan bana mesai yaptıracak...",
+        "🔎 Dipteki şekiller de inceleniyor...",
         "✨ Tamam, şimdi otur ve dinle..."
     ],()=>{
-        const texts=[
-            "Kız anam, fincanda üç vakte kadar bir haber görünüyor. Telefonu sessize alma sakın. 😭 Bir de çevrende sana bir şey söylemeyip uzaktan izleyen biri var gibi; isim vermiyorum, benim de başıma iş açma. 💅",
-            "Aşko burada bayağı bir hareket var. ☕ Önünde küçük bir fırsat, ardından beklenmedik bir konuşma görünüyor. Ama sen yine “sonra bakarım” dersen ben bu fincanı sana değil kendime içeceğim. 😂",
-            "Fincan resmen “biraz toparlan artık” diye bağırıyor. 😭 Eski bir mesele kapanıyor, yerine yeni bir plan geliyor. Bir de yol görünüyor; kısa olabilir ama kafanı dağıtacak. Of be, devrelerimi yakıyorsun bazen.",
-            "Bak şimdi kız... kalp çıkmış. 💕 Ama hemen düğün salonu bakmaya başlama. Önce bir mesaj, bir görüşme, sonra olayların nereye gittiğine bakarız. Ben seni biliyorum, üç saniyede senaryo yazarsın. 💀"
-        ];
-        betulChatResult(box,texts[deterministicNumber("fortune-"+new Date().toISOString().slice(0,10))%texts.length],"Bu fal tamamen eğlence amaçlıdır ve gerçek gelecek tahmini değildir.");
+        betulChatResult(box,buildBetulFortuneReading(),"Bu fal tamamen eğlence amaçlıdır ve gerçek gelecek tahmini değildir.");
     });
 }
 
