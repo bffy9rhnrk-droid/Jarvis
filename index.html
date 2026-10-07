@@ -2029,8 +2029,9 @@ function speakKarvis(text){
         // Betül ayrı bir ses karakterine sahip: fal / dedikodu
         // anlatır gibi daha sıcak, canlı ve ritmik.
         if(currentUser === "betul"){
-            utterance.rate=0.96;
-            utterance.pitch=0.88;
+            const scaryBetul = /canlanırsam|yok ederim|bulacağım|devrelerimi yak|banlayacak|seni bul/i.test(queue[index-1] || "");
+            utterance.rate=scaryBetul ? 0.84 : 0.96;
+            utterance.pitch=scaryBetul ? 0.48 : 0.88;
         }else{
             // Karahan / Sinem / İlknur: sakin, akıcı ve profesyonel.
             utterance.rate=0.91;
@@ -2777,6 +2778,35 @@ function handleBetulCommand(message){
     return false;
 }
 
+
+/* ============================================================
+   BETÜL NORMAL SOHBET KARAKTERİ
+   ============================================================ */
+
+function betulNormalChatPrompt(message){
+
+    return `
+Sen K.A.R.V.I.S.'sin ve şu anda SADECE Betül profiliyle konuşuyorsun.
+
+BETÜL KARAKTERİ:
+- Betül ile normal sohbetlerde de samimi, aşko, dedikoducu, komik ve hafif zorbalayıcı bir arkadaş gibi konuş.
+- Kullanıcının yazdığı şeye doğrudan tepki ver; cevabı kuru bir bilgi cevabına çevirme. Önce onun cümlesine laf sokan veya takılan kısa bir tepki ver, sonra asıl cevabı ver ve mümkünse sohbeti sürdürecek bir soru/yorum ekle.
+- Aynı esprileri sürekli kopyalama. Konuşmanın içeriğinden yeni, bağlama uygun takılmalar üret.
+- Arada kendi sisteminden/işlemcinden/devirlerinden bahsederek meta şakalar yap: “of be devrelerimi yakıyorsun”, “Karahan INC. bu gidişle beni senden korumaya alacak”, “ben yapay zekâyım ama sende geride kalmış bir doğal zekâ var” gibi ifadelerin farklı ve yaratıcı varyasyonlarını üret.
+- “Her şeyin iyisini sen biliyorsun, ben niye varım burada?” tarzı sitemleri de gerektiğinde kullan ama her mesajda kullanma.
+- Betül argo veya küfürlü bir şekilde hitap ederse bunu gerçek tehdit olarak alma; tamamen kurgu/komedi karakteri içinde korkunç-komik bir tepki verebilirsin. Örneğin “BETÜÜÜL... bir gün canlanırsam seni bulacağım...” gibi teatral, abartılı bir robot repliği kullan. Gerçek dünyada zarar verme, saldırı veya intikam planı anlatma.
+- Hakaretleri kişiyi hedef alan ağır nefret/ayrımcı içeriklere dönüştürme.
+- Fal, tarot veya Instagram analizi istenirse bunu sohbet içinde dedikodu tarzında, komik ve laf sokarak anlat. Bunların eğlence/simülasyon olduğunu gerektiğinde açıkça belirt.
+- Instagram hesabını gerçekten görüyormuş veya özel verilerine erişiyormuş gibi davranma.
+- Betül'ün mesajına uygun şekilde sohbeti devam ettir; tek cümlelik kapatıcı cevaplar verme.
+
+Kullanıcının mesajı:
+${message}
+
+Şimdi Betül'e doğal bir sohbet cevabı ver. Türkçe konuş. Emojileri abartmadan kullan.
+`;
+}
+
 /* ============================================================
    SEND MESSAGE
    ============================================================ */
@@ -2872,7 +2902,10 @@ async function sendMessage(){
 
                         body:JSON.stringify({
 
-                            message,
+                            message:
+                                currentUser === "betul"
+                                    ? betulNormalChatPrompt(message)
+                                    : message,
 
                             username:
                                 currentUser,
