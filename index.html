@@ -1954,38 +1954,8 @@ function cleanKarvisSpeech(text){
     return clean;
 }
 
-function turkishNumberWord(n){
-    const ones=["sıfır","bir","iki","üç","dört","beş","altı","yedi","sekiz","dokuz"];
-    const tens=["","","yirmi","otuz","kırk","elli","altmış","yetmiş","seksen","doksan"];
-    n=Number(n);
-    if(!Number.isFinite(n)) return String(n);
-    if(n<10) return ones[n];
-    if(n<100) return tens[Math.floor(n/10)] + (n%10 ? " "+ones[n%10] : "");
-    if(n<1000){
-        const h=Math.floor(n/100), r=n%100;
-        return (h===1 ? "yüz" : ones[h]+" yüz") + (r ? " "+turkishNumberWord(r) : "");
-    }
-    if(n<10000){
-        const th=Math.floor(n/1000), r=n%1000;
-        return (th===1 ? "bin" : turkishNumberWord(th)+" bin") + (r ? " "+turkishNumberWord(r) : "");
-    }
-    return String(n);
-}
-
-function normalizeTurkishSpeechNumbers(text){
-    let clean=String(text || "");
-    // 2026 -> iki bin yirmi altı. Ekrandaki metne dokunulmaz; yalnızca ses için dönüşür.
-    clean=clean.replace(/\b(20\d{2})\b/g,(m)=>turkishNumberWord(Number(m)));
-    // 20-26 / 20–26 gibi aralıkları doğal Türkçe okut.
-    clean=clean.replace(/\b(\d{1,2})\s*[-–—]\s*(\d{1,2})\b/g,(m,a,b)=>`${turkishNumberWord(a)} ${turkishNumberWord(b)}`);
-    // Yüzde işaretini doğal okut.
-    clean=clean.replace(/%(\d+)/g,(m,n)=>`yüzde ${turkishNumberWord(n)}`);
-    return clean;
-}
-
 function splitSpeechText(text){
     let clean=cleanKarvisSpeech(text);
-    clean=normalizeTurkishSpeechNumbers(clean);
 
     // BETÜL: fal / dedikodu anlatımı. Metni daha masalsı ve
     // sohbet eder gibi küçük duraklamalarla seslendir.
@@ -2060,11 +2030,11 @@ function speakKarvis(text){
         // anlatır gibi daha sıcak, canlı ve ritmik.
         if(currentUser === "betul"){
             const scaryBetul = /canlanırsam|yok ederim|bulacağım|devrelerimi yak|banlayacak|seni bul/i.test(queue[index-1] || "");
-            utterance.rate=scaryBetul ? 0.84 : 0.96;
+            utterance.rate=scaryBetul ? 0.90 : 1.02;
             utterance.pitch=scaryBetul ? 0.48 : 0.88;
         }else{
             // Karahan / Sinem / İlknur: sakin, akıcı ve profesyonel.
-            utterance.rate=0.91;
+            utterance.rate=1.00;
             utterance.pitch=0.68;
         }
         utterance.volume=karvisSettings.voiceVolume;
