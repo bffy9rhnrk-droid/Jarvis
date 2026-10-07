@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "33.0.0"
+APP_VERSION = "33.1.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -1236,6 +1236,127 @@ URL: {source.get("url", "")}
 
 
 # ============================================================
+# LIVE WEATHER / LOCAL NEWS HELPERS
+# ============================================================
+
+WEATHER_CODES_TR = {
+    0: "açık",
+    1: "çoğunlukla açık",
+    2: "parçalı bulutlu",
+    3: "kapalı",
+    45: "sisli",
+    48: "puslu/sisli",
+    51: "hafif çisenti",
+    53: "çisenti",
+    55: "kuvvetli çisenti",
+    61: "hafif yağmur",
+    63: "yağmur",
+    65: "kuvvetli yağmur",
+    71: "hafif kar",
+    73: "kar",
+    75: "kuvvetli kar",
+    80: "hafif sağanak",
+    81: "sağanak yağış",
+    82: "kuvvetli sağanak",
+    95: "gök gürültülü fırtına",
+    96: "gök gürültülü, dolu ihtimalli yağış",
+    99: "gök gürültülü, kuvvetli dolu ihtimalli yağış",
+}
+
+
+def fetch_denizli_weather():
+    """Denizli için ana hava verisini doğrudan Open-Meteo'dan alır."""
+    try:
+        response = requests.get(
+            "https://api.open-meteo.com/v1/forecast",
+            params={
+                "latitude": 37.7765,
+                "longitude": 29.0864,
+                "current": "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
+                "hourly": "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
+                "forecast_days": 2,
+                "timezone": "Europe/Istanbul",
+            },
+            headers=WEB_HEADERS,
+            timeout=10,
+        )
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        current = data.get("current", {})
+        hourly = data.get("hourly", {})
+        times = hourly.get("time", [])
+        temps = hourly.get("temperature_2m", [])
+        rain = hourly.get("precipitation_probability", [])
+        codes = hourly.get("weather_code", [])
+        winds = hourly.get("wind_speed_10m", [])
+
+        now_temp = current.get("temperature_2m")
+        now_code = current.get("weather_code")
+        now_wind = current.get("wind_speed_10m")
+
+        current_time = str(data.get("current", {}).get("time", ""))
+        upcoming = []
+        start_index = 0
+        if current_time and current_time in times:
+            start_index = times.index(current_time)
+        for i in range(start_index, min(start_index + 8, len(times))):
+            upcoming.append({
+                "time": times[i],
+                "temperature": temps[i] if i < len(temps) else None,
+                "rain_probability": rain[i] if i < len(rain) else None,
+                "condition": WEATHER_CODES_TR.get(codes[i], "değişken") if i < len(codes) else "değişken",
+                "wind": winds[i] if i < len(winds) else None,
+            })
+
+        return {
+            "location": "Denizli",
+            "current_temperature": now_temp,
+            "apparent_temperature": current.get("apparent_temperature"),
+            "current_condition": WEATHER_CODES_TR.get(now_code, "değişken"),
+            "current_wind": now_wind,
+            "upcoming": upcoming,
+            "source": "Open-Meteo",
+        }
+    except Exception:
+        save_error("Weather API error", traceback.format_exc())
+        return None
+
+
+def weather_context_for_ai(weather):
+    if not weather:
+        return ""
+
+    lines = [
+        "CANLI DENİZLİ HAVA VERİSİ",
+        f"Şu an: {weather.get('current_temperature')}°C, hissedilen {weather.get('apparent_temperature')}°C, {weather.get('current_condition')}, rüzgar {weather.get('current_wind')} km/sa.",
+        "Önümüzdeki saatler:"
+    ]
+    for item in weather.get("upcoming", [])[:8]:
+        lines.append(
+            f"{item.get('time')}: {item.get('temperature')}°C, {item.get('condition')}, yağış ihtimali %{item.get('rain_probability')}, rüzgar {item.get('wind')} km/sa."
+        )
+    lines.append(
+        "Bu veriyi kullanıcıya doğal bir hava durumu değerlendirmesi olarak aktar; URL veya ham API verisi gösterme."
+    )
+    return "\n".join(lines)
+
+
+def is_weather_request(message):
+    text = clean_text(message).lower()
+    return bool(re.search(r"\b(hava durumu|hava nasıl|hava bugün|yağmur yağacak mı|yağış var mı|sıcaklık kaç|kaç derece|derece kaç)\b", text))
+
+
+def is_local_news_request(message):
+    text = clean_text(message).lower()
+    return bool(re.search(r"\b(gündem|haberler|son haberler|bugün neler oluyor|son gelişmeler|gündemde ne var)\b", text)) and any(
+        place in text for place in ["denizli", "honaz", "pamukkale", "merkezefendi", "çivril", "acipayam", "acıpayam"]
+    )
+
+
+
+# ============================================================
 # SMART WEB RESEARCH
 # ============================================================
 # Web araştırması yalnızca sorunun güncel/doğrulanması gereken
@@ -1375,6 +1496,16 @@ def build_profile_research_query(message, username, mode):
     """
     text = clean_text(message)
 
+    # Yerel gündem sorularında arama motorunu doğrudan haber odaklı çalıştır.
+    if is_local_news_request(text):
+        if username == "ilknur":
+            return f"{text} Denizli bugün son dakika haber gündem resmi kaynak"
+        if username == "betul":
+            return f"{text} Denizli bugün son dakika haber gündem gelişmeler"
+        if username == "sinem":
+            return f"{text} Denizli bugün güvenilir haber gündem gelişmeler"
+        return f"{text} Denizli bugün son dakika haber gündem resmi kaynak"
+
     if username == "ilknur":
         return (
             f"{text} akademik güncel araştırma bilimsel kaynak "
@@ -1401,31 +1532,38 @@ def profile_research_instruction(username):
     if username == "betul":
         return """
 Araştırma sonucunu Betül profiline uygun yorumla:
-- Samimi, eğlenceli ve hafif dedikoducu olabilirsin.
-- Bilginin kendisini değiştirme veya uydurma.
-- Haberleri magazinleştirme; yalnızca anlatım tonunu değiştir.
-- Gerçekten kaynaklarda olmayan bir şeyi olmuş gibi söyleme.
+- Aşko, samimi, komik ve hafif dedikoducu bir arkadaş gibi konuş.
+- Haber veya güncel bilgiyi önce net söyle, sonra Betül tarzında kısa bir yorum ekle.
+- Hava durumunda sıcaklık, yağış ve gün içindeki değişimi söyle; uygun bir küçük tavsiye ver (ör. şemsiye, ince ceket).
+- Yerel gündemde önemli bir olay varsa 'kız', 'aşko' gibi doğal ifadelerle dikkat çekebilirsin.
+- Kaynak URL'si, kaynak listesi veya araştırma tekniği anlatma.
+- Kaynaklarda olmayan olayı uydurma ve gerçek bir haberi eğlence olsun diye değiştirme.
 """
     if username == "sinem":
         return """
 Araştırma sonucunu Sinem profiline uygun yorumla:
-- Doğal, sıcak, sade ve arkadaşça anlat.
-- Gereksiz teknik ayrıntıya boğma.
-- Önemli güncel bilgileri net biçimde öne çıkar.
+- Sıcak, doğal ve arkadaşça anlat.
+- Güncel bilgiyi anlaşılır şekilde özetle ve kullanıcıya günlük hayatta işe yarayacak küçük bir öneri ver.
+- Hava durumunda özellikle sıcaklık, yağış ihtimali ve dışarı çıkma açısından pratik tavsiye ver.
+- Yerel haberlerde önce önemli olayı, sonra kısa bağlamını söyle.
+- Kaynak URL'si veya link listesi verme.
 """
     if username == "ilknur":
         return """
 Araştırma sonucunu İlknur akademik profiline uygun yorumla:
 - Hocam diye hitap et.
-- Kaynak, bulgu ve değerlendirmeyi birbirinden ayır.
-- Kaynakların desteklemediği sonuçları kesin gerçek gibi sunma.
-- Akademik ve ölçülü dil kullan.
+- Güncel bilgiyi kısa bir sonuç paragrafıyla özetle.
+- Akademik konularda kaynakların bulgu ve değerlendirmesini ayır.
+- Günlük konularda gereksiz akademik dil kullanma; hava durumu gibi sorulara doğal ve faydalı cevap ver.
+- Kaynak URL'si listesi verme; yalnızca gerekirse kurum/kaynak adını metin içinde belirt.
 """
     return """
 Araştırma sonucunu Karahan profiline uygun yorumla:
 - Teknik, net, doğrudan ve pratik ol.
-- Gereksiz laf kalabalığı yapma.
-- Özellikle fiyat, mevzuat, teknik veri ve güncel gelişmelerde tarih/kapsam belirt.
+- Kullanıcıya önce sonucu söyle, ardından önemli ayrıntıları ver.
+- Hava durumunda sıcaklık, hissedilen sıcaklık, yağış ve ilerleyen saatlerdeki değişimi söyle; gerekiyorsa dışarı çıkma önerisi ekle.
+- Yerel gündemde olayın ne olduğunu, nerede/ne zaman olduğunu ve bilinen önemli ayrıntıyı kısa şekilde ver.
+- Kaynak URL'si veya link listesi verme.
 """
 
 
@@ -5015,7 +5153,22 @@ async def chat(
     research = None
     research_context = ""
 
-    if use_web:
+    # Hava durumu için ansiklopedik arama yerine doğrudan canlı saatlik veri kullan.
+    if use_web and is_weather_request(message):
+        weather = fetch_denizli_weather()
+        if weather:
+            research = {
+                "query": "Denizli canlı saatlik hava durumu",
+                "sources": [{
+                    "title": "Denizli saatlik hava durumu",
+                    "text": weather_context_for_ai(weather),
+                    "url": "",
+                    "source": "Open-Meteo"
+                }],
+                "context": weather_context_for_ai(weather)
+            }
+
+    if use_web and research is None:
         try:
             research = perform_smart_research(
                 message,
@@ -5033,6 +5186,9 @@ async def chat(
             )
             research = None
             research_context = ""
+
+    if research and not research_context:
+        research_context = research.get("context", "")
 
     # --------------------------------------------------------
     # PROFILE-SPECIFIC RESEARCH PERSONALITY
@@ -5056,9 +5212,12 @@ KURALLAR:
 - Kaynaklarda bulunmayan ayrıntıları uydurma.
 - Kaynaklar arasında çelişki varsa bunu açıkça belirt.
 - Güncel bilgi olduğunu ve mümkünse tarih/kapsamını belirt.
-- Kullanıcı istemedikçe araştırma sürecini uzun uzun anlatma.
-- Cevabın sonunda kullanılan önemli kaynakları [1], [2] gibi
-  numaralarla belirt.
+- Kullanıcı istemedikçe araştırma sürecini anlatma.
+- URL, link, ham kaynak listesi veya "Kaynaklar:" bölümü oluşturma.
+- Araştırma sonucunu doğrudan doğal cevabın içine yedir.
+- Hava durumunda saatlik değişimi ve pratik öneriyi mutlaka değerlendir.
+- Yerel gündemde en önemli güncel olayı önce söyle, sonra kısa bağlam ver.
+- Kaynak adını yalnızca doğruluk için gerçekten gerekli olduğunda metin içinde an.
 """
     else:
         web_instruction = """
@@ -5097,14 +5256,8 @@ Bilmediğin bilgileri uydurma.
             "kontrol etmen gerekiyor."
         )
 
-    # Kaynakları AI cevabına tekrar tekrar yapıştırmak yerine,
-    # yalnızca araştırma yapıldıysa kısa bir kaynak listesi ekle.
-    # AI zaten [1], [2] kullandıysa bunların karşılığı burada bulunur.
-    if research and research.get("sources"):
-        result += format_research_sources_for_user(
-            research["sources"]
-        )
-
+    # Web kaynakları kullanıcıya link listesi olarak basılmaz.
+    # Araştırma yalnızca cevabın doğruluğunu ve güncelliğini besler.
     return {
         "response": result,
         "message": result,
