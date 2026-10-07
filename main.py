@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "33.2.0"
+APP_VERSION = "33.3.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -1264,63 +1264,114 @@ WEATHER_CODES_TR = {
 }
 
 
+def _weather_from_open_meteo():
+    """Denizli canlı hava verisini Open-Meteo'dan alır."""
+    response = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={
+            "latitude": 37.7765,
+            "longitude": 29.0864,
+            "current": "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
+            "hourly": "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
+            "forecast_days": 2,
+            "timezone": "Europe/Istanbul",
+        },
+        headers=WEB_HEADERS,
+        timeout=12,
+    )
+    response.raise_for_status()
+    data = response.json()
+    current = data.get("current", {})
+    hourly = data.get("hourly", {})
+    times = hourly.get("time", [])
+    temps = hourly.get("temperature_2m", [])
+    rain = hourly.get("precipitation_probability", [])
+    codes = hourly.get("weather_code", [])
+    winds = hourly.get("wind_speed_10m", [])
+
+    current_time = str(current.get("time", ""))
+    start_index = times.index(current_time) if current_time in times else 0
+    upcoming = []
+    for i in range(start_index, min(start_index + 8, len(times))):
+        upcoming.append({
+            "time": times[i],
+            "temperature": temps[i] if i < len(temps) else None,
+            "rain_probability": rain[i] if i < len(rain) else None,
+            "condition": WEATHER_CODES_TR.get(codes[i], "değişken") if i < len(codes) else "değişken",
+            "wind": winds[i] if i < len(winds) else None,
+        })
+
+    return {
+        "location": "Denizli",
+        "current_temperature": current.get("temperature_2m"),
+        "apparent_temperature": current.get("apparent_temperature"),
+        "current_condition": WEATHER_CODES_TR.get(current.get("weather_code"), "değişken"),
+        "current_wind": current.get("wind_speed_10m"),
+        "upcoming": upcoming,
+        "source": "Open-Meteo",
+    }
+
+
+def _weather_from_wttr():
+    """Open-Meteo erişilemezse wttr.in üzerinden yedek canlı veri alır."""
+    response = requests.get(
+        "https://wttr.in/Denizli",
+        params={"format": "j1", "lang": "tr"},
+        headers=WEB_HEADERS,
+        timeout=12,
+    )
+    response.raise_for_status()
+    data = response.json()
+    current = (data.get("current_condition") or [{}])[0]
+    hourly_raw = (data.get("weather") or [{}])[0].get("hourly", [])
+
+    upcoming = []
+    for item in hourly_raw[:8]:
+        try:
+            temp = float(item.get("tempC"))
+        except Exception:
+            temp = item.get("tempC")
+        try:
+            rain_prob = int(item.get("chanceofrain"))
+        except Exception:
+            rain_prob = item.get("chanceofrain")
+        desc = ((item.get("lang_tr") or [{}])[0].get("value")
+                or (item.get("weatherDesc") or [{}])[0].get("value")
+                or "değişken")
+        upcoming.append({
+            "time": str(item.get("time", "")),
+            "temperature": temp,
+            "rain_probability": rain_prob,
+            "condition": clean_text(desc).lower(),
+            "wind": item.get("windspeedKmph"),
+        })
+
+    return {
+        "location": "Denizli",
+        "current_temperature": current.get("temp_C"),
+        "apparent_temperature": current.get("FeelsLikeC"),
+        "current_condition": clean_text(
+            ((current.get("lang_tr") or [{}])[0].get("value")
+             or (current.get("weatherDesc") or [{}])[0].get("value")
+             or "değişken")
+        ).lower(),
+        "current_wind": current.get("windspeedKmph"),
+        "upcoming": upcoming,
+        "source": "wttr.in",
+    }
+
+
 def fetch_denizli_weather():
-    """Denizli için ana hava verisini doğrudan Open-Meteo'dan alır."""
+    """Canlı Denizli hava durumu. Ana servis + otomatik yedek servis."""
     try:
-        response = requests.get(
-            "https://api.open-meteo.com/v1/forecast",
-            params={
-                "latitude": 37.7765,
-                "longitude": 29.0864,
-                "current": "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
-                "hourly": "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
-                "forecast_days": 2,
-                "timezone": "Europe/Istanbul",
-            },
-            headers=WEB_HEADERS,
-            timeout=10,
-        )
-        if response.status_code != 200:
-            return None
-
-        data = response.json()
-        current = data.get("current", {})
-        hourly = data.get("hourly", {})
-        times = hourly.get("time", [])
-        temps = hourly.get("temperature_2m", [])
-        rain = hourly.get("precipitation_probability", [])
-        codes = hourly.get("weather_code", [])
-        winds = hourly.get("wind_speed_10m", [])
-
-        now_temp = current.get("temperature_2m")
-        now_code = current.get("weather_code")
-        now_wind = current.get("wind_speed_10m")
-
-        current_time = str(data.get("current", {}).get("time", ""))
-        upcoming = []
-        start_index = 0
-        if current_time and current_time in times:
-            start_index = times.index(current_time)
-        for i in range(start_index, min(start_index + 8, len(times))):
-            upcoming.append({
-                "time": times[i],
-                "temperature": temps[i] if i < len(temps) else None,
-                "rain_probability": rain[i] if i < len(rain) else None,
-                "condition": WEATHER_CODES_TR.get(codes[i], "değişken") if i < len(codes) else "değişken",
-                "wind": winds[i] if i < len(winds) else None,
-            })
-
-        return {
-            "location": "Denizli",
-            "current_temperature": now_temp,
-            "apparent_temperature": current.get("apparent_temperature"),
-            "current_condition": WEATHER_CODES_TR.get(now_code, "değişken"),
-            "current_wind": now_wind,
-            "upcoming": upcoming,
-            "source": "Open-Meteo",
-        }
+        return _weather_from_open_meteo()
     except Exception:
-        save_error("Weather API error", traceback.format_exc())
+        save_error("Open-Meteo weather error", traceback.format_exc())
+
+    try:
+        return _weather_from_wttr()
+    except Exception:
+        save_error("wttr.in weather error", traceback.format_exc())
         return None
 
 
@@ -5170,7 +5221,7 @@ async def chat(
                     "title": "Denizli saatlik hava durumu",
                     "text": weather_context_for_ai(weather),
                     "url": "",
-                    "source": "Open-Meteo"
+                    "source": weather.get("source", "hava servisi")
                 }],
                 "context": weather_context_for_ai(weather)
             }
