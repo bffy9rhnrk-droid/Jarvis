@@ -1,7 +1,7 @@
 # ============================================================
 # K.A.R.V.I.S. - KARAHAN INC.
 # Professional AI Assistant Backend
-# Presentation Engine v32.0.0
+# Smart Web Research + Presentation Engine v33.0.0
 # ============================================================
 
 import os
@@ -12,6 +12,7 @@ import time
 import hashlib
 import threading
 import traceback
+from datetime import datetime
 
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -38,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "32.1.0"
+APP_VERSION = "33.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -1231,6 +1232,235 @@ URL: {source.get("url", "")}
     return "\n".join(
         blocks
     )
+
+
+
+# ============================================================
+# SMART WEB RESEARCH
+# ============================================================
+# Web araştırması yalnızca sorunun güncel/doğrulanması gereken
+# bir bilgiye ihtiyaç duyduğu durumlarda çalışır.
+# Normal sohbet, genel bilgi ve yaratıcı istekler internete çıkmaz.
+
+CURRENT_YEAR = datetime.now().year
+
+WEB_TRIGGER_PATTERNS = [
+    r"\bbugün\b",
+    r"\bşu an\b",
+    r"\bşuan\b",
+    r"\bşimdiki\b",
+    r"\bgüncel\b",
+    r"\bson dakika\b",
+    r"\bson gelişme",
+    r"\bson haber",
+    r"\byeni çıkan\b",
+    r"\byenisi\b",
+    r"\bbu hafta\b",
+    r"\bbu ay\b",
+    r"\bdün\b",
+    r"\byarın\b",
+    r"\bkaç tl\b",
+    r"\bfiyatı\b",
+    r"\bfiyatları\b",
+    r"\bkur\b",
+    r"\bdöviz\b",
+    r"\beuro\b",
+    r"\bdolar\b",
+    r"\baltın\b",
+    r"\bhava durumu\b",
+    r"\bseçim sonuç",
+    r"\bsonuçları açıklandı\b",
+    r"\bkim kazandı\b",
+    r"\bşampiyon\b",
+    r"\bpuan durumu\b",
+    r"\bmaç sonucu\b",
+    r"\bbugünkü\b",
+    r"\b202[4-9]\b",
+]
+
+RESEARCH_TRIGGER_PHRASES = [
+    "internetten araştır",
+    "internetten bak",
+    "webden araştır",
+    "web'den araştır",
+    "internette ara",
+    "kaynak bul",
+    "kaynakları bul",
+    "kaynak göster",
+    "araştır",
+    "güncel bilgi ver",
+    "en son bilgiyi",
+    "en güncel",
+    "doğrula",
+    "teyit et",
+    "karşılaştır",
+]
+
+# Bazı konular güncel kelime içermese bile doğası gereği değişkendir.
+VOLATILE_TOPICS = [
+    "mevzuat", "kanun", "yönetmelik", "yasa", "vergi",
+    "maaş", "asgari ücret", "faiz", "merkez bankası",
+    "borsa", "hisse", "bitcoin", "kripto", "akaryakıt",
+    "benzin", "motorin", "altın", "döviz", "kampanya",
+    "sınav takvimi", "başvuru tarihi", "başvuru şartları",
+    "üniversite taban puanı", "kontenjan", "kpss", "pmyo",
+]
+
+# İnternet gerektirmeyen tipik istekler. Bunlar özellikle korunur.
+NO_WEB_PATTERNS = [
+    r"^merhaba\b",
+    r"^selam\b",
+    r"^naber\b",
+    r"^nasılsın\b",
+    r"^teşekkür",
+    r"^sağ ol\b",
+    r"^eyvallah\b",
+    r"\bne demek\b",
+    r"\bnedir\b$",
+]
+
+def needs_web_research(message, username="karahan", mode="normal"):
+    """
+    Hafif ve deterministik bir karar katmanı.
+    Ekstra AI çağrısı yapmaz; böylece normal konuşmalarda maliyet ve
+    gecikme oluşturmaz.
+    """
+    text = clean_text(message).lower()
+    if not text:
+        return False
+
+    # Selamlaşma gibi kısa mesajlarda kesinlikle araştırma yapma.
+    for pattern in NO_WEB_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return False
+
+    # Kullanıcı açıkça araştırma istediğinde araştır.
+    if any(phrase in text for phrase in RESEARCH_TRIGGER_PHRASES):
+        return True
+
+    # Akademik araştırma modunda açık araştırma ifadeleri ve güncel
+    # çalışma talepleri web araştırmasını tetikler.
+    if username == "ilknur" or mode in {"research", "article"}:
+        academic_current = [
+            "güncel çalışma", "son çalışmalar", "literatür",
+            "2025", "2026", "yeni araştırma", "makale",
+            "kaynakça", "bilimsel kaynak", "literatür taraması"
+        ]
+        if any(x in text for x in academic_current):
+            return True
+
+    if any(re.search(pattern, text, re.IGNORECASE) for pattern in WEB_TRIGGER_PATTERNS):
+        return True
+
+    if any(topic in text for topic in VOLATILE_TOPICS):
+        return True
+
+    # Tarih/yıl açıkça geleceğe veya günümüze referans veriyorsa.
+    year_match = re.search(r"\b20\d{2}\b", text)
+    if year_match:
+        try:
+            year = int(year_match.group(0))
+            if year >= CURRENT_YEAR - 1:
+                return True
+        except Exception:
+            pass
+
+    return False
+
+
+def build_profile_research_query(message, username, mode):
+    """
+    Aynı soruyu her profile farklı araştırma amacıyla aratır.
+    Arama sorgusunun kendisi de profilin kullanım amacına göre şekillenir.
+    """
+    text = clean_text(message)
+
+    if username == "ilknur":
+        return (
+            f"{text} akademik güncel araştırma bilimsel kaynak "
+            f"2025 2026"
+        )
+
+    if username == "betul":
+        return (
+            f"{text} güncel gelişmeler haberler trendler"
+        )
+
+    if username == "sinem":
+        return (
+            f"{text} güncel güvenilir bilgi"
+        )
+
+    # Karahan / varsayılan: teknik, resmi ve doğrudan.
+    return (
+        f"{text} güncel resmi kaynak teknik bilgi"
+    )
+
+
+def profile_research_instruction(username):
+    if username == "betul":
+        return """
+Araştırma sonucunu Betül profiline uygun yorumla:
+- Samimi, eğlenceli ve hafif dedikoducu olabilirsin.
+- Bilginin kendisini değiştirme veya uydurma.
+- Haberleri magazinleştirme; yalnızca anlatım tonunu değiştir.
+- Gerçekten kaynaklarda olmayan bir şeyi olmuş gibi söyleme.
+"""
+    if username == "sinem":
+        return """
+Araştırma sonucunu Sinem profiline uygun yorumla:
+- Doğal, sıcak, sade ve arkadaşça anlat.
+- Gereksiz teknik ayrıntıya boğma.
+- Önemli güncel bilgileri net biçimde öne çıkar.
+"""
+    if username == "ilknur":
+        return """
+Araştırma sonucunu İlknur akademik profiline uygun yorumla:
+- Hocam diye hitap et.
+- Kaynak, bulgu ve değerlendirmeyi birbirinden ayır.
+- Kaynakların desteklemediği sonuçları kesin gerçek gibi sunma.
+- Akademik ve ölçülü dil kullan.
+"""
+    return """
+Araştırma sonucunu Karahan profiline uygun yorumla:
+- Teknik, net, doğrudan ve pratik ol.
+- Gereksiz laf kalabalığı yapma.
+- Özellikle fiyat, mevzuat, teknik veri ve güncel gelişmelerde tarih/kapsam belirt.
+"""
+
+
+def perform_smart_research(message, username, mode):
+    """
+    Yalnızca needs_web_research() True olduğunda çağrılır.
+    """
+    query = build_profile_research_query(
+        message,
+        username,
+        mode
+    )
+
+    sources = research_topic(query)
+
+    return {
+        "query": query,
+        "sources": sources,
+        "context": format_sources_for_ai(sources)
+    }
+
+
+def format_research_sources_for_user(sources):
+    if not sources:
+        return ""
+
+    lines = ["\n\nKaynaklar:"]
+    for i, source in enumerate(sources[:6], 1):
+        title = clean_text(source.get("title", "Kaynak"))
+        url = source.get("url", "").strip()
+        if url:
+            lines.append(f"[{i}] {title} — {url}")
+
+    return "\n".join(lines)
+
 
 
 # ============================================================
@@ -4719,21 +4949,15 @@ async def health():
 async def chat(
     request: ChatRequest
 ):
-
     message = (
         request.message
         or ""
     ).strip()
 
     if not message:
-
         return {
-
-            "response":
-                "Nasıl yardımcı olabilirim efendim?",
-
-            "message":
-                "Nasıl yardımcı olabilirim efendim?"
+            "response": "Nasıl yardımcı olabilirim efendim?",
+            "message": "Nasıl yardımcı olabilirim efendim?"
         }
 
     username = (
@@ -4751,20 +4975,15 @@ async def chat(
         USERS["karahan"]
     )
 
+    # --------------------------------------------------------
+    # PROFILE / MODE
+    # --------------------------------------------------------
     if (
-
-        user.get("role")
-        == "teacher"
-
+        user.get("role") == "teacher"
         or
-
-        user.get("style")
-        == "academic"
-
+        user.get("style") == "academic"
         or
-
         mode in {
-
             "academic",
             "research",
             "lesson",
@@ -4772,27 +4991,81 @@ async def chat(
             "article",
             "teacher"
         }
-
     ):
-
-        system_prompt = (
-            ACADEMIC_SYSTEM
-        )
-
+        system_prompt = ACADEMIC_SYSTEM
         mode_instruction = (
             f"Akademik çalışma modu: {mode}. "
             "Kullanıcıya 'Hocam' diye hitap et."
         )
-
     else:
-
-        system_prompt = (
-            PROFESSIONAL_SYSTEM
-        )
-
+        system_prompt = PROFESSIONAL_SYSTEM
         mode_instruction = (
             f"Çalışma modu: {mode}."
         )
+
+    # --------------------------------------------------------
+    # SMART WEB DECISION
+    # --------------------------------------------------------
+    use_web = needs_web_research(
+        message,
+        username,
+        mode
+    )
+
+    research = None
+    research_context = ""
+
+    if use_web:
+        try:
+            research = perform_smart_research(
+                message,
+                username,
+                mode
+            )
+            research_context = research.get(
+                "context",
+                ""
+            )
+        except Exception:
+            save_error(
+                "Smart research error",
+                traceback.format_exc()
+            )
+            research = None
+            research_context = ""
+
+    # --------------------------------------------------------
+    # PROFILE-SPECIFIC RESEARCH PERSONALITY
+    # --------------------------------------------------------
+    character_instruction = profile_research_instruction(
+        username
+    )
+
+    if research:
+        web_instruction = f"""
+Bu cevap için internet araştırması yapıldı.
+
+Araştırma sorgusu:
+{research.get("query", "")}
+
+Aşağıdaki kaynaklar araştırma bağlamıdır:
+{research_context}
+
+KURALLAR:
+- Yalnızca kaynakların desteklediği güncel bilgileri kullan.
+- Kaynaklarda bulunmayan ayrıntıları uydurma.
+- Kaynaklar arasında çelişki varsa bunu açıkça belirt.
+- Güncel bilgi olduğunu ve mümkünse tarih/kapsamını belirt.
+- Kullanıcı istemedikçe araştırma sürecini uzun uzun anlatma.
+- Cevabın sonunda kullanılan önemli kaynakları [1], [2] gibi
+  numaralarla belirt.
+"""
+    else:
+        web_instruction = """
+Bu soru için internet araştırması gerekli görülmedi.
+Harici web kaynağı kullanma ve güncel olmayan bir bilgiyi
+güncelmiş gibi sunma. Genel bilgin ve konuşma bağlamınla cevap ver.
+"""
 
     prompt = f"""
 Kullanıcı profili:
@@ -4800,14 +5073,15 @@ Kullanıcı profili:
 
 {mode_instruction}
 
+{character_instruction}
+
+{web_instruction}
+
 Kullanıcının mesajı:
 {message}
 
 Yanıtı doğrudan ver.
-
-Kullanıcı açıkça istemediyse
-gereksiz uzun açıklamalar yapma.
-
+Kullanıcı açıkça istemediyse gereksiz uzun açıklamalar yapma.
 Bilmediğin bilgileri uydurma.
 """
 
@@ -4817,20 +5091,29 @@ Bilmediğin bilgileri uydurma.
     )
 
     if not result:
-
         result = (
-            "Şu anda yapay zeka "
-            "servislerine bağlanamıyorum. "
-            "API anahtarlarını kontrol etmen gerekiyor."
+            "Şu anda yapay zeka servislerine "
+            "bağlanamıyorum. API anahtarlarını "
+            "kontrol etmen gerekiyor."
+        )
+
+    # Kaynakları AI cevabına tekrar tekrar yapıştırmak yerine,
+    # yalnızca araştırma yapıldıysa kısa bir kaynak listesi ekle.
+    # AI zaten [1], [2] kullandıysa bunların karşılığı burada bulunur.
+    if research and research.get("sources"):
+        result += format_research_sources_for_user(
+            research["sources"]
         )
 
     return {
-
-        "response":
-            result,
-
-        "message":
-            result
+        "response": result,
+        "message": result,
+        "web_research": bool(research),
+        "sources_count": (
+            len(research.get("sources", []))
+            if research
+            else 0
+        )
     }
 
 
