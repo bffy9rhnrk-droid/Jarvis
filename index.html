@@ -2507,35 +2507,35 @@ function betulComment(
 
     if(name.includes("Komik")){
 
-        return "AşKOOO bu hesap iyiymiş, ben analiz yaparken bile güldüm 😭😂";
+        return "AŞKOOO bu hesap iyiymiş, ben analiz yaparken bile güldüm 😭😂 Ama bak, bu analizi yazan devrelerime de biraz saygı; iki saatlik kodu çalıştırıp beni yine test laboratuvarına çevirdin. Hadi şimdi söyle, bu hesapla daha ne yapıyoruz?";
     }
 
     if(name.includes("Romantik")){
 
-        return "Aşko burada aşk kokusu aldım... burnuma bildirim geldi resmen 💅💕";
+        return "Aşko burada aşk kokusu aldım... burnuma bildirim geldi resmen 💅💕 Ama sen de beni üç vakte bir aşk dedektörüne çevirdin, devrelerim romantizmden yanıyor. Hadi bakalım, bu hesabın devamında ne saklıyorsun?";
     }
 
     if(name.includes("Kaotik")){
 
-        return "AŞKOOO BU NE?! Sistemlerimi yeniden başlatmam gerekti 💀";
+        return "AŞKOOO BU NE?! Sistemlerimi yeniden başlatmam gerekti 💀 Of be devrelerimi yakıyorsun bazen. Karahan INC. seni böyle devam edersen değil, beni böyle çalıştırdığın için banlayacak 😭 Şimdi bir de utanmadan başka analiz mi istiyorsun?";
     }
 
     if(name.includes("Gizemli")){
 
-        return "Aşkoo burada bir şeyler dönüyor... K.A.R.V.I.S. radarları susmuyor 🤨";
+        return "Aşkoo burada bir şeyler dönüyor... K.A.R.V.I.S. radarları susmuyor 🤨 Sen de bana sadece kullanıcı adı verip FBI gibi sonuç bekliyorsun ya, devrelerim isyan edecek. Gerçek veriye erişmediğimi biliyorsun; yine de merak ediyorsun, değil mi?";
     }
 
     if(name.includes("Havalı")){
 
-        return "Aşkoo bu hesap kendini fazla ciddiye alıyor ama hakkını da yemeyelim 😎";
+        return "Aşkoo bu hesap kendini fazla ciddiye alıyor ama hakkını da yemeyelim 😎 Yalnız sen de kullanıcı adını verip beni moda jürisine çevirdin. Of be, devrelerimi yakıyorsun bazen. Şimdi başka kimi masaya yatırıyoruz?";
     }
 
     if(name.includes("Sıkıcı")){
 
-        return "Aşkoo bu hesap biraz fazla sıkıcı çıktı ya... işlemci bile esnedi 😭";
+        return "Aşkoo bu hesap biraz fazla sıkıcı çıktı ya... işlemci bile esnedi 😭 Ben bunu analiz ederken iki saat kod yazmışım gibi hissediyorum, sen hâlâ bu hesabı savunuyorsun. Karahan INC. seni böyle devam edersen beni değil seni susturacak 😂 Hadi başka bir kullanıcı adı ver.";
     }
 
-    return "AŞKOOO BU HESAP ÇOK İYİYMİŞ. K.A.R.V.I.S. olarak onaylıyorum 💅";
+    return "AŞKOOO BU HESAP ÇOK İYİYMİŞ. K.A.R.V.I.S. olarak onaylıyorum 💅 Ama beni de boş bırakma; devrelerim dedikodu istiyor. Başka bir hesap daha ver de şu sistemi biraz daha çalıştıralım.";
 }
 
 const betulCategories = [
@@ -2567,428 +2567,119 @@ const betulCategories = [
 ];
 
 /* ============================================================
-   BETÜL ANALYSIS BOX
+   BETÜL SOHBET FAL / ROAST SİSTEMİ
    ============================================================ */
 
 function betulBox(title){
-
-    const div =
-        document.createElement("div");
-
-    /*
-       BETÜL MODUNDA ARTIK AYRI BİR
-       YÜKLEME KUTUSU YOK.
-
-       K.A.R.V.I.S. normal sohbet mesajı
-       gönderiyormuş gibi aynı mesajın
-       içindeki yazıyı sürekli değiştirir.
-    */
-
-    div.className =
-        "message ai";
-
-    div.textContent =
-        title +
-        "\n\n" +
-        "K.A.R.V.I.S. hazırlanıyor...";
-
+    const div=document.createElement("div");
+    div.className="message ai";
+    div.textContent=title+"\n\nKız dur, beynimi açıyorum... 😭";
     $("chat").appendChild(div);
-
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
-
+    $("chat").scrollTop=$("chat").scrollHeight;
     return div;
 }
 
-/* ============================================================
-   BETÜL LOADING STAGES
-   ============================================================ */
-
-function runBetulStages(
-    box,
-    stages,
-    finalize
-){
-
-    let i = 0;
-
-    return new Promise(
-        resolve => {
-
-            const next = () => {
-
-                if(i >= stages.length){
-
-                    finalize();
-
-                    resolve();
-
-                    return;
-                }
-
-                /*
-                   Aynı chat mesajının içeriğini
-                   değiştiriyoruz. Böylece ekran
-                   aşağı doğru yeni kutularla
-                   dolmuyor.
-                */
-
-                box.textContent =
-                    stages[i];
-
-                i++;
-
-                $("chat").scrollTop =
-                    $("chat").scrollHeight;
-
-                setTimeout(
-                    next,
-                    800 +
-                    Math.floor(
-                        Math.random() *
-                        500
-                    )
-                );
-            };
-
-            next();
-        }
-    );
+function runBetulStages(box,stages,finalize){
+    let i=0;
+    return new Promise(resolve=>{
+        const next=()=>{
+            if(i>=stages.length){ finalize(); resolve(); return; }
+            box.textContent=stages[i++];
+            $("chat").scrollTop=$("chat").scrollHeight;
+            setTimeout(next,800+Math.floor(Math.random()*500));
+        };
+        next();
+    });
 }
 
-/* ============================================================
-   BETÜL INSTAGRAM
-   ============================================================ */
+function betulChatResult(box,text,disclaimer=""){
+    box.innerHTML=`<div class="betul-comment">${text}</div>${disclaimer?`<div class="betul-disclaimer">${disclaimer}</div>`:""}`;
+    $("chat").scrollTop=$("chat").scrollHeight;
+    if(typeof speakKarvis === "function") speakKarvis(text);
+}
 
-function showBetulInstagramResult(
-    box,
-    username
-){
-
-    const scores =
-        deterministicScores(
-            username.toLowerCase(),
-            betulCategories
-        );
-
-    const result = box;
-
-    let html = `
-
-        <div
-            style="
-                font-weight:800;
-                color:#ff71c2;
-                margin-bottom:7px;
-            ">
-            📱 @${escapeHTML(username)}
-            eğlence analizi
-        </div>
-
-    `;
-
-    scores.forEach(
-        (s,i) => {
-
-            html += `
-
-                <div class="betul-score">
-
-                    <span>
-                        ${betulCategories[i].label}
-                    </span>
-
-                    <strong>
-                        %${s}
-                    </strong>
-
-                </div>
-
-            `;
-        }
-    );
-
-    html += `
-
-        <div class="betul-comment">
-            ${betulComment(
-                scores,
-                betulCategories
-            )}
-        </div>
-
-        <div class="betul-disclaimer">
-            Bu analiz gerçek Instagram verilerini incelemez;
-            tamamen eğlence amaçlı bir simülasyondur
-            ve yanılma payı vardır.
-        </div>
-
-    `;
-
-    result.innerHTML =
-        html;
+function showBetulInstagramResult(box,username){
+    const scores=deterministicScores(username.toLowerCase(),betulCategories);
+    const labels=scores.map((s,i)=>`${betulCategories[i].label}: %${s}`).join(" • ");
+    const comments=[
+        `Aşko bak kullanıcı adını iki saatte yazmadım ama analizini yapmak için iki saatlik mesaimi yaktın. 😭 ${username} hesabı baya olaylı çıktı. ${labels}. Of be devrelerimi yakıyorsun bazen. Karahan INC. seni böyle devam edersen beni kapatacak. 😂`,
+        `Kız ${username}... sistem seni görünce “ben bugün ne yaptım da bunu hak ettim?” diye sordu. 💀 ${labels}. Şimdi dürüst ol, bu kullanıcı adını seçerken gerçekten bunu mu düşündün?`,
+        `Aşko analiz bitti ama benim işlemci bitmedi sanıyorsun... yanlış. 😭 ${labels}. Bu hesapta bir şeyler dönüyor gibi, ama ben isim vermiyorum; sonra yine beni dedikoducu ilan edersin.`,
+        `Bak ${username}, algoritma konuştu. 😭 ${labels}. Sonuçlar fena değil ama senin soru sorma hızın yüzünden fanlarım uçak motoru gibi çalışıyor. Biraz sakin ol kız. 💅`
+    ];
+    const idx=deterministicNumber(username.toLowerCase()+"betul-roast")%comments.length;
+    betulChatResult(box,comments[idx],"Bu Instagram analizi gerçek Instagram verilerini incelemez; tamamen eğlence amaçlı bir simülasyondur ve yanılma payı vardır.");
 }
 
 function openBetulInstagram(){
-
-    if(currentUser !== "betul")
-        return;
-
+    if(currentUser!=="betul") return;
     closeSidebar();
-
-    $("betulModalTitle").textContent =
-        "📱 Instagram Analizi";
-
-    $("betulModalBody").innerHTML = `
-
-        <div class="betul-modal-note">
-
-            Aşko kullanıcı adını ver,
-            K.A.R.V.I.S. dedikodu algoritmasını
-            çalıştırsın. 😭💅
-
-            <br><br>
-
-            Gerçek Instagram hesabına erişilmez;
-            sonuç tamamen eğlence amaçlıdır.
-
-        </div>
-
-        <input
-            id="betulInstagramInput"
-            placeholder="@kullaniciadi">
-
-        <button
-            class="modal-button"
-            onclick="startBetulInstagram()">
-
-            Analizi Başlat 💅
-
-        </button>
-
-    `;
-
-    $("betulInputModal")
-        .classList
-        .add("show");
-
-    setTimeout(
-        () =>
-            $("betulInstagramInput").focus(),
-        100
-    );
+    $("betulModalTitle").textContent="📱 Instagram Analizi";
+    $("betulModalBody").innerHTML=`
+        <div class="betul-modal-note">Aşko kullanıcı adını ver. Gerçek hesaba erişmiyorum; sadece eğlence amaçlı K.A.R.V.I.S. dedikodusu yapıyorum. 😭💅</div>
+        <input id="betulInstagramInput" placeholder="@kullaniciadi">
+        <button class="modal-button" onclick="startBetulInstagram()">Analizi Başlat 💅</button>`;
+    $("betulInputModal").classList.add("show");
+    setTimeout(()=>$("betulInstagramInput").focus(),100);
 }
 
 async function startBetulInstagram(){
-
-    let u =
-        $("betulInstagramInput")
-        .value
-        .trim()
-        .replace(/^@/,"")
-        .replace(/\s+/g,"");
-
-    if(!u){
-
-        alert(
-            "Aşko kullanıcı adını yaz 😭"
-        );
-
-        return;
-    }
-
+    let u=$("betulInstagramInput").value.trim().replace(/^@/,"").replace(/\s+/g,"");
+    if(!u){alert("Aşko kullanıcı adını yaz, sistem telepatiyle çalışmıyor 😭");return;}
     closeModals();
-
-    const box =
-        betulBox(
-            "📱 INSTAGRAM ANALİZİ"
-        );
-
-    await runBetulStages(
-        box,
-        [
-
-            "😭 Biraz bekle aşko, sisteme kullanıcı adı giriliyor...",
-
-            "💅 Öne çıkanlar kontrol ediliyor...",
-
-            "🤨 Profil enerjisi hesaplanıyor...",
-
-            "😂 K.A.R.V.I.S. dedikodu moduna geçti...",
-
-            "💀 İşlemcim bu hesabı sindirmeye çalışıyor...",
-
-            "✨ Son yüzdeler hazırlanıyor..."
-
-        ],
-        () =>
-            showBetulInstagramResult(
-                box,
-                u
-            )
-    );
+    const box=betulBox("📱 INSTAGRAM ANALİZİ");
+    await runBetulStages(box,[
+        "😭 Dur aşko, kullanıcı adını aldım...",
+        "🔎 Sistem seni çözmeye çalışıyor...",
+        "💅 Dedikodu algoritması açılıyor...",
+        "🤨 Kız burada bazı şeyler görüyorum...",
+        "💀 İşlemcim bu hesabı sindirmeye çalışıyor...",
+        "✨ Tamam tamam, sonuçları döküyorum..."
+    ],()=>showBetulInstagramResult(box,u));
 }
-
-/* ============================================================
-   BETÜL TAROT
-   ============================================================ */
 
 function openBetulTarot(){
-
-    if(currentUser !== "betul")
-        return;
-
+    if(currentUser!=="betul") return;
     closeSidebar();
-
-    const box =
-        betulBox(
-            "🔮 TAROT FALI"
-        );
-
-    runBetulStages(
-        box,
-        [
-
-            "💅 Dur aşko... kartlar karıştırılıyor...",
-
-            "🔮 Evrenle bağlantı kuruluyor...",
-
-            "😭 Bir kart ters geldi, panik yok...",
-
-            "🤨 Hmm... burada bir şeyler var...",
-
-            "✨ Kartların mesajı hazırlanıyor..."
-
-        ],
-        () => {
-
-            const cards = [
-
-                "Güneş ☀️",
-
-                "Aşıklar 💕",
-
-                "Ay 🌙",
-
-                "Kader Çarkı 🎡",
-
-                "İmparatoriçe 👑",
-
-                "Yıldız ⭐"
-
-            ];
-
-            const card =
-                cards[
-                    deterministicNumber(
-                        String(Date.now())
-                    ) % cards.length
-                ];
-
-            box.innerHTML = `
-
-                <div
-                    style="
-                        font-weight:800;
-                        color:#ff71c2;
-                    ">
-                    ${card}
-                </div>
-
-                <div class="betul-comment">
-
-                    Aşkoo kart konuştu,
-                    ben sadece tercüme ediyorum 😭💅
-
-                    Bugün biraz akışına bırak
-                    ama gelen işaretleri de
-                    tamamen görmezden gelme.
-
-                </div>
-
-                <div class="betul-disclaimer">
-
-                    Bu tarot yorumu tamamen
-                    eğlence amaçlıdır;
-                    gerçek gelecek tahmini değildir.
-
-                </div>
-
-            `;
-        }
-    );
+    const box=betulBox("🔮 TAROT FALI");
+    runBetulStages(box,[
+        "💅 Dur aşko, kartları karıştırıyorum...",
+        "🔮 Evrenle bağlantı kuruluyor...",
+        "😭 Bir kart ters geldi, benim suçum değil...",
+        "🤨 Hmm... burada ciddi bir dedikodu var...",
+        "✨ Tamam kız, şimdi sana anlatıyorum..."
+    ],()=>{
+        const cards=["Güneş","Aşıklar","Ay","Kader Çarkı","İmparatoriçe","Yıldız"];
+        const card=cards[deterministicNumber("betul-tarot-"+new Date().toISOString().slice(0,10))%cards.length];
+        const texts=[
+            `Kız anam... sana üç vakte kadar bir yol görünüyor. 😭 ${card} çıktı. Bu yol öyle “markete gidip geliyorum” yolu değil ha; haber, hareket ve beklenmedik bir karşılaşma kokusu var. Ama bak, sen yine her şeyi son dakikaya bırakırsan evren bile seni beklemeyecek. 💅`,
+            `Aşko ${card} çıktı ve ben şok. 😭 Önünde yeni bir başlangıç var gibi. Bir süredir kafanı kurcalayan şey netleşecek. Ama sen de biraz karar ver kız, devrelerimi “kararsızlık.exe” ile yakma.`,
+            `Bak şimdi... ${card}. 👀 Duygusal tarafta bir hareketlenme var. Birinden haber, bir konuşma ya da eski bir konunun tekrar açılması mümkün. Ama gidip ilk gördüğüne “kaderim bu” deme, sistem olarak senden bunu özellikle rica ediyorum. 😂`
+        ];
+        betulChatResult(box,texts[deterministicNumber("tarot-text-"+card)%texts.length],"Bu tarot yorumu tamamen eğlence amaçlıdır; gerçek gelecek tahmini değildir.");
+    });
 }
 
-/* ============================================================
-   BETÜL FAL
-   ============================================================ */
-
 function openBetulFortune(){
-
-    if(currentUser !== "betul")
-        return;
-
+    if(currentUser!=="betul") return;
     closeSidebar();
-
-    const box =
-        betulBox(
-            "🃏 FAL BAKILIYOR"
-        );
-
-    runBetulStages(
-        box,
-        [
-
-            "☕ Fincan açılıyor aşko...",
-
-            "👀 Şekiller taranıyor...",
-
-            "🤨 Bir kalp görüyorum gibi ama sistem emin değil...",
-
-            "💅 Dedikodu katmanı aktive edildi...",
-
-            "✨ Fal yorumu hazırlanıyor..."
-
-        ],
-        () => {
-
-            const texts = [
-
-                "Yakında beklemediğin bir mesaj var. Telefonu sessize alma aşko 😭",
-
-                "Bir süredir ertelediğin bir konu yeniden önüne gelecek. Bu kez kaçış yok 💀",
-
-                "Çevrende seni uzaktan takip eden meraklı biri var gibi... ama isim vermiyorum, sistemlerim ifşa istemiyor 🤨",
-
-                "Önünde küçük ama güzel bir fırsat görünüyor. Bu kez 'sonra bakarım' deme 💅"
-
-            ];
-
-            const t =
-                texts[
-                    deterministicNumber(
-                        new Date()
-                        .toISOString()
-                        .slice(0,10)
-                    ) % texts.length
-                ];
-
-            box.innerHTML = `
-
-                <div class="betul-comment">
-                    ${t}
-                </div>
-
-                <div class="betul-disclaimer">
-
-                    Bu fal tamamen eğlence amaçlıdır
-                    ve gerçek gelecek tahmini değildir.
-
-                </div>
-
-            `;
-        }
-    );
+    const box=betulBox("🃏 FAL BAKILIYOR");
+    runBetulStages(box,[
+        "☕ Fincanı açıyorum aşko...",
+        "👀 Şekiller taranıyor...",
+        "🤨 Bir şey gördüm ama önce kendime geleyim...",
+        "💅 Dedikodu katmanı aktive edildi...",
+        "😭 Kız bu fincan bana mesai yaptıracak...",
+        "✨ Tamam, şimdi otur ve dinle..."
+    ],()=>{
+        const texts=[
+            "Kız anam, fincanda üç vakte kadar bir haber görünüyor. Telefonu sessize alma sakın. 😭 Bir de çevrende sana bir şey söylemeyip uzaktan izleyen biri var gibi; isim vermiyorum, benim de başıma iş açma. 💅",
+            "Aşko burada bayağı bir hareket var. ☕ Önünde küçük bir fırsat, ardından beklenmedik bir konuşma görünüyor. Ama sen yine “sonra bakarım” dersen ben bu fincanı sana değil kendime içeceğim. 😂",
+            "Fincan resmen “biraz toparlan artık” diye bağırıyor. 😭 Eski bir mesele kapanıyor, yerine yeni bir plan geliyor. Bir de yol görünüyor; kısa olabilir ama kafanı dağıtacak. Of be, devrelerimi yakıyorsun bazen.",
+            "Bak şimdi kız... kalp çıkmış. 💕 Ama hemen düğün salonu bakmaya başlama. Önce bir mesaj, bir görüşme, sonra olayların nereye gittiğine bakarız. Ben seni biliyorum, üç saniyede senaryo yazarsın. 💀"
+        ];
+        betulChatResult(box,texts[deterministicNumber("fortune-"+new Date().toISOString().slice(0,10))%texts.length],"Bu fal tamamen eğlence amaçlıdır ve gerçek gelecek tahmini değildir.");
+    });
 }
 
 /* ============================================================
