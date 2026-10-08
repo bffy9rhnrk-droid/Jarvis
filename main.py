@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "35.0.0"
+APP_VERSION = "34.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -250,6 +250,13 @@ USERS = {
         "role": "teacher",
         "style": "academic",
     },
+
+    "murat": {
+        "name": "Murat",
+        "password": "0000",
+        "role": "admin",
+        "style": "professional",
+    },
 }
 
 
@@ -280,6 +287,107 @@ class PresentationRequest(BaseModel):
 class BetulInstagramRequest(BaseModel):
 
     username: str
+
+
+class UserRequestCreate(BaseModel):
+
+    username: str
+    original: str
+    summary: str = ""
+
+
+# ============================================================
+# USER REQUESTS / SUGGESTIONS
+# ============================================================
+
+REQUEST_FILE = BASE_DIR / "user_requests.json"
+request_lock = threading.Lock()
+
+
+def normalize_request_text(text):
+    return re.sub(r"\s+", " ", str(text or "").strip().lower())
+
+
+def detect_user_feature_request(message):
+    text = normalize_request_text(message)
+    if not text or len(text) < 10:
+        return False
+
+    # Bilgi isteme kalıplarını özellikle dışarıda bırak.
+    pure_question = re.match(r"^(hava|hava durumu|saat|kaç|kim|ne|nedir|nasıl|nerede|ne zaman|hangi)\b", text)
+    request_patterns = [
+        "keşke", "şöyle olsa", "böyle olsa", "olsa daha güzel",
+        "olsa daha iyi", "olsa iyi olur", "yapabilsen", "yapabilirsen",
+        "ekleyebilirsen", "eklenebilir", "ekleyebilir misin",
+        "özellik ekle", "özelliği ekle", "bence ekle", "bunu da yap",
+        "şunu da yap", "bunu da ekle", "şunu da ekle", "yapabilir misin"
+    ]
+    if pure_question and not any(p in text for p in request_patterns):
+        return False
+    return any(p in text for p in request_patterns)
+
+
+def make_request_summary(message):
+    text = re.sub(r"\s+", " ", str(message or "").strip())
+    text = re.sub(r"^(keşke|bence|şunu|bunu)\s*", "", text, flags=re.IGNORECASE)
+    text = text.strip(" .,!?")
+    if len(text) > 180:
+        text = text[:177].rstrip() + "..."
+    return text
+
+
+def save_user_request(username, original):
+    username = str(username or "").strip().lower()
+    if username in {"", "karahan", "murat"}:
+        return None
+    if not detect_user_feature_request(original):
+        return None
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        # Aynı cümlenin kısa süre içinde tekrar kaydedilmesini önle.
+        norm = normalize_request_text(original)
+        now = time.time()
+        for item in reversed(data[-30:]):
+            if item.get("username") == username and normalize_request_text(item.get("original", "")) == norm:
+                try:
+                    if now - datetime.fromisoformat(item.get("created_at", "")).timestamp() < 300:
+                        return item
+                except Exception:
+                    pass
+        item = {
+            "id": uuid.uuid4().hex,
+            "username": username,
+            "name": USERS.get(username, {}).get("name", username),
+            "original": str(original).strip(),
+            "summary": make_request_summary(original),
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "read": False,
+            "status": "new",
+            "priority": "normal"
+        }
+        data.append(item)
+        write_json_file(REQUEST_FILE, data[-500:])
+        return item
+
+
+def get_user_requests():
+    with request_lock:
+        return read_json_file(REQUEST_FILE, [])
+
+
+def requests_answer_for_admin():
+    data = get_user_requests()
+    if not data:
+        return "Efendim, kayıtlı kullanıcı isteği bulunmuyor."
+    unread = [x for x in data if not x.get("read", False)]
+    recent = data[-10:][::-1]
+    lines = [
+        "Efendim, kullanıcıların kayıtlı isteklerini kontrol ettim.",
+        f"Toplam {len(data)} istek var; {len(unread)} tanesi yeni."
+    ]
+    for item in recent:
+        lines.append(f"• {item.get('name', item.get('username'))}: {item.get('summary') or item.get('original')}")
+    return "\n".join(lines)
 
 
 # ============================================================
@@ -358,6 +466,46 @@ async def login(
         "message":
             "Giriş başarılı."
     }
+
+
+# ============================================================
+# USER REQUEST ADMIN API
+# ============================================================
+
+@app.get("/user-requests")
+async def user_requests(username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Bu alan yalnızca yetkili profile açıktır.")
+    data = get_user_requests()
+    return {"success": True, "requests": data, "count": len(data), "unread": sum(1 for x in data if not x.get("read", False))}
+
+
+@app.post("/user-requests/{request_id}/read")
+async def mark_user_request_read(request_id: str, username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        for item in data:
+            if item.get("id") == request_id:
+                item["read"] = True
+                item["status"] = "read"
+                write_json_file(REQUEST_FILE, data)
+                return {"success": True}
+    raise HTTPException(status_code=404, detail="İstek bulunamadı.")
+
+
+@app.delete("/user-requests/{request_id}")
+async def delete_user_request(request_id: str, username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        new_data = [x for x in data if x.get("id") != request_id]
+        if len(new_data) == len(data):
+            raise HTTPException(status_code=404, detail="İstek bulunamadı.")
+        write_json_file(REQUEST_FILE, new_data)
+    return {"success": True}
 
 
 # ============================================================
@@ -5178,42 +5326,6 @@ async def health():
 
 
 # ============================================================
-# KARVIS LIVE / RADAR / BRAIN
-# ============================================================
-
-@app.get("/live-status")
-async def live_status():
-    return {
-        "status": "online",
-        "version": APP_VERSION,
-        "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
-        "research": True,
-        "weather": True,
-        "presentation": True,
-        "memory": True,
-    }
-
-@app.get("/radar")
-async def radar():
-    return {
-        "items": [
-            {"name": "AI Engine", "status": "ONLINE" if (GROQ_API_KEY or OPENROUTER_API_KEY) else "OFFLINE"},
-            {"name": "Web Research", "status": "ONLINE"},
-            {"name": "Weather", "status": "ONLINE"},
-            {"name": "Presentation Engine", "status": "ONLINE"},
-            {"name": "Memory Core", "status": "ONLINE"},
-        ]
-    }
-
-@app.get("/brain")
-async def brain():
-    return {
-        "version": APP_VERSION,
-        "modules": ["CHAT", "WEB RESEARCH", "MEMORY", "WEATHER", "PRESENTATION", "PROFILE ENGINE"],
-        "state": "READY"
-    }
-
-# ============================================================
 # CHAT
 # ============================================================
 
@@ -5247,6 +5359,22 @@ async def chat(
         USERS["karahan"]
     )
 
+    # Kullanıcı özellik önerisi algılama: yalnızca gerçek öneri kalıplarında kaydet.
+    save_user_request(username, message)
+
+    # Yetkili Murat, kayıtlı istekleri doğal dille sorabilir.
+    admin_request_query = (
+        username == "murat"
+        and any(term in normalize_request_text(message) for term in [
+            "kullanıcıların istekleri", "kullanicilarin istekleri",
+            "kullanıcı istekleri", "kullanici istekleri",
+            "kullanıcıların önerileri", "kullanicilarin onerileri"
+        ])
+    )
+    if admin_request_query:
+        answer = requests_answer_for_admin()
+        return {"response": answer, "message": answer}
+
     # --------------------------------------------------------
     # PROFILE / MODE
     # --------------------------------------------------------
@@ -5274,11 +5402,6 @@ async def chat(
         mode_instruction = (
             f"Çalışma modu: {mode}."
         )
-
-    if mode == "investigator":
-        mode_instruction += " Dedektif modundasın: iddiaları kanıt, kaynak, zaman ve güven düzeyi açısından ayır; varsayımı gerçek gibi sunma."
-    elif mode == "live":
-        mode_instruction += " Canlı konuşma modundasın: kısa, doğal ve konuşma diline yakın yanıt ver."
 
     # --------------------------------------------------------
     # SMART WEB DECISION
