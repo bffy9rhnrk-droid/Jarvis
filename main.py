@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "33.4.0"
+APP_VERSION = "35.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -5178,6 +5178,42 @@ async def health():
 
 
 # ============================================================
+# KARVIS LIVE / RADAR / BRAIN
+# ============================================================
+
+@app.get("/live-status")
+async def live_status():
+    return {
+        "status": "online",
+        "version": APP_VERSION,
+        "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
+        "research": True,
+        "weather": True,
+        "presentation": True,
+        "memory": True,
+    }
+
+@app.get("/radar")
+async def radar():
+    return {
+        "items": [
+            {"name": "AI Engine", "status": "ONLINE" if (GROQ_API_KEY or OPENROUTER_API_KEY) else "OFFLINE"},
+            {"name": "Web Research", "status": "ONLINE"},
+            {"name": "Weather", "status": "ONLINE"},
+            {"name": "Presentation Engine", "status": "ONLINE"},
+            {"name": "Memory Core", "status": "ONLINE"},
+        ]
+    }
+
+@app.get("/brain")
+async def brain():
+    return {
+        "version": APP_VERSION,
+        "modules": ["CHAT", "WEB RESEARCH", "MEMORY", "WEATHER", "PRESENTATION", "PROFILE ENGINE"],
+        "state": "READY"
+    }
+
+# ============================================================
 # CHAT
 # ============================================================
 
@@ -5238,6 +5274,11 @@ async def chat(
         mode_instruction = (
             f"Çalışma modu: {mode}."
         )
+
+    if mode == "investigator":
+        mode_instruction += " Dedektif modundasın: iddiaları kanıt, kaynak, zaman ve güven düzeyi açısından ayır; varsayımı gerçek gibi sunma."
+    elif mode == "live":
+        mode_instruction += " Canlı konuşma modundasın: kısa, doğal ve konuşma diline yakın yanıt ver."
 
     # --------------------------------------------------------
     # SMART WEB DECISION
