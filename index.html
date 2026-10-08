@@ -1089,6 +1089,10 @@ body.voice-speaking .ring.three{
     }
 }
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
+<meta name="theme-color" content="#050b12">
 </head>
 
 <body>
@@ -1235,6 +1239,7 @@ body.voice-speaking .ring.three{
         <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
         <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
+        <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
         <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
@@ -1396,6 +1401,27 @@ body.voice-speaking .ring.three{
 <!-- ============================================================
      ADMIN DASHBOARD MODAL
      ============================================================ -->
+<div id="adminNotificationModal" class="modal" style="max-width:760px;">
+    <h2>🔔 Bildirim Gönder</h2>
+    <div class="settings-section">
+        <label style="display:block;margin-bottom:6px;opacity:.8;">Alıcı</label>
+        <select id="notificationTarget" class="voice-select" style="width:100%;">
+            <option value="all">📢 Tüm kullanıcılar</option>
+            <option value="karahan">KARAHAN INC.</option>
+            <option value="betul">Betül</option>
+            <option value="sinem">Sinem</option>
+            <option value="ilknur">İlknur</option>
+            <option value="murat">Murat</option>
+        </select>
+    </div>
+    <input id="notificationTitle" placeholder="Bildirim başlığı" maxlength="120" value="K.A.R.V.I.S.">
+    <textarea id="notificationBody" placeholder="Göndermek istediğiniz bildirim..." maxlength="1000" style="width:100%;min-height:130px;box-sizing:border-box;"></textarea>
+    <input id="notificationUrl" placeholder="Tıklanınca açılacak adres (opsiyonel)" value="/">
+    <div id="notificationSendStatus" style="margin:10px 0;opacity:.8;"></div>
+    <button class="modal-button" onclick="sendAdminNotification()">🚀 Bildirimi Gönder</button>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
 <div id="adminStatsModal" class="modal" style="max-width:760px;">
     <h2>📊 Kullanım İstatistikleri</h2>
     <div id="adminStatsContent" class="error-list">Yükleniyor...</div>
@@ -1541,6 +1567,16 @@ body.voice-speaking .ring.three{
                 <small>Mevcut sohbet ekranını temizle</small>
             </div>
             <button class="settings-action" onclick="clearChatFromSettings()">Temizle</button>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-row">
+            <div>
+                <strong>🔔 Bildirimler</strong>
+                <small id="pushStatusText">iPhone bildirimlerini etkinleştir</small>
+            </div>
+            <button id="pushToggleButton" class="settings-action" onclick="enableKarvisPush()">Aç</button>
         </div>
     </div>
 
@@ -1917,6 +1953,7 @@ function openSettings(){
     closeSidebar();
     populateVoiceList();
     refreshSettingsUI();
+    refreshPushStatus();
     $("settingsModal").classList.add("show");
 }
 
@@ -4078,6 +4115,136 @@ async function openKarvisBrain(){
     }
 }
 
+/* ============================================================
+   WEB PUSH / IPHONE BILDIRIMLERI
+   ============================================================ */
+
+let karvisPushRegistration = null;
+
+function urlBase64ToUint8Array(base64String){
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}
+
+async function registerKarvisServiceWorker(){
+    if(!("serviceWorker" in navigator) || !("PushManager" in window)) return null;
+    if(!karvisPushRegistration){
+        karvisPushRegistration = await navigator.serviceWorker.register("/service-worker.js");
+    }
+    return karvisPushRegistration;
+}
+
+async function enableKarvisPush(){
+    if(!currentUser){
+        alert("Önce profilinize giriş yapın.");
+        return;
+    }
+    if(!window.isSecureContext){
+        alert("Bildirimler yalnızca HTTPS üzerinden kullanılabilir.");
+        return;
+    }
+    if(!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
+        alert("Bu cihaz/tarayıcı Web Push bildirimlerini desteklemiyor.");
+        return;
+    }
+    try{
+        const configResponse = await fetch(API + "/push/config");
+        const config = await configResponse.json();
+        if(!config.configured || !config.public_key){
+            alert("K.A.R.V.I.S. bildirim sunucusu henüz yapılandırılmamış.");
+            return;
+        }
+
+        // iOS'ta izin isteme işlemi kullanıcı dokunuşundan doğrudan başlatılmalıdır.
+        const permission = await Notification.requestPermission();
+        if(permission !== "granted"){
+            const st=$("pushStatusText"); if(st) st.textContent="Bildirim izni verilmedi.";
+            return;
+        }
+
+        const registration = await registerKarvisServiceWorker();
+        let subscription = await registration.pushManager.getSubscription();
+        if(!subscription){
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(config.public_key)
+            });
+        }
+
+        const response = await fetch(API + "/push/subscribe", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username:currentUser, subscription:subscription.toJSON()})
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "Abonelik kaydedilemedi.");
+
+        const st=$("pushStatusText");
+        const btn=$("pushToggleButton");
+        if(st) st.textContent="Bildirimler açık ✓";
+        if(btn){btn.textContent="Açık ✓";btn.disabled=true;}
+    }catch(error){
+        alert("Bildirim kurulamadı: " + error.message);
+    }
+}
+
+async function refreshPushStatus(){
+    const st=$("pushStatusText"), btn=$("pushToggleButton");
+    if(!st || !btn) return;
+    if(!window.isSecureContext || !("Notification" in window)){
+        st.textContent="Bu cihazda bildirim desteği yok.";
+        btn.disabled=true;
+        return;
+    }
+    if(Notification.permission === "granted"){
+        st.textContent="Bildirim izni açık. K.A.R.V.I.S. aboneliğini kontrol edin.";
+    }else if(Notification.permission === "denied"){
+        st.textContent="Bildirimler engellenmiş. iPhone Ayarları'ndan izin verin.";
+    }else{
+        st.textContent="iPhone bildirimlerini etkinleştir";
+    }
+}
+
+async function openAdminNotifications(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("adminNotificationModal").classList.add("show");
+    const status=$("notificationSendStatus");
+    status.textContent="Abonelik durumu kontrol ediliyor...";
+    try{
+        const r=await fetch(API+"/admin/push-status?username=murat");
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.detail || "Bildirim durumu alınamadı.");
+        status.textContent = d.configured
+            ? `🟢 Push hazır · ${d.total} aktif cihaz aboneliği`
+            : "🔴 Push yapılandırılmamış";
+    }catch(e){ status.textContent="Hata: "+e.message; }
+}
+
+async function sendAdminNotification(){
+    if(currentUser !== "murat") return;
+    const target=$("notificationTarget").value;
+    const title=$("notificationTitle").value.trim() || "K.A.R.V.I.S.";
+    const body=$("notificationBody").value.trim();
+    const url=$("notificationUrl").value.trim() || "/";
+    const status=$("notificationSendStatus");
+    if(!body){ alert("Bildirim mesajını yazın."); return; }
+    status.textContent="Gönderiliyor...";
+    try{
+        const r=await fetch(API+"/admin/notifications/send",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username:"murat",target,title,body,url})
+        });
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.detail || "Bildirim gönderilemedi.");
+        status.textContent=`🟢 Gönderildi · ${d.sent || 0} cihaz · ${d.removed || 0} geçersiz abonelik temizlendi.`;
+        $("notificationBody").value="";
+    }catch(e){ status.textContent="🔴 "+e.message; }
+}
+
 async function openAdminStats(){
     if(currentUser !== "murat") return;
     closeSidebar();
@@ -4272,5 +4439,6 @@ initialize();
 
 </script>
 
+<script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
