@@ -12,6 +12,7 @@ import time
 import hashlib
 import threading
 import traceback
+import random
 from datetime import datetime
 
 from pathlib import Path
@@ -150,12 +151,71 @@ def send_push_to_all(title, body, url="/"):
     total_sent = 0
     total_removed = 0
     for username in data:
-        if username == "murat":
-            continue
         result = send_push_to_user(username, title, body, url)
         total_sent += result.get("sent", 0)
         total_removed += result.get("removed", 0)
     return {"sent": total_sent, "removed": total_removed}
+
+
+# ============================================================
+# KARVIS SELF PUSH
+# ============================================================
+
+SELF_PUSH_ENABLED = os.getenv("KARVIS_SELF_PUSH_ENABLED", "true").strip().lower() in {"1", "true", "yes", "on"}
+SELF_PUSH_MIN_SECONDS = int(os.getenv("KARVIS_SELF_PUSH_MIN_SECONDS", "7200"))
+SELF_PUSH_MAX_SECONDS = int(os.getenv("KARVIS_SELF_PUSH_MAX_SECONDS", "14400"))
+_self_push_started = False
+_self_push_start_lock = threading.Lock()
+
+SELF_PUSH_MESSAGES = [
+    "Hey 👀 Ben K.A.R.V.I.S. Bir test yapmaya ne dersin? Gel beni biraz zorla.",
+    "🛰️ Hey, buradayım. K.A.R.V.I.S.'i test etmek ister misin?",
+    "🤖 Sessizlik fazla sürdü... Gel bana bir şey sor, devrelerimi çalıştır.",
+    "🔔 K.A.R.V.I.S. kontrol bildirimi: Hadi beni test et.",
+    "🧠 Sistem hazır. Bana zor bir soru sorup sınamak ister misin?",
+    "⚡ Hey! K.A.R.V.I.S. burada. Gel bakalım, bugün beni neyle test edeceksin?"
+]
+
+def karvis_self_push_worker():
+    """Bildirim izni veren kullanıcılara aralıklı K.A.R.V.I.S. bildirimi gönderir."""
+    if not SELF_PUSH_ENABLED:
+        return
+    while True:
+        try:
+            wait_seconds = random.randint(SELF_PUSH_MIN_SECONDS, max(SELF_PUSH_MIN_SECONDS, SELF_PUSH_MAX_SECONDS))
+            time.sleep(wait_seconds)
+
+            if not push_configured():
+                continue
+
+            data = get_push_subscriptions()
+            recipients = [u for u, items in data.items() if items and u in USERS]
+            if not recipients:
+                continue
+
+            body = random.choice(SELF_PUSH_MESSAGES)
+            for username in recipients:
+                send_push_to_user(
+                    username,
+                    "K.A.R.V.I.S.",
+                    body,
+                    "/"
+                )
+        except Exception:
+            save_error("K.A.R.V.I.S. self-push worker error", traceback.format_exc())
+            time.sleep(60)
+
+def start_self_push_worker():
+    global _self_push_started
+    with _self_push_start_lock:
+        if _self_push_started:
+            return
+        _self_push_started = True
+        threading.Thread(
+            target=karvis_self_push_worker,
+            name="karvis-self-push",
+            daemon=True
+        ).start()
 
 
 
@@ -6243,6 +6303,8 @@ async def startup():
     GENERATED_DIR.mkdir(
         exist_ok=True
     )
+
+    start_self_push_worker()
 
     print("=" * 65)
 
