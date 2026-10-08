@@ -23,6 +23,13 @@ from difflib import SequenceMatcher
 import requests
 
 try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+except Exception:
+    psycopg2 = None
+    RealDictCursor = None
+
+try:
     from pywebpush import webpush, WebPushException
 except Exception:
     webpush = None
@@ -67,18 +74,136 @@ push_lock = threading.Lock()
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
 VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@karahaninc.com").strip()
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+
+def push_database_configured():
+    return bool(DATABASE_URL and psycopg2)
 
 
 def push_configured():
     return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
 
 
+def get_push_db_connection():
+    if not push_database_configured():
+        return None
+    return psycopg2.connect(DATABASE_URL, connect_timeout=8, sslmode="require")
+
+
+def init_push_database():
+    if not push_database_configured():
+        return False
+    try:
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS karvis_push_subscriptions (
+                        id BIGSERIAL PRIMARY KEY,
+                        username TEXT NOT NULL,
+                        endpoint TEXT NOT NULL UNIQUE,
+                        p256dh TEXT NOT NULL,
+                        auth TEXT NOT NULL,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        last_success_at TIMESTAMPTZ NULL,
+                        last_failure_at TIMESTAMPTZ NULL,
+                        failure_count INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_karvis_push_username ON karvis_push_subscriptions(username)")
+        conn.close()
+        return True
+    except Exception:
+        save_error("Push database initialization error", traceback.format_exc())
+        return False
+
+
+def migrate_push_json_to_database():
+    if not push_database_configured():
+        return
+    try:
+        init_push_database()
+        legacy = read_json_file(PUSH_SUBSCRIPTION_FILE, {})
+        if not isinstance(legacy, dict):
+            return
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                for username, items in legacy.items():
+                    if username not in USERS or not isinstance(items, list):
+                        continue
+                    for item in items:
+                        endpoint = str(item.get("endpoint", "")).strip()
+                        keys = item.get("keys") or {}
+                        if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+                            continue
+                        cur.execute("""
+                            INSERT INTO karvis_push_subscriptions
+                                (username, endpoint, p256dh, auth)
+                            VALUES (%s, %s, %s, %s)
+                            ON CONFLICT (endpoint) DO UPDATE SET
+                                username=EXCLUDED.username,
+                                p256dh=EXCLUDED.p256dh,
+                                auth=EXCLUDED.auth,
+                                updated_at=NOW()
+                        """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+        conn.close()
+    except Exception:
+        save_error("Push subscription migration error", traceback.format_exc())
+
+
 def get_push_subscriptions():
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT username, endpoint, p256dh, auth, updated_at, last_success_at, last_failure_at, failure_count FROM karvis_push_subscriptions ORDER BY updated_at DESC")
+                rows = cur.fetchall()
+            conn.close()
+            data = {}
+            for row in rows:
+                item = dict(row)
+                item["keys"] = {"p256dh": item.pop("p256dh"), "auth": item.pop("auth")}
+                for k in ("updated_at", "last_success_at", "last_failure_at"):
+                    if item.get(k) is not None:
+                        item[k] = item[k].isoformat()
+                data.setdefault(item.pop("username"), []).append(item)
+            return data
+        except Exception:
+            save_error("Push database read error", traceback.format_exc())
     with push_lock:
         return read_json_file(PUSH_SUBSCRIPTION_FILE, {})
 
 
 def save_push_subscriptions(data):
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    for username, items in data.items():
+                        for item in items or []:
+                            endpoint = str(item.get("endpoint", "")).strip()
+                            keys = item.get("keys") or {}
+                            if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+                                continue
+                            cur.execute("""
+                                INSERT INTO karvis_push_subscriptions (username, endpoint, p256dh, auth, updated_at)
+                                VALUES (%s, %s, %s, %s, NOW())
+                                ON CONFLICT (endpoint) DO UPDATE SET
+                                    username=EXCLUDED.username,
+                                    p256dh=EXCLUDED.p256dh,
+                                    auth=EXCLUDED.auth,
+                                    updated_at=NOW()
+                            """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+            conn.close()
+            return
+        except Exception:
+            save_error("Push database write error", traceback.format_exc())
     with push_lock:
         write_json_file(PUSH_SUBSCRIPTION_FILE, data)
 
@@ -91,43 +216,96 @@ def save_push_subscription(username, subscription):
     keys = subscription.get("keys") or {}
     if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
         return False
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO karvis_push_subscriptions (username, endpoint, p256dh, auth, updated_at, failure_count)
+                        VALUES (%s, %s, %s, %s, NOW(), 0)
+                        ON CONFLICT (endpoint) DO UPDATE SET
+                            username=EXCLUDED.username,
+                            p256dh=EXCLUDED.p256dh,
+                            auth=EXCLUDED.auth,
+                            updated_at=NOW(),
+                            failure_count=0,
+                            last_failure_at=NULL
+                    """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+            conn.close()
+            return True
+        except Exception:
+            save_error("Push subscription database save error", traceback.format_exc())
     data = get_push_subscriptions()
     user_items = data.get(username, [])
     user_items = [x for x in user_items if x.get("endpoint") != endpoint]
-    user_items.append({
-        "endpoint": endpoint,
-        "keys": {"p256dh": keys.get("p256dh"), "auth": keys.get("auth")},
-        "updated_at": datetime.now().isoformat(timespec="seconds")
-    })
+    user_items.append({"endpoint": endpoint, "keys": {"p256dh": keys.get("p256dh"), "auth": keys.get("auth")}, "updated_at": datetime.now().isoformat(timespec="seconds")})
     data[username] = user_items[-10:]
     save_push_subscriptions(data)
     return True
 
 
 def remove_push_subscription(username, endpoint):
+    if push_database_configured():
+        try:
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("DELETE FROM karvis_push_subscriptions WHERE username=%s AND endpoint=%s", (username, endpoint))
+            conn.close()
+            return
+        except Exception:
+            save_error("Push subscription database delete error", traceback.format_exc())
     data = get_push_subscriptions()
     items = data.get(username, [])
     data[username] = [x for x in items if x.get("endpoint") != endpoint]
     save_push_subscriptions(data)
 
 
+def update_push_delivery(username, endpoint, success=False, failure=False):
+    if not push_database_configured():
+        return
+    try:
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                if success:
+                    cur.execute("UPDATE karvis_push_subscriptions SET last_success_at=NOW(), failure_count=0, updated_at=NOW() WHERE username=%s AND endpoint=%s", (username, endpoint))
+                elif failure:
+                    cur.execute("UPDATE karvis_push_subscriptions SET last_failure_at=NOW(), failure_count=failure_count+1 WHERE username=%s AND endpoint=%s", (username, endpoint))
+        conn.close()
+    except Exception:
+        save_error("Push delivery state update error", traceback.format_exc())
+
 def send_push_to_user(username, title, body, url="/"):
+    """Send push and aggressively clean stale subscriptions.
+
+    Push endpoints can become invalid after browser/app changes. A failed
+    send must never leave a dead endpoint looking active in the admin panel.
+    """
     if not push_configured():
-        return {"sent": 0, "removed": 0, "error": "Web Push sunucusu yapılandırılmamış."}
+        return {"sent": 0, "removed": 0, "failed": 0, "errors": ["Web Push sunucusu yapılandırılmamış."]}
+
+    username = str(username or "").strip().lower()
     data = get_push_subscriptions()
     items = list(data.get(username, []))
     sent = 0
     removed = 0
+    failed = 0
+    errors = []
+    payload = json.dumps({
+        "title": str(title or "K.A.R.V.I.S."),
+        "body": str(body or ""),
+        "url": str(url or "/")
+    }, ensure_ascii=False)
+
     for item in items:
+        endpoint = str(item.get("endpoint", "")).strip()
         subscription = {
-            "endpoint": item.get("endpoint"),
+            "endpoint": endpoint,
             "keys": item.get("keys", {})
         }
-        payload = json.dumps({
-            "title": str(title or "K.A.R.V.I.S."),
-            "body": str(body or ""),
-            "url": str(url or "/")
-        }, ensure_ascii=False)
         try:
             webpush(
                 subscription_info=subscription,
@@ -136,25 +314,37 @@ def send_push_to_user(username, title, body, url="/"):
                 vapid_claims={"sub": VAPID_CLAIMS_EMAIL}
             )
             sent += 1
+            update_push_delivery(username, endpoint, success=True)
         except Exception as e:
-            status = getattr(getattr(e, "response", None), "status_code", None)
+            response = getattr(e, "response", None)
+            status = getattr(response, "status_code", None)
+            failed += 1
+            update_push_delivery(username, endpoint, failure=True)
             if status in (404, 410):
-                remove_push_subscription(username, item.get("endpoint", ""))
+                remove_push_subscription(username, endpoint)
                 removed += 1
-            else:
-                save_error("Web Push send error", traceback.format_exc())
-    return {"sent": sent, "removed": removed}
+                continue
+
+            detail = f"HTTP {status}: {str(e)}" if status else str(e)
+            errors.append(detail[:300])
+            save_error("Web Push send error", traceback.format_exc())
+
+    return {"sent": sent, "removed": removed, "failed": failed, "errors": errors[:5]}
 
 
 def send_push_to_all(title, body, url="/"):
     data = get_push_subscriptions()
     total_sent = 0
     total_removed = 0
-    for username in data:
+    total_failed = 0
+    all_errors = []
+    for username in list(data):
         result = send_push_to_user(username, title, body, url)
         total_sent += result.get("sent", 0)
         total_removed += result.get("removed", 0)
-    return {"sent": total_sent, "removed": total_removed}
+        total_failed += result.get("failed", 0)
+        all_errors.extend(result.get("errors", []))
+    return {"sent": total_sent, "removed": total_removed, "failed": total_failed, "errors": all_errors[:10]}
 
 
 # ============================================================
@@ -786,10 +976,14 @@ async def push_unsubscribe(request: PushUnsubscribeRequest):
 async def admin_push_status(username: str = "murat"):
     require_admin(username)
     data = get_push_subscriptions()
+    total = sum(len(v) for v in data.values())
+    active_profiles = {k: len(v) for k, v in data.items() if v}
     return {
         "configured": push_configured(),
-        "profiles": {k: len(v) for k, v in data.items()},
-        "total": sum(len(v) for v in data.values())
+        "storage": "postgresql" if push_database_configured() else "json_fallback",
+        "profiles": active_profiles,
+        "total": total,
+        "database_persistent": push_database_configured()
     }
 
 
@@ -6321,6 +6515,10 @@ async def startup():
     GENERATED_DIR.mkdir(
         exist_ok=True
     )
+
+    if push_database_configured():
+        init_push_database()
+        migrate_push_json_to_database()
 
     start_self_push_worker()
 
