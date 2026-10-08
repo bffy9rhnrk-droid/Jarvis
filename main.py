@@ -39,7 +39,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "34.0.0"
+APP_VERSION = "35.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -334,6 +334,33 @@ def make_request_summary(message):
     if len(text) > 180:
         text = text[:177].rstrip() + "..."
     return text
+
+
+def feature_request_ack(username):
+    name = USERS.get(username, {}).get("name", username)
+    if username == "betul":
+        return (
+            "Aşkoo, bunu KARAHAN INC.'e bildiriyorum 💅 "
+            "En kısa sürede bu konuyu değerlendirip uygun görülürse "
+            "K.A.R.V.I.S.'e ekleyeceklerinden eminim. ✨"
+        )
+    if username == "ilknur":
+        return (
+            "Hocam, talebinizi KARAHAN INC. yönetimine bildiriyorum. "
+            "En kısa sürede değerlendirmeye alınarak uygun görülmesi hâlinde "
+            "uygulamaya dahil edilecektir."
+        )
+    if username == "sinem":
+        return (
+            "Sinem, bunu KARAHAN INC.'e bildiriyorum. "
+            "En kısa sürede bu konuyu değerlendirip uygun görülürse "
+            "uygulamayı güncelleyeceklerinden eminim. ✨"
+        )
+    return (
+        f"{name}, talebinizi KARAHAN INC.'e bildiriyorum. "
+        "En kısa sürede bu konuyu değerlendirip uygun görülmesi hâlinde "
+        "uygulamaya dahil edeceklerinden eminim."
+    )
 
 
 def save_user_request(username, original):
@@ -1521,16 +1548,27 @@ def _weather_from_wttr():
 
 
 def fetch_denizli_weather():
-    """Canlı Denizli hava durumu. Ana servis + otomatik yedek servis."""
+    """Canlı Denizli hava durumu. Open-Meteo ana servis, wttr.in yedek servis.
+
+    Ana servis geçici olarak başarısız olup yedek servis başarılıysa bunu
+    sistem hatası olarak kaydetmez; böylece admin hata ekranı gereksiz
+    Open-Meteo kayıtlarıyla dolmaz. İki servis de başarısızsa hata kaydedilir.
+    """
+    open_meteo_error = None
     try:
         return _weather_from_open_meteo()
     except Exception:
-        save_error("Open-Meteo weather error", traceback.format_exc())
+        open_meteo_error = traceback.format_exc()
 
     try:
         return _weather_from_wttr()
     except Exception:
-        save_error("wttr.in weather error", traceback.format_exc())
+        wttr_error = traceback.format_exc()
+        save_error(
+            "Weather services unavailable",
+            "Open-Meteo error:\n" + str(open_meteo_error or "") +
+            "\nwttr.in error:\n" + wttr_error
+        )
         return None
 
 
@@ -5360,7 +5398,9 @@ async def chat(
     )
 
     # Kullanıcı özellik önerisi algılama: yalnızca gerçek öneri kalıplarında kaydet.
-    save_user_request(username, message)
+    feature_request = detect_user_feature_request(message)
+    if feature_request and username not in {"karahan", "murat"}:
+        save_user_request(username, message)
 
     # Yetkili Murat, kayıtlı istekleri doğal dille sorabilir.
     admin_request_query = (
@@ -5374,6 +5414,10 @@ async def chat(
     if admin_request_query:
         answer = requests_answer_for_admin()
         return {"response": answer, "message": answer}
+
+    if feature_request and username not in {"karahan", "murat"}:
+        answer = feature_request_ack(username)
+        return {"response": answer, "message": answer, "feature_request_saved": True}
 
     # --------------------------------------------------------
     # PROFILE / MODE
@@ -5793,6 +5837,49 @@ async def new_chat():
 
 
 # ============================================================
+# ADMIN DASHBOARD API
+# ============================================================
+
+def require_admin(username):
+    if str(username or "").strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Bu alan yalnızca Murat yetkili profiline açıktır.")
+
+
+@app.get("/admin/stats")
+async def admin_stats(username: str = "murat"):
+    require_admin(username)
+    requests = get_user_requests()
+    errors = read_json_file(ERROR_FILE, [])
+    return {
+        "success": True,
+        "users": len(USERS),
+        "requests": len(requests),
+        "unread_requests": sum(1 for x in requests if not x.get("read", False)),
+        "completed_requests": sum(1 for x in requests if x.get("status") == "completed"),
+        "errors": len(errors),
+        "version": APP_VERSION,
+        "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
+    }
+
+
+@app.post("/user-requests/{request_id}/status")
+async def update_user_request_status(request_id: str, status: str, username: str = "murat"):
+    require_admin(username)
+    allowed = {"new", "read", "reviewing", "planned", "completed", "rejected"}
+    if status not in allowed:
+        raise HTTPException(status_code=400, detail="Geçersiz durum.")
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        for item in data:
+            if item.get("id") == request_id:
+                item["status"] = status
+                item["read"] = True
+                write_json_file(REQUEST_FILE, data)
+                return {"success": True, "request": item}
+    raise HTTPException(status_code=404, detail="İstek bulunamadı.")
+
+
+# ============================================================
 # ERRORS
 # ============================================================
 
@@ -5807,6 +5894,83 @@ async def errors():
                 []
             )
     }
+
+
+# ============================================================
+# ADMIN ERROR CENTER
+# ============================================================
+
+def get_error_items():
+    data = read_json_file(ERROR_FILE, [])
+    for item in data:
+        item.setdefault("id", uuid.uuid4().hex)
+        item.setdefault("status", "open")
+    return data
+
+
+@app.get("/admin/errors")
+async def admin_errors(username: str = "murat"):
+    require_admin(username)
+    data = get_error_items()
+    # ID'leri kalıcılaştır. Eski errors.json kayıtları da panelde yönetilebilir.
+    with error_lock:
+        write_json_file(ERROR_FILE, data)
+    return {
+        "success": True,
+        "errors": data,
+        "open": sum(1 for x in data if x.get("status") != "resolved"),
+        "resolved": sum(1 for x in data if x.get("status") == "resolved")
+    }
+
+
+@app.post("/admin/errors/{error_id}/resolve")
+async def resolve_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    with error_lock:
+        data = get_error_items()
+        for item in data:
+            if item.get("id") == error_id:
+                item["status"] = "resolved"
+                item["resolved_at"] = datetime.now().isoformat(timespec="seconds")
+                write_json_file(ERROR_FILE, data)
+                return {"success": True, "error": item}
+    raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+
+@app.post("/admin/errors/{error_id}/reopen")
+async def reopen_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    with error_lock:
+        data = get_error_items()
+        for item in data:
+            if item.get("id") == error_id:
+                item["status"] = "open"
+                item.pop("resolved_at", None)
+                write_json_file(ERROR_FILE, data)
+                return {"success": True, "error": item}
+    raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+
+@app.post("/admin/errors/{error_id}/analyze")
+async def analyze_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    data = get_error_items()
+    target = next((x for x in data if x.get("id") == error_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+    prompt = (
+        "K.A.R.V.I.S. sistem yöneticisi için aşağıdaki hata kaydını analiz et. "
+        "Türkçe ve kısa yanıt ver. Şu başlıkları kullan: Muhtemel neden, Etki, "
+        "Önerilen çözüm, Öncelik. Bilmediğin şeyi kesinmiş gibi söyleme.\n\n"
+        f"Hata zamanı: {target.get('time','')}\n"
+        f"Hata: {target.get('error', target.get('message',''))}\n"
+        f"Detay: {target.get('details','')}"
+    )
+    analysis = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True)
+    if not analysis:
+        analysis = "AI hata analizi şu anda kullanılamıyor. Hata kaydının ayrıntılarını manuel olarak inceleyin."
+    return {"success": True, "analysis": analysis}
 
 
 # ============================================================
