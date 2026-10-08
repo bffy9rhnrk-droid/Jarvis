@@ -4183,6 +4183,7 @@ async function enableKarvisPush(){
 
         const st=$("pushStatusText");
         const btn=$("pushToggleButton");
+        localStorage.setItem("karvis_push_enabled", "true");
         if(st) st.textContent="Bildirimler açık ✓";
         if(btn){btn.textContent="Açık ✓";btn.disabled=true;}
     }catch(error){
@@ -4193,18 +4194,46 @@ async function enableKarvisPush(){
 async function refreshPushStatus(){
     const st=$("pushStatusText"), btn=$("pushToggleButton");
     if(!st || !btn) return;
+
     if(!window.isSecureContext || !("Notification" in window)){
         st.textContent="Bu cihazda bildirim desteği yok.";
+        btn.textContent="Desteklenmiyor";
         btn.disabled=true;
         return;
     }
-    if(Notification.permission === "granted"){
-        st.textContent="Bildirim izni açık. K.A.R.V.I.S. aboneliğini kontrol edin.";
-    }else if(Notification.permission === "denied"){
+
+    if(Notification.permission === "denied"){
         st.textContent="Bildirimler engellenmiş. iPhone Ayarları'ndan izin verin.";
-    }else{
-        st.textContent="iPhone bildirimlerini etkinleştir";
+        btn.textContent="Engelli";
+        btn.disabled=true;
+        return;
     }
+
+    if(Notification.permission === "granted"){
+        try{
+            const registration = await registerKarvisServiceWorker();
+            const subscription = registration
+                ? await registration.pushManager.getSubscription()
+                : null;
+
+            if(subscription){
+                localStorage.setItem("karvis_push_enabled", "true");
+                st.textContent="Bildirimler açık ✓";
+                btn.textContent="Açık ✓";
+                btn.disabled=true;
+                return;
+            }
+        }catch(e){}
+
+        st.textContent="Bildirim izni açık. K.A.R.V.I.S. aboneliğini etkinleştirin.";
+        btn.textContent="Aç";
+        btn.disabled=false;
+        return;
+    }
+
+    st.textContent="iPhone bildirimlerini etkinleştir";
+    btn.textContent="Aç";
+    btn.disabled=false;
 }
 
 async function openAdminNotifications(){
