@@ -21,6 +21,12 @@ from difflib import SequenceMatcher
 
 import requests
 
+try:
+    from pywebpush import webpush, WebPushException
+except Exception:
+    webpush = None
+    WebPushException = Exception
+
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -49,6 +55,108 @@ GENERATED_DIR.mkdir(
 )
 
 INDEX_FILE = BASE_DIR / "index.html"
+
+# ============================================================
+# WEB PUSH
+# ============================================================
+
+PUSH_SUBSCRIPTION_FILE = BASE_DIR / "push_subscriptions.json"
+push_lock = threading.Lock()
+
+VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
+VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@karahaninc.com").strip()
+
+
+def push_configured():
+    return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
+
+
+def get_push_subscriptions():
+    with push_lock:
+        return read_json_file(PUSH_SUBSCRIPTION_FILE, {})
+
+
+def save_push_subscriptions(data):
+    with push_lock:
+        write_json_file(PUSH_SUBSCRIPTION_FILE, data)
+
+
+def save_push_subscription(username, subscription):
+    username = str(username or "").strip().lower()
+    if username not in USERS or not isinstance(subscription, dict):
+        return False
+    endpoint = str(subscription.get("endpoint", "")).strip()
+    keys = subscription.get("keys") or {}
+    if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+        return False
+    data = get_push_subscriptions()
+    user_items = data.get(username, [])
+    user_items = [x for x in user_items if x.get("endpoint") != endpoint]
+    user_items.append({
+        "endpoint": endpoint,
+        "keys": {"p256dh": keys.get("p256dh"), "auth": keys.get("auth")},
+        "updated_at": datetime.now().isoformat(timespec="seconds")
+    })
+    data[username] = user_items[-10:]
+    save_push_subscriptions(data)
+    return True
+
+
+def remove_push_subscription(username, endpoint):
+    data = get_push_subscriptions()
+    items = data.get(username, [])
+    data[username] = [x for x in items if x.get("endpoint") != endpoint]
+    save_push_subscriptions(data)
+
+
+def send_push_to_user(username, title, body, url="/"):
+    if not push_configured():
+        return {"sent": 0, "removed": 0, "error": "Web Push sunucusu yapılandırılmamış."}
+    data = get_push_subscriptions()
+    items = list(data.get(username, []))
+    sent = 0
+    removed = 0
+    for item in items:
+        subscription = {
+            "endpoint": item.get("endpoint"),
+            "keys": item.get("keys", {})
+        }
+        payload = json.dumps({
+            "title": str(title or "K.A.R.V.I.S."),
+            "body": str(body or ""),
+            "url": str(url or "/")
+        }, ensure_ascii=False)
+        try:
+            webpush(
+                subscription_info=subscription,
+                data=payload,
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims={"sub": VAPID_CLAIMS_EMAIL}
+            )
+            sent += 1
+        except Exception as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status in (404, 410):
+                remove_push_subscription(username, item.get("endpoint", ""))
+                removed += 1
+            else:
+                save_error("Web Push send error", traceback.format_exc())
+    return {"sent": sent, "removed": removed}
+
+
+def send_push_to_all(title, body, url="/"):
+    data = get_push_subscriptions()
+    total_sent = 0
+    total_removed = 0
+    for username in data:
+        if username == "murat":
+            continue
+        result = send_push_to_user(username, title, body, url)
+        total_sent += result.get("sent", 0)
+        total_removed += result.get("removed", 0)
+    return {"sent": total_sent, "removed": total_removed}
+
 
 
 app = FastAPI(
@@ -294,6 +402,21 @@ class UserRequestCreate(BaseModel):
     username: str
     original: str
     summary: str = ""
+
+
+class PushSubscribeRequest(BaseModel):
+
+    username: str
+    subscription: dict
+
+
+class AdminNotificationRequest(BaseModel):
+
+    username: str = "murat"
+    target: str = "all"
+    title: str = "K.A.R.V.I.S."
+    body: str
+    url: str = "/"
 
 
 # ============================================================
@@ -555,6 +678,61 @@ async def delete_user_request(request_id: str, username: str = "murat"):
             raise HTTPException(status_code=404, detail="İstek bulunamadı.")
         write_json_file(REQUEST_FILE, new_data)
     return {"success": True}
+
+
+# ============================================================
+# WEB PUSH API
+# ============================================================
+
+@app.get("/push/config")
+async def push_config():
+    return {
+        "configured": push_configured(),
+        "public_key": VAPID_PUBLIC_KEY if push_configured() else ""
+    }
+
+
+@app.post("/push/subscribe")
+async def push_subscribe(request: PushSubscribeRequest):
+    username = str(request.username or "").strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz profil.")
+    if not push_configured():
+        raise HTTPException(status_code=503, detail="Web Push henüz yapılandırılmamış.")
+    if not save_push_subscription(username, request.subscription):
+        raise HTTPException(status_code=400, detail="Geçersiz push aboneliği.")
+    return {"success": True, "message": "Bildirim aboneliği kaydedildi."}
+
+
+@app.get("/admin/push-status")
+async def admin_push_status(username: str = "murat"):
+    require_admin(username)
+    data = get_push_subscriptions()
+    return {
+        "configured": push_configured(),
+        "profiles": {k: len(v) for k, v in data.items()},
+        "total": sum(len(v) for v in data.values())
+    }
+
+
+@app.post("/admin/notifications/send")
+async def admin_send_notification(request: AdminNotificationRequest):
+    require_admin(request.username)
+    title = str(request.title or "K.A.R.V.I.S.").strip()[:120]
+    body = str(request.body or "").strip()[:1000]
+    target = str(request.target or "all").strip().lower()
+    url = str(request.url or "/").strip()[:500]
+    if not body:
+        raise HTTPException(status_code=400, detail="Bildirim mesajı boş olamaz.")
+    if target != "all" and target not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz hedef profil.")
+    if target == "all":
+        result = send_push_to_all(title, body, url)
+    else:
+        result = send_push_to_user(target, title, body, url)
+    if not push_configured():
+        raise HTTPException(status_code=503, detail="Web Push yapılandırılmamış. Render ortam değişkenlerini ekleyin.")
+    return {"success": True, "target": target, **result}
 
 
 # ============================================================
@@ -5334,6 +5512,38 @@ async def home():
     return FileResponse(
         INDEX_FILE
     )
+
+
+@app.get("/service-worker.js")
+async def service_worker():
+    file = BASE_DIR / "service-worker.js"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="Service worker bulunamadı.")
+    return FileResponse(file, media_type="application/javascript")
+
+
+@app.get("/manifest.json")
+async def manifest():
+    file = BASE_DIR / "manifest.json"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="Manifest bulunamadı.")
+    return FileResponse(file, media_type="application/manifest+json")
+
+
+@app.get("/icon-192.png")
+async def icon_192():
+    file = BASE_DIR / "icon-192.png"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="İkon bulunamadı.")
+    return FileResponse(file, media_type="image/png")
+
+
+@app.get("/icon-512.png")
+async def icon_512():
+    file = BASE_DIR / "icon-512.png"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="İkon bulunamadı.")
+    return FileResponse(file, media_type="image/png")
 
 
 # ============================================================
