@@ -1194,6 +1194,23 @@ body.voice-speaking .ring.three{
     </div>
 
     <!-- ========================================================
+         SADECE KARAHAN - K.A.R.V.I.S. CORE
+         ======================================================== -->
+
+    <div
+        id="karahanCoreMenu"
+        style="display:none;">
+
+        <div class="academic-title">
+            ◈ K.A.R.V.I.S. CORE
+        </div>
+
+        <button class="menu-item" onclick="setCoreMode('investigator')">🕵️ Dedektif Modu</button>
+        <button class="menu-item" onclick="setCoreMode('live')">🎙️ Canlı Konuşma</button>
+
+    </div>
+
+    <!-- ========================================================
          SADECE MURAT - YETKİLİ / ADMIN
          ======================================================== -->
 
@@ -1320,6 +1337,28 @@ body.voice-speaking .ring.three{
         Vazgeç
     </button>
 
+</div>
+
+<!-- ============================================================
+     K.A.R.V.I.S. CORE MODALS
+     ============================================================ -->
+
+<div id="karvisLiveModal" class="modal" style="max-width:760px;">
+    <h2>🛰️ K.A.R.V.I.S. LIVE</h2>
+    <div id="karvisLiveContent" class="error-list">Bağlantı kontrol ediliyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<div id="karvisRadarModal" class="modal" style="max-width:760px;">
+    <h2>📡 Sistem Radarı</h2>
+    <div id="karvisRadarContent" class="error-list">Tarama yapılıyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<div id="karvisBrainModal" class="modal" style="max-width:760px;">
+    <h2>🧠 Sistem Beyni</h2>
+    <div id="karvisBrainContent" class="error-list">Sistem durumu okunuyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
 <!-- ============================================================
@@ -2206,9 +2245,15 @@ function updateSidebar(){
     const funButton = $("funButton");
     const betulMenu = $("betulMenu");
     const adminMenu = $("adminMenu");
+    const karahanCoreMenu = $("karahanCoreMenu");
 
     teacherMenu.style.display =
         currentUser === "ilknur" ? "block" : "none";
+
+    if(karahanCoreMenu){
+        karahanCoreMenu.style.display =
+            currentUser === "karahan" ? "block" : "none";
+    }
 
     funButton.style.display =
         currentUser === "betul" || currentUser === "ilknur" || currentUser === "murat"
@@ -3956,6 +4001,85 @@ async function newChat(){
     showGreeting();
 }
 
+function setCoreMode(mode){
+    if(currentUser !== "karahan") return;
+
+    if(mode !== "investigator" && mode !== "live") return;
+
+    currentMode = mode;
+    localStorage.setItem("karvis_mode", currentMode);
+    closeSidebar();
+    addMessage(
+        mode === "investigator"
+            ? "🕵️ Dedektif Modu aktif. İddiaları kanıt, kaynak, zaman ve güven düzeyi açısından değerlendireceğim."
+            : "🎙️ Canlı Konuşma modu aktif. Daha kısa, doğal ve konuşma diline yakın yanıt vereceğim.",
+        "ai"
+    );
+    updateStatus();
+}
+
+async function openKarvisLive(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("karvisLiveModal").classList.add("show");
+    const box=$("karvisLiveContent");
+    box.textContent="Bağlantı kontrol ediliyor...";
+    try{
+        const r=await fetch(API+"/live-status");
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.detail || "LIVE durumu alınamadı.");
+        box.innerHTML=`
+            <p>🟢 <strong>Durum:</strong> ONLINE</p>
+            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "-")}</p>
+            <p>🧠 <strong>AI:</strong> ${escapeHTML(d.ai || "offline")}</p>
+            <p>🌐 <strong>Web araştırma:</strong> ${d.research ? "ONLINE" : "OFFLINE"}</p>
+            <p>🌤️ <strong>Hava durumu:</strong> ${d.weather ? "ONLINE" : "OFFLINE"}</p>
+            <p>📊 <strong>Sunum:</strong> ${d.presentation ? "ONLINE" : "OFFLINE"}</p>
+            <p>🧠 <strong>Hafıza:</strong> ${d.memory ? "ONLINE" : "OFFLINE"}</p>`;
+    }catch(e){
+        box.textContent="LIVE bağlantısı alınamadı: "+e.message;
+    }
+}
+
+async function openKarvisRadar(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("karvisRadarModal").classList.add("show");
+    const box=$("karvisRadarContent");
+    box.textContent="Sistemler taranıyor...";
+    try{
+        const r=await fetch(API+"/radar");
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.detail || "Radar verisi alınamadı.");
+        const items=d.items || [];
+        box.innerHTML=items.length
+            ? items.map(x=>`<p>${x.status === "ONLINE" ? "🟢" : "🔴"} <strong>${escapeHTML(x.name || "Sistem")}</strong> — ${escapeHTML(x.status || "UNKNOWN")}</p>`).join("")
+            : "Radar verisi bulunamadı.";
+    }catch(e){
+        box.textContent="Sistem radarı alınamadı: "+e.message;
+    }
+}
+
+async function openKarvisBrain(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("karvisBrainModal").classList.add("show");
+    const box=$("karvisBrainContent");
+    box.textContent="Sistem durumu okunuyor...";
+    try{
+        const r=await fetch(API+"/brain");
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.detail || "Beyin durumu alınamadı.");
+        box.innerHTML=`
+            <p>🟢 <strong>Durum:</strong> ${escapeHTML(d.state || "UNKNOWN")}</p>
+            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "-")}</p>
+            <p>🧩 <strong>Modüller:</strong></p>
+            <div>${(d.modules || []).map(x=>`<span style="display:inline-block;margin:4px;padding:6px 9px;border:1px solid rgba(0,220,255,.22);border-radius:8px;">${escapeHTML(x)}</span>`).join("")}</div>`;
+    }catch(e){
+        box.textContent="Sistem beyni alınamadı: "+e.message;
+    }
+}
+
 async function openAdminStats(){
     if(currentUser !== "murat") return;
     closeSidebar();
@@ -4111,7 +4235,8 @@ function initialize(){
             "karahan",
             "betul",
             "sinem",
-            "ilknur"
+            "ilknur",
+            "murat"
         ].includes(savedUser)
     ){
 
@@ -4126,7 +4251,9 @@ function initialize(){
                     "karvis_mode"
                 ) || "lesson"
             )
-            : "normal";
+            : currentUser === "karahan"
+                ? (localStorage.getItem("karvis_mode") || "normal")
+                : "normal";
 
     applyUserTheme();
 
