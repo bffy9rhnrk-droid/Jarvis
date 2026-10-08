@@ -1162,6 +1162,18 @@ body.voice-speaking .ring.three{
     </button>
 
     <!-- ========================================================
+         K.A.R.V.I.S. CORE TOOLS
+         ======================================================== -->
+    <div id="karvisCoreTools" style="margin-top:14px;">
+        <div class="academic-title">K.A.R.V.I.S. CORE</div>
+        <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
+        <button class="menu-item" onclick="openKarvisRadar()">📡 Sistem Radarı</button>
+        <button class="menu-item" onclick="openKarvisBrain()">🧠 Brain / Sistem Durumu</button>
+        <button class="menu-item" onclick="activateInvestigator()">🕵️ Dedektif Modu</button>
+        <button class="menu-item" onclick="activateLiveConversation()">🎙️ Canlı Konuşma</button>
+    </div>
+
+    <!-- ========================================================
          SADECE BETÜL
          ======================================================== -->
 
@@ -3996,6 +4008,58 @@ function initialize(){
 
 initialize();
 
+/* ============================================================
+   K.A.R.V.I.S. CORE TOOLS v35
+   ============================================================ */
+async function karvisCoreFetch(path){
+    try{
+        const r=await fetch(API+path);
+        return await r.json();
+    }catch(e){ return null; }
+}
+
+function openKarvisLive(){
+    closeSidebar();
+    addMessage("🛰️ K.A.R.V.I.S. LIVE paneli açılıyor...", "ai");
+    karvisCoreFetch("/live-status").then(d=>{
+        if(!d) return addMessage("LIVE bağlantısı alınamadı.","ai");
+        addMessage(`🛰️ LIVE STATUS\nAI: ${d.ai}\nAraştırma: ${d.research?"ONLINE":"OFFLINE"}\nHava: ${d.weather?"ONLINE":"OFFLINE"}\nSunum: ${d.presentation?"ONLINE":"OFFLINE"}\nHafıza: ${d.memory?"ONLINE":"OFFLINE"}`,"ai");
+    });
+}
+
+function openKarvisRadar(){
+    closeSidebar();
+    karvisCoreFetch("/radar").then(d=>{
+        if(!d) return addMessage("📡 Sistem radarı yanıt vermedi.","ai");
+        const lines=(d.items||[]).map(x=>`${x.status==="ONLINE"?"🟢":"🔴"} ${x.name}: ${x.status}`).join("\n");
+        addMessage("📡 K.A.R.V.I.S. SİSTEM RADARI\n"+lines,"ai");
+    });
+}
+
+function openKarvisBrain(){
+    closeSidebar();
+    karvisCoreFetch("/brain").then(d=>{
+        if(!d) return addMessage("🧠 Brain modülü yanıt vermedi.","ai");
+        addMessage("🧠 BRAIN CORE\nDurum: "+d.state+"\nSürüm: "+d.version+"\nModüller: "+(d.modules||[]).join(" • "),"ai");
+    });
+}
+
+function activateInvestigator(){
+    currentMode="investigator";
+    localStorage.setItem("karvis_mode",currentMode);
+    closeSidebar();
+    updateStatus();
+    addMessage("🕵️ Dedektif Modu aktif. İddiaları kanıt, kaynak ve güven düzeyi üzerinden inceleyeceğim.","ai");
+}
+
+function activateLiveConversation(){
+    currentMode="live";
+    localStorage.setItem("karvis_mode",currentMode);
+    closeSidebar();
+    updateStatus();
+    if(speechSupported && $("messageInput")) $("messageInput").focus();
+    addMessage("🎙️ Canlı Konuşma modu aktif. Kısa ve doğal yanıt vereceğim. Sesli yanıt için Ses ayarını açık tut.","ai");
+}
 </script>
 
 </body>
