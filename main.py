@@ -389,7 +389,6 @@ def save_user_request(username, original):
             "summary": make_request_summary(original),
             "created_at": datetime.now().isoformat(timespec="seconds"),
             "read": False,
-            "status": "new",
             "priority": "normal"
         }
         data.append(item)
@@ -398,8 +397,31 @@ def save_user_request(username, original):
 
 
 def get_user_requests():
+    """Return only genuine user feature requests.
+
+    Older versions could accidentally save the Betül system prompt instead of
+    the user message. Those malformed records are ignored and removed.
+    """
     with request_lock:
-        return read_json_file(REQUEST_FILE, [])
+        data = read_json_file(REQUEST_FILE, [])
+        clean = []
+        changed = False
+        for item in data:
+            original = str(item.get("original", "")).strip()
+            normalized = normalize_request_text(original)
+            looks_like_system_prompt = (
+                normalized.startswith("sen k.a.r.v.i.s.")
+                or "betül karakteri:" in normalized
+                or "kullanıcının mesajı:" in normalized and "sen k.a.r.v.i.s." in normalized
+            )
+            if looks_like_system_prompt:
+                changed = True
+                continue
+            item.pop("status", None)
+            clean.append(item)
+        if changed or len(clean) != len(data):
+            write_json_file(REQUEST_FILE, clean[-500:])
+        return clean[-500:]
 
 
 def requests_answer_for_admin():
@@ -516,7 +538,7 @@ async def mark_user_request_read(request_id: str, username: str = "murat"):
         for item in data:
             if item.get("id") == request_id:
                 item["read"] = True
-                item["status"] = "read"
+                item.pop("status", None)
                 write_json_file(REQUEST_FILE, data)
                 return {"success": True}
     raise HTTPException(status_code=404, detail="İstek bulunamadı.")
@@ -5901,28 +5923,10 @@ async def admin_stats(username: str = "murat"):
         "users": len(USERS),
         "requests": len(requests),
         "unread_requests": sum(1 for x in requests if not x.get("read", False)),
-        "completed_requests": sum(1 for x in requests if x.get("status") == "completed"),
         "errors": len(errors),
         "version": APP_VERSION,
         "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
     }
-
-
-@app.post("/user-requests/{request_id}/status")
-async def update_user_request_status(request_id: str, status: str, username: str = "murat"):
-    require_admin(username)
-    allowed = {"new", "read", "reviewing", "planned", "completed", "rejected"}
-    if status not in allowed:
-        raise HTTPException(status_code=400, detail="Geçersiz durum.")
-    with request_lock:
-        data = read_json_file(REQUEST_FILE, [])
-        for item in data:
-            if item.get("id") == request_id:
-                item["status"] = status
-                item["read"] = True
-                write_json_file(REQUEST_FILE, data)
-                return {"success": True, "request": item}
-    raise HTTPException(status_code=404, detail="İstek bulunamadı.")
 
 
 # ============================================================
