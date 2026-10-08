@@ -4128,48 +4128,29 @@ function urlBase64ToUint8Array(base64String){
     return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }
 
-async function registerKarvisServiceWorker(){
-    if(!("serviceWorker" in navigator) || !("PushManager" in window)) return null;
-    if(!karvisPushRegistration){
-        karvisPushRegistration = await navigator.serviceWorker.register("/service-worker.js");
-    }
-    return karvisPushRegistration;
-}
+let karvisPushSyncTimer = null;
+let karvisPushSyncRunning = false;
 
-async function enableKarvisPush(){
-    if(!currentUser){
-        alert("Önce profilinize giriş yapın.");
-        return;
-    }
-    if(!window.isSecureContext){
-        alert("Bildirimler yalnızca HTTPS üzerinden kullanılabilir.");
-        return;
-    }
-    if(!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
-        alert("Bu cihaz/tarayıcı Web Push bildirimlerini desteklemiyor.");
-        return;
-    }
+async function syncKarvisPushSubscription(silent=true){
+    if(!currentUser || !window.isSecureContext || !("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+    if(Notification.permission !== "granted") return false;
+    if(karvisPushSyncRunning) return false;
+    karvisPushSyncRunning = true;
     try{
-        const configResponse = await fetch(API + "/push/config");
+        const configResponse = await fetch(API + "/push/config", {cache:"no-store"});
         const config = await configResponse.json();
-        if(!config.configured || !config.public_key){
-            alert("K.A.R.V.I.S. bildirim sunucusu henüz yapılandırılmamış.");
-            return;
-        }
-
-        // iOS'ta izin isteme işlemi kullanıcı dokunuşundan doğrudan başlatılmalıdır.
-        const permission = await Notification.requestPermission();
-        if(permission !== "granted"){
-            const st=$("pushStatusText"); if(st) st.textContent="Bildirim izni verilmedi.";
-            return;
-        }
+        if(!config.configured || !config.public_key) return false;
 
         const registration = await registerKarvisServiceWorker();
+        if(!registration) return false;
         let subscription = await registration.pushManager.getSubscription();
+
+        // Mevcut abonelik varsa tekrar subscribe etmeyiz; yalnızca sunucuya
+        // yeniden kaydederek Render yeniden başlatmalarında senkronu onarırız.
         if(!subscription){
             subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(config.public_key)
+                userVisibleOnly:true,
+                applicationServerKey:urlBase64ToUint8Array(config.public_key)
             });
         }
 
@@ -4179,18 +4160,64 @@ async function enableKarvisPush(){
             body:JSON.stringify({username:currentUser, subscription:subscription.toJSON()})
         });
         const data = await response.json();
-        if(!response.ok) throw new Error(data.detail || "Abonelik kaydedilemedi.");
+        if(!response.ok) throw new Error(data.detail || "Push aboneliği senkronize edilemedi.");
 
-        const st=$("pushStatusText");
-        const btn=$("pushToggleButton");
         localStorage.setItem("karvis_push_enabled", "true");
-        if(st) st.textContent="Bildirimler açık ✓";
-        if(btn){btn.textContent="Kapat";btn.disabled=false;}
+        return true;
+    }catch(error){
+        if(!silent) throw error;
+        return false;
+    }finally{
+        karvisPushSyncRunning = false;
+    }
+}
+
+function startKarvisPushAutoSync(){
+    if(karvisPushSyncTimer) clearInterval(karvisPushSyncTimer);
+    // Uygulama açık kaldığı sürece aboneliği periyodik olarak sunucuya tazeler.
+    karvisPushSyncTimer = setInterval(() => syncKarvisPushSubscription(true), 15 * 60 * 1000);
+    window.addEventListener("focus", () => syncKarvisPushSubscription(true));
+    window.addEventListener("pageshow", () => syncKarvisPushSubscription(true));
+    document.addEventListener("visibilitychange", () => {
+        if(document.visibilityState === "visible") syncKarvisPushSubscription(true);
+    });
+}
+
+async function registerKarvisServiceWorker(){
+    if(!("serviceWorker" in navigator) || !("PushManager" in window)) return null;
+    if(!karvisPushRegistration){
+        karvisPushRegistration = await navigator.serviceWorker.register("/service-worker.js");
+    }
+    return karvisPushRegistration;
+}
+
+async function enableKarvisPush(){
+    if(!currentUser){ alert("Önce profilinize giriş yapın."); return; }
+    if(!window.isSecureContext){ alert("Bildirimler yalnızca HTTPS üzerinden kullanılabilir."); return; }
+    if(!( "Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
+        alert("Bu cihaz/tarayıcı Web Push bildirimlerini desteklemiyor."); return;
+    }
+    try{
+        const configResponse = await fetch(API + "/push/config", {cache:"no-store"});
+        const config = await configResponse.json();
+        if(!config.configured || !config.public_key){
+            alert("K.A.R.V.I.S. bildirim sunucusu henüz yapılandırılmamış."); return;
+        }
+        const permission = Notification.permission === "granted"
+            ? "granted"
+            : await Notification.requestPermission();
+        if(permission !== "granted"){
+            const st=$("pushStatusText"); if(st) st.textContent="Bildirim izni verilmedi.";
+            return;
+        }
+        const ok = await syncKarvisPushSubscription(false);
+        if(!ok) throw new Error("Push aboneliği oluşturulamadı.");
+        await refreshPushStatus();
+        startKarvisPushAutoSync();
     }catch(error){
         alert("Bildirim kurulamadı: " + error.message);
     }
 }
-
 async function refreshPushStatus(){
     const st=$("pushStatusText"), btn=$("pushToggleButton");
     if(!st || !btn) return;
@@ -4262,6 +4289,14 @@ async function toggleKarvisPush(){
     }
 }
 
+
+// Uygulama her açıldığında sunucu ile push aboneliğini sessizce eşitle.
+// Böylece Render yeniden başlasa bile kullanıcı tekrar "Kapat/Aç" yapmak zorunda kalmaz.
+setTimeout(() => {
+    startKarvisPushAutoSync();
+    syncKarvisPushSubscription(true);
+}, 1200);
+
 async function openAdminNotifications(){
     if(currentUser !== "murat") return;
     closeSidebar();
@@ -4295,7 +4330,9 @@ async function sendAdminNotification(){
         });
         const d=await r.json();
         if(!r.ok) throw new Error(d.detail || "Bildirim gönderilemedi.");
-        status.textContent=`🟢 Gönderildi · ${d.sent || 0} cihaz · ${d.removed || 0} geçersiz abonelik temizlendi.`;
+        status.textContent = d.sent > 0
+            ? `🟢 Gönderildi · ${d.sent} cihaz · ${d.removed || 0} geçersiz abonelik temizlendi.`
+            : `🔴 Gönderilemedi · ${d.removed || 0} geçersiz abonelik temizlendi · ${d.failed || 0} hata. ${d.errors?.[0] || "Kullanıcı uygulamayı yeniden açtığında abonelik otomatik eşitlenecek."}`;
         $("notificationBody").value="";
     }catch(e){ status.textContent="🔴 "+e.message; }
 }
