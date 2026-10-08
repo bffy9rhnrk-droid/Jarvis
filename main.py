@@ -470,6 +470,12 @@ class PushSubscribeRequest(BaseModel):
     subscription: dict
 
 
+class PushUnsubscribeRequest(BaseModel):
+
+    username: str
+    endpoint: str
+
+
 class AdminNotificationRequest(BaseModel):
 
     username: str = "murat"
@@ -762,6 +768,18 @@ async def push_subscribe(request: PushSubscribeRequest):
     if not save_push_subscription(username, request.subscription):
         raise HTTPException(status_code=400, detail="Geçersiz push aboneliği.")
     return {"success": True, "message": "Bildirim aboneliği kaydedildi."}
+
+
+@app.post("/push/unsubscribe")
+async def push_unsubscribe(request: PushUnsubscribeRequest):
+    username = str(request.username or "").strip().lower()
+    endpoint = str(request.endpoint or "").strip()
+    if username not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz profil.")
+    if not endpoint:
+        raise HTTPException(status_code=400, detail="Push endpoint boş olamaz.")
+    remove_push_subscription(username, endpoint)
+    return {"success": True, "message": "Bildirim aboneliği kapatıldı."}
 
 
 @app.get("/admin/push-status")
