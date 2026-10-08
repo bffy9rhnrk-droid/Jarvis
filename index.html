@@ -1202,15 +1202,16 @@ body.voice-speaking .ring.three{
         style="display:none;">
 
         <div class="academic-title">
-            YETKİLİ / ADMIN
+            👑 YETKİLİ MERKEZİ
         </div>
 
-        <button
-            class="menu-item"
-            onclick="openUserRequests()">
-            📋 Kullanıcı İstekleri
-            <span id="requestBadge" style="float:right;display:none;">🔴</span>
-        </button>
+        <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
+        <button class="menu-item" onclick="openKarvisRadar()">📡 Sistem Radarı</button>
+        <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
+        <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
+        <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
+        <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
+        <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
 
     </div>
 
@@ -1345,22 +1346,45 @@ body.voice-speaking .ring.three{
 </div>
 
 <!-- ============================================================
+     ADMIN DASHBOARD MODAL
+     ============================================================ -->
+<div id="adminStatsModal" class="modal" style="max-width:760px;">
+    <h2>📊 Kullanım İstatistikleri</h2>
+    <div id="adminStatsContent" class="error-list">Yükleniyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<div id="developmentMemoryModal" class="modal" style="max-width:760px;">
+    <h2>💡 Geliştirme Hafızası</h2>
+    <div class="error-list">
+        <p>🔴 <strong>YÜKSEK ÖNCELİK</strong></p>
+        <p>• Kullanıcı isteklerinin yönetimi</p>
+        <p>• Sistem hata takibi</p>
+        <p>🟡 <strong>PLANLANAN</strong></p>
+        <p>• Kullanıcı istatistiklerinin genişletilmesi</p>
+        <p>• Geliştirme görevlerinin durum takibi</p>
+        <p>🟢 <strong>AKTİF</strong></p>
+        <p>• Profil sistemi • Akademik Mod • Betül Eğlence Merkezi • Dedektif Modu • Canlı Konuşma</p>
+    </div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<!-- ============================================================
      ERROR MODAL
      ============================================================ -->
 
 <div
     id="errorModal"
-    class="modal">
+    class="modal"
+    style="max-width:860px;">
 
-    <h2>
-        Hatalar
-    </h2>
+    <h2>🚨 Sistem Hata Merkezi</h2>
+    <div id="errorSummary" class="error-list">Yükleniyor...</div>
+    <div id="errorContent" class="error-list" style="margin-top:12px;">Yükleniyor...</div>
 
-    <div
-        id="errorContent"
-        class="error-list">
-        Yükleniyor...
-    </div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+
+</div>
 
     <button
         class="modal-button secondary-button"
@@ -2271,7 +2295,10 @@ async function openUserRequests(){
                 <div style="margin-top:6px;"><strong>İstek:</strong> ${escapeHTML(item.summary || item.original || "")}</div>
                 <div style="margin-top:5px;opacity:.75;"><strong>Orijinal:</strong> ${escapeHTML(item.original || "")}</div>
                 <div style="margin-top:8px;display:flex;gap:8px;">
-                    ${item.read ? "" : `<button class="modal-button" style="margin:0;padding:7px 10px;" onclick="markUserRequestRead('${item.id}')">Okundu işaretle</button>`}
+                    ${item.read ? "" : `<button class="modal-button" style="margin:0;padding:7px 10px;" onclick="markUserRequestRead('${item.id}')">Okundu</button>`}
+                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','reviewing')">İnceleniyor</button>
+                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','planned')">Planlandı</button>
+                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','completed')">Tamamlandı</button>
                     <button class="modal-button secondary-button" style="margin:0;padding:7px 10px;" onclick="deleteUserRequest('${item.id}')">Sil</button>
                 </div>
             </div>`;
@@ -2284,6 +2311,14 @@ async function openUserRequests(){
 async function markUserRequestRead(id){
     try{
         await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/read?username=murat", {method:"POST"});
+        openUserRequests();
+        refreshRequestBadge();
+    }catch(error){}
+}
+
+async function setRequestStatus(id,status){
+    try{
+        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/status?status=" + encodeURIComponent(status) + "&username=murat", {method:"POST"});
         openUserRequests();
         refreshRequestBadge();
     }catch(error){}
@@ -3929,97 +3964,104 @@ async function newChat(){
     showGreeting();
 }
 
+async function openAdminStats(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("adminStatsModal").classList.add("show");
+    const box = $("adminStatsContent");
+    box.textContent = "Yükleniyor...";
+    try{
+        const r = await fetch(API + "/admin/stats?username=murat");
+        const d = await r.json();
+        if(!r.ok) throw new Error(d.detail || "İstatistikler alınamadı.");
+        box.innerHTML = `
+            <p>👥 <strong>Toplam profil:</strong> ${d.users}</p>
+            <p>📋 <strong>Toplam kullanıcı isteği:</strong> ${d.requests}</p>
+            <p>🔴 <strong>Yeni istek:</strong> ${d.unread_requests}</p>
+            <p>🟢 <strong>Tamamlanan:</strong> ${d.completed_requests}</p>
+            <p>🚨 <strong>Kayıtlı hata:</strong> ${d.errors}</p>
+            <p>🧠 <strong>AI:</strong> ${escapeHTML(d.ai || "offline")}</p>
+            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "")}</p>`;
+    }catch(e){ box.textContent = "Hata: " + e.message; }
+}
+
+function openDevelopmentMemory(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    $("developmentMemoryModal").classList.add("show");
+}
+
 /* ============================================================
    ERRORS
    ============================================================ */
 
 async function openErrors(){
-
+    if(currentUser !== "murat") return;
     closeSidebar();
-
-    $("errorModal")
-        .classList
-        .add("show");
-
-    $("errorContent")
-        .textContent =
-        "Yükleniyor...";
+    $("errorModal").classList.add("show");
+    $("errorContent").textContent = "Yükleniyor...";
+    $("errorSummary").textContent = "Yükleniyor...";
 
     try{
+        const response = await fetch(API + "/admin/errors?username=murat");
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "Hatalar alınamadı.");
 
-        const response =
-            await fetch(
-                API + "/errors"
-            );
+        $("errorSummary").innerHTML =
+            `🔴 Açık: <strong>${data.open || 0}</strong> &nbsp; | &nbsp; 🟢 Çözülen: <strong>${data.resolved || 0}</strong>`;
 
-        const data =
-            await response.json();
-
-        const errors =
-            data.errors || [];
-
+        const errors = data.errors || [];
         if(!errors.length){
-
-            $("errorContent")
-                .textContent =
-                "Kayıtlı hata bulunmuyor.";
-
+            $("errorContent").textContent = "Kayıtlı sistem hatası bulunmuyor.";
             return;
         }
 
-        const wrapper =
-            document.createElement(
-                "div"
-            );
+        const wrapper = document.createElement("div");
+        wrapper.className = "error-list";
 
-        wrapper.className =
-            "error-list";
-
-        errors
-            .slice()
-            .reverse()
-            .forEach(
-                item => {
-
-                    const div =
-                        document.createElement(
-                            "div"
-                        );
-
-                    div.className =
-                        "error-item";
-
-                    div.textContent =
-                        (
-                            item.time
-                                ? item.time + "\n"
-                                : ""
-                        ) +
-                        (
-                            item.error ||
-                            item.message ||
-                            "Bilinmeyen hata."
-                        );
-
-                    wrapper.appendChild(
-                        div
-                    );
-                }
-            );
-
-        $("errorContent")
-            .innerHTML = "";
-
-        $("errorContent")
-            .appendChild(wrapper);
-
+        errors.slice().reverse().forEach(item => {
+            const card = document.createElement("div");
+            card.className = "error-item";
+            card.style.whiteSpace = "pre-wrap";
+            const resolved = item.status === "resolved";
+            const title = item.error || item.message || "Bilinmeyen hata.";
+            card.innerHTML = `
+                <div style="font-weight:700;">${resolved ? "🟢" : "🔴"} ${escapeHTML(title)}</div>
+                <div style="opacity:.75;margin-top:5px;">${escapeHTML(item.time || "")}</div>
+                <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap;">
+                    <button class="modal-button" style="width:auto;padding:8px 12px;" onclick="analyzeAdminError('${item.id}')">🧠 AI Analiz</button>
+                    ${resolved
+                        ? `<button class="modal-button secondary-button" style="width:auto;padding:8px 12px;" onclick="reopenAdminError('${item.id}')">↩️ Yeniden Aç</button>`
+                        : `<button class="modal-button" style="width:auto;padding:8px 12px;" onclick="resolveAdminError('${item.id}')">✅ Çözüldü</button>`}
+                </div>`;
+            wrapper.appendChild(card);
+        });
+        $("errorContent").innerHTML = "";
+        $("errorContent").appendChild(wrapper);
     }catch(error){
-
-        $("errorContent")
-            .textContent =
-            "Hatalar alınamadı:\n" +
-            error.message;
+        $("errorContent").textContent = "Hatalar alınamadı:\n" + error.message;
     }
+}
+
+async function analyzeAdminError(id){
+    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/analyze?username=murat", {method:"POST"});
+    const data = await response.json();
+    if(!response.ok){ alert(data.detail || "Analiz yapılamadı."); return; }
+    alert("🧠 K.A.R.V.I.S. HATA ANALİZİ\n\n" + (data.analysis || "Analiz bulunamadı."));
+}
+
+async function resolveAdminError(id){
+    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/resolve?username=murat", {method:"POST"});
+    const data = await response.json();
+    if(!response.ok){ alert(data.detail || "Hata güncellenemedi."); return; }
+    openErrors();
+}
+
+async function reopenAdminError(id){
+    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/reopen?username=murat", {method:"POST"});
+    const data = await response.json();
+    if(!response.ok){ alert(data.detail || "Hata güncellenemedi."); return; }
+    openErrors();
 }
 
 /* ============================================================
