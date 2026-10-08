@@ -6,3 +6,4 @@ reportlab
 requests
 Pillow
 pywebpush
+psycopg2-binary
