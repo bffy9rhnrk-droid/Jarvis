@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>K.A.R.V.I.S. - KARAHAN INC.</title>
+<meta name="application-name" content="K.A.R.V.I.S. - KARAHAN INC.">
+<meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
+<meta name="description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="K.A.R.V.I.S. - KARAHAN INC.">
+<meta property="og:description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
+<meta property="og:site_name" content="K.A.R.V.I.S.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="K.A.R.V.I.S. - KARAHAN INC.">
+<meta name="twitter:description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
 
 <style>
 *{
@@ -1223,7 +1233,6 @@ body.voice-speaking .ring.three{
         </div>
 
         <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
-        <button class="menu-item" onclick="openKarvisRadar()">📡 Sistem Radarı</button>
         <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
@@ -2333,9 +2342,6 @@ async function openUserRequests(){
                 <div style="margin-top:5px;opacity:.75;"><strong>Orijinal:</strong> ${escapeHTML(item.original || "")}</div>
                 <div style="margin-top:8px;display:flex;gap:8px;">
                     ${item.read ? "" : `<button class="modal-button" style="margin:0;padding:7px 10px;" onclick="markUserRequestRead('${item.id}')">Okundu</button>`}
-                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','reviewing')">İnceleniyor</button>
-                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','planned')">Planlandı</button>
-                    <button class="modal-button" style="margin:0;padding:7px 10px;" onclick="setRequestStatus('${item.id}','completed')">Tamamlandı</button>
                     <button class="modal-button secondary-button" style="margin:0;padding:7px 10px;" onclick="deleteUserRequest('${item.id}')">Sil</button>
                 </div>
             </div>`;
@@ -2348,14 +2354,6 @@ async function openUserRequests(){
 async function markUserRequestRead(id){
     try{
         await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/read?username=murat", {method:"POST"});
-        openUserRequests();
-        refreshRequestBadge();
-    }catch(error){}
-}
-
-async function setRequestStatus(id,status){
-    try{
-        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/status?status=" + encodeURIComponent(status) + "&username=murat", {method:"POST"});
         openUserRequests();
         refreshRequestBadge();
     }catch(error){}
