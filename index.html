@@ -1576,7 +1576,7 @@ body.voice-speaking .ring.three{
                 <strong>🔔 Bildirimler</strong>
                 <small id="pushStatusText">iPhone bildirimlerini etkinleştir</small>
             </div>
-            <button id="pushToggleButton" class="settings-action" onclick="enableKarvisPush()">Aç</button>
+            <button id="pushToggleButton" class="settings-action" onclick="toggleKarvisPush()">Aç</button>
         </div>
     </div>
 
@@ -4185,7 +4185,7 @@ async function enableKarvisPush(){
         const btn=$("pushToggleButton");
         localStorage.setItem("karvis_push_enabled", "true");
         if(st) st.textContent="Bildirimler açık ✓";
-        if(btn){btn.textContent="Açık ✓";btn.disabled=true;}
+        if(btn){btn.textContent="Kapat";btn.disabled=false;}
     }catch(error){
         alert("Bildirim kurulamadı: " + error.message);
     }
@@ -4195,7 +4195,7 @@ async function refreshPushStatus(){
     const st=$("pushStatusText"), btn=$("pushToggleButton");
     if(!st || !btn) return;
 
-    if(!window.isSecureContext || !("Notification" in window)){
+    if(!window.isSecureContext || !("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
         st.textContent="Bu cihazda bildirim desteği yok.";
         btn.textContent="Desteklenmiyor";
         btn.disabled=true;
@@ -4203,7 +4203,7 @@ async function refreshPushStatus(){
     }
 
     if(Notification.permission === "denied"){
-        st.textContent="Bildirimler engellenmiş. iPhone Ayarları'ndan izin verin.";
+        st.textContent="Bildirimler iPhone Ayarları'ndan engellenmiş.";
         btn.textContent="Engelli";
         btn.disabled=true;
         return;
@@ -4212,28 +4212,54 @@ async function refreshPushStatus(){
     if(Notification.permission === "granted"){
         try{
             const registration = await registerKarvisServiceWorker();
-            const subscription = registration
-                ? await registration.pushManager.getSubscription()
-                : null;
-
+            const subscription = await registration.pushManager.getSubscription();
             if(subscription){
-                localStorage.setItem("karvis_push_enabled", "true");
                 st.textContent="Bildirimler açık ✓";
-                btn.textContent="Açık ✓";
-                btn.disabled=true;
+                btn.textContent="Kapat";
+                btn.disabled=false;
                 return;
             }
         }catch(e){}
-
-        st.textContent="Bildirim izni açık. K.A.R.V.I.S. aboneliğini etkinleştirin.";
-        btn.textContent="Aç";
-        btn.disabled=false;
-        return;
     }
 
-    st.textContent="iPhone bildirimlerini etkinleştir";
+    st.textContent="Bildirimler kapalı";
     btn.textContent="Aç";
     btn.disabled=false;
+}
+
+async function toggleKarvisPush(){
+    if(!currentUser) return;
+    const btn=$("pushToggleButton");
+    if(btn) btn.disabled=true;
+
+    try{
+        const registration = await registerKarvisServiceWorker();
+        const subscription = registration
+            ? await registration.pushManager.getSubscription()
+            : null;
+
+        if(subscription){
+            const response = await fetch(API + "/push/unsubscribe", {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    username:currentUser,
+                    endpoint:subscription.endpoint
+                })
+            });
+            const data = await response.json();
+            if(!response.ok) throw new Error(data.detail || "Abonelik kapatılamadı.");
+            await subscription.unsubscribe();
+            localStorage.removeItem("karvis_push_enabled");
+            await refreshPushStatus();
+            return;
+        }
+
+        await enableKarvisPush();
+    }catch(error){
+        if(btn) btn.disabled=false;
+        alert("Bildirim ayarı değiştirilemedi: " + error.message);
+    }
 }
 
 async function openAdminNotifications(){
