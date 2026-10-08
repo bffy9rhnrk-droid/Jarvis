@@ -1162,18 +1162,6 @@ body.voice-speaking .ring.three{
     </button>
 
     <!-- ========================================================
-         K.A.R.V.I.S. CORE TOOLS
-         ======================================================== -->
-    <div id="karvisCoreTools" style="margin-top:14px;">
-        <div class="academic-title">K.A.R.V.I.S. CORE</div>
-        <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
-        <button class="menu-item" onclick="openKarvisRadar()">📡 Sistem Radarı</button>
-        <button class="menu-item" onclick="openKarvisBrain()">🧠 Brain / Sistem Durumu</button>
-        <button class="menu-item" onclick="activateInvestigator()">🕵️ Dedektif Modu</button>
-        <button class="menu-item" onclick="activateLiveConversation()">🎙️ Canlı Konuşma</button>
-    </div>
-
-    <!-- ========================================================
          SADECE BETÜL
          ======================================================== -->
 
@@ -1201,6 +1189,27 @@ body.voice-speaking .ring.three{
             class="menu-item"
             onclick="openBetulFortune()">
             🃏 Fal Bak
+        </button>
+
+    </div>
+
+    <!-- ========================================================
+         SADECE MURAT - YETKİLİ / ADMIN
+         ======================================================== -->
+
+    <div
+        id="adminMenu"
+        style="display:none;">
+
+        <div class="academic-title">
+            YETKİLİ / ADMIN
+        </div>
+
+        <button
+            class="menu-item"
+            onclick="openUserRequests()">
+            📋 Kullanıcı İstekleri
+            <span id="requestBadge" style="float:right;display:none;">🔴</span>
         </button>
 
     </div>
@@ -1261,6 +1270,17 @@ body.voice-speaking .ring.three{
 
     </div>
 
+    <!-- ========================================================
+         TÜM PROFİLLER - ANA PROFİLE DÖN
+         ======================================================== -->
+
+    <button
+        class="menu-item"
+        onclick="returnToKarahan()"
+        style="margin-top:14px;">
+        🏢 KARAHAN INC. — Ana Profil
+    </button>
+
 </div>
 
 <!-- ============================================================
@@ -1297,6 +1317,29 @@ body.voice-speaking .ring.three{
         class="modal-button secondary-button"
         onclick="closeModals()">
         Vazgeç
+    </button>
+
+</div>
+
+<!-- ============================================================
+     USER REQUESTS MODAL
+     ============================================================ -->
+
+<div
+    id="userRequestsModal"
+    class="modal"
+    style="max-width:760px;">
+
+    <h2>📋 Kullanıcı İstekleri</h2>
+
+    <div id="userRequestsSummary" class="error-list">
+        Yükleniyor...
+    </div>
+
+    <button
+        class="modal-button secondary-button"
+        onclick="closeModals()">
+        Kapat
     </button>
 
 </div>
@@ -1730,7 +1773,8 @@ async function login(){
                 "karahan",
                 "betul",
                 "sinem",
-                "ilknur"
+                "ilknur",
+                "murat"
             ].includes(currentUser)
         ){
 
@@ -2142,55 +2186,24 @@ function updateStatus(){
 
 function updateSidebar(){
 
-    const teacherMenu =
-        $("teacherMenu");
+    const teacherMenu = $("teacherMenu");
+    const funButton = $("funButton");
+    const betulMenu = $("betulMenu");
+    const adminMenu = $("adminMenu");
 
-    const funButton =
-        $("funButton");
+    teacherMenu.style.display =
+        currentUser === "ilknur" ? "block" : "none";
 
-    const betulMenu =
-        $("betulMenu");
+    funButton.style.display =
+        currentUser === "betul" || currentUser === "ilknur" || currentUser === "murat"
+            ? "none"
+            : "block";
 
-    /*
-       SADECE BETÜL
-    */
+    betulMenu.style.display =
+        currentUser === "betul" ? "block" : "none";
 
-    if(currentUser === "betul"){
-
-        teacherMenu.style.display = "none";
-
-        funButton.style.display = "none";
-
-        betulMenu.style.display = "block";
-
-    }
-
-    /*
-       SADECE İLKNUR
-    */
-
-    else if(currentUser === "ilknur"){
-
-        teacherMenu.style.display = "block";
-
-        funButton.style.display = "none";
-
-        betulMenu.style.display = "none";
-
-    }
-
-    /*
-       KARAHAN + SİNEM
-    */
-
-    else{
-
-        teacherMenu.style.display = "none";
-
-        funButton.style.display = "block";
-
-        betulMenu.style.display = "none";
-    }
+    adminMenu.style.display =
+        currentUser === "murat" ? "block" : "none";
 
     document
         .querySelectorAll(".academic-menu-item")
@@ -2201,6 +2214,88 @@ function updateSidebar(){
                     b.dataset.mode === currentMode
                 )
         );
+
+    if(currentUser === "murat")
+        refreshRequestBadge();
+}
+
+function returnToKarahan(){
+    currentUser = "karahan";
+    currentMode = "normal";
+    funMode = false;
+    document.body.classList.remove("fun-mode");
+    localStorage.setItem("karvis_user", "karahan");
+    localStorage.setItem("karvis_mode", "normal");
+    closeModals();
+    closeSidebar();
+    stopKarvisVoice();
+    applyUserTheme();
+    updateSidebar();
+    showGreeting();
+    updateStatus();
+}
+
+async function refreshRequestBadge(){
+    if(currentUser !== "murat") return;
+    try{
+        const response = await fetch(API + "/user-requests?username=murat");
+        if(!response.ok) return;
+        const data = await response.json();
+        const badge = $("requestBadge");
+        if(badge) badge.style.display = Number(data.unread || 0) > 0 ? "inline" : "none";
+    }catch(error){}
+}
+
+async function openUserRequests(){
+    if(currentUser !== "murat"){
+        alert("Bu bölüm yalnızca Murat yetkili profiline açıktır.");
+        return;
+    }
+    closeSidebar();
+    $("userRequestsModal").classList.add("show");
+    const box = $("userRequestsSummary");
+    box.innerHTML = "Yükleniyor...";
+    try{
+        const response = await fetch(API + "/user-requests?username=murat");
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "İstekler alınamadı.");
+        if(!data.requests || !data.requests.length){
+            box.innerHTML = "Henüz kayıtlı kullanıcı isteği yok.";
+            return;
+        }
+        box.innerHTML = data.requests.slice().reverse().map(item => {
+            const state = item.read ? "🟢 Okundu" : "🔴 Yeni";
+            const priority = item.priority === "high" ? " 🔥 Öncelikli" : "";
+            return `<div style="padding:12px;margin:8px 0;border:1px solid rgba(0,220,255,.22);border-radius:10px;">
+                <div><strong>${escapeHTML(item.name || item.username)}</strong> · ${escapeHTML(item.created_at || "")} · ${state}${priority}</div>
+                <div style="margin-top:6px;"><strong>İstek:</strong> ${escapeHTML(item.summary || item.original || "")}</div>
+                <div style="margin-top:5px;opacity:.75;"><strong>Orijinal:</strong> ${escapeHTML(item.original || "")}</div>
+                <div style="margin-top:8px;display:flex;gap:8px;">
+                    ${item.read ? "" : `<button class="modal-button" style="margin:0;padding:7px 10px;" onclick="markUserRequestRead('${item.id}')">Okundu işaretle</button>`}
+                    <button class="modal-button secondary-button" style="margin:0;padding:7px 10px;" onclick="deleteUserRequest('${item.id}')">Sil</button>
+                </div>
+            </div>`;
+        }).join("");
+    }catch(error){
+        box.innerHTML = "Hata: " + escapeHTML(error.message);
+    }
+}
+
+async function markUserRequestRead(id){
+    try{
+        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/read?username=murat", {method:"POST"});
+        openUserRequests();
+        refreshRequestBadge();
+    }catch(error){}
+}
+
+async function deleteUserRequest(id){
+    if(!confirm("Bu kullanıcı isteği silinsin mi?")) return;
+    try{
+        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "?username=murat", {method:"DELETE"});
+        openUserRequests();
+        refreshRequestBadge();
+    }catch(error){}
 }
 
 /* ============================================================
@@ -2292,6 +2387,14 @@ function showGreeting(){
 
         addMessage(
             "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız hazır. Ders, araştırma, makale, quiz ve sunum çalışmalarında yardımcı olabilirim.",
+            "ai"
+        );
+    }
+
+    else if(currentUser === "murat"){
+
+        addMessage(
+            "Hoş geldiniz efendim. Yetkili giriş yaptınız. K.A.R.V.I.S. yönetim ve kullanıcı istekleri sistemi hazır.",
             "ai"
         );
     }
@@ -4008,58 +4111,6 @@ function initialize(){
 
 initialize();
 
-/* ============================================================
-   K.A.R.V.I.S. CORE TOOLS v35
-   ============================================================ */
-async function karvisCoreFetch(path){
-    try{
-        const r=await fetch(API+path);
-        return await r.json();
-    }catch(e){ return null; }
-}
-
-function openKarvisLive(){
-    closeSidebar();
-    addMessage("🛰️ K.A.R.V.I.S. LIVE paneli açılıyor...", "ai");
-    karvisCoreFetch("/live-status").then(d=>{
-        if(!d) return addMessage("LIVE bağlantısı alınamadı.","ai");
-        addMessage(`🛰️ LIVE STATUS\nAI: ${d.ai}\nAraştırma: ${d.research?"ONLINE":"OFFLINE"}\nHava: ${d.weather?"ONLINE":"OFFLINE"}\nSunum: ${d.presentation?"ONLINE":"OFFLINE"}\nHafıza: ${d.memory?"ONLINE":"OFFLINE"}`,"ai");
-    });
-}
-
-function openKarvisRadar(){
-    closeSidebar();
-    karvisCoreFetch("/radar").then(d=>{
-        if(!d) return addMessage("📡 Sistem radarı yanıt vermedi.","ai");
-        const lines=(d.items||[]).map(x=>`${x.status==="ONLINE"?"🟢":"🔴"} ${x.name}: ${x.status}`).join("\n");
-        addMessage("📡 K.A.R.V.I.S. SİSTEM RADARI\n"+lines,"ai");
-    });
-}
-
-function openKarvisBrain(){
-    closeSidebar();
-    karvisCoreFetch("/brain").then(d=>{
-        if(!d) return addMessage("🧠 Brain modülü yanıt vermedi.","ai");
-        addMessage("🧠 BRAIN CORE\nDurum: "+d.state+"\nSürüm: "+d.version+"\nModüller: "+(d.modules||[]).join(" • "),"ai");
-    });
-}
-
-function activateInvestigator(){
-    currentMode="investigator";
-    localStorage.setItem("karvis_mode",currentMode);
-    closeSidebar();
-    updateStatus();
-    addMessage("🕵️ Dedektif Modu aktif. İddiaları kanıt, kaynak ve güven düzeyi üzerinden inceleyeceğim.","ai");
-}
-
-function activateLiveConversation(){
-    currentMode="live";
-    localStorage.setItem("karvis_mode",currentMode);
-    closeSidebar();
-    updateStatus();
-    if(speechSupported && $("messageInput")) $("messageInput").focus();
-    addMessage("🎙️ Canlı Konuşma modu aktif. Kısa ve doğal yanıt vereceğim. Sesli yanıt için Ses ayarını açık tut.","ai");
-}
 </script>
 
 </body>
