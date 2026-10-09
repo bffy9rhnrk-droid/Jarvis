@@ -633,6 +633,7 @@ class ChatRequest(BaseModel):
     message: str
     username: str = "karahan"
     mode: str = "normal"
+    conversation_id: str = ""
 
 
 class PresentationRequest(BaseModel):
@@ -5914,6 +5915,49 @@ async def brain():
 
 
 # ============================================================
+# EPHEMERAL CHAT CONTEXT (RAM ONLY; NEVER WRITTEN TO DATABASE)
+# ============================================================
+
+# Context exists only in server memory. It is not persisted to PostgreSQL,
+# JSON files, or browser storage. Starting a new chat uses a new ID.
+_CHAT_CONTEXTS = {}
+_CHAT_CONTEXT_MAX_TURNS = 10
+
+
+def _get_chat_context(conversation_id, username):
+    if not conversation_id:
+        return []
+    key = (str(username or "karahan")[:40], str(conversation_id)[:120])
+    return list(_CHAT_CONTEXTS.get(key, []))
+
+
+def _append_chat_context(conversation_id, username, user_message, assistant_message):
+    if not conversation_id:
+        return
+    key = (str(username or "karahan")[:40], str(conversation_id)[:120])
+    history = _CHAT_CONTEXTS.setdefault(key, [])
+    history.append({"role": "user", "content": str(user_message)[:6000]})
+    history.append({"role": "assistant", "content": str(assistant_message)[:6000]})
+    # Keep only the most recent turns and discard empty contexts.
+    _CHAT_CONTEXTS[key] = history[-(_CHAT_CONTEXT_MAX_TURNS * 2):]
+    # Soft bound to prevent unbounded RAM growth from abandoned chats.
+    if len(_CHAT_CONTEXTS) > 500:
+        oldest_key = next(iter(_CHAT_CONTEXTS))
+        if oldest_key != key:
+            _CHAT_CONTEXTS.pop(oldest_key, None)
+
+
+def _format_chat_context(history):
+    if not history:
+        return "Önceki mesaj yok; bu sohbetin ilk mesajı."
+    return "\\n".join(
+        ("Kullanıcı: " if item.get("role") == "user" else "K.A.R.V.I.S.: ")
+        + str(item.get("content", ""))
+        for item in history[-(_CHAT_CONTEXT_MAX_TURNS * 2):]
+    )
+
+
+# ============================================================
 # CHAT
 # ============================================================
 
@@ -5941,6 +5985,9 @@ async def chat(
         request.mode
         or "normal"
     ).strip().lower()
+
+    conversation_id = (request.conversation_id or "").strip()[:120]
+    chat_history = _get_chat_context(conversation_id, username)
 
     user = USERS.get(
         username,
@@ -6094,10 +6141,13 @@ Kullanıcı profili:
 
 {web_instruction}
 
-Kullanıcının mesajı:
+ÖNCEKİ MESAJLAR (yalnızca bu aktif sohbetin geçici bağlamı):
+{_format_chat_context(chat_history)}
+
+Kullanıcının son mesajı:
 {message}
 
-Yanıtı doğrudan ver.
+Yanıtı doğrudan ver. Önceki mesajlarla ilgili kısa takip sorularını bağlama göre yorumla.
 Kullanıcı açıkça istemediyse gereksiz uzun açıklamalar yapma.
 Bilmediğin bilgileri uydurma.
 """
@@ -6114,6 +6164,14 @@ Bilmediğin bilgileri uydurma.
             "bağlanamıyorum. API anahtarlarını "
             "kontrol etmen gerekiyor."
         )
+
+    # Sohbet bağlamını yalnızca RAM'de tut; PostgreSQL veya dosyaya yazma.
+    _append_chat_context(
+        conversation_id,
+        username,
+        message,
+        result
+    )
 
     # Web kaynakları kullanıcıya link listesi olarak basılmaz.
     # Araştırma yalnızca cevabın doğruluğunu ve güncelliğini besler.
