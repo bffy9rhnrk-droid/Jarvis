@@ -1607,6 +1607,23 @@ def search_wikipedia(
         )
 
         if response.status_code != 200:
+            try:
+                error_body = response.json().get("error", {})
+                error_message = error_body.get("message") or response.text[:1200]
+                error_reason = ", ".join(
+                    str(item.get("reason", ""))
+                    for item in error_body.get("errors", [])
+                    if item.get("reason")
+                )
+            except Exception:
+                error_message = (response.text or "")[:1200]
+                error_reason = ""
+            save_error(
+                "Google Custom Search API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; reason={error_reason}; detail={error_message}",
+                category="web_search", severity="error",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
+            )
             return []
 
         pages = (
@@ -1719,6 +1736,23 @@ def search_google_web(
         )
 
         if response.status_code != 200:
+            try:
+                error_body = response.json().get("error", {})
+                error_message = error_body.get("message") or (response.text or "")[:1200]
+                error_reason = ", ".join(
+                    str(item.get("reason", ""))
+                    for item in error_body.get("errors", [])
+                    if item.get("reason")
+                )
+            except Exception:
+                error_message = (response.text or "")[:1200]
+                error_reason = ""
+            save_error(
+                "Google Custom Search API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; reason={error_reason}; detail={error_message}",
+                category="web_search", severity="error",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
+            )
             return []
 
         items = (
@@ -2383,7 +2417,18 @@ def needs_web_research(message, username="karahan", mode="normal"):
         if re.search(pattern, text, re.IGNORECASE):
             return False
 
-    # Kullanıcı açıkça araştırma istediğinde araştır.
+    # Kullanıcı açıkça web araması istediğinde, konu ile fiil arasında
+    # kelime olsa bile araştırmayı başlat: "internette perde ara" vb.
+    explicit_search_patterns = [
+        r"\binternette\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\binternetten\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\bweb(?:'den|den)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\bgoogle(?:'da|da|de)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\b(ara|araştır|bak|bul)\b.{0,100}\b(internette|internetten|webde|web'de|google'da|google)\b",
+    ]
+    if any(re.search(pattern, text, re.IGNORECASE) for pattern in explicit_search_patterns):
+        return True
+
     if any(phrase in text for phrase in RESEARCH_TRIGGER_PHRASES):
         return True
 
@@ -2503,19 +2548,41 @@ KARAHAN KARAKTERİ:
 
 
 def perform_smart_research(message, username, mode):
-    """
-    Yalnızca needs_web_research() True olduğunda çağrılır.
-    """
-    query = build_profile_research_query(
-        message,
-        username,
-        mode
-    )
+    """Yalnızca needs_web_research() True olduğunda çağrılır."""
+    raw_message = clean_text(message)
+    lowered = raw_message.lower()
+    explicit_search = bool(re.search(
+        r"\b(internette|internetten|webde|web'de|google'da|google)\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        lowered, re.IGNORECASE
+    ))
+
+    if explicit_search:
+        subject = lowered
+        for pattern in [
+            r"\binternette\b", r"\binternetten\b", r"\bweb'de\b",
+            r"\bwebde\b", r"\bgoogle'da\b", r"\bgoogle\b",
+            r"\baraştır\b", r"\bara\b", r"\bbak\b", r"\bbul\b",
+            r"\blütfen\b", r"\bkarvis\b",
+        ]:
+            subject = re.sub(pattern, " ", subject, flags=re.IGNORECASE)
+        subject = clean_text(subject).strip(" .,!?:;-")
+        if subject:
+            query = f"{subject} ürünler modeller fiyatlar Türkiye"
+        else:
+            query = build_profile_research_query(raw_message, username, mode)
+    else:
+        query = build_profile_research_query(raw_message, username, mode)
 
     sources = research_topic(query)
 
     context = format_sources_for_ai(sources)
     if not sources:
+        save_error(
+            "Web araştırması sonuç döndürmedi",
+            f"Kullanıcı isteği: {raw_message!r}; arama sorgusu: {query!r}. Google CSE ve DuckDuckGo kaynaklarından kullanılabilir sonuç gelmedi.",
+            category="web_search", severity="warning",
+            path="/chat", method="POST",
+        )
         context = (
             "CANLI WEB ARAŞTIRMASI DENENDİ ANCAK BU İSTEK İÇİN DOĞRULANABİLİR "
             "ARAMA SONUCU ALINAMADI. Kullanıcıya internet erişimi kesinlikle yokmuş "
