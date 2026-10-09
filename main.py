@@ -2041,6 +2041,7 @@ def _weather_from_open_meteo():
             "longitude": 29.0864,
             "current": "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
             "hourly": "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
+            "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
             "forecast_days": 2,
             "timezone": "Europe/Istanbul",
         },
@@ -2056,6 +2057,17 @@ def _weather_from_open_meteo():
     rain = hourly.get("precipitation_probability", [])
     codes = hourly.get("weather_code", [])
     winds = hourly.get("wind_speed_10m", [])
+    daily = data.get("daily", {})
+    daily_times = daily.get("time", [])
+    tomorrow = None
+    if len(daily_times) > 1:
+        tomorrow = {
+            "date": daily_times[1],
+            "condition": WEATHER_CODES_TR.get((daily.get("weather_code") or [None, None])[1], "değişken"),
+            "max_temperature": (daily.get("temperature_2m_max") or [None, None])[1],
+            "min_temperature": (daily.get("temperature_2m_min") or [None, None])[1],
+            "rain_probability": (daily.get("precipitation_probability_max") or [None, None])[1],
+        }
 
     current_time = str(current.get("time", ""))
     start_index = times.index(current_time) if current_time in times else 0
@@ -2076,6 +2088,7 @@ def _weather_from_open_meteo():
         "current_condition": WEATHER_CODES_TR.get(current.get("weather_code"), "değişken"),
         "current_wind": current.get("wind_speed_10m"),
         "upcoming": upcoming,
+        "tomorrow": tomorrow,
         "source": "Open-Meteo",
     }
 
@@ -2091,7 +2104,30 @@ def _weather_from_wttr():
     response.raise_for_status()
     data = response.json()
     current = (data.get("current_condition") or [{}])[0]
-    hourly_raw = (data.get("weather") or [{}])[0].get("hourly", [])
+    daily_raw = data.get("weather") or []
+    today_data = daily_raw[0] if daily_raw else {}
+    tomorrow_raw = daily_raw[1] if len(daily_raw) > 1 else {}
+    hourly_raw = today_data.get("hourly", [])
+
+    tomorrow_hours = tomorrow_raw.get("hourly", [])
+    tomorrow_conditions = [
+        clean_text(((x.get("lang_tr") or [{}])[0].get("value") or (x.get("weatherDesc") or [{}])[0].get("value") or "")).lower()
+        for x in tomorrow_hours
+    ]
+    tomorrow_conditions = [x for x in tomorrow_conditions if x]
+    tomorrow = None
+    if tomorrow_raw:
+        try:
+            rain_probs = [int(x.get("chanceofrain")) for x in tomorrow_hours if x.get("chanceofrain") not in (None, "")]
+        except Exception:
+            rain_probs = []
+        tomorrow = {
+            "date": tomorrow_raw.get("date"),
+            "condition": tomorrow_conditions[0] if tomorrow_conditions else "değişken",
+            "min_temperature": tomorrow_raw.get("mintempC"),
+            "max_temperature": tomorrow_raw.get("maxtempC"),
+            "rain_probability": max(rain_probs) if rain_probs else None,
+        }
 
     upcoming = []
     for item in hourly_raw[:8]:
@@ -2125,6 +2161,7 @@ def _weather_from_wttr():
         ).lower(),
         "current_wind": current.get("windspeedKmph"),
         "upcoming": upcoming,
+        "tomorrow": tomorrow,
         "source": "wttr.in",
     }
 
@@ -2154,8 +2191,8 @@ def fetch_denizli_weather():
         return None
 
 
-def weather_context_for_ai(weather):
-    """AI'ya ham saatlik liste yerine kısa, kullanılabilir hava özeti verir."""
+def weather_context_for_ai(weather, message=""):
+    """İsteğe göre mevcut hava veya yarının tahminini kısa biçimde hazırlar."""
     if not weather:
         return ""
 
@@ -2164,10 +2201,32 @@ def weather_context_for_ai(weather):
     condition = clean_text(weather.get("current_condition") or "değişken").lower()
     upcoming = weather.get("upcoming") or []
 
-    lines = [
-        "CANLI DENİZLİ HAVA VERİSİ",
-        f"Şu an: {temp}°C, {condition}."
-    ]
+    request_text = clean_text(message).lower()
+    asks_tomorrow = bool(re.search(r"\b(yarın|yarinki|yarınki|yarin|yarin hava)\b", request_text))
+    lines = ["DENİZLİ HAVA DURUMU TAHMİNİ"]
+    if asks_tomorrow:
+        tomorrow = weather.get("tomorrow") or {}
+        if tomorrow:
+            date_label = tomorrow.get("date") or "yarın"
+            t_condition = clean_text(tomorrow.get("condition") or "değişken").lower()
+            t_min = tomorrow.get("min_temperature")
+            t_max = tomorrow.get("max_temperature")
+            t_rain = tomorrow.get("rain_probability")
+            summary = f"Yarın ({date_label}) Denizli'de hava {t_condition} olacak."
+            if t_min is not None and t_max is not None:
+                summary += f" Sıcaklık {t_min}°C ile {t_max}°C arasında."
+            elif t_max is not None:
+                summary += f" En yüksek sıcaklık {t_max}°C."
+            if t_rain is not None:
+                summary += f" Yağış olasılığı en fazla %{t_rain}."
+            lines.append(summary)
+            lines.append("Kullanıcının yarınla ilgili sorusunu bu günlük tahminle cevapla; bugünkü sıcaklığı yarının tahmini gibi sunma.")
+            lines.append("Yanıtı tamamen Türkçe ve kısa ver; veri yoksa bunu açıkça söyle, tahmin uydurma.")
+            return "\n".join(lines)
+        lines.append("Yarın için günlük tahmin verisi bulunamadı. Canlı veride olmayan tahmini uydurma.")
+        return "\n".join(lines)
+
+    lines.append(f"Şu an: {temp}°C, {condition}.")
     if temp is not None and feels is not None:
         try:
             if abs(float(temp) - float(feels)) >= 3:
@@ -6190,7 +6249,7 @@ async def chat(
         try:
             weather = fetch_denizli_weather()
             if weather:
-                weather_context = weather_context_for_ai(weather)
+                weather_context = weather_context_for_ai(weather, message)
                 research = {
                     "query": "Denizli canlı saatlik hava durumu",
                     "sources": [{
