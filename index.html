@@ -1673,6 +1673,10 @@ const API = "";
 
 let currentUser = "karahan";
 let currentMode = "normal";
+// RAM-only server context is keyed by a per-tab chat ID, not saved to localStorage.
+let currentConversationId = (window.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : ("chat-" + Date.now() + "-" + Math.random().toString(36).slice(2));
 let funMode = false;
 let sending = false;
 let presentationPolling = null;
@@ -3232,6 +3236,9 @@ async function sendMessage(){
                             mode:
                                 currentMode,
 
+                            conversation_id:
+                                currentConversationId,
+
                             response_style:
                                 karvisSettings.responseStyle,
 
@@ -4018,21 +4025,16 @@ function showPresentationResult(
    NEW CHAT
    ============================================================ */
 
-async function newChat(){
+function newChat(){
 
     closeSidebar();
 
-    try{
+    // A fresh ID guarantees no prior conversation context is sent.
+    currentConversationId = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : ("chat-" + Date.now() + "-" + Math.random().toString(36).slice(2));
 
-        await fetch(
-            API + "/new-chat",
-            {
-                method:"POST"
-            }
-        );
-
-    }catch{}
-
+    $("chat").innerHTML = "";
     showGreeting();
 }
 
