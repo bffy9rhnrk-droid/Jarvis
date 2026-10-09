@@ -1698,12 +1698,18 @@ def search_google_web(
     topic
 ):
 
-    if (
-        not GOOGLE_IMAGE_API_KEY
-        or
-        not GOOGLE_CSE_ID
-    ):
-
+    if not GOOGLE_IMAGE_API_KEY or not GOOGLE_CSE_ID:
+        missing = []
+        if not GOOGLE_IMAGE_API_KEY:
+            missing.append("GOOGLE_IMAGE_API_KEY eksik")
+        if not GOOGLE_CSE_ID:
+            missing.append("GOOGLE_CSE_ID eksik")
+        save_error(
+            "Google araması yapılandırılmamış",
+            "; ".join(missing) + ". Render > Environment bölümünde değişken adlarını ve değerlerinin boş olmadığını kontrol edin. Değerleri hata kaydına yazdırmayın.",
+            category="web_search", severity="error",
+            path="https://www.googleapis.com/customsearch/v1", method="GET",
+        )
         return []
 
     try:
@@ -1755,14 +1761,16 @@ def search_google_web(
             )
             return []
 
-        items = (
-            response
-            .json()
-            .get(
-                "items",
-                []
+        payload = response.json()
+        items = payload.get("items", [])
+        if not items:
+            search_info = payload.get("searchInformation", {})
+            save_error(
+                "Google Custom Search API sonuç döndürmedi",
+                f"HTTP 200; query={topic!r}; totalResults={search_info.get('totalResults', 'bilinmiyor')}. API anahtarı çalışmış olabilir ancak CSE kapsamı, arama sorgusu veya arama motoru ayarları sonuç üretmemiş olabilir.",
+                category="web_search", severity="warning",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
             )
-        )
 
         results = []
 
@@ -1884,9 +1892,21 @@ def search_duckduckgo_web(topic):
                     seen.add(item["url"])
                     unique.append(item)
                 return unique[:8]
-        except Exception:
+        except Exception as exc:
+            save_error(
+                "DuckDuckGo web yedeği başarısız",
+                f"endpoint={endpoint}; exception_type={type(exc).__name__}; detail={exc}",
+                category="web_search", severity="warning",
+                path=endpoint, method="GET",
+            )
             continue
 
+    save_error(
+        "DuckDuckGo web yedeği sonuç bulamadı",
+        f"Sorgu={topic!r}; HTML ve Lite uç noktalarından ayrıştırılabilir sonuç alınamadı. CAPTCHA/engelleme, sayfa yapısının değişmesi veya ağ erişimi olası nedenlerdir.",
+        category="web_search", severity="warning",
+        path="DuckDuckGo HTML/Lite", method="GET",
+    )
     return []
 
 
