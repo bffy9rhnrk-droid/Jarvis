@@ -1750,45 +1750,76 @@ def search_google_web(
 
 
 def search_duckduckgo_web(topic):
-    """Google CSE anahtarı bulunmadığında da web sonuçları aramak için yedek arama."""
-    try:
-        response = requests.get(
-            "https://html.duckduckgo.com/html/",
-            params={"q": topic},
-            headers={**WEB_HEADERS, "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.7"},
-            timeout=12
-        )
-        if response.status_code != 200:
-            return []
+    """Google CSE yoksa DuckDuckGo HTML/Lite sonuçlarını yedek olarak dener."""
+    headers = {
+        **WEB_HEADERS,
+        "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    }
+    endpoints = [
+        ("https://html.duckduckgo.com/html/", {"q": topic}),
+        ("https://lite.duckduckgo.com/lite/", {"q": topic}),
+    ]
 
-        html = response.text
-        blocks = re.findall(
-            r'<div class="result[^>]*>(.*?)(?=<div class="result|</html>)',
-            html,
-            flags=re.IGNORECASE | re.DOTALL
-        )
-        results = []
-        for block in blocks[:8]:
-            link_match = re.search(
-                r'<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
-                block,
-                flags=re.IGNORECASE | re.DOTALL
+    for endpoint, params in endpoints:
+        try:
+            response = requests.get(endpoint, params=params, headers=headers, timeout=15)
+            response.raise_for_status()
+            page = response.text or ""
+            results = []
+
+            # HTML endpoint: parse each result block.
+            blocks = re.findall(
+                r"<div[^>]*class=[\"'][^\"']*result[^\"']*[\"'][^>]*>(.*?)(?=<div[^>]*class=[\"'][^\"']*result|</html>)",
+                page, flags=re.IGNORECASE | re.DOTALL
             )
-            snippet_match = re.search(
-                r'<(?:a|div)[^>]*class="result__snippet"[^>]*>(.*?)</(?:a|div)>',
-                block,
-                flags=re.IGNORECASE | re.DOTALL
-            )
-            if not link_match:
-                continue
-            url = html_lib.unescape(link_match.group(1))
-            title = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", link_match.group(2))))
-            snippet = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", snippet_match.group(1)))) if snippet_match else ""
-            if title and url.startswith("http"):
-                results.append({"title": title, "text": snippet or title, "url": url, "source": "DuckDuckGo Web"})
-        return results
-    except Exception:
-        return []
+            for block in blocks:
+                link_match = re.search(
+                    r"<a[^>]*class=[\"'][^\"']*result__a[^\"']*[\"'][^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+                    block, flags=re.IGNORECASE | re.DOTALL
+                )
+                snippet_match = re.search(
+                    r"<(?:a|div)[^>]*class=[\"'][^\"']*result__snippet[^\"']*[\"'][^>]*>(.*?)</(?:a|div)>",
+                    block, flags=re.IGNORECASE | re.DOTALL
+                )
+                if not link_match:
+                    continue
+                url = html_lib.unescape(link_match.group(1))
+                title = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", link_match.group(2))))
+                snippet = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", snippet_match.group(1)))) if snippet_match else ""
+                if title and url.startswith("http"):
+                    results.append({
+                        "title": title, "text": snippet or title,
+                        "url": url, "source": "DuckDuckGo Web"
+                    })
+
+            # Lite endpoint uses a simpler result-link class.
+            if not results:
+                links = re.findall(
+                    r"<a[^>]*class=[\"'][^\"']*result-link[^\"']*[\"'][^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+                    page, flags=re.IGNORECASE | re.DOTALL
+                )
+                for url, raw_title in links:
+                    url = html_lib.unescape(url)
+                    title = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", raw_title)))
+                    if title and url.startswith("http"):
+                        results.append({
+                            "title": title, "text": title,
+                            "url": url, "source": "DuckDuckGo Web"
+                        })
+
+            if results:
+                unique, seen = [], set()
+                for item in results:
+                    if item["url"] in seen:
+                        continue
+                    seen.add(item["url"])
+                    unique.append(item)
+                return unique[:8]
+        except Exception:
+            continue
+
+    return []
 
 
 def research_topic(
@@ -2384,10 +2415,19 @@ def perform_smart_research(message, username, mode):
 
     sources = research_topic(query)
 
+    context = format_sources_for_ai(sources)
+    if not sources:
+        context = (
+            "CANLI WEB ARAŞTIRMASI DENENDİ ANCAK BU İSTEK İÇİN DOĞRULANABİLİR "
+            "ARAMA SONUCU ALINAMADI. Kullanıcıya internet erişimi kesinlikle yokmuş "
+            "gibi genelleme yapma. Aramanın bu istekte sonuç döndürmediğini açıkça "
+            "söyle; güncel ürün/fiyat/özellik bilgisi uydurma."
+        )
+
     return {
         "query": query,
         "sources": sources,
-        "context": format_sources_for_ai(sources)
+        "context": context
     }
 
 
