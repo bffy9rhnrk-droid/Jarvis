@@ -54,7 +54,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "35.0.0"
+APP_VERSION = "35.1.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -425,6 +425,27 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(Exception)
+async def karvis_unhandled_exception_handler(request, exc):
+    """Yakalanmamış API hatalarını admin hata merkezine kaydeder."""
+    try:
+        details = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        save_error(
+            "Yakalanmamış sunucu hatası: " + type(exc).__name__,
+            details,
+            category="http_unhandled_exception",
+            severity="critical",
+            path=request.url.path,
+            method=request.method,
+        )
+    except Exception as logging_exc:
+        print("KARVIS_EXCEPTION_HANDLER_FAILED: " + repr(logging_exc), flush=True)
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "error": "Sunucu tarafında beklenmeyen bir hata oluştu. Hata yönetici kayıtlarına iletildi."},
+    )
+
+
 # ============================================================
 # API KEYS
 # ============================================================
@@ -540,40 +561,53 @@ def write_json_file(
     temp.replace(path)
 
 
-def save_error(
-    message,
-    details=None
-):
+def _sanitize_error_text(value):
+    """Hata ayrıntılarından yaygın gizli anahtar/parola değerlerini maskeler."""
+    text = str(value or "")
+    patterns = [
+        (r"(?i)(api[_-]?key|authorization|bearer|password|passwd|secret|token)(\s*[=:]\s*)([^\s,;]+)", r"\1\2[REDACTED]"),
+        (r"(?i)(sk-[A-Za-z0-9_-]{12,})", "[REDACTED_API_KEY]"),
+        (r"(?i)(postgres(?:ql)?://[^:\s]+:)([^@\s]+)(@)", r"\1[REDACTED]\3"),
+    ]
+    for pattern, replacement in patterns:
+        text = re.sub(pattern, replacement, text)
+    return text[:20000]
+
+
+def save_error(message, details=None, *, category="application", severity="error", path=None, method=None):
+    """Admin hata merkezine yapılandırılmış, hassas bilgilerden arındırılmış kayıt ekler."""
+    item = {
+        "id": uuid.uuid4().hex,
+        "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "error": _sanitize_error_text(message),
+        "details": _sanitize_error_text(details),
+        "category": _sanitize_error_text(category),
+        "severity": severity if severity in {"info", "warning", "error", "critical"} else "error",
+        "status": "open",
+    }
+    if path:
+        item["path"] = _sanitize_error_text(path)[:500]
+    if method:
+        item["method"] = _sanitize_error_text(method)[:20]
 
     try:
-
         with error_lock:
-
-            data = read_json_file(
-                ERROR_FILE,
-                []
-            )
-
-            data.append({
-                "time":
-                    time.strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    ),
-
-                "error":
-                    str(message),
-
-                "details":
-                    str(details or "")
-            })
-
-            write_json_file(
-                ERROR_FILE,
-                data[-100:]
-            )
-
-    except Exception:
-        pass
+            data = read_json_file(ERROR_FILE, [])
+            if not isinstance(data, list):
+                data = []
+            # Eski kayıtların alanlarını koru; yeni kayıtlar en fazla 100 adet tutulur.
+            data.append(item)
+            write_json_file(ERROR_FILE, data[-100:])
+        return True
+    except Exception as exc:
+        # Kayıt sistemi de arızalıysa sessizce yutma; Render loglarında görünür olsun.
+        print(
+            "KARVIS_ERROR_LOG_WRITE_FAILED: "
+            + _sanitize_error_text(repr(exc))
+            + " | original_error=" + _sanitize_error_text(message),
+            flush=True,
+        )
+        return False
 
 
 # ============================================================
@@ -2170,7 +2204,13 @@ def weather_context_for_ai(weather):
 
 def is_weather_request(message):
     text = clean_text(message).lower()
-    return bool(re.search(r"\b(hava durumu|hava nasıl|hava bugün|yağmur yağacak mı|yağış var mı|sıcaklık kaç|kaç derece|derece kaç)\b", text))
+    weather_terms = (
+        r"\b(hava durumu|hava nasıl|hava bugün|bugün hava|yarın hava|hava yarın|"
+        r"hava tahmini|yağmur yağacak mı|yağış var mı|sıcaklık kaç|kaç derece|derece kaç|"
+        r"hava kaç derece|denizli hava|hava soğuk mu|hava sıcak mı|yağmur var mı|"
+        r"kar yağacak mı|rüzgar var mı)\b"
+    )
+    return bool(re.search(weather_terms, text))
 
 
 def is_local_news_request(message):
@@ -6144,20 +6184,37 @@ async def chat(
     research = None
     research_context = ""
 
-    # Hava durumu için ansiklopedik arama yerine doğrudan canlı saatlik veri kullan.
-    if use_web and is_weather_request(message):
-        weather = fetch_denizli_weather()
-        if weather:
-            research = {
-                "query": "Denizli canlı saatlik hava durumu",
-                "sources": [{
-                    "title": "Denizli saatlik hava durumu",
-                    "text": weather_context_for_ai(weather),
-                    "url": "",
-                    "source": weather.get("source", "hava servisi")
-                }],
-                "context": weather_context_for_ai(weather)
-            }
+    # Hava durumu soruları web karar katmanından bağımsız olarak canlı veri servisine gider.
+    # Böylece kısa/doğal ifadeler yüzünden hava durumu araştırmasının atlanması önlenir.
+    if is_weather_request(message):
+        try:
+            weather = fetch_denizli_weather()
+            if weather:
+                weather_context = weather_context_for_ai(weather)
+                research = {
+                    "query": "Denizli canlı saatlik hava durumu",
+                    "sources": [{
+                        "title": "Denizli saatlik hava durumu",
+                        "text": weather_context,
+                        "url": "",
+                        "source": weather.get("source", "hava servisi")
+                    }],
+                    "context": weather_context
+                }
+            else:
+                save_error(
+                    "Canlı hava durumu verisi alınamadı",
+                    "Open-Meteo ve wttr.in servislerinden sonuç alınamadı. Ayrıntılar varsa önceki 'Weather services unavailable' kaydında bulunur.",
+                    category="weather",
+                    severity="warning",
+                )
+        except Exception as weather_exc:
+            save_error(
+                "Hava durumu isteği işlenemedi",
+                traceback.format_exc(),
+                category="weather",
+                severity="error",
+            )
 
     if use_web and research is None:
         try:
@@ -6580,10 +6637,17 @@ async def errors():
 
 def get_error_items():
     data = read_json_file(ERROR_FILE, [])
+    if not isinstance(data, list):
+        data = []
     for item in data:
+        if not isinstance(item, dict):
+            continue
         item.setdefault("id", uuid.uuid4().hex)
         item.setdefault("status", "open")
-    return data
+        item.setdefault("category", "legacy")
+        item.setdefault("severity", "error")
+        item.setdefault("details", "")
+    return [item for item in data if isinstance(item, dict)]
 
 
 @app.get("/admin/errors")
