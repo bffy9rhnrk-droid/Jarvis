@@ -470,6 +470,8 @@ GOOGLE_CSE_ID = os.getenv(
     ""
 ).strip()
 
+SEARXNG_URL = os.getenv("SEARXNG_URL", "").strip().rstrip("/")
+
 
 groq_client = (
     OpenAI(
@@ -1694,6 +1696,74 @@ def search_wikipedia(
         return []
 
 
+def search_searxng_web(topic, limit=8):
+    """KARVIS web araması: yapılandırılmış SearXNG JSON API."""
+    if not SEARXNG_URL:
+        save_error(
+            "SearXNG araması yapılandırılmamış",
+            "Render Environment bölümünde SEARXNG_URL değişkenini kendi SearXNG sunucunun temel adresiyle ayarlayın.",
+            category="web_search",
+            severity="warning",
+            path="SEARXNG_URL",
+            method="GET",
+        )
+        return []
+
+    endpoint = SEARXNG_URL
+    if not endpoint.endswith("/search"):
+        endpoint += "/search"
+
+    try:
+        response = requests.get(
+            endpoint,
+            params={"q": topic, "format": "json", "language": "tr-TR"},
+            headers={**WEB_HEADERS, "Accept": "application/json"},
+            timeout=20,
+        )
+        if response.status_code != 200:
+            save_error(
+                "SearXNG API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; detail={(response.text or '')[:800]}",
+                category="web_search",
+                severity="error",
+                path=endpoint,
+                method="GET",
+            )
+            return []
+
+        payload = response.json()
+        items = payload.get("results", [])
+        results = []
+
+        for item in items[:limit]:
+            title = clean_text(item.get("title", ""))
+            snippet = clean_text(item.get("content", "") or item.get("description", ""))
+            url = str(item.get("url", "")).strip()
+            if not title or not url:
+                continue
+            results.append({
+                "title": title,
+                "text": snippet or title,
+                "url": url,
+                "source": ", ".join(item.get("engines", [])) or item.get("engine", "SearXNG"),
+            })
+
+        if not results:
+            save_error(
+                "SearXNG sonuç döndürmedi",
+                f"HTTP 200; query={topic!r}; unresponsive_engines={payload.get('unresponsive_engines', [])}",
+                category="web_search",
+                severity="warning",
+                path=endpoint,
+                method="GET",
+            )
+        return results
+
+    except Exception:
+        save_error("SearXNG web search error", traceback.format_exc())
+        return []
+
+
 def search_google_web(
     topic
 ):
@@ -1965,24 +2035,16 @@ def research_topic(
         )
 
     # --------------------------------------------------------
-    # Google
+    # SearXNG web search
     # --------------------------------------------------------
 
     if progress_callback:
-
         progress_callback(
             25,
-            "Ek web kaynakları kontrol ediliyor..."
+            "KARVIS Search üzerinden web kaynakları kontrol ediliyor..."
         )
 
-    google_sources = search_google_web(
-        topic
-    )
-    sources.extend(google_sources)
-
-    # Google CSE yapılandırılmamışsa veya az sonuç döndürürse canlı web yedeği.
-    if len(google_sources) < 4:
-        sources.extend(search_duckduckgo_web(topic))
+    sources.extend(search_searxng_web(topic, limit=8))
 
     # --------------------------------------------------------
     # Duplicate
