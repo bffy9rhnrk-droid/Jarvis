@@ -470,7 +470,7 @@ GOOGLE_CSE_ID = os.getenv(
     ""
 ).strip()
 
-SEARXNG_URL = os.getenv("SEARXNG_URL", "").strip().rstrip("/")
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
 
 
 groq_client = (
@@ -1696,48 +1696,52 @@ def search_wikipedia(
         return []
 
 
-def search_searxng_web(topic, limit=8):
-    """KARVIS web araması: yapılandırılmış SearXNG JSON API."""
-    if not SEARXNG_URL:
+def search_tavily_web(topic, limit=8):
+    """Search the web through Tavily and normalize results for KARVIS."""
+    if not TAVILY_API_KEY:
         save_error(
-            "SearXNG araması yapılandırılmamış",
-            "Render Environment bölümünde SEARXNG_URL değişkenini kendi SearXNG sunucunun temel adresiyle ayarlayın.",
+            "Tavily araması yapılandırılmamış",
+            "Render KARVIS backend Environment bölümünde TAVILY_API_KEY değişkenini tanımlayın.",
             category="web_search",
             severity="warning",
-            path="SEARXNG_URL",
-            method="GET",
+            path="TAVILY_API_KEY",
+            method="POST",
         )
         return []
 
-    endpoint = SEARXNG_URL
-    if not endpoint.endswith("/search"):
-        endpoint += "/search"
-
+    endpoint = "https://api.tavily.com/search"
     try:
-        response = requests.get(
+        response = requests.post(
             endpoint,
-            params={"q": topic, "format": "json", "language": "tr-TR"},
-            headers={**WEB_HEADERS, "Accept": "application/json"},
-            timeout=20,
+            json={
+                "api_key": TAVILY_API_KEY,
+                "query": str(topic or "").strip(),
+                "search_depth": "basic",
+                "topic": "general",
+                "max_results": max(1, min(int(limit), 10)),
+                "include_answer": False,
+                "include_raw_content": False,
+            },
+            headers={**WEB_HEADERS, "Accept": "application/json", "Content-Type": "application/json"},
+            timeout=25,
         )
         if response.status_code != 200:
+            detail = (response.text or "")[:800]
             save_error(
-                "SearXNG API başarısız",
-                f"HTTP {response.status_code}; query={topic!r}; detail={(response.text or '')[:800]}",
+                "Tavily API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; detail={detail}",
                 category="web_search",
                 severity="error",
                 path=endpoint,
-                method="GET",
+                method="POST",
             )
             return []
 
         payload = response.json()
-        items = payload.get("results", [])
         results = []
-
-        for item in items[:limit]:
+        for item in (payload.get("results") or [])[:limit]:
             title = clean_text(item.get("title", ""))
-            snippet = clean_text(item.get("content", "") or item.get("description", ""))
+            snippet = clean_text(item.get("content", "") or item.get("raw_content", ""))
             url = str(item.get("url", "")).strip()
             if not title or not url:
                 continue
@@ -1745,22 +1749,21 @@ def search_searxng_web(topic, limit=8):
                 "title": title,
                 "text": snippet or title,
                 "url": url,
-                "source": ", ".join(item.get("engines", [])) or item.get("engine", "SearXNG"),
+                "source": "Tavily",
             })
 
         if not results:
             save_error(
-                "SearXNG sonuç döndürmedi",
-                f"HTTP 200; query={topic!r}; unresponsive_engines={payload.get('unresponsive_engines', [])}",
+                "Tavily sonuç döndürmedi",
+                f"HTTP 200; query={topic!r}; response_keys={list(payload.keys())}",
                 category="web_search",
                 severity="warning",
                 path=endpoint,
-                method="GET",
+                method="POST",
             )
         return results
-
     except Exception:
-        save_error("SearXNG web search error", traceback.format_exc())
+        save_error("Tavily web search error", traceback.format_exc())
         return []
 
 
@@ -2035,16 +2038,16 @@ def research_topic(
         )
 
     # --------------------------------------------------------
-    # SearXNG web search
+    # Tavily web search
     # --------------------------------------------------------
 
     if progress_callback:
         progress_callback(
             25,
-            "KARVIS Search üzerinden web kaynakları kontrol ediliyor..."
+            "Tavily üzerinden web kaynakları kontrol ediliyor..."
         )
 
-    sources.extend(search_searxng_web(topic, limit=8))
+    sources.extend(search_tavily_web(topic, limit=8))
 
     # --------------------------------------------------------
     # Duplicate
@@ -2661,7 +2664,7 @@ def perform_smart_research(message, username, mode):
     if not sources:
         save_error(
             "Web araştırması sonuç döndürmedi",
-            f"Kullanıcı isteği: {raw_message!r}; arama sorgusu: {query!r}. Google CSE ve DuckDuckGo kaynaklarından kullanılabilir sonuç gelmedi.",
+            f"Kullanıcı isteği: {raw_message!r}; arama sorgusu: {query!r}. Tavily ve Wikipedia kaynaklarından kullanılabilir sonuç gelmedi.",
             category="web_search", severity="warning",
             path="/chat", method="POST",
         )
