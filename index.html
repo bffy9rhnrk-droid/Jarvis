@@ -1722,7 +1722,7 @@ body.voice-speaking .ring.three{
     </div>
     <div id="arenaGameArea" aria-live="polite"><p>Bir oyun seçerek yarışmayı başlat.</p></div>
   </section>
-  <section class="arena-card"><h3>📊 Ortak puan tablosu</h3><div id="arenaLeaderboard">Sıralama yükleniyor…</div></section>
+  <section class="arena-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><h3 style="margin:0">📊 Ortak puan tablosu</h3><button id="arenaRefreshButton" class="sude-btn" style="width:auto;padding:10px 14px" onclick="refreshArenaTable()">🔄 Tabloyu yenile</button></div><p id="arenaRefreshStatus" style="margin:10px 0 8px;font-size:.9em;opacity:.8" aria-live="polite">Puan tablosu hazır.</p><div id="arenaLeaderboard">Sıralama yükleniyor…</div></section>
   <section class="arena-card"><h3>🎖️ Rozetlerim</h3><div id="arenaBadges">Henüz rozet kazanılmadı.</div><h3 style="margin-top:16px">🗓️ Son yarışmalar</h3><div id="arenaHistory">Henüz yarışma tamamlanmadı.</div></section>
   <section id="arenaAdminTools" class="arena-card" style="display:none;border:1px solid #dc6262;">
     <h3>🛡️ Yönetici araçları</h3>
@@ -4661,19 +4661,42 @@ async function adminResetArena(){
  try{const r=await fetch(API+"/arena/reset?username="+encodeURIComponent(currentUser),{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena sıfırlanamadı.");alert(d.message||"Arena sıfırlandı.");arenaAttemptId=null;await loadArenaOverview();}
  catch(e){alert(e.message||"Arena sıfırlanırken hata oluştu.");}
 }
-async function loadArenaOverview(){
- try{const r=await fetch(API+"/arena/overview?username="+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena yüklenemedi.");
- $("arenaMyPoints").textContent=Number(d.player?.points||0).toLocaleString("tr-TR");$("arenaMyLeague").textContent=d.player?.league||"Bronz";$("arenaMyRank").textContent=(d.player?.rank?d.player.rank+". sıradasın":"Henüz sıralama yok");
- $("arenaLeaderboard").innerHTML=(d.leaderboard||[]).map((p,i)=>`<div class="sude-task"><strong>${i+1}.</strong><span>${arenaEscape(p.name)}</span><span style="margin-left:auto;font-weight:800">${Number(p.points||0).toLocaleString("tr-TR")} puan</span><small>${arenaEscape(p.league)}</small></div>`).join("")||"Henüz puan yok.";
- $("arenaBadges").innerHTML=(d.player?.badges||[]).map(b=>`<span class="badge">🏅 ${arenaEscape(b)}</span>`).join(" ")||"Henüz rozet kazanılmadı. İlk yarışmanı tamamla!";
- $("arenaHistory").innerHTML=(d.player?.history||[]).map(x=>`<div class="sude-task"><span>${arenaEscape(x.title)}</span><span style="margin-left:auto">${Number(x.score||0)} puan</span></div>`).join("")||"Henüz yarışma tamamlanmadı.";
- }catch(e){$("arenaLeaderboard").textContent=e.message;$("arenaGameArea").innerHTML="<p>Arena verileri alınamadı. Sunucunun güncel sürümde olduğundan emin ol.</p>";}}
+async function refreshArenaTable(){
+ const button=$("arenaRefreshButton"),status=$("arenaRefreshStatus");
+ if(button)button.disabled=true;
+ if(button)button.textContent="⏳ Yenileniyor…";
+ if(status)status.textContent="Puan tablosu güncelleniyor…";
+ try{await loadArenaOverview({fromRefresh:true});if(status)status.textContent="✅ Puan tablosu güncellendi.";}
+ catch(e){if(status)status.textContent="⚠️ Tablo yenilenemedi: "+(e.message||"Sunucu yanıt vermedi.");}
+ finally{if(button){button.disabled=false;button.textContent="🔄 Tabloyu yenile";}}
+}
+async function loadArenaOverview(options={}){
+ const status=$("arenaRefreshStatus");
+ let timeoutId;
+ try{
+  const controller=new AbortController();
+  timeoutId=setTimeout(()=>controller.abort(),12000);
+  const r=await fetch(API+"/arena/overview?username="+encodeURIComponent(currentUser),{signal:controller.signal});
+  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena yüklenemedi.");
+  $("arenaMyPoints").textContent=Number(d.player?.points||0).toLocaleString("tr-TR");$("arenaMyLeague").textContent=d.player?.league||"Bronz";$("arenaMyRank").textContent=(d.player?.rank?d.player.rank+". sıradasın":"Henüz sıralama yok");
+  $("arenaLeaderboard").innerHTML=(d.leaderboard||[]).map((p,i)=>`<div class="sude-task"><strong>${i+1}.</strong><span>${arenaEscape(p.name)}</span><span style="margin-left:auto;font-weight:800">${Number(p.points||0).toLocaleString("tr-TR")} puan</span><small>${arenaEscape(p.league)}</small></div>`).join("")||"Henüz puan yok.";
+  $("arenaBadges").innerHTML=(d.player?.badges||[]).map(b=>`<span class="badge">🏅 ${arenaEscape(b)}</span>`).join(" ")||"Henüz rozet kazanılmadı. İlk yarışmanı tamamla!";
+  $("arenaHistory").innerHTML=(d.player?.history||[]).map(x=>`<div class="sude-task"><span>${arenaEscape(x.title)}</span><span style="margin-left:auto">${Number(x.score||0)} puan</span></div>`).join("")||"Henüz yarışma tamamlanmadı.";
+  if(status&&!options.fromRefresh)status.textContent="Puan tablosu hazır.";
+ }catch(e){
+  const message=e.name==="AbortError"?"Sunucu 12 saniye içinde yanıt vermedi.":(e.message||"Arena yüklenemedi.");
+  $("arenaLeaderboard").textContent=message;
+  if(status)status.textContent="⚠️ "+message;
+  if(!options.fromRefresh)$("arenaGameArea").innerHTML=`<p>${arenaEscape(message)} Tabloyu yenile düğmesini tekrar deneyebilirsin.</p>`;
+  throw e;
+ }finally{if(timeoutId)clearTimeout(timeoutId);}
+}
 async function startArena(mode){
  const area=$("arenaGameArea");area.innerHTML="<p>Yarışma hazırlanıyor…</p>";arenaAttemptId=null;arenaQuestionIndex=0;arenaAnswered=false;
  try{const r=await fetch(API+"/arena/start",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,mode})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Yarışma başlatılamadı.");arenaAttemptId=d.attempt_id;renderArenaQuestion(d.question,d.question_number,d.total_questions);await loadArenaOverview();}catch(e){area.innerHTML=`<p>${arenaEscape(e.message)}</p>`;}}
 function renderArenaQuestion(q,num,total){arenaAnswered=false;arenaStartedAt=Date.now();const area=$("arenaGameArea");area.innerHTML=`<div class="sude-card"><p>Tur ${num}/${total}</p><h3>${arenaEscape(q.prompt)}</h3><div>${(q.options||[]).map((o,i)=>`<button class="arena-option" onclick="answerArena(${i})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaAnswerFeedback" aria-live="polite"></p></div>`;}
 async function answerArena(choice){if(!arenaAttemptId||arenaAnswered)return;arenaAnswered=true;document.querySelectorAll(".arena-option").forEach(b=>b.disabled=true);const feedback=$("arenaAnswerFeedback");if(feedback)feedback.textContent="Cevap kontrol ediliyor…";
- try{const r=await fetch(API+"/arena/answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,attempt_id:arenaAttemptId,answer:choice,elapsed_ms:Date.now()-arenaStartedAt})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Cevap gönderilemedi.");if(feedback)feedback.textContent=(d.correct?"✅ Doğru!":"❌ Bu cevap doğru değil.")+` ${d.message||""} · +${d.points_awarded||0} puan`;
+ try{const r=await fetch(API+"/arena/answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,attempt_id:arenaAttemptId,answer:choice,elapsed_ms:Date.now()-arenaStartedAt})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Cevap gönderilemedi.");if(feedback)feedback.textContent=(d.correct?"✅ Doğru!":"❌ Bu cevap doğru değil.")+` ${d.message||""} · ${Number(d.points_awarded||0)>0?"+":""}${Number(d.points_awarded||0)} puan`;
  setTimeout(async()=>{if(d.finished){arenaAttemptId=null;$("arenaGameArea").innerHTML=`<div class="sude-card"><h3>🏁 Yarışma tamamlandı!</h3><p>Bu yarışmada ${d.score} puan kazandın.</p><button class="sude-btn" onclick="openArena()">Sonuçları ve sıralamayı yenile</button></div>`;await loadArenaOverview();}else{renderArenaQuestion(d.question,d.question_number,d.total_questions);}},850);
  }catch(e){arenaAnswered=false;if(feedback)feedback.textContent=e.message;}}
 
