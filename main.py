@@ -76,6 +76,161 @@ VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
 VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@karahaninc.com").strip()
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+# Arena uses a separate Supabase database; notification storage keeps using DATABASE_URL.
+SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL", "").strip()
+
+
+def arena_database_configured():
+    return bool(SUPABASE_DB_URL and psycopg2)
+
+
+def get_arena_db_connection():
+    if not arena_database_configured():
+        return None
+    return psycopg2.connect(SUPABASE_DB_URL, connect_timeout=10, sslmode="require")
+
+
+def init_arena_database():
+    """Create the Arena state/attempt persistence layer and preserve existing tables."""
+    if not arena_database_configured():
+        return False
+    try:
+        conn = get_arena_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_state (
+                        id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+                        state JSONB NOT NULL DEFAULT '{}'::jsonb,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_players (
+                        username TEXT PRIMARY KEY,
+                        points INTEGER NOT NULL DEFAULT 0,
+                        league TEXT NOT NULL DEFAULT 'Bronz',
+                        badges JSONB NOT NULL DEFAULT '[]'::jsonb,
+                        games_played INTEGER NOT NULL DEFAULT 0,
+                        wins INTEGER NOT NULL DEFAULT 0,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_game_history (
+                        id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                        username TEXT NOT NULL REFERENCES public.arena_players(username) ON DELETE CASCADE,
+                        game_mode TEXT NOT NULL,
+                        score INTEGER NOT NULL DEFAULT 0,
+                        correct_answers INTEGER NOT NULL DEFAULT 0,
+                        total_questions INTEGER NOT NULL DEFAULT 0,
+                        played_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_attempts (
+                        attempt_id TEXT PRIMARY KEY,
+                        username TEXT NOT NULL,
+                        attempt JSONB NOT NULL,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_history_username ON public.arena_game_history(username)")
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_history_played_at ON public.arena_game_history(played_at DESC)")
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_attempts_username ON public.arena_attempts(username)")
+                # Import the previous JSON save only when the database has no state yet.
+                cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
+                row = cur.fetchone()
+                if not row:
+                    legacy = read_json_file(ARENA_FILE, {}) if 'ARENA_FILE' in globals() else {}
+                    if not isinstance(legacy, dict):
+                        legacy = {}
+                    legacy.setdefault("players", {})
+                    legacy.setdefault("attempts", {})
+                    legacy.setdefault("updated_at", time.strftime("%Y-%m-%d %H:%M:%S"))
+                    cur.execute(
+                        "INSERT INTO public.arena_state (id, state) VALUES (1, %s::jsonb) ON CONFLICT (id) DO NOTHING",
+                        (json.dumps(legacy, ensure_ascii=False),)
+                    )
+        conn.close()
+        return True
+    except Exception:
+        try:
+            save_error("Arena database initialization error", traceback.format_exc())
+        except Exception:
+            pass
+        return False
+
+
+def _arena_load_state_from_db():
+    conn = get_arena_db_connection()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
+                row = cur.fetchone()
+                if not row:
+                    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+                state = row[0]
+                if isinstance(state, str):
+                    state = json.loads(state)
+                if not isinstance(state, dict):
+                    state = {}
+                state.setdefault("players", {})
+                state.setdefault("attempts", {})
+                return state
+    finally:
+        conn.close()
+
+
+def _arena_save_state_to_db(data):
+    conn = get_arena_db_connection()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO public.arena_state (id, state, updated_at)
+                    VALUES (1, %s::jsonb, NOW())
+                    ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()
+                """, (json.dumps(data, ensure_ascii=False),))
+                # Keep the normalized tables (created in Supabase SQL Editor) in sync.
+                for username, player in data.get("players", {}).items():
+                    points = int(player.get("points", 0) or 0)
+                    cur.execute("""
+                        INSERT INTO public.arena_players
+                            (username, points, league, badges, games_played, wins, updated_at)
+                        VALUES (%s, %s, %s, %s::jsonb, %s, %s, NOW())
+                        ON CONFLICT (username) DO UPDATE SET
+                            points = EXCLUDED.points, league = EXCLUDED.league,
+                            badges = EXCLUDED.badges, games_played = EXCLUDED.games_played,
+                            wins = EXCLUDED.wins, updated_at = NOW()
+                    """, (username, points, _arena_league(points),
+                          json.dumps(player.get("badges", []), ensure_ascii=False),
+                          len(player.get("history", [])), int(player.get("wins", 0) or 0)))
+                # History rows are a display/analytics copy; replace atomically to avoid duplicates.
+                cur.execute("DELETE FROM public.arena_game_history")
+                for username, player in data.get("players", {}).items():
+                    for item in player.get("history", [])[-50:]:
+                        title = str(item.get("title", "Arena"))
+                        mode = next((key for key, label in ARENA_MODES.items() if label == title), title)
+                        cur.execute("""
+                            INSERT INTO public.arena_game_history
+                                (username, game_mode, score, correct_answers, total_questions, played_at)
+                            VALUES (%s, %s, %s, %s, %s, NOW())
+                        """, (username, mode, int(item.get("score", 0) or 0), 0, 0))
+                for attempt_id, attempt in data.get("attempts", {}).items():
+                    cur.execute("""
+                        INSERT INTO public.arena_attempts (attempt_id, username, attempt, updated_at)
+                        VALUES (%s, %s, %s::jsonb, NOW())
+                        ON CONFLICT (attempt_id) DO UPDATE SET
+                            username = EXCLUDED.username, attempt = EXCLUDED.attempt, updated_at = NOW()
+                    """, (attempt_id, str(attempt.get("username", "")),
+                          json.dumps(attempt, ensure_ascii=False)))
+        conn.close()
+    except Exception:
+        conn.close()
+        raise
 
 
 def push_database_configured():
@@ -551,10 +706,31 @@ def _arena_default():
     return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 def _arena_load():
+    if arena_database_configured():
+        try:
+            return _arena_load_state_from_db()
+        except Exception:
+            # Do not silently lose writes; surface database failures to the API caller.
+            raise HTTPException(status_code=503, detail="Arena veritabanına erişilemiyor.")
     data = read_json_file(ARENA_FILE, {})
     if not isinstance(data, dict): data = {}
     data.setdefault("players", {}); data.setdefault("attempts", {})
     return data
+
+
+def _arena_save(data):
+    data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    if arena_database_configured():
+        try:
+            _arena_save_state_to_db(data)
+            return
+        except Exception:
+            try:
+                save_error("Arena database save error", traceback.format_exc())
+            except Exception:
+                pass
+            raise HTTPException(status_code=503, detail="Arena veritabanına kaydedilemedi.")
+    write_json_file(ARENA_FILE, data)
 
 def _arena_league(points):
     points = int(points or 0)
@@ -593,6 +769,37 @@ async def arena_leaderboard():
         data=_arena_load()
         return {"success":True,"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in _arena_rankings(data)]}
 
+@app.post("/arena/reset")
+async def arena_reset(username: str = ""):
+    """Reset Arena scores/history; only the Murat admin profile may invoke this."""
+    require_admin(username)
+    empty_state = {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    with arena_lock:
+        if arena_database_configured():
+            conn = get_arena_db_connection()
+            try:
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute("DELETE FROM public.arena_attempts")
+                        cur.execute("DELETE FROM public.arena_game_history")
+                        cur.execute("DELETE FROM public.arena_players")
+                        cur.execute("""
+                            INSERT INTO public.arena_state (id, state, updated_at)
+                            VALUES (1, %s::jsonb, NOW())
+                            ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()
+                        """, (json.dumps(empty_state, ensure_ascii=False),))
+            except Exception:
+                try:
+                    save_error("Arena reset error", traceback.format_exc())
+                except Exception:
+                    pass
+                raise HTTPException(status_code=503, detail="Arena tablosu sıfırlanamadı.")
+            finally:
+                conn.close()
+        else:
+            write_json_file(ARENA_FILE, empty_state)
+        return {"success": True, "message": "Arena puan tablosu, rozetler ve oyun geçmişi sıfırlandı."}
+
 @app.post("/arena/start")
 async def arena_start(payload: dict):
     username=str(payload.get("username", "")).strip().lower(); mode=str(payload.get("mode", "knowledge"))
@@ -604,7 +811,7 @@ async def arena_start(payload: dict):
         chosen=random.sample(bank, min(5,len(bank)))
         attempt_id=uuid.uuid4().hex
         data["attempts"][attempt_id]={"username":username,"mode":mode,"questions":chosen,"index":0,"score":0,"answers":[],"started":time.time(),"question_started_at":time.time(),"finished":False,"awarded":False}
-        write_json_file(ARENA_FILE,data)
+        _arena_save(data)
         q=chosen[0]
         return {"success":True,"attempt_id":attempt_id,"question_number":1,"total_questions":len(chosen),"question":{"prompt":q["prompt"],"options":q["options"]}}
 
@@ -638,7 +845,7 @@ async def arena_answer(payload: dict):
             response["score"]=int(attempt["score"]); response["message"]="Yarışma tamamlandı!"
         else:
             nextq=questions[attempt["index"]];attempt["question_started_at"]=time.time();response["question"]={"prompt":nextq["prompt"],"options":nextq["options"]};response["question_number"]=attempt["index"]+1;response["total_questions"]=len(questions)
-        data["updated_at"]=time.strftime("%Y-%m-%d %H:%M:%S");write_json_file(ARENA_FILE,data)
+        data["updated_at"]=time.strftime("%Y-%m-%d %H:%M:%S");_arena_save(data)
         return response
 
 
@@ -7243,6 +7450,12 @@ async def startup():
     if push_database_configured():
         init_push_database()
         migrate_push_json_to_database()
+
+    if arena_database_configured():
+        if init_arena_database():
+            print("KARVIS Arena: Supabase database connected.")
+        else:
+            print("KARVIS Arena: Supabase unavailable; Arena requests may return 503.")
 
     start_self_push_worker()
 
