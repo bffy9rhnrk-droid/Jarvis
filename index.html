@@ -1088,6 +1088,26 @@ body.voice-speaking .ring.three{
         max-width:92%
     }
 }
+
+/* ============================================================
+   SUDE'S WORLD — isolated pastel dashboard
+   ============================================================ */
+#sudeWorldModal{width:min(96vw,760px);max-height:92vh;background:linear-gradient(145deg,#241735,#17172d);border-color:rgba(226,170,255,.5);color:#fff;}
+#sudeWorldModal h2{color:#f3c4ff;}
+.sude-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0;}
+.sude-card{border:1px solid rgba(235,190,255,.2);border-radius:16px;padding:13px;background:linear-gradient(140deg,rgba(232,174,255,.12),rgba(255,184,219,.06));min-width:0;}
+.sude-card h3{font-size:14px;margin:0 0 10px;color:#f4caff;}
+.sude-card p,.sude-card small{color:rgba(255,255,255,.7);font-size:12px;line-height:1.5;}
+.sude-field{width:100%;height:40px;border:1px solid rgba(233,185,255,.25);border-radius:10px;background:#20192e;color:white;padding:0 10px;margin:4px 0 8px;}
+.sude-btn{border:1px solid rgba(245,197,255,.3);border-radius:10px;background:linear-gradient(90deg,#b77bdf,#ec9fc6);color:#24152e;font-weight:800;padding:10px 12px;width:100%;margin-top:5px;}
+.sude-task{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;}
+.sude-task button{margin-left:auto;border:0;border-radius:8px;padding:7px;background:#d5a4ed;color:#25152e;}
+.sude-stat{font-size:24px;font-weight:900;color:#f5c5ff;}
+body.sude-mode{background:radial-gradient(circle at 30% 20%,rgba(201,139,255,.2),transparent 38%),radial-gradient(circle at 80% 90%,rgba(255,163,205,.14),transparent 45%),#171321;}
+body.sude-mode .header{border-color:rgba(222,169,255,.2);}
+body.sude-mode .logo-small,body.sude-mode .menu-button{color:#e9b6ff;border-color:#d5a4ed;}
+@media(max-width:520px){.sude-grid{grid-template-columns:1fr;}#sudeWorldModal{padding:16px;}}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1207,6 +1227,11 @@ body.voice-speaking .ring.three{
 
     </div>
 
+    <div id="sudeMenu" style="display:none;">
+        <div class="academic-title">🌷 SUDE'NİN DÜNYASI</div>
+        <button class="menu-item" onclick="openSudeWorld()">🌸 Sude's World</button>
+    </div>
+
     <!-- ========================================================
          SADECE KARAHAN - K.A.R.V.I.S. CORE
          ======================================================== -->
@@ -1243,6 +1268,8 @@ body.voice-speaking .ring.three{
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
         <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
+        <button class="menu-item" onclick="openSudeAdminSummary()">🌷 Sude İlerleme Özeti</button>
+        <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
 
     </div>
 
@@ -1412,6 +1439,7 @@ body.voice-speaking .ring.three{
             <option value="sinem">Sinem</option>
             <option value="ilknur">İlknur</option>
             <option value="murat">Murat</option>
+            <option value="sude">Sude</option>
         </select>
     </div>
     <input id="notificationTitle" placeholder="Bildirim başlığı" maxlength="120" value="K.A.R.V.I.S.">
@@ -1561,6 +1589,10 @@ body.voice-speaking .ring.three{
     </div>
 
     <div class="settings-section">
+        <div class="settings-row"><div><strong>🔐 Şifre</strong><small>Bu profilin giriş şifresini değiştir</small></div><button class="settings-action" onclick="openPasswordChange()">Değiştir</button></div>
+    </div>
+
+    <div class="settings-section">
         <div class="settings-row">
             <div>
                 <strong>🧹 Sohbet</strong>
@@ -1608,6 +1640,34 @@ body.voice-speaking .ring.three{
         Vazgeç
     </button>
 
+</div>
+
+<div id="adminSudeSummaryModal" class="modal"><h2>🌷 Sude — İlerleme Özeti</h2><div id="adminSudeSummaryContent" class="error-list">Yükleniyor...</div><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
+<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">KARAHAN INC.</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
+<!-- ACCOUNT PASSWORD MODAL -->
+<div id="passwordModal" class="modal">
+  <h2>🔐 Şifre Değiştir</h2>
+  <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Mevcut şifre">
+  <input id="newPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre (en az 6 karakter)">
+  <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre tekrar">
+  <button class="modal-button" onclick="changeOwnPassword()">Şifreyi Güncelle</button>
+  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<!-- SUDE'S WORLD DASHBOARD -->
+<div id="sudeWorldModal" class="modal">
+  <h2>🌷 Sude's World</h2>
+  <p style="font-size:12px;color:#d9bce9;margin-top:-5px;">Küçük adımlar, sağlıklı alışkanlıklar ve eğlence 💜</p>
+  <div class="sude-grid">
+    <section class="sude-card"><h3>✨ Günlük ilerleme</h3><div class="sude-stat" id="sudePoints">0 puan</div><p id="sudeLevel">Seviye 1</p><p id="sudeBadges">Rozetler: henüz yok</p></section>
+    <section class="sude-card"><h3>🐱 Sanal arkadaşın</h3><div style="font-size:42px;text-align:center;">🐱💜</div><p id="sudePetStats">Luna · Mutluluk 70 · Enerji 70</p><button class="sude-btn" onclick="sudePetAction('feed')">🍓 Besle</button><button class="sude-btn" onclick="sudePetAction('play')">🧶 Oyna</button></section>
+    <section class="sude-card"><h3>🥗 Beslenme günlüğü</h3><input id="sudeFoodName" class="sude-field" placeholder="Yiyecek / öğün"><input id="sudeFoodCalories" class="sude-field" type="number" min="0" max="5000" placeholder="Yaklaşık kalori (kcal)"><button class="sude-btn" onclick="estimateSudeCalories()">✨ Kalori Tahmin Et</button><p id="sudeCalorieEstimate"></p><button class="sude-btn" onclick="addSudeFood()">Öğünü Kaydet</button><div id="sudeFoodList"></div><small>Kalori değerleri yaklaşık tahminlerdir; porsiyon ve tarife göre değişir.</small></section>
+    <section class="sude-card"><h3>📐 VKİ hesaplama</h3><input id="sudeHeight" class="sude-field" type="number" min="80" max="250" placeholder="Boy (cm)"><input id="sudeWeight" class="sude-field" type="number" min="20" max="350" step="0.1" placeholder="Kilo (kg)"><button class="sude-btn" onclick="calculateSudeBMI()">VKİ Hesapla</button><p id="sudeBmiResult"></p></section>
+    <section class="sude-card"><h3>📝 Günlük görevler</h3><input id="sudeTaskTitle" class="sude-field" placeholder="Örn. 10 dakika yürüyüş"><button class="sude-btn" onclick="addSudeTask()">Görev Ekle</button><div id="sudeTaskList"></div></section>
+    <section class="sude-card"><h3>🧩 Mini oyun: Bilmece</h3><p id="sudeRiddle">Bir ağzı var ama konuşmaz; yatağı var ama uyumaz. Nedir?</p><input id="sudeRiddleAnswer" class="sude-field" placeholder="Cevabın"><button class="sude-btn" onclick="checkSudeRiddle()">Cevabı Kontrol Et</button><p id="sudeRiddleFeedback"></p><button class="sude-btn" onclick="newSudeRiddle()">Yeni Bilmece</button></section>
+  </div>
+  <p style="font-size:10px;color:#cdb9d9;line-height:1.5;">Beslenme ve VKİ araçları genel bilgilendirme içindir; tıbbi tanı veya kişiye özel diyet tedavisi değildir.</p>
+  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
 <!-- ============================================================
@@ -1878,7 +1938,8 @@ async function login(){
                 "betul",
                 "sinem",
                 "ilknur",
-                "murat"
+                "murat",
+                "sude"
             ].includes(currentUser)
         ){
 
@@ -2296,6 +2357,7 @@ function updateSidebar(){
     const betulMenu = $("betulMenu");
     const adminMenu = $("adminMenu");
     const karahanCoreMenu = $("karahanCoreMenu");
+    const sudeMenu = $("sudeMenu");
 
     teacherMenu.style.display =
         currentUser === "ilknur" ? "block" : "none";
@@ -2312,6 +2374,8 @@ function updateSidebar(){
 
     betulMenu.style.display =
         currentUser === "betul" ? "block" : "none";
+    if(sudeMenu) sudeMenu.style.display = currentUser === "sude" ? "block" : "none";
+    document.body.classList.toggle("sude-mode", currentUser === "sude");
 
     adminMenu.style.display =
         currentUser === "murat" ? "block" : "none";
@@ -2500,6 +2564,10 @@ function showGreeting(){
             "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız hazır. Ders, araştırma, makale, quiz ve sunum çalışmalarında yardımcı olabilirim.",
             "ai"
         );
+    }
+
+    else if(currentUser === "sude"){
+        addMessage("Hoş geldin Sude! 🌷 Burası senin dünyan. Sağlıklı alışkanlıklarını takip edebilir, görevlerini tamamlayabilir ve Luna ile oynayabilirsin. 💜", "ai");
     }
 
     else if(currentUser === "murat"){
@@ -4479,6 +4547,36 @@ function handleKey(e){
 }
 
 /* ============================================================
+   PASSWORD + SUDE'S WORLD
+   ============================================================ */
+async function estimateSudeCalories(){const meal=$("sudeFoodName").value.trim();if(!meal){alert("Önce yiyecek veya öğün adını yaz.");return;}$("sudeCalorieEstimate").textContent="Tahmin hazırlanıyor...";try{const r=await fetch(API+"/sude/estimate-calories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",meal})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Tahmin yapılamadı.");if(!d.success)throw new Error(d.explanation||"Tahmin yapılamadı.");$("sudeFoodCalories").value=d.estimate;$("sudeCalorieEstimate").textContent=`Yaklaşık ${d.estimate} kcal — ${d.explanation} ${d.disclaimer||""}`;}catch(e){$("sudeCalorieEstimate").textContent=e.message;}}
+async function openSudeAdminSummary(){if(currentUser!=="murat"){alert("Bu bölüm yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminSudeSummaryModal").classList.add("show");const box=$("adminSudeSummaryContent");box.textContent="Yükleniyor...";try{const r=await fetch(API+"/admin/sude-summary?username=murat");const d=await r.json();if(!r.ok)throw new Error(d.detail||"Özet alınamadı.");const s=d.summary||{};box.innerHTML=`<p><strong>Puan:</strong> ${Number(s.points)||0}</p><p><strong>Seviye:</strong> ${Number(s.level)||1}</p><p><strong>Tamamlanan görev:</strong> ${Number(s.completed_tasks)||0} / ${Number(s.total_tasks)||0}</p><p><strong>Rozetler:</strong> ${escapeHTML((s.badges||[]).join(", ")||"Henüz yok")}</p><small>Bu özet ayrıntılı yiyecek kayıtlarını veya özel beslenme günlüklerini göstermez.</small>`;}catch(e){box.textContent=e.message;}}
+function openAdminPasswordReset(){if(currentUser!=="murat"){alert("Bu işlem yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminPasswordResetModal").classList.add("show");}
+async function adminResetPassword(){if(currentUser!=="murat"){alert("Yetkisiz işlem.");return;}const target=$("resetTargetUser").value,password=$("resetNewPassword").value;if(password.length<6){alert("Şifre en az 6 karakter olmalı.");return;}try{const r=await fetch(API+"/admin/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"murat",target_username:target,new_password:password})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre sıfırlanamadı.");alert(d.message||"Şifre sıfırlandı.");$("resetNewPassword").value="";closeModals();}catch(e){alert(e.message);}}
+function openPasswordChange(){ closeSidebar(); $("passwordModal").classList.add("show"); }
+async function changeOwnPassword(){
+    const current=$("currentPassword").value, next=$("newPassword").value, confirmPass=$("confirmPassword").value;
+    if(next.length<6){alert("Yeni şifre en az 6 karakter olmalı.");return;}
+    if(next!==confirmPass){alert("Yeni şifreler eşleşmiyor.");return;}
+    try{const r=await fetch(API+"/account/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,current_password:current,new_password:next})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre değiştirilemedi.");alert("Şifren güncellendi.");["currentPassword","newPassword","confirmPassword"].forEach(id=>$(id).value="");closeModals();}catch(e){alert(e.message);}
+}
+async function openSudeWorld(){
+    if(currentUser!=="sude"){alert("Bu alan yalnızca Sude profiline açıktır.");return;}
+    closeSidebar();$("sudeWorldModal").classList.add("show");await refreshSudeWorld();
+}
+async function refreshSudeWorld(){
+    try{const r=await fetch(API+"/sude/world?username=sude");const d=await r.json();if(!r.ok)throw new Error(d.detail||"Dünya yüklenemedi.");const w=d.world||{};$("sudePoints").textContent=(w.points||0)+" puan";$("sudeLevel").textContent="Seviye "+((w.pet&&w.pet.level)||1);$("sudeBadges").textContent="Rozetler: "+((w.badges||[]).join(", ")||"henüz yok");const p=w.pet||{};$("sudePetStats").textContent=(p.name||"Luna")+" · Mutluluk "+(p.mood||0)+" · Enerji "+(p.energy||0);const today=new Date().toISOString().slice(0,10);const foods=(w.food_log||[]).filter(x=>x.date===today);$("sudeFoodList").innerHTML=foods.slice().reverse().map(x=>`<div class="sude-task">${escapeHTML(x.name)} <span style="margin-left:auto">${Number(x.calories)||0} kcal</span></div>`).join("")||"<small>Bugün henüz kayıt yok.</small>";$("sudeTaskList").innerHTML=(w.tasks||[]).slice().reverse().map(t=>`<div class="sude-task"><span>${t.done?"✅":"🌱"} ${escapeHTML(t.title)}</span>${t.done?"<small>Tamamlandı</small>":`<button onclick="completeSudeTask('${t.id}')">+10 puan</button>`}</div>`).join("")||"<small>İlk görevini ekle!</small>";}catch(e){alert(e.message);}
+}
+async function addSudeFood(){const name=$("sudeFoodName").value.trim(), calories=$("sudeFoodCalories").value;if(!name||calories===""){alert("Yiyecek adı ve yaklaşık kalori gir.");return;}try{const r=await fetch(API+"/sude/food",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",name,calories})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Kayıt yapılamadı.");$("sudeFoodName").value="";$("sudeFoodCalories").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
+async function addSudeTask(){const title=$("sudeTaskTitle").value.trim();if(!title)return;try{const r=await fetch(API+"/sude/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",title})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev eklenemedi.");$("sudeTaskTitle").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
+async function completeSudeTask(id){try{const r=await fetch(API+"/sude/tasks/"+encodeURIComponent(id)+"/complete?username=sude",{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev tamamlanamadı.");await refreshSudeWorld();}catch(e){alert(e.message);}}
+async function sudePetAction(action){try{const r=await fetch(API+"/sude/pet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",action})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Evcil karakter güncellenemedi.");await refreshSudeWorld();}catch(e){alert(e.message);}}
+async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("sudeWeight").value;try{const r=await fetch(API+"/sude/bmi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",height,weight})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"VKİ hesaplanamadı.");$("sudeBmiResult").textContent=`VKİ: ${d.bmi} · ${d.category}. ${d.note}`;}catch(e){alert(e.message);}}
+const sudeRiddles=[{q:"Bir ağzı var ama konuşmaz; yatağı var ama uyumaz. Nedir?",a:"nehir"},{q:"Ne kadar çok alırsan, arkanda o kadar çok bırakırsın. Nedir?",a:"adım"},{q:"Kırılmadan kullanılamayan şey nedir?",a:"yumurta"},{q:"Sana ait ama başkaları senden daha çok kullanır. Nedir?",a:"isim"}];let sudeRiddleIndex=0;
+function newSudeRiddle(){sudeRiddleIndex=(sudeRiddleIndex+1)%sudeRiddles.length;$("sudeRiddle").textContent=sudeRiddles[sudeRiddleIndex].q;$("sudeRiddleAnswer").value="";$("sudeRiddleFeedback").textContent="";}
+function checkSudeRiddle(){const answer=$("sudeRiddleAnswer").value.trim().toLocaleLowerCase("tr-TR");const correct=sudeRiddles[sudeRiddleIndex].a;if(answer===correct||answer.includes(correct)){ $("sudeRiddleFeedback").textContent="🎉 Doğru cevap! Harikasın."; }else{$("sudeRiddleFeedback").textContent="Bir daha düşün 😊 İpucu: cevabı günlük hayatta sık görürüz.";}}
+
+/* ============================================================
    INITIALIZE
    ============================================================ */
 
@@ -4495,7 +4593,8 @@ function initialize(){
             "betul",
             "sinem",
             "ilknur",
-            "murat"
+            "murat",
+            "sude"
         ].includes(savedUser)
     ){
 
