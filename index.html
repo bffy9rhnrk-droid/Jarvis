@@ -1241,7 +1241,7 @@ body.voice-speaking .ring.three{
         <button class="menu-item" onclick="openSudeSection('food')">🥗 Beslenme günlüğü</button>
         <button class="menu-item" onclick="openSudeSection('bmi')">📐 VKİ hesaplama</button>
         <button class="menu-item" onclick="openSudeSection('tasks')">📝 Günlük görevler</button>
-        <button class="menu-item" onclick="openSudeSection('games')">🧩 Mini oyunlar ve bilmeceler</button>
+        <button class="menu-item" onclick="openSudeSection('games')">🐾 Luna’nın macerası</button>
     </div>
 
     <!-- ========================================================
@@ -1379,6 +1379,7 @@ body.voice-speaking .ring.three{
         onkeydown="handleLoginKey(event)">
 
     <button
+        id="loginButton"
         class="modal-button"
         onclick="login()">
         Giriş Yap
@@ -1719,9 +1720,23 @@ body.voice-speaking .ring.three{
 </div>
 
 <div id="sudeGamesModal" class="modal sude-panel">
-  <h2>🧩 Mini oyunlar</h2>
-  <p class="sude-subtitle">Bir bilmece çöz, sonra yenisine geç! 🌸</p>
-  <section class="sude-card"><h3>🌙 Bilmece</h3><p id="sudeRiddle">Bir ağzı var ama konuşmaz; yatağı var ama uyumaz. Nedir?</p><input id="sudeRiddleAnswer" class="sude-field" placeholder="Cevabın"><button class="sude-btn" onclick="checkSudeRiddle()">Cevabı kontrol et</button><p id="sudeRiddleFeedback" aria-live="polite"></p><div class="luna-food">🐾 Luna'nın mama stoğu: <span id="sudeRiddleFood">0</span> 🍓</div><p style="font-size:12px;opacity:.8">Doğru bildiğinde 1 mama kazanırsın. Sonra Luna bölümüne gidip onu besleyebilirsin.</p><button class="sude-btn" onclick="newSudeRiddle()">Yeni bilmece</button></section>
+  <h2>🐾 Luna’nın küçük macerası</h2>
+  <p class="sude-subtitle">Luna bugün ne keşfetsin? Seçimini yap, birlikte tatlı bir hikâye yaşayın. 💗</p>
+  <section class="sude-card">
+    <div class="luna-stage" style="min-height:145px"><div class="luna-cat" aria-label="Hareket eden sevimli kedi">🐈</div><div class="luna-hearts">✨ 💗 ✨</div></div>
+    <h3 id="sudeAdventureTitle">🌷 Bahçede bir gün</h3>
+    <p id="sudeAdventureStory" aria-live="polite">Luna bahçede minik pati izleri buldu. Acaba nereye gidiyorlar?</p>
+    <div class="sude-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <button class="sude-btn" onclick="chooseSudeAdventure(0)">🦋 Kelebeği takip et</button>
+      <button class="sude-btn" onclick="chooseSudeAdventure(1)">🌼 Çiçekleri kokla</button>
+      <button class="sude-btn" onclick="chooseSudeAdventure(2)">📦 Gizemli kutuya bak</button>
+      <button class="sude-btn" onclick="chooseSudeAdventure(3)">🧶 Yün yumağını bul</button>
+    </div>
+    <p id="sudeAdventureFeedback" aria-live="polite">Bir macera seçerek Luna’yla vakit geçir. 🐾</p>
+    <div class="luna-food">🍓 Luna için biriken mama: <span id="sudeRiddleFood">0</span></div>
+    <p style="font-size:12px;opacity:.8">Her yeni macerada bir kez mama kazanabilirsin. Mama stoğun Luna bölümünde de görünür.</p>
+    <button class="sude-btn" onclick="startSudeAdventure()">🔄 Yeni macera başlat</button>
+  </section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -1927,8 +1942,9 @@ function handleLoginKey(e){
     }
 }
 
+let loginInProgress = false;
 async function login(){
-
+    if(loginInProgress) return;
     const username =
         $("usernameInput")
         .value
@@ -1945,6 +1961,9 @@ async function login(){
         return;
     }
 
+    const loginButton = $("loginButton");
+    loginInProgress = true;
+    if(loginButton){ loginButton.disabled = true; loginButton.textContent = "Giriş yapılıyor…"; }
     try{
 
         const response = await fetch(
@@ -2043,6 +2062,9 @@ async function login(){
             "Profil değiştirilemedi.\n\n" +
             error.message
         );
+    } finally {
+        loginInProgress = false;
+        if(loginButton){ loginButton.disabled = false; loginButton.textContent = "Giriş Yap"; }
     }
 }
 
@@ -4631,7 +4653,7 @@ async function refreshSudeWorld(){
         const p=w.pet||{};put("sudePetStats",(p.name||"Luna")+" · Mutluluk "+(p.mood||0)+" · Enerji "+(p.energy||0));
         const foodStock=getLunaFoodStock();put("sudeLunaFood",foodStock);put("sudeRiddleFood",foodStock);
         put("sudePetMoodLine",foodStock>0?"Luna mamalarını bekliyor! 😻":"Luna'yı mutlu etmek için bilmece çöz ve mama biriktir. 💗");
-        const foodList=$("sudeFoodList");if(foodList){const today=new Date().toISOString().slice(0,10);const foods=(w.food_log||[]).filter(x=>x.date===today);foodList.innerHTML=foods.slice().reverse().map(x=>`<div class="sude-task">${escapeHTML(x.name)} <span style="margin-left:auto">${Number(x.calories)||0} kcal</span></div>`).join("")||"<small>Bugün henüz kayıt yok.</small>";}
+        const foodList=$("sudeFoodList");if(foodList){const now=new Date();const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;const foods=(w.food_log||[]).filter(x=>x.date===today);foodList.innerHTML=foods.slice().reverse().map(x=>`<div class="sude-task">${escapeHTML(x.name)} <span style="margin-left:auto">${Number(x.calories)||0} kcal</span></div>`).join("")||"<small>Bugün henüz kayıt yok.</small>";}
         const taskList=$("sudeTaskList");if(taskList)taskList.innerHTML=(w.tasks||[]).slice().reverse().map(t=>`<div class="sude-task"><span>${t.done?"✅":"🌱"} ${escapeHTML(t.title)}</span>${t.done?"<small>Tamamlandı</small>":`<button onclick="completeSudeTask('${t.id}')">+10 puan</button>`}</div>`).join("")||"<small>İlk görevini ekle!</small>";
     }catch(e){alert(e.message);}
 }
@@ -4641,25 +4663,30 @@ async function completeSudeTask(id){try{const r=await fetch(API+"/sude/tasks/"+e
 const LUNA_FOOD_KEY="karvis_sude_luna_food_v1";
 function getLunaFoodStock(){try{return Math.max(0,parseInt(localStorage.getItem(LUNA_FOOD_KEY)||"0",10)||0);}catch(e){return 0;}}
 function setLunaFoodStock(n){try{localStorage.setItem(LUNA_FOOD_KEY,String(Math.max(0,n|0)));}catch(e){}const stock=getLunaFoodStock();const a=$("sudeLunaFood"),b=$("sudeRiddleFood");if(a)a.textContent=stock;if(b)b.textContent=stock;}
-let solvedSudeRiddles=new Set();
+let completedSudeAdventures=new Set();
+let sudeAdventureRound=0;
 async function sudePetAction(action){
     if(action==="feed"){
-        const stock=getLunaFoodStock();if(stock<1){alert("Luna'nın mama stoğu boş! Mini oyunlar bölümünde bir bilmeceyi doğru bilerek mama kazan. 🍓");return;}
+        const stock=getLunaFoodStock();if(stock<1){alert("Luna'nın mama stoğu boş! Luna’nın macerası bölümünde yeni bir macera tamamlayarak mama kazan. 🍓");return;}
         setLunaFoodStock(stock-1);
     }
     try{const r=await fetch(API+"/sude/pet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",action})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Evcil karakter güncellenemedi.");await refreshSudeWorld();const line=$("sudePetMoodLine");if(line)line.textContent=action==="feed"?"Miyav! Luna karnını doyurdu. Teşekkürler! 😻":"Luna seninle oynamaya bayılıyor! 🧶";}catch(e){if(action==="feed")setLunaFoodStock(getLunaFoodStock()+1);alert(e.message);}
 }
 async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("sudeWeight").value;try{const r=await fetch(API+"/sude/bmi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",height,weight})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"VKİ hesaplanamadı.");$("sudeBmiResult").textContent=`VKİ: ${d.bmi} · ${d.category}. ${d.note}`;}catch(e){alert(e.message);}}
-const sudeRiddles=[{q:"Bir ağzı var ama konuşmaz; yatağı var ama uyumaz. Nedir?",a:"nehir"},{q:"Ne kadar çok alırsan, arkanda o kadar çok bırakırsın. Nedir?",a:"adım"},{q:"Kırılmadan kullanılamayan şey nedir?",a:"yumurta"},{q:"Sana ait ama başkaları senden daha çok kullanır. Nedir?",a:"isim"}];let sudeRiddleIndex=0;
-function newSudeRiddle(){sudeRiddleIndex=(sudeRiddleIndex+1)%sudeRiddles.length;$("sudeRiddle").textContent=sudeRiddles[sudeRiddleIndex].q;$("sudeRiddleAnswer").value="";$("sudeRiddleFeedback").textContent="";}
-function checkSudeRiddle(){
-    const answer=$("sudeRiddleAnswer").value.trim().toLocaleLowerCase("tr-TR");const correct=sudeRiddles[sudeRiddleIndex].a;
-    if(answer===correct||answer.includes(correct)){
-        if(solvedSudeRiddles.has(sudeRiddleIndex)){$("sudeRiddleFeedback").textContent="Bu bilmeceyi zaten çözdün! Yeni bilmeceyle bir mama daha kazanabilirsin. 💗";return;}
-        solvedSudeRiddles.add(sudeRiddleIndex);setLunaFoodStock(getLunaFoodStock()+1);
-        $("sudeRiddleFeedback").textContent="🎉 Doğru cevap! Luna için 1 porsiyon mama kazandın! 🍓🐱";
-    }else{$("sudeRiddleFeedback").textContent="Bir daha düşün 😊 İpucu: cevabı günlük hayatta sık görürüz.";}
+const sudeAdventures=[
+ {title:"🦋 Kelebeğin peşinde",story:"Luna rengârenk bir kelebeğin peşinden koştu ve yumuşacık çimenlerin üzerinde yuvarlandı. Sonunda küçük bir çiçek buldu! 🌸",reward:"Luna çok eğlendi! Bu maceradan 1 porsiyon mama kazandın. 🍓"},
+ {title:"🌼 Çiçeklerin kokusu",story:"Luna papatyaların arasına saklandı. Burnuna minicik bir polen bulaştı ve komik bir hapşırık attı: Hapşuu! 😹",reward:"Luna'nın keyfi yerine geldi! 1 porsiyon mama kazandın. 🍓"},
+ {title:"📦 Gizemli kutu",story:"Kutunun içinden küçük bir çıngıraklı top çıktı. Luna topu patileriyle yuvarlayıp senin yanına getirdi. 🔔",reward:"Luna harika bir keşif yaptı! 1 porsiyon mama kazandın. 🍓"},
+ {title:"🧶 Yün yumağı",story:"Luna yün yumağını salonun içinde yuvarladı. Biraz oynadıktan sonra gelip dizine kıvrıldı ve mırıldamaya başladı. 💗",reward:"Luna seninle vakit geçirmeye bayıldı! 1 porsiyon mama kazandın. 🍓"}
+];
+function startSudeAdventure(){sudeAdventureRound++;const idx=(sudeAdventureRound-1)%sudeAdventures.length;const a=sudeAdventures[idx];$("sudeAdventureTitle").textContent=a.title;$("sudeAdventureStory").textContent="Luna merakla etrafına bakıyor… Macerayı başlatmak için aşağıdan bir seçim yap! 🐾";$("sudeAdventureFeedback").textContent="Bu macerada Luna’ya eşlik et.";}
+function chooseSudeAdventure(choice){
+ const key="round-"+sudeAdventureRound;
+ if(completedSudeAdventures.has(key)){ $("sudeAdventureFeedback").textContent="Bu macerayı tamamladın! Yeni bir macera için ‘Yeni macera başlat’ düğmesine dokun. 💗";return; }
+ const idx=((Math.max(1,sudeAdventureRound)-1)+choice)%sudeAdventures.length;const a=sudeAdventures[idx];
+ $("sudeAdventureTitle").textContent=a.title;$("sudeAdventureStory").textContent=a.story;completedSudeAdventures.add(key);setLunaFoodStock(getLunaFoodStock()+1);$("sudeAdventureFeedback").textContent=a.reward;
 }
+
 
 /* ============================================================
    INITIALIZE
