@@ -505,6 +505,144 @@ OPENROUTER_MODELS = [
 
 
 # ============================================================
+# KARVIS ARENA — persistent cross-profile competition
+# ============================================================
+ARENA_FILE = BASE_DIR / "karvis_arena.json"
+arena_lock = threading.Lock()
+ARENA_MODES = {"knowledge": "Bilgi Düellosu", "speed": "Hız Turu", "logic": "Mantık ve Örüntü", "memory": "Hafıza Meydan Okuması", "tournament": "Özel Turnuva"}
+ARENA_QUESTIONS = {
+ "knowledge": [
+  {"prompt":"Güneş Sistemi'nin en büyük gezegeni hangisidir?","options":["Dünya","Jüpiter","Satürn","Mars"],"answer":1},
+  {"prompt":"Türkiye Cumhuriyeti hangi yıl ilan edildi?","options":["1920","1921","1923","1938"],"answer":2},
+  {"prompt":"Suyun deniz seviyesindeki kaynama noktası kaç °C'dir?","options":["50","80","100","120"],"answer":2},
+  {"prompt":"Bir üçgenin iç açılarının toplamı kaç derecedir?","options":["90","180","270","360"],"answer":1},
+  {"prompt":"Bitkiler fotosentez sırasında temel olarak hangi gazı kullanır?","options":["Oksijen","Karbondioksit","Helyum","Hidrojen"],"answer":1},
+  {"prompt":"Dünya'nın doğal uydusu hangisidir?","options":["Mars","Ay","Venüs","Güneş"],"answer":1},
+  {"prompt":"Bir bayt kaç bittir?","options":["4","8","16","32"],"answer":1}
+ ],
+ "speed": [
+  {"prompt":"12 × 8 kaçtır?","options":["86","92","96","108"],"answer":2},
+  {"prompt":"Bir saatte kaç dakika vardır?","options":["30","45","60","100"],"answer":2},
+  {"prompt":"100'ün dörtte biri kaçtır?","options":["20","25","40","50"],"answer":1},
+  {"prompt":"9 + 17 kaçtır?","options":["24","25","26","27"],"answer":2},
+  {"prompt":"En küçük asal sayı hangisidir?","options":["0","1","2","3"],"answer":2},
+  {"prompt":"5² kaçtır?","options":["10","15","20","25"],"answer":3}
+ ],
+ "logic": [
+  {"prompt":"Dizi nasıl devam eder: 2, 4, 8, 16, …?","options":["18","24","30","32"],"answer":3},
+  {"prompt":"Hangisi diğerlerinden farklıdır?","options":["Kare","Üçgen","Daire","Mavi"],"answer":3},
+  {"prompt":"Dizi nasıl devam eder: 3, 6, 9, 12, …?","options":["13","14","15","18"],"answer":2},
+  {"prompt":"Ali, Ece'den uzun; Ece, Can'dan uzun. En kısa kimdir?","options":["Ali","Ece","Can","Belirlenemez"],"answer":2},
+  {"prompt":"Tüm kediler memelidir. Minnoş bir kedidir. Hangisi kesin doğrudur?","options":["Minnoş memelidir","Minnoş kuştur","Tüm memeliler kedidir","Minnoş uçar"],"answer":0},
+  {"prompt":"Dizi nasıl devam eder: 1, 1, 2, 3, 5, …?","options":["6","7","8","10"],"answer":2}
+ ],
+ "memory": [
+  {"prompt":"Bir haftada kaç gün vardır?","options":["5","6","7","8"],"answer":2},
+  {"prompt":"Trafik ışıklarında kırmızı genellikle ne anlama gelir?","options":["Geç","Dur","Hızlan","Park et"],"answer":1},
+  {"prompt":"Bir düzine kaç adettir?","options":["10","12","20","24"],"answer":1},
+  {"prompt":"Kuzeyin karşı yönü hangisidir?","options":["Doğu","Batı","Güney","Kuzeydoğu"],"answer":2},
+  {"prompt":"Bir yılda normalde kaç ay vardır?","options":["10","11","12","13"],"answer":2},
+  {"prompt":"Gökkuşağında geleneksel olarak kaç renk sayılır?","options":["5","6","7","8"],"answer":2}
+ ]
+}
+ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["logic"]
+
+def _arena_default():
+    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+def _arena_load():
+    data = read_json_file(ARENA_FILE, {})
+    if not isinstance(data, dict): data = {}
+    data.setdefault("players", {}); data.setdefault("attempts", {})
+    return data
+
+def _arena_league(points):
+    points = int(points or 0)
+    return "Elmas" if points >= 5000 else "Altın" if points >= 2500 else "Gümüş" if points >= 1000 else "Bronz"
+
+def _arena_player(data, username):
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    players = data["players"]
+    if username not in players:
+        players[username] = {"points": 0, "badges": [], "history": [], "answered_ids": [], "wins": 0}
+    p = players[username]
+    for k,v in {"points":0,"badges":[],"history":[],"answered_ids":[],"wins":0}.items(): p.setdefault(k,v)
+    return p
+
+def _arena_rankings(data):
+    rows=[]
+    for uname in USERS:
+        p=_arena_player(data, uname)
+        rows.append({"username":uname,"name":USERS[uname]["name"],"points":int(p.get("points",0)),"league":_arena_league(p.get("points",0))})
+    rows.sort(key=lambda x:(-x["points"], x["name"].casefold()))
+    for i,row in enumerate(rows,1): row["rank"]=i
+    return rows
+
+@app.get("/arena/overview")
+async def arena_overview(username: str = "karahan"):
+    username=username.strip().lower()
+    with arena_lock:
+        data=_arena_load(); player=_arena_player(data,username); rankings=_arena_rankings(data)
+        own=next(x for x in rankings if x["username"]==username)
+        history=player.get("history", [])[-8:]
+        return {"success":True,"player":{"username":username,"points":player["points"],"league":_arena_league(player["points"]),"rank":own["rank"],"badges":player["badges"],"history":list(reversed(history))},"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in rankings]}
+
+@app.get("/arena/leaderboard")
+async def arena_leaderboard():
+    with arena_lock:
+        data=_arena_load()
+        return {"success":True,"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in _arena_rankings(data)]}
+
+@app.post("/arena/start")
+async def arena_start(payload: dict):
+    username=str(payload.get("username", "")).strip().lower(); mode=str(payload.get("mode", "knowledge"))
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if mode not in ARENA_MODES: raise HTTPException(status_code=400, detail="Geçersiz oyun türü.")
+    with arena_lock:
+        data=_arena_load(); _arena_player(data,username)
+        bank=ARENA_QUESTIONS.get(mode, ARENA_QUESTIONS["knowledge"])
+        chosen=random.sample(bank, min(5,len(bank)))
+        attempt_id=uuid.uuid4().hex
+        data["attempts"][attempt_id]={"username":username,"mode":mode,"questions":chosen,"index":0,"score":0,"answers":[],"started":time.time(),"question_started_at":time.time(),"finished":False,"awarded":False}
+        write_json_file(ARENA_FILE,data)
+        q=chosen[0]
+        return {"success":True,"attempt_id":attempt_id,"question_number":1,"total_questions":len(chosen),"question":{"prompt":q["prompt"],"options":q["options"]}}
+
+@app.post("/arena/answer")
+async def arena_answer(payload: dict):
+    username=str(payload.get("username", "")).strip().lower(); attempt_id=str(payload.get("attempt_id", ""));
+    try: answer=int(payload.get("answer"))
+    except Exception: raise HTTPException(status_code=400, detail="Geçersiz cevap.")
+    with arena_lock:
+        data=_arena_load(); attempt=data["attempts"].get(attempt_id)
+        if not attempt or attempt.get("username")!=username: raise HTTPException(status_code=404, detail="Yarışma bulunamadı.")
+        if attempt.get("finished"): raise HTTPException(status_code=409, detail="Bu yarışma zaten tamamlandı.")
+        idx=int(attempt.get("index",0)); questions=attempt["questions"]
+        if idx>=len(questions): raise HTTPException(status_code=409, detail="Yarışmada cevaplanacak soru kalmadı.")
+        q=questions[idx]
+        if answer<0 or answer>=len(q["options"]): raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
+        elapsed_ms=max(0,int((time.time()-float(attempt.get("question_started_at", time.time())))*1000))
+        correct=answer==int(q["answer"]); awarded=(100 + (min(50,max(0,50-int(elapsed_ms/200))) if attempt["mode"]=="speed" else 0)) if correct else 0
+        attempt["score"]+=awarded; attempt["answers"].append({"correct":correct,"awarded":awarded}); attempt["index"]+=1
+        finished=attempt["index"]>=len(questions)
+        response={"success":True,"correct":correct,"points_awarded":awarded,"message":("+ hız bonusu dahil" if awarded>100 else ("Güzel gidiyorsun!" if correct else "Bir sonraki soruda şansını dene.")),"finished":finished}
+        if finished:
+            attempt["finished"]=True
+            if not attempt.get("awarded"):
+                p=_arena_player(data,username); p["points"]+=int(attempt["score"]); p["wins"]+=1 if attempt["score"]>=300 else 0
+                if "İlk Zafer" not in p["badges"]: p["badges"].append("İlk Zafer")
+                if attempt["score"]>=400 and "Bilgi Avcısı" not in p["badges"]: p["badges"].append("Bilgi Avcısı")
+                if p["wins"]>=5 and "Seri Galibiyet" not in p["badges"]: p["badges"].append("Seri Galibiyet")
+                p["history"].append({"title":ARENA_MODES.get(attempt["mode"],attempt["mode"]),"score":int(attempt["score"]),"date":time.strftime("%Y-%m-%d %H:%M")});p["history"]=p["history"][-50:]
+                attempt["awarded"]=True
+            response["score"]=int(attempt["score"]); response["message"]="Yarışma tamamlandı!"
+        else:
+            nextq=questions[attempt["index"]];attempt["question_started_at"]=time.time();response["question"]={"prompt":nextq["prompt"],"options":nextq["options"]};response["question_number"]=attempt["index"]+1;response["total_questions"]=len(questions)
+        data["updated_at"]=time.strftime("%Y-%m-%d %H:%M:%S");write_json_file(ARENA_FILE,data)
+        return response
+
+
+# ============================================================
 # MEMORY / ERROR LOG
 # ============================================================
 
@@ -709,7 +847,7 @@ def _set_password(username, password):
 
 
 def _sude_default_state():
-    return {"food_log": [], "tasks": [], "points": 0, "pet": {"name": "Luna", "level": 1, "mood": 70, "energy": 70}, "badges": [], "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    return {"food_log": [], "tasks": [], "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 
 def _get_sude_state():
@@ -720,6 +858,10 @@ def _get_sude_state():
     if not isinstance(state, dict): state = _sude_default_state()
     defaults = _sude_default_state()
     for key, value in defaults.items(): state.setdefault(key, value)
+    # Remove legacy pet/individual-points fields from older persisted Sude profiles.
+    state.pop("pet", None)
+    state.pop("points", None)
+    state.pop("badges", None)
     data["sude"] = state
     return data, state
 
@@ -6902,32 +7044,11 @@ async def sude_complete_task(task_id: str, username: str = "sude"):
         task = next((x for x in state["tasks"] if x.get("id") == task_id), None)
         if not task: raise HTTPException(status_code=404, detail="Görev bulunamadı.")
         if not task.get("done"):
-            task["done"] = True; state["points"] = int(state.get("points", 0)) + 10
-            state["pet"]["mood"] = min(100, int(state["pet"].get("mood", 70)) + 5)
-            state["pet"]["level"] = 1 + int(state["points"]) // 100
-            if state["points"] >= 50 and "İlk Adımlar" not in state["badges"]: state["badges"].append("İlk Adımlar")
+            task["done"] = True
+            state["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
         write_json_file(SUDE_WORLD_FILE, all_data)
     return {"success": True, "world": state}
 
-@app.post("/sude/pet")
-async def sude_pet(data: dict):
-    if str(data.get("username", "sude")).lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
-    action = str(data.get("action", "pet"))
-    with sude_lock:
-        all_data, state = _get_sude_state(); pet = state["pet"]
-        if action == "feed": pet["energy"] = min(100, int(pet.get("energy",70))+15); state["points"] += 2
-        elif action == "play": pet["mood"] = min(100, int(pet.get("mood",70))+12); pet["energy"] = max(0, int(pet.get("energy",70))-8); state["points"] += 2
-        else: pet["mood"] = min(100, int(pet.get("mood",70))+3)
-        pet["level"] = 1 + int(state.get("points",0)) // 100
-        write_json_file(SUDE_WORLD_FILE, all_data)
-    return {"success": True, "world": state}
-
-@app.get("/admin/sude-summary")
-async def admin_sude_summary(username: str = "murat"):
-    require_admin(username)
-    _, state = _get_sude_state()
-    # Deliberately share only aggregate progress, not detailed food entries.
-    return {"success": True, "summary": {"points": state.get("points",0), "level": state.get("pet",{}).get("level",1), "completed_tasks": sum(1 for t in state.get("tasks",[]) if t.get("done")), "total_tasks": len(state.get("tasks",[])), "badges": state.get("badges",[])}}
 
 
 # ============================================================
