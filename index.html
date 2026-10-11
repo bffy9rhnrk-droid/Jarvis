@@ -1105,15 +1105,7 @@ body.voice-speaking .ring.three{
 .sude-task{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.15);font-size:12px;}
 .sude-task button{margin-left:auto;border:0;border-radius:8px;padding:7px;}
 .sude-stat{font-size:24px;font-weight:900;}
-.luna-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:190px;overflow:hidden;position:relative;border-radius:15px;background:transparent;}
-.luna-cat{font-size:94px;line-height:1;display:inline-block;transform-origin:50% 85%;animation:luna-bob 2.1s ease-in-out infinite;filter:drop-shadow(0 7px 5px rgba(0,0,0,.12));}
-.luna-tail{display:inline-block;transform-origin:15% 80%;animation:luna-tail 1.2s ease-in-out infinite;}
-.luna-hearts{min-height:24px;font-size:19px;letter-spacing:5px;animation:luna-heart 2s ease-in-out infinite;}
-.luna-food{font-weight:800;font-size:16px;text-align:center;margin:8px 0;}
-@keyframes luna-bob{0%,100%{transform:translateY(2px) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
-@keyframes luna-tail{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(24deg)}}
-@keyframes luna-heart{0%,100%{opacity:.65;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
-@media(max-width:520px){.sude-grid{grid-template-columns:1fr;}.sude-panel{padding:16px;}.sude-card[style*="grid-column"]{grid-column:auto!important;}}
+.arena-panel{width:min(96vw,760px);max-height:92vh;} .arena-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0;} .arena-card{border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:16px;padding:14px;background:var(--card-bg,rgba(128,128,128,.06));min-width:0;} .arena-stat{font-size:25px;font-weight:900;} .arena-option{width:100%;text-align:left;margin:5px 0;padding:12px;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:12px;background:var(--button-bg,rgba(128,128,128,.08));color:inherit;} .arena-option:disabled{opacity:.6;} @media(max-width:520px){.sude-grid,.arena-grid{grid-template-columns:1fr;}.sude-panel,.arena-panel{padding:16px;}}
 
 </style>
 <link rel="manifest" href="/manifest.json">
@@ -1177,6 +1169,8 @@ body.voice-speaking .ring.three{
         ＋ Yeni Sohbet
     </button>
 
+    <button class="menu-item" onclick="openArena()">🏆 KARVIS ARENA</button>
+
     <button
         class="menu-item"
         onclick="openErrors()">
@@ -1236,12 +1230,10 @@ body.voice-speaking .ring.three{
 
     <div id="sudeMenu" style="display:none;">
         <div class="academic-title">🌷 SUDE'NİN MENÜSÜ</div>
-        <button class="menu-item" onclick="openSudeSection('progress')">✨ İlerlemem ve rozetler</button>
-        <button class="menu-item" onclick="openSudeSection('pet')">🐱 Luna — Sanal arkadaşım</button>
+        <button class="menu-item" onclick="openArena()">🏆 KARVIS ARENA</button>
         <button class="menu-item" onclick="openSudeSection('food')">🥗 Beslenme günlüğü</button>
         <button class="menu-item" onclick="openSudeSection('bmi')">📐 VKİ hesaplama</button>
         <button class="menu-item" onclick="openSudeSection('tasks')">📝 Günlük görevler</button>
-        <button class="menu-item" onclick="openSudeSection('games')">🐾 Luna’nın macerası</button>
     </div>
 
     <!-- ========================================================
@@ -1280,7 +1272,6 @@ body.voice-speaking .ring.three{
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
         <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
-        <button class="menu-item" onclick="openSudeAdminSummary()">🌷 Sude İlerleme Özeti</button>
         <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
 
     </div>
@@ -1655,7 +1646,6 @@ body.voice-speaking .ring.three{
 
 </div>
 
-<div id="adminSudeSummaryModal" class="modal"><h2>🌷 Sude — İlerleme Özeti</h2><div id="adminSudeSummaryContent" class="error-list">Yükleniyor...</div><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
 <div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">KARAHAN INC.</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
 <!-- ACCOUNT PASSWORD MODAL -->
 <div id="passwordModal" class="modal">
@@ -1667,37 +1657,7 @@ body.voice-speaking .ring.three{
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
-<!-- SUDE PROFILE: SEPARATE MENU PANELS -->
-<div id="sudeProgressModal" class="modal sude-panel">
-  <h2>✨ İlerlemem ve rozetler</h2>
-  <p class="sude-subtitle">Küçük adımların da başarıdır. 💜</p>
-  <div class="sude-grid">
-    <section class="sude-card"><h3>🌟 Toplam puan</h3><div class="sude-stat" id="sudePoints">0 puan</div></section>
-    <section class="sude-card"><h3>🎀 Seviyem</h3><div class="sude-stat" id="sudeLevel">Seviye 1</div></section>
-    <section class="sude-card" style="grid-column:1/-1"><h3>🏅 Rozetlerim</h3><p id="sudeBadges">Henüz rozet yok — ilk görevini tamamla!</p></section>
-  </div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="sudePetModal" class="modal sude-panel">
-  <h2>🐱 Luna — Sanal arkadaşım</h2>
-  <p class="sude-subtitle">Luna'yı besle, onunla oyna ve gelişimini takip et. 💗</p>
-  <section class="sude-card">
-    <div class="luna-stage" aria-label="Hareket eden sevimli kedi Luna">
-      <div class="luna-hearts" aria-hidden="true">💗 ✨ 💗</div>
-      <div class="luna-cat" role="img" aria-label="Sevimli kedi">🐈<span class="luna-tail">‍⬛</span></div>
-      <div style="font-weight:800;font-size:18px;margin-top:9px">Luna 🐾</div>
-      <div id="sudePetMoodLine" style="font-size:12px;opacity:.78">Luna seninle bilmece çözmeye hazır!</div>
-    </div>
-    <p id="sudePetStats" style="text-align:center">Luna · Mutluluk 70 · Enerji 70</p>
-    <div class="luna-food">🍓 Biriken mama: <span id="sudeLunaFood">0</span></div>
-    <p style="text-align:center;font-size:12px;opacity:.8">Her doğru bilmece cevabı Luna için 1 porsiyon mama kazandırır.</p>
-    <button class="sude-btn" onclick="sudePetAction('feed')">🍓 Biriktirdiğim mamayla Luna'yı besle</button>
-    <button class="sude-btn" onclick="sudePetAction('play')">🧶 Luna ile oyna</button>
-  </section>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
+<!-- SUDE PROFILE: PERSONAL TOOLS -->
 <div id="sudeFoodModal" class="modal sude-panel">
   <h2>🥗 Beslenme günlüğüm</h2>
   <p class="sude-subtitle">Yediklerini kaydet; kalori değerleri yaklaşık tahmindir.</p>
@@ -1714,29 +1674,33 @@ body.voice-speaking .ring.three{
 
 <div id="sudeTasksModal" class="modal sude-panel">
   <h2>📝 Günlük görevlerim</h2>
-  <p class="sude-subtitle">Kendine uygun küçük hedefler belirle ve tamamladıkça puan kazan.</p>
+  <p class="sude-subtitle">Kendine uygun küçük hedefler belirle ve tamamladıkça işaretle.</p>
   <section class="sude-card"><input id="sudeTaskTitle" class="sude-field" placeholder="Örn. 10 dakika yürüyüş"><button class="sude-btn" onclick="addSudeTask()">＋ Görev ekle</button><div id="sudeTaskList"></div></section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
-<div id="sudeGamesModal" class="modal sude-panel">
-  <h2>🐾 Luna’nın küçük macerası</h2>
-  <p class="sude-subtitle">Luna bugün ne keşfetsin? Seçimini yap, birlikte tatlı bir hikâye yaşayın. 💗</p>
-  <section class="sude-card">
-    <div class="luna-stage" style="min-height:145px"><div class="luna-cat" aria-label="Hareket eden sevimli kedi">🐈</div><div class="luna-hearts">✨ 💗 ✨</div></div>
-    <h3 id="sudeAdventureTitle">🌷 Bahçede bir gün</h3>
-    <p id="sudeAdventureStory" aria-live="polite">Luna bahçede minik pati izleri buldu. Acaba nereye gidiyorlar?</p>
-    <div class="sude-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-      <button class="sude-btn" onclick="chooseSudeAdventure(0)">🦋 Kelebeği takip et</button>
-      <button class="sude-btn" onclick="chooseSudeAdventure(1)">🌼 Çiçekleri kokla</button>
-      <button class="sude-btn" onclick="chooseSudeAdventure(2)">📦 Gizemli kutuya bak</button>
-      <button class="sude-btn" onclick="chooseSudeAdventure(3)">🧶 Yün yumağını bul</button>
+<!-- KARVIS ARENA -->
+<div id="arenaModal" class="modal arena-panel">
+  <h2>🏆 K.A.R.V.I.S. ARENA</h2>
+  <p class="sude-subtitle">Bütün profiller aynı ligde yarışır. İstediğin zaman oyna, puanını yükselt!</p>
+  <div class="arena-grid">
+    <section class="arena-card"><h3>⭐ Toplam puan</h3><div id="arenaMyPoints" class="arena-stat">0</div></section>
+    <section class="arena-card"><h3>🏅 Ligim ve sıram</h3><div id="arenaMyLeague" class="arena-stat">Bronz</div><p id="arenaMyRank">Sıra hesaplanıyor…</p></section>
+  </div>
+  <section class="arena-card">
+    <h3>🎮 Yarışma seç</h3>
+    <p>Her yarışma 5 sorudan oluşur. Cevaplarını sunucu doğrular ve puanını kaydeder.</p>
+    <div class="arena-grid">
+      <button class="sude-btn" onclick="startArena('knowledge')">🧠 Bilgi düellosu</button>
+      <button class="sude-btn" onclick="startArena('speed')">⚡ Hız turu</button>
+      <button class="sude-btn" onclick="startArena('logic')">🧩 Mantık ve örüntü</button>
+      <button class="sude-btn" onclick="startArena('memory')">🧠 Hafıza meydan okuması</button>
+      <button class="sude-btn" onclick="startArena('tournament')">👑 Özel turnuva</button>
     </div>
-    <p id="sudeAdventureFeedback" aria-live="polite">Bir macera seçerek Luna’yla vakit geçir. 🐾</p>
-    <div class="luna-food">🍓 Luna için biriken mama: <span id="sudeRiddleFood">0</span></div>
-    <p style="font-size:12px;opacity:.8">Her yeni macerada bir kez mama kazanabilirsin. Mama stoğun Luna bölümünde de görünür.</p>
-    <button class="sude-btn" onclick="startSudeAdventure()">🔄 Yeni macera başlat</button>
+    <div id="arenaGameArea" aria-live="polite"><p>Bir oyun seçerek yarışmayı başlat.</p></div>
   </section>
+  <section class="arena-card"><h3>📊 Ortak puan tablosu</h3><div id="arenaLeaderboard">Sıralama yükleniyor…</div></section>
+  <section class="arena-card"><h3>🎖️ Rozetlerim</h3><div id="arenaBadges">Henüz rozet kazanılmadı.</div><h3 style="margin-top:16px">🗓️ Son yarışmalar</h3><div id="arenaHistory">Henüz yarışma tamamlanmadı.</div></section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -2644,7 +2608,7 @@ function showGreeting(){
     }
 
     else if(currentUser === "sude"){
-        addMessage("Hoş geldin Sude! 🌷 Burası senin dünyan. Sağlıklı alışkanlıklarını takip edebilir, görevlerini tamamlayabilir ve Luna ile oynayabilirsin. 💜", "ai");
+        addMessage("Hoş geldin Sude! 🌷 KARVIS ARENA’da diğer profillerle yarışabilir, ayrıca kişisel beslenme ve günlük görev kartlarını kullanabilirsin. 🏆", "ai");
     }
 
     else if(currentUser === "murat"){
@@ -4624,10 +4588,9 @@ function handleKey(e){
 }
 
 /* ============================================================
-   PASSWORD + SUDE'S WORLD
+   PASSWORD + SUDE PERSONAL TOOLS
    ============================================================ */
 async function estimateSudeCalories(){const meal=$("sudeFoodName").value.trim();if(!meal){alert("Önce yiyecek veya öğün adını yaz.");return;}$("sudeCalorieEstimate").textContent="Tahmin hazırlanıyor...";try{const r=await fetch(API+"/sude/estimate-calories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",meal})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Tahmin yapılamadı.");if(!d.success)throw new Error(d.explanation||"Tahmin yapılamadı.");$("sudeFoodCalories").value=d.estimate;$("sudeCalorieEstimate").textContent=`Yaklaşık ${d.estimate} kcal — ${d.explanation} ${d.disclaimer||""}`;}catch(e){$("sudeCalorieEstimate").textContent=e.message;}}
-async function openSudeAdminSummary(){if(currentUser!=="murat"){alert("Bu bölüm yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminSudeSummaryModal").classList.add("show");const box=$("adminSudeSummaryContent");box.textContent="Yükleniyor...";try{const r=await fetch(API+"/admin/sude-summary?username=murat");const d=await r.json();if(!r.ok)throw new Error(d.detail||"Özet alınamadı.");const s=d.summary||{};box.innerHTML=`<p><strong>Puan:</strong> ${Number(s.points)||0}</p><p><strong>Seviye:</strong> ${Number(s.level)||1}</p><p><strong>Tamamlanan görev:</strong> ${Number(s.completed_tasks)||0} / ${Number(s.total_tasks)||0}</p><p><strong>Rozetler:</strong> ${escapeHTML((s.badges||[]).join(", ")||"Henüz yok")}</p><small>Bu özet ayrıntılı yiyecek kayıtlarını veya özel beslenme günlüklerini göstermez.</small>`;}catch(e){box.textContent=e.message;}}
 function openAdminPasswordReset(){if(currentUser!=="murat"){alert("Bu işlem yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminPasswordResetModal").classList.add("show");}
 async function adminResetPassword(){if(currentUser!=="murat"){alert("Yetkisiz işlem.");return;}const target=$("resetTargetUser").value,password=$("resetNewPassword").value;if(password.length<6){alert("Şifre en az 6 karakter olmalı.");return;}try{const r=await fetch(API+"/admin/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"murat",target_username:target,new_password:password})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre sıfırlanamadı.");alert(d.message||"Şifre sıfırlandı.");$("resetNewPassword").value="";closeModals();}catch(e){alert(e.message);}}
 function openPasswordChange(){ closeSidebar(); $("passwordModal").classList.add("show"); }
@@ -4639,54 +4602,43 @@ async function changeOwnPassword(){
 }
 async function openSudeSection(section){
     if(currentUser!=="sude"){alert("Bu bölüm yalnızca Sude profiline açıktır.");return;}
-    const panels={progress:"sudeProgressModal",pet:"sudePetModal",food:"sudeFoodModal",bmi:"sudeBmiModal",tasks:"sudeTasksModal",games:"sudeGamesModal"};
-    const panel=$(panels[section]||panels.progress);
-    closeSidebar();closeModals();panel.classList.add("show");
-    if(["progress","pet","food","tasks"].includes(section)) await refreshSudeWorld();
+    const panels={food:"sudeFoodModal",bmi:"sudeBmiModal",tasks:"sudeTasksModal"};
+    const id=panels[section]; if(!id)return;
+    closeSidebar(); closeModals(); $(id).classList.add("show");
+    if(["food","tasks"].includes(section)) await refreshSudeWorld();
 }
-async function openSudeWorld(){return openSudeSection("progress");}
 async function refreshSudeWorld(){
     try{
         const r=await fetch(API+"/sude/world?username=sude");const d=await r.json();if(!r.ok)throw new Error(d.detail||"Bilgiler yüklenemedi.");const w=d.world||{};
-        const put=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
-        put("sudePoints",(w.points||0)+" puan");put("sudeLevel","Seviye "+((w.pet&&w.pet.level)||1));put("sudeBadges","Rozetler: "+((w.badges||[]).join(", ")||"henüz yok"));
-        const p=w.pet||{};put("sudePetStats",(p.name||"Luna")+" · Mutluluk "+(p.mood||0)+" · Enerji "+(p.energy||0));
-        const foodStock=getLunaFoodStock();put("sudeLunaFood",foodStock);put("sudeRiddleFood",foodStock);
-        put("sudePetMoodLine",foodStock>0?"Luna mamalarını bekliyor! 😻":"Luna'yı mutlu etmek için bilmece çöz ve mama biriktir. 💗");
         const foodList=$("sudeFoodList");if(foodList){const now=new Date();const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;const foods=(w.food_log||[]).filter(x=>x.date===today);foodList.innerHTML=foods.slice().reverse().map(x=>`<div class="sude-task">${escapeHTML(x.name)} <span style="margin-left:auto">${Number(x.calories)||0} kcal</span></div>`).join("")||"<small>Bugün henüz kayıt yok.</small>";}
-        const taskList=$("sudeTaskList");if(taskList)taskList.innerHTML=(w.tasks||[]).slice().reverse().map(t=>`<div class="sude-task"><span>${t.done?"✅":"🌱"} ${escapeHTML(t.title)}</span>${t.done?"<small>Tamamlandı</small>":`<button onclick="completeSudeTask('${t.id}')">+10 puan</button>`}</div>`).join("")||"<small>İlk görevini ekle!</small>";
+        const taskList=$("sudeTaskList");if(taskList)taskList.innerHTML=(w.tasks||[]).slice().reverse().map(t=>`<div class="sude-task"><span>${t.done?"✅":"🌱"} ${escapeHTML(t.title)}</span>${t.done?"<small>Tamamlandı</small>":`<button onclick="completeSudeTask('${t.id}')">Tamamla</button>`}</div>`).join("")||"<small>İlk görevini ekle!</small>";
     }catch(e){alert(e.message);}
 }
 async function addSudeFood(){const name=$("sudeFoodName").value.trim(), calories=$("sudeFoodCalories").value;if(!name||calories===""){alert("Yiyecek adı ve yaklaşık kalori gir.");return;}try{const r=await fetch(API+"/sude/food",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",name,calories})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Kayıt yapılamadı.");$("sudeFoodName").value="";$("sudeFoodCalories").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
 async function addSudeTask(){const title=$("sudeTaskTitle").value.trim();if(!title)return;try{const r=await fetch(API+"/sude/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",title})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev eklenemedi.");$("sudeTaskTitle").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
 async function completeSudeTask(id){try{const r=await fetch(API+"/sude/tasks/"+encodeURIComponent(id)+"/complete?username=sude",{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev tamamlanamadı.");await refreshSudeWorld();}catch(e){alert(e.message);}}
-const LUNA_FOOD_KEY="karvis_sude_luna_food_v1";
-function getLunaFoodStock(){try{return Math.max(0,parseInt(localStorage.getItem(LUNA_FOOD_KEY)||"0",10)||0);}catch(e){return 0;}}
-function setLunaFoodStock(n){try{localStorage.setItem(LUNA_FOOD_KEY,String(Math.max(0,n|0)));}catch(e){}const stock=getLunaFoodStock();const a=$("sudeLunaFood"),b=$("sudeRiddleFood");if(a)a.textContent=stock;if(b)b.textContent=stock;}
-let completedSudeAdventures=new Set();
-let sudeAdventureRound=0;
-async function sudePetAction(action){
-    if(action==="feed"){
-        const stock=getLunaFoodStock();if(stock<1){alert("Luna'nın mama stoğu boş! Luna’nın macerası bölümünde yeni bir macera tamamlayarak mama kazan. 🍓");return;}
-        setLunaFoodStock(stock-1);
-    }
-    try{const r=await fetch(API+"/sude/pet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",action})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Evcil karakter güncellenemedi.");await refreshSudeWorld();const line=$("sudePetMoodLine");if(line)line.textContent=action==="feed"?"Miyav! Luna karnını doyurdu. Teşekkürler! 😻":"Luna seninle oynamaya bayılıyor! 🧶";}catch(e){if(action==="feed")setLunaFoodStock(getLunaFoodStock()+1);alert(e.message);}
-}
 async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("sudeWeight").value;try{const r=await fetch(API+"/sude/bmi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",height,weight})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"VKİ hesaplanamadı.");$("sudeBmiResult").textContent=`VKİ: ${d.bmi} · ${d.category}. ${d.note}`;}catch(e){alert(e.message);}}
-const sudeAdventures=[
- {title:"🦋 Kelebeğin peşinde",story:"Luna rengârenk bir kelebeğin peşinden koştu ve yumuşacık çimenlerin üzerinde yuvarlandı. Sonunda küçük bir çiçek buldu! 🌸",reward:"Luna çok eğlendi! Bu maceradan 1 porsiyon mama kazandın. 🍓"},
- {title:"🌼 Çiçeklerin kokusu",story:"Luna papatyaların arasına saklandı. Burnuna minicik bir polen bulaştı ve komik bir hapşırık attı: Hapşuu! 😹",reward:"Luna'nın keyfi yerine geldi! 1 porsiyon mama kazandın. 🍓"},
- {title:"📦 Gizemli kutu",story:"Kutunun içinden küçük bir çıngıraklı top çıktı. Luna topu patileriyle yuvarlayıp senin yanına getirdi. 🔔",reward:"Luna harika bir keşif yaptı! 1 porsiyon mama kazandın. 🍓"},
- {title:"🧶 Yün yumağı",story:"Luna yün yumağını salonun içinde yuvarladı. Biraz oynadıktan sonra gelip dizine kıvrıldı ve mırıldamaya başladı. 💗",reward:"Luna seninle vakit geçirmeye bayıldı! 1 porsiyon mama kazandın. 🍓"}
-];
-function startSudeAdventure(){sudeAdventureRound++;const idx=(sudeAdventureRound-1)%sudeAdventures.length;const a=sudeAdventures[idx];$("sudeAdventureTitle").textContent=a.title;$("sudeAdventureStory").textContent="Luna merakla etrafına bakıyor… Macerayı başlatmak için aşağıdan bir seçim yap! 🐾";$("sudeAdventureFeedback").textContent="Bu macerada Luna’ya eşlik et.";}
-function chooseSudeAdventure(choice){
- const key="round-"+sudeAdventureRound;
- if(completedSudeAdventures.has(key)){ $("sudeAdventureFeedback").textContent="Bu macerayı tamamladın! Yeni bir macera için ‘Yeni macera başlat’ düğmesine dokun. 💗";return; }
- const idx=((Math.max(1,sudeAdventureRound)-1)+choice)%sudeAdventures.length;const a=sudeAdventures[idx];
- $("sudeAdventureTitle").textContent=a.title;$("sudeAdventureStory").textContent=a.story;completedSudeAdventures.add(key);setLunaFoodStock(getLunaFoodStock()+1);$("sudeAdventureFeedback").textContent=a.reward;
-}
-
+/* ============================================================
+   KARVIS ARENA
+   ============================================================ */
+let arenaAttemptId=null, arenaQuestionIndex=0, arenaAnswered=false, arenaStartedAt=0;
+function arenaEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";await loadArenaOverview();}
+async function loadArenaOverview(){
+ try{const r=await fetch(API+"/arena/overview?username="+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena yüklenemedi.");
+ $("arenaMyPoints").textContent=Number(d.player?.points||0).toLocaleString("tr-TR");$("arenaMyLeague").textContent=d.player?.league||"Bronz";$("arenaMyRank").textContent=(d.player?.rank?d.player.rank+". sıradasın":"Henüz sıralama yok");
+ $("arenaLeaderboard").innerHTML=(d.leaderboard||[]).map((p,i)=>`<div class="sude-task"><strong>${i+1}.</strong><span>${arenaEscape(p.name)}</span><span style="margin-left:auto;font-weight:800">${Number(p.points||0).toLocaleString("tr-TR")} puan</span><small>${arenaEscape(p.league)}</small></div>`).join("")||"Henüz puan yok.";
+ $("arenaBadges").innerHTML=(d.player?.badges||[]).map(b=>`<span class="badge">🏅 ${arenaEscape(b)}</span>`).join(" ")||"Henüz rozet kazanılmadı. İlk yarışmanı tamamla!";
+ $("arenaHistory").innerHTML=(d.player?.history||[]).map(x=>`<div class="sude-task"><span>${arenaEscape(x.title)}</span><span style="margin-left:auto">${Number(x.score||0)} puan</span></div>`).join("")||"Henüz yarışma tamamlanmadı.";
+ }catch(e){$("arenaLeaderboard").textContent=e.message;$("arenaGameArea").innerHTML="<p>Arena verileri alınamadı. Sunucunun güncel sürümde olduğundan emin ol.</p>";}}
+async function startArena(mode){
+ const area=$("arenaGameArea");area.innerHTML="<p>Yarışma hazırlanıyor…</p>";arenaAttemptId=null;arenaQuestionIndex=0;arenaAnswered=false;
+ try{const r=await fetch(API+"/arena/start",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,mode})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Yarışma başlatılamadı.");arenaAttemptId=d.attempt_id;renderArenaQuestion(d.question,d.question_number,d.total_questions);await loadArenaOverview();}catch(e){area.innerHTML=`<p>${arenaEscape(e.message)}</p>`;}}
+function renderArenaQuestion(q,num,total){arenaAnswered=false;arenaStartedAt=Date.now();const area=$("arenaGameArea");area.innerHTML=`<div class="sude-card"><p>Tur ${num}/${total}</p><h3>${arenaEscape(q.prompt)}</h3><div>${(q.options||[]).map((o,i)=>`<button class="arena-option" onclick="answerArena(${i})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaAnswerFeedback" aria-live="polite"></p></div>`;}
+async function answerArena(choice){if(!arenaAttemptId||arenaAnswered)return;arenaAnswered=true;document.querySelectorAll(".arena-option").forEach(b=>b.disabled=true);const feedback=$("arenaAnswerFeedback");if(feedback)feedback.textContent="Cevap kontrol ediliyor…";
+ try{const r=await fetch(API+"/arena/answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,attempt_id:arenaAttemptId,answer:choice,elapsed_ms:Date.now()-arenaStartedAt})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Cevap gönderilemedi.");if(feedback)feedback.textContent=(d.correct?"✅ Doğru!":"❌ Bu cevap doğru değil.")+` ${d.message||""} · +${d.points_awarded||0} puan`;
+ setTimeout(async()=>{if(d.finished){arenaAttemptId=null;$("arenaGameArea").innerHTML=`<div class="sude-card"><h3>🏁 Yarışma tamamlandı!</h3><p>Bu yarışmada ${d.score} puan kazandın.</p><button class="sude-btn" onclick="openArena()">Sonuçları ve sıralamayı yenile</button></div>`;await loadArenaOverview();}else{renderArenaQuestion(d.question,d.question_number,d.total_questions);}},850);
+ }catch(e){arenaAnswered=false;if(feedback)feedback.textContent=e.message;}}
 
 /* ============================================================
    INITIALIZE
