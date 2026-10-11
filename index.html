@@ -529,6 +529,30 @@ button:active{
     color:#00e5ff
 }
 
+/* Shared Arena menu item with a compact NEW label */
+.menu-item.arena-menu-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.arena-menu-label{white-space:nowrap;}
+.arena-new-badge{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 6px;
+    border-radius:6px;
+    font-size:9px;
+    line-height:1.2;
+    font-weight:900;
+    letter-spacing:.6px;
+    color:#07140d;
+    background:#78f0a5;
+    border:1px solid rgba(120,240,165,.65);
+}
+
 .academic-title{
     margin:22px 5px 10px;
     font-size:10px;
@@ -1169,7 +1193,7 @@ body.voice-speaking .ring.three{
         ＋ Yeni Sohbet
     </button>
 
-    <button class="menu-item" onclick="openArena()">🏆 KARVIS ARENA</button>
+    <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
 
     <button
         class="menu-item"
@@ -1230,7 +1254,6 @@ body.voice-speaking .ring.three{
 
     <div id="sudeMenu" style="display:none;">
         <div class="academic-title">🌷 SUDE'NİN MENÜSÜ</div>
-        <button class="menu-item" onclick="openArena()">🏆 KARVIS ARENA</button>
         <button class="menu-item" onclick="openSudeSection('food')">🥗 Beslenme günlüğü</button>
         <button class="menu-item" onclick="openSudeSection('bmi')">📐 VKİ hesaplama</button>
         <button class="menu-item" onclick="openSudeSection('tasks')">📝 Günlük görevler</button>
@@ -1701,6 +1724,11 @@ body.voice-speaking .ring.three{
   </section>
   <section class="arena-card"><h3>📊 Ortak puan tablosu</h3><div id="arenaLeaderboard">Sıralama yükleniyor…</div></section>
   <section class="arena-card"><h3>🎖️ Rozetlerim</h3><div id="arenaBadges">Henüz rozet kazanılmadı.</div><h3 style="margin-top:16px">🗓️ Son yarışmalar</h3><div id="arenaHistory">Henüz yarışma tamamlanmadı.</div></section>
+  <section id="arenaAdminTools" class="arena-card" style="display:none;border:1px solid #dc6262;">
+    <h3>🛡️ Yönetici araçları</h3>
+    <p>Bu işlem bütün profillerin Arena puanlarını, rozetlerini, sıralamasını ve oyun geçmişini kalıcı olarak siler.</p>
+    <button class="sude-btn" style="background:#9f2424;color:white" onclick="adminResetArena()">🗑️ Arena tablosunu sıfırla</button>
+  </section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -4623,7 +4651,16 @@ async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("s
    ============================================================ */
 let arenaAttemptId=null, arenaQuestionIndex=0, arenaAnswered=false, arenaStartedAt=0;
 function arenaEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";await loadArenaOverview();}
+async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";await loadArenaOverview();}
+async function adminResetArena(){
+ if(currentUser!=="murat"){alert("Bu işlem yalnızca yönetici profiline açıktır.");return;}
+ const ok=confirm("DİKKAT! Tüm profillerin Arena puanları, rozetleri, sıralaması ve oyun geçmişi kalıcı olarak silinecek. Bildirimler etkilenmeyecek. Devam edilsin mi?");
+ if(!ok)return;
+ const typed=prompt("Onaylamak için ARENA SIFIRLA yaz:");
+ if(typed!=="ARENA SIFIRLA"){alert("İşlem iptal edildi.");return;}
+ try{const r=await fetch(API+"/arena/reset?username="+encodeURIComponent(currentUser),{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena sıfırlanamadı.");alert(d.message||"Arena sıfırlandı.");arenaAttemptId=null;await loadArenaOverview();}
+ catch(e){alert(e.message||"Arena sıfırlanırken hata oluştu.");}
+}
 async function loadArenaOverview(){
  try{const r=await fetch(API+"/arena/overview?username="+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena yüklenemedi.");
  $("arenaMyPoints").textContent=Number(d.player?.points||0).toLocaleString("tr-TR");$("arenaMyLeague").textContent=d.player?.league||"Bronz";$("arenaMyRank").textContent=(d.player?.rank?d.player.rank+". sıradasın":"Henüz sıralama yok");
