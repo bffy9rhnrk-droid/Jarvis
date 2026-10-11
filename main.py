@@ -708,7 +708,62 @@ ARENA_QUESTIONS = {
   {"prompt":"Gökkuşağında geleneksel olarak kaç renk sayılır?","options":["5","6","7","8"],"answer":2}
  ]
 }
+# Expanded question pool: each game draws five random questions from these banks.
+ARENA_QUESTIONS["knowledge"] += [
+ {"prompt":"Türkiye'nin başkenti hangisidir?","options":["İstanbul","Ankara","İzmir","Bursa"],"answer":1},
+ {"prompt":"Dünya'nın Güneş etrafındaki bir turu yaklaşık ne kadar sürer?","options":["24 saat","30 gün","365 gün","12 saat"],"answer":2},
+ {"prompt":"İnsan vücudunda kanı pompalayan organ hangisidir?","options":["Akciğer","Beyin","Kalp","Karaciğer"],"answer":2},
+ {"prompt":"En büyük okyanus hangisidir?","options":["Atlas Okyanusu","Hint Okyanusu","Arktik Okyanusu","Pasifik Okyanusu"],"answer":3},
+ {"prompt":"Sembolü Fe olan element hangisidir?","options":["Flor","Demir","Fosfor","Gümüş"],"answer":1},
+ {"prompt":"Türkiye hangi iki kıta üzerinde topraklara sahiptir?","options":["Avrupa ve Asya","Asya ve Afrika","Avrupa ve Afrika","Asya ve Amerika"],"answer":0},
+ {"prompt":"Bir kilogram kaç gramdır?","options":["100","500","1000","10000"],"answer":2},
+ {"prompt":"Ses boşlukta yayılır mı?","options":["Evet, çok hızlı","Hayır, ortam gerekir","Sadece geceleri","Sadece suda"],"answer":1},
+ {"prompt":"İstiklal Marşı'nın yazarı kimdir?","options":["Nazım Hikmet","Mehmet Akif Ersoy","Orhan Veli","Yahya Kemal"],"answer":1},
+ {"prompt":"Dünyanın en yüksek dağı hangisidir?","options":["Ağrı","K2","Everest","Elbruz"],"answer":2},
+ {"prompt":"Fotosentez için ışık enerjisini yakalayan pigment hangisidir?","options":["Hemoglobin","Melanin","Klorofil","Keratin"],"answer":2},
+ {"prompt":"Türkiye'nin para birimi hangisidir?","options":["Euro","Lira","Dinar","Frank"],"answer":1},
+ {"prompt":"Bir dik açının ölçüsü kaç derecedir?","options":["45","90","180","360"],"answer":1},
+ {"prompt":"Dünya atmosferinde en çok bulunan gaz hangisidir?","options":["Oksijen","Karbondioksit","Azot","Hidrojen"],"answer":2},
+ {"prompt":"Su molekülünün kimyasal formülü nedir?","options":["CO2","H2O","O2","NaCl"],"answer":1}
+]
+ARENA_QUESTIONS["speed"] += [
+ {"prompt":"15 × 6 kaçtır?","options":["80","90","96","105"],"answer":1},
+ {"prompt":"144'ün karekökü kaçtır?","options":["10","11","12","14"],"answer":2},
+ {"prompt":"250'nin yüzde 10'u kaçtır?","options":["15","20","25","30"],"answer":2},
+ {"prompt":"7 × 7 kaçtır?","options":["42","48","49","56"],"answer":2},
+ {"prompt":"Bir gün kaç saattir?","options":["12","18","24","36"],"answer":2},
+ {"prompt":"3³ kaçtır?","options":["9","18","27","36"],"answer":2},
+ {"prompt":"80 - 37 kaçtır?","options":["33","43","47","53"],"answer":1},
+ {"prompt":"Bir düz açı kaç derecedir?","options":["90","120","180","270"],"answer":2},
+ {"prompt":"64 / 8 kaçtır?","options":["6","7","8","9"],"answer":2},
+ {"prompt":"2,5 + 1,5 kaçtır?","options":["3","3,5","4","4,5"],"answer":2}
+]
+ARENA_QUESTIONS["logic"] += [
+ {"prompt":"Dizi: 5, 10, 15, 20, …?","options":["22","24","25","30"],"answer":2},
+ {"prompt":"Dizi: 1, 4, 9, 16, …?","options":["20","24","25","36"],"answer":2},
+ {"prompt":"Bugün salıysa 10 gün sonra hangi gündür?","options":["Perşembe","Cuma","Cumartesi","Pazar"],"answer":1},
+ {"prompt":"Hangisi diğerlerinden farklı bir ölçü birimidir?","options":["Metre","Santimetre","Kilometre","Kilogram"],"answer":3},
+ {"prompt":"Bütün güller çiçektir. Bazı çiçekler kırmızıdır. Hangisi kesin doğrudur?","options":["Bütün güller kırmızıdır","Güller çiçektir","Hiçbir gül kırmızı değildir","Bütün çiçekler güldür"],"answer":1},
+ {"prompt":"Dizi: 20, 18, 16, 14, …?","options":["10","11","12","13"],"answer":2},
+ {"prompt":"Bir yarışta ikinci kişiyi geçersen kaçıncı olursun?","options":["Birinci","İkinci","Üçüncü","Dördüncü"],"answer":1},
+ {"prompt":"Dizi: 2, 3, 5, 8, 12, …?","options":["15","16","17","18"],"answer":2},
+ {"prompt":"Saat 3:00'te akrep ile yelkovan arasındaki küçük açı kaç derecedir?","options":["45","60","90","180"],"answer":2},
+ {"prompt":"A, C, E, G, … harf dizisi nasıl sürer?","options":["H","I","J","K"],"answer":1}
+]
+ARENA_QUESTIONS["memory"] += [
+ {"prompt":"Bir yılda kaç mevsim vardır?","options":["2","3","4","5"],"answer":2},
+ {"prompt":"Bir üçgenin kaç kenarı vardır?","options":["2","3","4","5"],"answer":1},
+ {"prompt":"Hangi renk, mavi ile sarının karışımından elde edilir?","options":["Mor","Turuncu","Yeşil","Pembe"],"answer":2},
+ {"prompt":"Alfabemizde 'M' harfinden sonra hangisi gelir?","options":["L","N","O","P"],"answer":1},
+ {"prompt":"Bir futbol takımında sahada aynı anda kaç oyuncu bulunur?","options":["9","10","11","12"],"answer":2},
+ {"prompt":"Türkiye'nin telefon ülke kodu hangisidir?","options":["+30","+44","+49","+90"],"answer":3},
+ {"prompt":"Kış mevsimini hangi mevsim izler?","options":["Sonbahar","İlkbahar","Yaz","Kış"],"answer":1},
+ {"prompt":"Bir saatin yarısı kaç dakikadır?","options":["15","20","30","45"],"answer":2},
+ {"prompt":"Arıların ürettiği besin hangisidir?","options":["Süt","Bal","Pekmez","Şurup"],"answer":1},
+ {"prompt":"Hangi gezegen 'Kızıl Gezegen' olarak bilinir?","options":["Venüs","Mars","Jüpiter","Merkür"],"answer":1}
+]
 ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["logic"]
+
 
 def _arena_default():
     return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
@@ -818,7 +873,7 @@ async def arena_start(payload: dict):
         bank=ARENA_QUESTIONS.get(mode, ARENA_QUESTIONS["knowledge"])
         chosen=random.sample(bank, min(5,len(bank)))
         attempt_id=uuid.uuid4().hex
-        data["attempts"][attempt_id]={"username":username,"mode":mode,"questions":chosen,"index":0,"score":0,"answers":[],"started":time.time(),"question_started_at":time.time(),"finished":False,"awarded":False}
+        data["attempts"][attempt_id]={"username":username,"mode":mode,"questions":chosen,"index":0,"score":0,"answers":[],"consecutive_wrong":0,"started":time.time(),"question_started_at":time.time(),"finished":False,"awarded":False}
         _arena_save(data)
         q=chosen[0]
         return {"success":True,"attempt_id":attempt_id,"question_number":1,"total_questions":len(chosen),"question":{"prompt":q["prompt"],"options":q["options"]}}
@@ -837,14 +892,27 @@ async def arena_answer(payload: dict):
         q=questions[idx]
         if answer<0 or answer>=len(q["options"]): raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
         elapsed_ms=max(0,int((time.time()-float(attempt.get("question_started_at", time.time())))*1000))
-        correct=answer==int(q["answer"]); awarded=(100 + (min(50,max(0,50-int(elapsed_ms/200))) if attempt["mode"]=="speed" else 0)) if correct else 0
-        attempt["score"]+=awarded; attempt["answers"].append({"correct":correct,"awarded":awarded}); attempt["index"]+=1
+        correct=answer==int(q["answer"])
+        if correct:
+            awarded=100 + (min(50,max(0,50-int(elapsed_ms/200))) if attempt["mode"]=="speed" else 0)
+            attempt["consecutive_wrong"]=0
+            message="+ hız bonusu dahil" if awarded>100 else "Güzel gidiyorsun!"
+        else:
+            streak=int(attempt.get("consecutive_wrong",0))+1
+            # Three consecutive wrong answers cost 200 points total across that streak:
+            # the first two cost 50 each, and the third costs 100.
+            awarded=-100 if streak>=3 else -50
+            attempt["consecutive_wrong"]=0 if streak>=3 else streak
+            message="Üst üste 3 yanlış! Bu cevap -100 puan; üç yanlışın toplam cezası -200." if streak>=3 else "Yanlış cevap: -50 puan."
+        attempt["score"]+=awarded
+        attempt["answers"].append({"correct":correct,"awarded":awarded,"consecutive_wrong":int(attempt.get("consecutive_wrong",0))})
+        attempt["index"]+=1
         finished=attempt["index"]>=len(questions)
-        response={"success":True,"correct":correct,"points_awarded":awarded,"message":("+ hız bonusu dahil" if awarded>100 else ("Güzel gidiyorsun!" if correct else "Bir sonraki soruda şansını dene.")),"finished":finished}
+        response={"success":True,"correct":correct,"points_awarded":awarded,"message":message,"finished":finished}
         if finished:
             attempt["finished"]=True
             if not attempt.get("awarded"):
-                p=_arena_player(data,username); p["points"]+=int(attempt["score"]); p["wins"]+=1 if attempt["score"]>=300 else 0
+                p=_arena_player(data,username); p["points"]=max(0, int(p.get("points",0))+int(attempt["score"])); p["wins"]+=1 if attempt["score"]>=300 else 0
                 if "İlk Zafer" not in p["badges"]: p["badges"].append("İlk Zafer")
                 if attempt["score"]>=400 and "Bilgi Avcısı" not in p["badges"]: p["badges"].append("Bilgi Avcısı")
                 if p["wins"]>=5 and "Seri Galibiyet" not in p["badges"]: p["badges"].append("Seri Galibiyet")
