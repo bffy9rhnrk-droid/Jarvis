@@ -92,7 +92,11 @@ def get_arena_db_connection():
 
 def init_arena_database():
     """Create the Arena state/attempt persistence layer and preserve existing tables."""
-    if not arena_database_configured():
+    if not SUPABASE_DB_URL:
+        print("KARVIS Arena DB: SUPABASE_DB_URL is missing.", flush=True)
+        return False
+    if psycopg2 is None:
+        print("KARVIS Arena DB: psycopg2 is unavailable; check requirements.txt.", flush=True)
         return False
     try:
         conn = get_arena_db_connection()
@@ -155,11 +159,15 @@ def init_arena_database():
                     )
         conn.close()
         return True
-    except Exception:
+    except Exception as exc:
+        details = traceback.format_exc()
         try:
-            save_error("Arena database initialization error", traceback.format_exc())
+            save_error("Arena database initialization error", details)
         except Exception:
             pass
+        # Print a sanitized diagnostic so the actual failure is visible in Render Logs.
+        safe_message = _sanitize_error_text(f"{type(exc).__name__}: {exc}") if "_sanitize_error_text" in globals() else type(exc).__name__
+        print(f"KARVIS Arena DB INIT FAILED: {safe_message}", flush=True)
         return False
 
 
