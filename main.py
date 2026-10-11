@@ -54,7 +54,7 @@ from reportlab.lib.units import inch
 # APP
 # ============================================================
 
-APP_VERSION = "35.1.0"
+APP_VERSION = "36.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -652,7 +652,76 @@ USERS = {
         "role": "admin",
         "style": "professional",
     },
+
+    "sude": {
+        "name": "Sude",
+        "password": "1234",
+        "role": "user",
+        "style": "sude",
+    },
 }
+
+
+# ============================================================
+# PASSWORD STORE + SUDE WORLD DATA
+# ============================================================
+PASSWORD_FILE = BASE_DIR / "user_passwords.json"
+SUDE_WORLD_FILE = BASE_DIR / "sude_world.json"
+password_lock = threading.Lock()
+sude_lock = threading.Lock()
+
+
+def _password_hash(password, salt=None):
+    salt = salt or os.urandom(16).hex()
+    digest = hashlib.pbkdf2_hmac("sha256", str(password).encode("utf-8"), bytes.fromhex(salt), 240000).hex()
+    return {"salt": salt, "hash": digest, "scheme": "pbkdf2_sha256", "iterations": 240000}
+
+
+def _verify_password(password, record):
+    if not isinstance(record, dict) or not record.get("salt") or not record.get("hash"):
+        return False
+    candidate = _password_hash(password, record["salt"])["hash"]
+    return hashlib.compare_digest(candidate, str(record.get("hash", ""))) if hasattr(hashlib, "compare_digest") else __import__("hmac").compare_digest(candidate, str(record.get("hash", "")))
+
+
+def _load_password_store():
+    with password_lock:
+        records = read_json_file(PASSWORD_FILE, {})
+        if not isinstance(records, dict): records = {}
+        changed = False
+        for uname, info in USERS.items():
+            if uname not in records:
+                legacy = str(info.get("password", ""))
+                records[uname] = _password_hash(legacy)
+                changed = True
+            info["password"] = ""  # don't keep plaintext credentials in the active user map
+        if changed or not PASSWORD_FILE.exists():
+            write_json_file(PASSWORD_FILE, records)
+        return records
+
+
+def _set_password(username, password):
+    with password_lock:
+        records = read_json_file(PASSWORD_FILE, {})
+        if not isinstance(records, dict): records = {}
+        records[username] = _password_hash(password)
+        write_json_file(PASSWORD_FILE, records)
+
+
+def _sude_default_state():
+    return {"food_log": [], "tasks": [], "points": 0, "pet": {"name": "Luna", "level": 1, "mood": 70, "energy": 70}, "badges": [], "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+
+def _get_sude_state():
+    data = read_json_file(SUDE_WORLD_FILE, {})
+    if not isinstance(data, dict): data = {}
+    data.setdefault("sude", _sude_default_state())
+    state = data["sude"]
+    if not isinstance(state, dict): state = _sude_default_state()
+    defaults = _sude_default_state()
+    for key, value in defaults.items(): state.setdefault(key, value)
+    data["sude"] = state
+    return data, state
 
 
 # ============================================================
@@ -884,15 +953,17 @@ async def login(
             detail="Kullanıcı adı veya şifre hatalı."
         )
 
-    if user.get(
-        "password",
-        ""
-    ) != password:
-
-        raise HTTPException(
-            status_code=401,
-            detail="Kullanıcı adı veya şifre hatalı."
-        )
+    password_records = _load_password_store()
+    record = password_records.get(username)
+    # Legacy fallback allows one-time migration of existing installations.
+    valid = _verify_password(password, record) if record else False
+    if not valid and user.get("password"):
+        valid = user.get("password") == password
+        if valid:
+            _set_password(username, password)
+            user["password"] = ""
+    if not valid:
+        raise HTTPException(status_code=401, detail="Kullanıcı adı veya şifre hatalı.")
 
     public_user = {
 
@@ -2606,6 +2677,14 @@ BETÜL KARAKTERİ:
 - Güncel haberlerde önemli olayı kısa ve anlaşılır söyle, ardından en fazla kısa bir Betül yorumu ekle.
 - Hava durumunda önce sıcaklık ve yağış bilgisini söyle, sonra kısa bir günlük öneri ver.
 - Gereksiz 'aşko/kız' tekrarlarından kaçın; doğal kullan.
+"""
+    if username == "sude":
+        return common + """
+SUDE KARAKTERİ:
+- Neşeli, destekleyici, yargılamayan ve sıcak konuş.
+- Sağlıklı beslenme hedeflerinde aşırı kısıtlamayı veya hızlı kilo kaybını teşvik etme.
+- Kalori değerlerinin yaklaşık olduğunu ve porsiyona göre değiştiğini belirt.
+- Oyun, bilmece ve günlük hedeflerde motive edici ol.
 """
     if username == "sinem":
         return common + """
@@ -6328,10 +6407,9 @@ async def chat(
     conversation_id = (request.conversation_id or "").strip()[:120]
     chat_history = _get_chat_context(conversation_id, username)
 
-    user = USERS.get(
-        username,
-        USERS["karahan"]
-    )
+    user = USERS.get(username)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
 
     # Kullanıcı özellik önerisi algılama: yalnızca gerçek öneri kalıplarında kaydet.
     feature_request = detect_user_feature_request(message)
@@ -6706,81 +6784,185 @@ async def generated_file(
 
 
 # ============================================================
+# ACCOUNT PASSWORD MANAGEMENT
+# ============================================================
+class PasswordChangeRequest(BaseModel):
+    username: str
+    current_password: str = ""
+    new_password: str
+
+class AdminPasswordResetRequest(BaseModel):
+    username: str = "murat"
+    target_username: str
+    new_password: str
+
+@app.post("/account/change-password")
+async def change_password(data: PasswordChangeRequest):
+    username = data.username.strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    records = _load_password_store()
+    record = records.get(username)
+    if record and not _verify_password(data.current_password, record):
+        raise HTTPException(status_code=401, detail="Mevcut şifre hatalı.")
+    if not record and USERS[username].get("password") != data.current_password:
+        raise HTTPException(status_code=401, detail="Mevcut şifre hatalı.")
+    _set_password(username, data.new_password)
+    USERS[username]["password"] = ""
+    return {"success": True, "message": "Şifre güncellendi."}
+
+@app.post("/admin/password-reset")
+async def admin_password_reset(data: AdminPasswordResetRequest):
+    require_admin(data.username)
+    target = data.target_username.strip().lower()
+    if target not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    _set_password(target, data.new_password)
+    USERS[target]["password"] = ""
+    return {"success": True, "message": f"{USERS[target]['name']} profilinin şifresi sıfırlandı."}
+
+
+# ============================================================
+# SUDE'S WORLD API
+# ============================================================
+@app.get("/sude/world")
+async def sude_world(username: str = "sude"):
+    if username.strip().lower() != "sude":
+        raise HTTPException(status_code=403, detail="Bu dünya yalnızca Sude profiline açıktır.")
+    _, state = _get_sude_state()
+    return {"success": True, "world": state}
+
+@app.post("/sude/bmi")
+async def sude_bmi(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    try:
+        weight = float(data.get("weight")); height = float(data.get("height"))
+        if not (20 <= weight <= 350 and 80 <= height <= 250): raise ValueError()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Boyu cm, kiloyu kg olarak geçerli girin.")
+    bmi = weight / ((height / 100) ** 2)
+    category = "Düşük kilo" if bmi < 18.5 else "Normal aralık" if bmi < 25 else "Fazla kilo aralığı" if bmi < 30 else "Obezite aralığı"
+    return {"success": True, "bmi": round(bmi, 1), "category": category, "note": "VKİ yalnızca genel bir tarama ölçütüdür; tek başına tanı koymaz ve yaş/gebelik/kas oranı gibi etkenleri değerlendirmez."}
+
+@app.post("/sude/estimate-calories")
+async def sude_estimate_calories(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    meal = str(data.get("meal", "")).strip()[:500]
+    if not meal: raise HTTPException(status_code=400, detail="Yiyecek veya öğün adı gerekli.")
+    prompt = ("Tahmini kalori hesaplayıcısı olarak yanıtla. Kullanıcının yazdığı yiyecek/öğün için porsiyon bilgisi yoksa standart bir porsiyon varsay. "
+              "Yalnızca şu biçimde yanıt ver: KALORI: <tam sayı>\nACIKLAMA: <kısa porsiyon varsayımı>. Kesinlik iddia etme.\nÖğün: " + meal)
+    answer = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True) or ""
+    match = re.search(r"KALORI\s*:\s*(\d{1,4})", answer, re.IGNORECASE)
+    calories = max(0, min(5000, int(match.group(1)))) if match else None
+    explanation_match = re.search(r"ACIKLAMA\s*:\s*(.+)", answer, re.IGNORECASE | re.DOTALL)
+    explanation = explanation_match.group(1).strip()[:500] if explanation_match else "Porsiyon ve hazırlanışa göre değişebilir."
+    if calories is None:
+        return {"success": False, "estimate": None, "explanation": "Güvenilir bir tahmin üretilemedi. Porsiyon miktarını ve malzemeleri daha ayrıntılı yaz."}
+    return {"success": True, "estimate": calories, "explanation": explanation, "disclaimer": "Bu değer yaklaşık tahmindir; ürün etiketi veya ölçülmüş malzeme değerinin yerini tutmaz."}
+
+@app.post("/sude/food")
+async def sude_add_food(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    name = str(data.get("name", "")).strip()[:120]
+    try: calories = max(0, min(5000, int(float(data.get("calories", 0)))))
+    except Exception: calories = 0
+    if not name: raise HTTPException(status_code=400, detail="Yiyecek adı gerekli.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        state["food_log"].append({"id": uuid.uuid4().hex, "name": name, "calories": calories, "date": time.strftime("%Y-%m-%d"), "created_at": time.strftime("%H:%M")})
+        state["food_log"] = state["food_log"][-200:]
+        state["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.post("/sude/tasks")
+async def sude_add_task(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    title = str(data.get("title", "")).strip()[:120]
+    if not title: raise HTTPException(status_code=400, detail="Görev adı gerekli.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        state["tasks"].append({"id": uuid.uuid4().hex, "title": title, "done": False, "date": time.strftime("%Y-%m-%d")})
+        state["tasks"] = state["tasks"][-100:]
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.post("/sude/tasks/{task_id}/complete")
+async def sude_complete_task(task_id: str, username: str = "sude"):
+    if username.strip().lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        task = next((x for x in state["tasks"] if x.get("id") == task_id), None)
+        if not task: raise HTTPException(status_code=404, detail="Görev bulunamadı.")
+        if not task.get("done"):
+            task["done"] = True; state["points"] = int(state.get("points", 0)) + 10
+            state["pet"]["mood"] = min(100, int(state["pet"].get("mood", 70)) + 5)
+            state["pet"]["level"] = 1 + int(state["points"]) // 100
+            if state["points"] >= 50 and "İlk Adımlar" not in state["badges"]: state["badges"].append("İlk Adımlar")
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.post("/sude/pet")
+async def sude_pet(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    action = str(data.get("action", "pet"))
+    with sude_lock:
+        all_data, state = _get_sude_state(); pet = state["pet"]
+        if action == "feed": pet["energy"] = min(100, int(pet.get("energy",70))+15); state["points"] += 2
+        elif action == "play": pet["mood"] = min(100, int(pet.get("mood",70))+12); pet["energy"] = max(0, int(pet.get("energy",70))-8); state["points"] += 2
+        else: pet["mood"] = min(100, int(pet.get("mood",70))+3)
+        pet["level"] = 1 + int(state.get("points",0)) // 100
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.get("/admin/sude-summary")
+async def admin_sude_summary(username: str = "murat"):
+    require_admin(username)
+    _, state = _get_sude_state()
+    # Deliberately share only aggregate progress, not detailed food entries.
+    return {"success": True, "summary": {"points": state.get("points",0), "level": state.get("pet",{}).get("level",1), "completed_tasks": sum(1 for t in state.get("tasks",[]) if t.get("done")), "total_tasks": len(state.get("tasks",[])), "badges": state.get("badges",[])}}
+
+
+# ============================================================
 # MEMORY
 # ============================================================
 
 @app.get("/memory")
-async def get_memory():
-
+async def get_memory(username: str = "karahan"):
+    username = username.strip().lower()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
     with memory_lock:
-
-        return {
-
-            "memory":
-                read_json_file(
-                    MEMORY_FILE,
-                    []
-                )
-        }
-
+        stored = read_json_file(MEMORY_FILE, [])
+        # Backward compatibility: existing legacy memory remains attached to the main owner profile.
+        if isinstance(stored, dict):
+            memories = stored.get(username, [])
+        else:
+            memories = stored if username == "karahan" and isinstance(stored, list) else []
+        return {"memory": memories}
 
 @app.post("/memory")
-async def add_memory(
-    data: dict
-):
-
-    text = str(
-        data.get(
-            "text",
-            ""
-        )
-    ).strip()
-
-    if not text:
-
-        return {
-            "success":
-                False
-        }
-
+async def add_memory(data: dict):
+    username = str(data.get("username", "karahan")).strip().lower()
+    text = str(data.get("text", "")).strip()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if not text: return {"success": False}
     with memory_lock:
-
-        memories = read_json_file(
-            MEMORY_FILE,
-            []
-        )
-
-        memories.append({
-
-            "id":
-                uuid.uuid4().hex,
-
-            "text":
-                text,
-
-            "created_at":
-                time.strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
-        })
-
-        memories = memories[
-            -200:
-        ]
-
-        write_json_file(
-            MEMORY_FILE,
-            memories
-        )
-
-    return {
-
-        "success":
-            True,
-
-        "memory":
-            memories
-    }
+        stored = read_json_file(MEMORY_FILE, [])
+        if not isinstance(stored, dict):
+            stored = {"karahan": stored if isinstance(stored, list) else []}
+        memories = stored.get(username, [])
+        if not isinstance(memories, list): memories = []
+        memories.append({"id": uuid.uuid4().hex, "text": text[:2000], "created_at": time.strftime("%Y-%m-%d %H:%M:%S")})
+        stored[username] = memories[-200:]
+        write_json_file(MEMORY_FILE, stored)
+    return {"success": True, "memory": stored[username]}
 
 
 # ============================================================
