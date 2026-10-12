@@ -1503,7 +1503,7 @@ body.voice-speaking .ring.three{
             onclick="selectAcademicMode('quiz')">
             🧪 Sınav / Quiz
         </button>
-        <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
+        <button class="menu-item" onclick="openTeacherExamManager()">📝 Sınav Hazırlama</button>
         <button class="menu-item" onclick="openTeacherExamStatsDashboard()">📊 Sınav İstatistikleri</button>
 
         <button
@@ -1943,7 +1943,7 @@ body.voice-speaking .ring.three{
 <div id="teacherExamModal" class="modal exam-modal" style="max-width:980px;">
   <header class="exam-manager-hero">
     <div class="exam-manager-icon">✦</div>
-    <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Yönetimi</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
+    <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Hazırlama</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
   </header>
   <div class="exam-manager-note">⏱ Süre dakika cinsindendir. <strong>0 = sınırsız</strong>. Tarihler cihazının yerel saatine göre ayarlanır.</div>
   <section class="exam-manager-section">
@@ -1987,14 +1987,6 @@ body.voice-speaking .ring.three{
   <div class="exam-publish-actions"><button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button><button class="exam-generate-button" onclick="saveTeacherExam(true)">✓ Sınavı yayımla</button></div>
   <div id="teacherExamStatus" aria-live="polite" class="exam-status-message"></div>
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
-  <section class="sude-card" style="margin-top:16px;padding:14px;">
-    <h3>📊 Öğrenci İstatistikleri ve KARVIS Değerlendirmesi</h3>
-    <p>Bir sınavın sonuçlarını seçerek sınıf başarısını, soru bazlı zorlanma oranlarını ve KARVIS'in olası konu eksikliği analizini görüntüleyin.</p>
-    <label for="examStatsSelect">Sınav seçin</label>
-    <select id="examStatsSelect" class="voice-select" style="width:100%;margin:6px 0 10px;"><option value="">Sınavlar yükleniyor…</option></select>
-    <button class="settings-choice" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">📈 İstatistikleri ve KARVIS değerlendirmesini getir</button>
-    <div id="teacherExamStats" aria-live="polite" style="margin-top:12px;"></div>
-  </section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 <div id="teacherExamStatsModal" class="modal exam-modal exam-stats-modal">
@@ -2927,7 +2919,7 @@ function selectAcademicMode(mode){
    ============================================================ */
 let examDraftQuestions = [];
 function openTeacherExamManager(){
-  if(currentUser !== "ilknur"){alert("Sınav yönetimi yalnızca İlknur öğretmen profiline açıktır.");return;}
+  if(currentUser !== "ilknur"){alert("Sınav hazırlama yalnızca İlknur öğretmen profiline açıktır.");return;}
   closeSidebar(); closeModals(); $("teacherExamModal").classList.add("show");
   examDraftQuestions=[]; renderExamQuestionBuilder(); loadTeacherExams();
 }
@@ -2948,7 +2940,7 @@ function addExamQuestion(){
 }
 function renderExamQuestionBuilder(){
   const box=$("examQuestionBuilder"); if(!box)return;
-  box.innerHTML=examDraftQuestions.length ? examDraftQuestions.map((q,i)=>`<section class="exam-editor-card"><header class="exam-editor-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div><h3>${i+1}. Soru</h3><small>${q.type==='multiple_choice'?'Çoktan seçmeli':q.type==='true_false'?'Doğru / Yanlış':'Açık uçlu'}</small></div><button type="button" class="exam-remove-question" onclick="if(confirm('Bu soruyu silmek istiyor musunuz?')){examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()}">Sil</button></header><label class="exam-editor-label">Soru metni<textarea class="exam-prompt-editor" rows="4" placeholder="Soruyu tam metniyle yazın…" oninput="examDraftQuestions[${i}].prompt=this.value">${escapeHTML(q.prompt||'')}</textarea></label><div class="exam-editor-grid"><label class="exam-editor-label">Soru türü<select onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu</option></select></label><label class="exam-editor-label">Puan<input type="number" min="1" max="100" value="${Number(q.points)||1}" oninput="examDraftQuestions[${i}].points=Math.max(1,Math.min(100,Number(this.value)||1))"></label></div>${q.type==='multiple_choice'?`<div class="exam-editor-options-title">Cevap seçenekleri</div><div class="exam-editor-options">${(q.options||[]).map((o,j)=>`<label class="exam-editor-option"><span>${String.fromCharCode(65+j)}</span><input value="${escapeHTML(o)}" placeholder="${String.fromCharCode(65+j)} seçeneği" oninput="examDraftQuestions[${i}].options[${j}]=this.value"></label>`).join('')}</div><label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${(q.options||[]).map((o,j)=>`<option value="${j}" ${Number(q.correct_index)===j?'selected':''}>${String.fromCharCode(65+j)} seçeneği</option>`).join('')}</select></label>`:q.type==='true_false'?`<label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select></label>`:`<label class="exam-editor-label">Örnek cevap / değerlendirme ölçütü<textarea rows="3" placeholder="Öğretmen değerlendirmesi için not (isteğe bağlı)" oninput="examDraftQuestions[${i}].correct_answer=this.value">${escapeHTML(q.correct_answer||'')}</textarea></label>`}</section>`).join('') : '<div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>KARVIS ile soru oluştur veya yeni soru ekle.</p></div>';
+  box.innerHTML=examDraftQuestions.length ? examDraftQuestions.map((q,i)=>`<section class="exam-editor-card"><header class="exam-editor-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div><h3>${i+1}. Soru</h3><small>${q.type==='multiple_choice'?'Çoktan seçmeli':q.type==='true_false'?'Doğru / Yanlış':'Açık uçlu'}</small></div><button type="button" class="exam-remove-question" onclick="if(confirm('Bu soruyu silmek istiyor musunuz?')){examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()}">Sil</button></header><label class="exam-editor-label">Soru metni<textarea class="exam-prompt-editor" rows="4" placeholder="Soruyu tam metniyle yazın…" oninput="examDraftQuestions[${i}].prompt=this.value">${escapeHTML(q.prompt||'')}</textarea></label><div class="exam-editor-grid"><label class="exam-editor-label">Soru türü<select onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu</option></select></label><label class="exam-editor-label">Puan<input type="number" min="1" max="100" value="${Number(q.points)||1}" oninput="examDraftQuestions[${i}].points=Math.max(1,Math.min(100,Number(this.value)||1))"></label></div>${q.type==='multiple_choice'?`<div class="exam-editor-options-title">Cevap seçenekleri</div><div class="exam-editor-options">${(q.options||[]).map((o,j)=>`<label class="exam-editor-option"><span>${String.fromCharCode(65+j)}</span><input value="${escapeHTML(o)}" placeholder="${String.fromCharCode(65+j)} seçeneği" oninput="examDraftQuestions[${i}].options[${j}]=this.value"></label>`).join('')}</div><label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${(q.options||[]).map((o,j)=>`<option value="${j}" ${Number(q.correct_index)===j?'selected':''}>${String.fromCharCode(65+j)} seçeneği</option>`).join('')}</select></label>`:q.type==='true_false'?`<label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select></label>`:`<label class="exam-editor-label">Örnek cevap / puanlama ölçütü<textarea rows="3" placeholder="Öğretmen değerlendirmesi için not (isteğe bağlı)" oninput="examDraftQuestions[${i}].correct_answer=this.value">${escapeHTML(q.correct_answer||'')}</textarea></label>`}</section>`).join('') : '<div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>KARVIS ile soru oluştur veya yeni soru ekle.</p></div>';
 }
 function changeExamQuestionType(i,type){examDraftQuestions[i].type=type;if(type==='true_false')examDraftQuestions[i].correct_answer=true;if(type==='open_ended')examDraftQuestions[i].correct_answer='';renderExamQuestionBuilder();}
 async function saveTeacherExam(published){
@@ -2960,7 +2952,7 @@ async function saveTeacherExam(published){
 }
 async function loadTeacherExams(){
  const box=$('teacherExamList');if(!box)return;
- try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button><button class="settings-choice" onclick="selectExamForAnalysis('${e.id}')">📊 Öğrenci istatistikleri</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';
+ try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';
  const sel=$('examStatsSelect');if(sel){const previous=sel.value;sel.innerHTML='<option value="">Sınav seçin…</option>'+(d.exams||[]).map(e=>`<option value="${e.id}">${escapeHTML(e.title)}</option>`).join('');if((d.exams||[]).some(e=>e.id===previous))sel.value=previous;}}
  catch(e){box.textContent='Hata: '+e.message;}
 }
@@ -2991,7 +2983,7 @@ async function openTeacherExamStatsDashboard(){
  sel.innerHTML='<option value="">Sınavlar yükleniyor…</option>';content.innerHTML='<div class="exam-stats-empty">Sınav listesi yükleniyor…</div>';
  try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');
   const exams=d.exams||[];sel.innerHTML='<option value="">Bir sınav seçin…</option>'+exams.map(e=>`<option value="${e.id}">${escapeHTML(e.title)}${e.published?'':' · Taslak'}</option>`).join('');
-  if(!exams.length){content.innerHTML='<div class="exam-stats-empty">Henüz sınav oluşturulmamış. Önce Sınav Yönetimi bölümünden bir sınav hazırlayın.</div>';return;}
+  if(!exams.length){content.innerHTML='<div class="exam-stats-empty">Henüz sınav oluşturulmamış. Önce Sınav Hazırlama bölümünden bir sınav hazırlayın.</div>';return;}
   const preferred=exams.find(e=>e.submission_count>0)||exams[0];sel.value=preferred.id;await loadExamStatsDashboard();
  }catch(e){content.innerHTML='<div class="exam-stats-empty">Hata: '+escapeHTML(e.message)+'</div>';}
 }
@@ -3026,7 +3018,7 @@ function showExamQuestionAnswers(examId,questionId,number){
 
 async function openStudentExams(){
   closeSidebar();closeModals();$('studentExamModal').classList.add('show');$('studentExamWork').style.display='none';$('studentExamList').style.display='block';
-  if(currentUser==='ilknur'){$('studentExamList').innerHTML='<p>Öğretmen profili için Sınav Yönetimi bölümünü kullanın.</p>';return;}
+  if(currentUser==='ilknur'){$('studentExamList').innerHTML='<p>Öğretmen profili için Sınav Hazırlama bölümünü kullanın.</p>';return;}
   try{const r=await fetch(API+'/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar alınamadı.');$('studentExamList').innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${Number(e.duration_minutes)||'Sınırsız'} ${Number(e.duration_minutes)?'dakika':''}</p><p>${escapeHTML(e.description||'')}</p>${e.starts_at?`<p>Başlangıç: ${escapeHTML(new Date(e.starts_at).toLocaleString())}</p>`:''}${e.ends_at?`<p>Bitiş: ${escapeHTML(new Date(e.ends_at).toLocaleString())}</p>`:''}${e.submitted?'<strong>✅ Teslim edildi</strong>':`<button class="settings-choice" onclick="startStudentExam('${e.id}')">Sınava gir</button>`}</div>`).join('')||'<p>Şu anda yayımlanmış sınav yok.</p>';}
   catch(e){$('studentExamList').textContent='Hata: '+e.message;}
 }
