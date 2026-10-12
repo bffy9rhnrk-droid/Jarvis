@@ -1293,6 +1293,28 @@ body.voice-speaking .ring.three{
 @media(max-width:650px){.exam-stats-hero{grid-template-columns:46px minmax(0,1fr) 34px;gap:10px;padding:13px}.exam-stats-hero-icon{width:46px;height:46px}.exam-stats-close{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px;min-height:34px!important}.exam-stats-hero p{font-size:12px;line-height:1.5}}
 
 
+
+/* Fix: keep the AI exam difficulty selector fully inside its field on mobile and desktop. */
+.exam-modal #examAIDifficulty{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:46px!important;
+  margin-top:7px!important;
+  padding:10px 38px 10px 12px!important;
+  border:1px solid rgba(130,160,180,.3)!important;
+  border-radius:12px!important;
+  background-color:#0b1c28!important;
+  color:#f4fbff!important;
+  font-size:14px!important;
+  line-height:1.4!important;
+  box-sizing:border-box!important;
+  white-space:normal!important;
+}
+.exam-modal #examAIDifficulty option{background:#0b1c28;color:#f4fbff;}
+.exam-modal .exam-modern-field:has(#examAIDifficulty){width:100%;min-width:0;}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1909,14 +1931,14 @@ body.voice-speaking .ring.three{
   </div>
   <section class="arena-card" id="arenaDuelCard">
     <h3>⚔️ Özel Düello — puanına meydan oku</h3>
-    <p>Bir rakip seç, bahis puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
+    <p>Bir rakip seç, meydan okuma puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
     <div class="sude-grid">
       <div><label for="arenaDuelOpponent">Rakip profil</label>
         <select id="arenaDuelOpponent" class="sude-field">
           <option value="karahan">KARAHAN INC.</option><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="murat">Murat</option><option value="sude">Sude</option>
         </select>
       </div>
-      <div><label for="arenaDuelStake">Bahis puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
+      <div><label for="arenaDuelStake">Meydan okuma puanı</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100 puan"></div>
     </div>
     <button class="sude-btn" onclick="sendArenaDuelRequest()">📨 Düello isteği gönder</button>
     <div id="arenaDuelStatus" aria-live="polite" style="margin-top:10px;font-size:13px"></div>
