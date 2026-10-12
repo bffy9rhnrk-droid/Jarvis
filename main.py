@@ -2119,6 +2119,60 @@ async def teacher_exam_results(exam_id: str, username: str = "ilknur"):
     return {"success":True,"exam":{"id":exam_id,"title":exam["title"],"question_count":len(exam.get("questions",[]))},"summary":{"submission_count":len(submissions),"average_percent":round(sum(scores)/len(scores),2) if scores else 0,"highest_percent":max(scores) if scores else 0,"lowest_percent":min(scores) if scores else 0},"submissions":[{"id":s["id"],"username":s["username"],"submitted_at":s["submitted_at"],"score":s["score"],"max_score":s["max_score"],"percent":s["percent"],"status":s.get("status","graded"),"answers":[{**a,"prompt":next((q.get("prompt","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"type":next((q.get("type","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),"")} for a in s["answers"]]} for s in submissions]}
 
 
+@app.get("/teacher/exams/{exam_id}/analysis")
+async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
+    """Teacher-only class statistics and evidence-based topic-gap analysis."""
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data = _exam_store()
+        exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
+        if not exam:
+            raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        submissions = [s.copy() for s in data["submissions"] if s.get("exam_id") == exam_id]
+        questions = [q.copy() for q in exam.get("questions", [])]
+
+    scores = [float(s.get("percent", 0) or 0) for s in submissions]
+    question_stats = []
+    for q in questions:
+        related = [a for sub in submissions for a in sub.get("answers", []) if a.get("question_id") == q.get("id")]
+        reviewed = [a for a in related if not a.get("manual_review")]
+        incorrect = sum(1 for a in reviewed if a.get("correct") is False)
+        unanswered = sum(1 for a in related if not str(a.get("answer", "")).strip())
+        question_stats.append({
+            "question_id": q.get("id"), "prompt": q.get("prompt", ""),
+            "type": q.get("type", ""), "responses": len(related),
+            "incorrect": incorrect, "unanswered": unanswered,
+            "incorrect_percent": round(100 * incorrect / len(reviewed), 1) if reviewed else None,
+            "manual_review_count": sum(1 for a in related if a.get("manual_review")),
+        })
+    weak = sorted([x for x in question_stats if x["incorrect_percent"] is not None], key=lambda x: x["incorrect_percent"], reverse=True)[:8]
+    summary = {
+        "submission_count": len(submissions),
+        "average_percent": round(sum(scores) / len(scores), 1) if scores else 0,
+        "highest_percent": max(scores) if scores else 0,
+        "lowest_percent": min(scores) if scores else 0,
+        "pass_rate_percent": round(100 * sum(1 for x in scores if x >= 50) / len(scores), 1) if scores else 0,
+        "pending_open_answers": sum(1 for sub in submissions for a in sub.get("answers", []) if a.get("manual_review")),
+    }
+    # Analyze only aggregate/question-level evidence; do not send student names or raw student answers.
+    ai_analysis = "Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça konu analizi oluşacaktır."
+    if submissions and weak:
+        compact = [{"soru": x["prompt"][:240], "yanlis_yuzdesi": x["incorrect_percent"], "bos_cevap": x["unanswered"], "yanit_sayisi": x["responses"]} for x in weak]
+        prompt = (
+            "Türkçe bir öğretmen için sınıf öğrenme boşluklarını değerlendir. Sadece aşağıdaki sınav istatistiklerine dayan; "
+            "soru metninden konu/kazanım çıkarımını kesin değil olası olarak belirt. Öğrenci adı üretme, veri uydurma. "
+            "En fazla 5 kısa madde: zorlanılan olası konular, kanıt (yanlış yüzdesi), önerilen tekrar/etkinlik ve veri sınırlaması.\n"
+            f"Ders: {str(exam.get('subject',''))[:100]}\nSınav: {str(exam.get('title',''))[:140]}\nİstatistikler: {json.dumps(compact, ensure_ascii=False)}"
+        )
+        try:
+            result = ask_ai(prompt, system_prompt="Sen ölçme-değerlendirme uzmanısın. Yalnızca verilen istatistiklerden temkinli sonuç çıkar.", fast=True)
+            if result and str(result).strip():
+                ai_analysis = str(result).strip()[:6000]
+        except Exception:
+            ai_analysis = "KARVIS değerlendirmesi şu anda üretilemedi. Aşağıdaki soru bazlı istatistikler kullanılabilir."
+    return {"success": True, "exam": {"id": exam_id, "title": exam.get("title", ""), "subject": exam.get("subject", "")}, "summary": summary, "question_stats": question_stats, "likely_gaps": weak, "karvis_evaluation": ai_analysis}
+
+
 # ============================================================
 # USER REQUEST ADMIN API
 # ============================================================
