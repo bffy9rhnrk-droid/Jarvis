@@ -1349,7 +1349,7 @@ def save_error(message, details=None, *, category="application", severity="error
 USERS = {
 
     "karahan": {
-        "name": "KARAHAN INC.",
+        "name": "Ana Profil",
         "password": "",
         "role": "owner",
         "style": "professional",
@@ -1690,6 +1690,190 @@ class RegisterRequest(BaseModel):
     username: str
     display_name: str
     password: str
+
+
+# ============================================================
+# BIG UPDATE: EXAMS + ACTIVE USER PRESENCE
+# ============================================================
+EXAMS_FILE = BASE_DIR / "karvis_exams.json"
+PRESENCE_FILE = BASE_DIR / "karvis_presence.json"
+exam_lock = threading.Lock()
+presence_lock = threading.Lock()
+
+class PresencePing(BaseModel):
+    username: str
+    name: str = ""
+    role: str = "user"
+
+class ExamCreateRequest(BaseModel):
+    username: str = "ilknur"
+    title: str
+    subject: str = ""
+    questions: list = []
+
+class ExamSubmitRequest(BaseModel):
+    username: str
+    exam_id: str
+    answers: dict = {}
+
+def _load_exam_records():
+    value = read_json_file(EXAMS_FILE, [])
+    return value if isinstance(value, list) else []
+
+def _load_presence_records():
+    value = read_json_file(PRESENCE_FILE, {})
+    return value if isinstance(value, dict) else {}
+
+@app.post("/presence/ping")
+async def presence_ping(data: PresencePing):
+    username = (data.username or "").strip().lower()
+    profile = USERS.get(username)
+    if not profile:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    now = time.time()
+    with presence_lock:
+        records = _load_presence_records()
+        records[username] = {
+            "username": username,
+            "name": str(profile.get("name") or data.name or username)[:60],
+            "role": str(profile.get("role") or "user"),
+            "last_seen": now,
+            "status": "online",
+        }
+        # Mark a profile offline after 90 seconds without a heartbeat.
+        for key, item in list(records.items()):
+            if not isinstance(item, dict) or now - float(item.get("last_seen", 0) or 0) > 90:
+                if isinstance(item, dict):
+                    item["status"] = "offline"
+        write_json_file(PRESENCE_FILE, records)
+    return {"success": True, "interval_seconds": 25}
+
+@app.get("/admin/active-users")
+async def admin_active_users(username: str = "murat"):
+    require_admin(username)
+    now = time.time()
+    with presence_lock:
+        records = _load_presence_records()
+        users = []
+        changed = False
+        for key, item in records.items():
+            if not isinstance(item, dict):
+                continue
+            seen = float(item.get("last_seen", 0) or 0)
+            status = "online" if now - seen <= 90 else "offline"
+            if item.get("status") != status:
+                item["status"] = status
+                changed = True
+            users.append({
+                "username": str(item.get("username") or key),
+                "name": str(item.get("name") or key),
+                "role": str(item.get("role") or "user"),
+                "status": status,
+                "last_seen": seen,
+                "seconds_ago": max(0, int(now-seen)),
+            })
+        if changed:
+            write_json_file(PRESENCE_FILE, records)
+    users.sort(key=lambda item: (item["status"] != "online", -item["last_seen"]))
+    return {"success": True, "online": sum(x["status"] == "online" for x in users), "total_seen": len(users), "users": users}
+
+@app.get("/exams")
+async def list_exams(username: str):
+    if (username or "").strip().lower() not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    exams = _load_exam_records()
+    safe = []
+    for exam in exams:
+        if not isinstance(exam, dict):
+            continue
+        safe.append({
+            "id": exam.get("id"),
+            "title": exam.get("title"),
+            "subject": exam.get("subject", ""),
+            "created_by": exam.get("created_by", "ilknur"),
+            "created_at": exam.get("created_at"),
+            "question_count": len(exam.get("questions", [])),
+        })
+    return {"success": True, "exams": safe}
+
+@app.post("/exams")
+async def create_exam(data: ExamCreateRequest):
+    username = (data.username or "").strip().lower()
+    if username != "ilknur":
+        raise HTTPException(status_code=403, detail="Sınav oluşturma yalnızca İlknur öğretmen profiline açıktır.")
+    title = (data.title or "").strip()[:120]
+    subject = (data.subject or "").strip()[:120]
+    questions = data.questions or []
+    if len(title) < 3:
+        raise HTTPException(status_code=400, detail="Sınav başlığı en az 3 karakter olmalı.")
+    if not isinstance(questions, list) or not 1 <= len(questions) <= 100:
+        raise HTTPException(status_code=400, detail="Sınav 1-100 arası soru içermeli.")
+    clean_questions = []
+    for index, question in enumerate(questions):
+        if not isinstance(question, dict):
+            raise HTTPException(status_code=400, detail=f"{index+1}. soru biçimi geçersiz.")
+        prompt = str(question.get("question") or "").strip()[:1000]
+        options = question.get("options")
+        answer = str(question.get("answer") or "").strip().upper()
+        if len(prompt) < 3 or not isinstance(options, list) or len(options) != 4 or answer not in ["A","B","C","D"]:
+            raise HTTPException(status_code=400, detail=f"{index+1}. soruda soru metni, 4 seçenek ve A-D doğru cevap gerekli.")
+        clean_questions.append({"question": prompt, "options": [str(x)[:500] for x in options], "answer": answer})
+    exam = {
+        "id": uuid.uuid4().hex,
+        "title": title,
+        "subject": subject,
+        "created_by": "ilknur",
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        "questions": clean_questions,
+        "results": [],
+    }
+    with exam_lock:
+        exams = _load_exam_records()
+        exams.append(exam)
+        write_json_file(EXAMS_FILE, exams)
+    return {"success": True, "exam": {"id": exam["id"], "title": title, "subject": subject, "question_count": len(clean_questions)}}
+
+@app.get("/exams/{exam_id}")
+async def get_exam(exam_id: str, username: str):
+    if (username or "").strip().lower() not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    for exam in _load_exam_records():
+        if isinstance(exam, dict) and exam.get("id") == exam_id:
+            # Never expose answer keys to a student.
+            return {"success": True, "exam": {
+                "id": exam["id"], "title": exam["title"], "subject": exam.get("subject", ""),
+                "questions": [{"question": q["question"], "options": q["options"]} for q in exam.get("questions", [])]
+            }}
+    raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+
+@app.post("/exams/submit")
+async def submit_exam(data: ExamSubmitRequest):
+    username = (data.username or "").strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with exam_lock:
+        exams = _load_exam_records()
+        exam = next((x for x in exams if isinstance(x, dict) and x.get("id") == data.exam_id), None)
+        if not exam:
+            raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        questions = exam.get("questions", [])
+        correct = sum(1 for i, q in enumerate(questions) if str(data.answers.get(str(i), "")).upper() == q.get("answer"))
+        total = len(questions)
+        result = {"username": username, "name": USERS[username].get("name", username), "correct": correct, "wrong": total-correct, "total": total, "percent": round(correct*100/total) if total else 0, "submitted_at": datetime.utcnow().isoformat()+"Z"}
+        exam.setdefault("results", []).append(result)
+        write_json_file(EXAMS_FILE, exams)
+    return {"success": True, "result": result}
+
+@app.get("/exams/{exam_id}/results")
+async def exam_results(exam_id: str, username: str = "ilknur"):
+    if (username or "").strip().lower() != "ilknur":
+        raise HTTPException(status_code=403, detail="Sonuç analizi yalnızca İlknur öğretmene açıktır.")
+    for exam in _load_exam_records():
+        if isinstance(exam, dict) and exam.get("id") == exam_id:
+            results = exam.get("results", [])
+            return {"success": True, "results": results, "count": len(results), "average_percent": round(sum(x.get("percent",0) for x in results)/len(results), 1) if results else 0}
+    raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+
 
 @app.post("/register")
 async def register_account(data: RegisterRequest):
