@@ -1369,15 +1369,23 @@ body.voice-speaking .ring.three{
 </div>
 
 <!-- ============================================================
-     PROFILE MODAL
+     PROFILE CHOICE + LOGIN MODALS
      ============================================================ -->
+
+<div id="profileChoiceModal" class="modal">
+    <h2>Profil Değiştir</h2>
+    <p style="opacity:.8;font-size:13px">Devam etmek için bir seçenek belirleyin.</p>
+    <button class="modal-button" onclick="openProfileLogin()">Profile Giriş</button>
+    <button class="modal-button" onclick="openRegisterModal()">Yeni Profil</button>
+    <button class="modal-button secondary-button" onclick="closeModals()">Vazgeç</button>
+</div>
 
 <div
     id="profileModal"
     class="modal">
 
     <h2>
-        Profil Değiştir
+        Profile Giriş
     </h2>
 
     <input
@@ -1397,12 +1405,6 @@ body.voice-speaking .ring.three{
         class="modal-button"
         onclick="login()">
         Giriş Yap
-    </button>
-
-    <button
-        class="modal-button"
-        onclick="openRegisterModal()">
-        Yeni Hesap Oluştur
     </button>
 
     <button
@@ -1950,26 +1952,26 @@ function closeModals(){
    ============================================================ */
 
 function openProfile(){
-
     closeSidebar();
+    closeModals();
+    $("profileChoiceModal").classList.add("show");
+}
 
+function openProfileLogin(){
+    closeModals();
     $("profileModal").classList.add("show");
-
-    setTimeout(
-        () => $("usernameInput").focus(),
-        100
-    );
+    setTimeout(() => $("usernameInput").focus(), 100);
 }
 
 function openRegisterModal(){
-    $("profileModal").classList.remove("show");
+    closeModals();
     $("registerModal").classList.add("show");
     setTimeout(() => $("registerDisplayName").focus(), 100);
 }
 
 function backToLoginModal(){
-    $("registerModal").classList.remove("show");
-    $("profileModal").classList.add("show");
+    closeModals();
+    $("profileChoiceModal").classList.add("show");
 }
 
 let registerInProgress = false;
