@@ -1392,6 +1392,30 @@ USERS = {
 }
 
 
+# Self-registered user profiles are kept separately so built-in profiles and roles stay intact.
+REGISTERED_USERS_FILE = BASE_DIR / "registered_users.json"
+
+def _load_registered_users():
+    """Load registered standard-user profiles without overriding trusted built-in accounts."""
+    records = read_json_file(REGISTERED_USERS_FILE, {})
+    if not isinstance(records, dict):
+        records = {}
+    for uname, profile in records.items():
+        uname = str(uname).strip().lower()
+        if not re.fullmatch(r"[a-z0-9_.-]{3,24}", uname) or uname in USERS:
+            continue
+        if not isinstance(profile, dict):
+            continue
+        USERS[uname] = {
+            "name": str(profile.get("name") or uname)[:60],
+            "password": "",
+            "role": "user",
+            "style": "professional",
+        }
+
+_load_registered_users()
+
+
 # ============================================================
 # PASSWORD STORE + SUDE WORLD DATA
 # ============================================================
@@ -1657,6 +1681,50 @@ def requests_answer_for_admin():
     for item in recent:
         lines.append(f"• {item.get('name', item.get('username'))}: {item.get('summary') or item.get('original')}")
     return "\n".join(lines)
+
+
+# ============================================================
+# ACCOUNT REGISTRATION
+# ============================================================
+class RegisterRequest(BaseModel):
+    username: str
+    display_name: str
+    password: str
+
+@app.post("/register")
+async def register_account(data: RegisterRequest):
+    username = (data.username or "").strip().lower()
+    display_name = (data.display_name or "").strip()
+    password = data.password or ""
+    if not re.fullmatch(r"[a-z0-9_.-]{3,24}", username):
+        raise HTTPException(status_code=400, detail="Kullanıcı adı 3-24 karakter olmalı; yalnızca İngilizce harf, rakam, nokta, alt çizgi ve tire kullanılabilir.")
+    if username in USERS:
+        raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+    if len(display_name) < 2 or len(display_name) > 60:
+        raise HTTPException(status_code=400, detail="Görünen ad 2-60 karakter arasında olmalı.")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Şifre en az 8 karakter olmalı.")
+    if not any(ch.isalpha() for ch in password) or not any(ch.isdigit() for ch in password):
+        raise HTTPException(status_code=400, detail="Şifre en az bir harf ve bir rakam içermeli.")
+
+    # Recheck and write under the same lock to avoid duplicate registrations.
+    with password_lock:
+        if username in USERS:
+            raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        registered = read_json_file(REGISTERED_USERS_FILE, {})
+        if not isinstance(registered, dict):
+            registered = {}
+        if username in registered:
+            raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        registered[username] = {"name": display_name, "role": "user", "style": "professional"}
+        write_json_file(REGISTERED_USERS_FILE, registered)
+        password_records = read_json_file(PASSWORD_FILE, {})
+        if not isinstance(password_records, dict):
+            password_records = {}
+        password_records[username] = _password_hash(password)
+        write_json_file(PASSWORD_FILE, password_records)
+        USERS[username] = {"name": display_name, "password": "", "role": "user", "style": "professional"}
+    return {"success": True, "message": "Hesap oluşturuldu. Giriş yapabilirsiniz.", "username": username}
 
 
 # ============================================================
