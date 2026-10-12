@@ -1451,8 +1451,6 @@ body.voice-speaking .ring.three{
             onclick="selectAcademicMode('quiz')">
             🧪 Sınav / Quiz
         </button>
-        <button class="menu-item" onclick="openStudentExams()">📝 Yayımlanan Sınavlar</button>
-
         <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
 
         <button
@@ -1463,6 +1461,15 @@ body.voice-speaking .ring.three{
         </button>
 
     </div>
+
+    <!-- ========================================================
+         TÜM ÖĞRENCİ PROFİLLERİ - SINAV TAKİBİ
+         İlknur öğretmen profili sınav yönetimini kullanır.
+         ======================================================== -->
+
+    <button id="studentExamTrackingMenu" class="menu-item" onclick="openStudentExams()" style="display:none;">
+        📝 Sınav Takibi
+    </button>
 
     <!-- ========================================================
          TÜM PROFİLLER - ANA PROFİLE DÖN
@@ -1913,6 +1920,14 @@ body.voice-speaking .ring.three{
   <button class="modal-button" onclick="saveTeacherExam(true)">Yayımla</button>
   <div id="teacherExamStatus" aria-live="polite"></div>
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
+  <section class="sude-card" style="margin-top:16px;padding:14px;">
+    <h3>📊 Öğrenci İstatistikleri ve KARVIS Değerlendirmesi</h3>
+    <p>Bir sınavın sonuçlarını seçerek sınıf başarısını, soru bazlı zorlanma oranlarını ve KARVIS'in olası konu eksikliği analizini görüntüleyin.</p>
+    <label for="examStatsSelect">Sınav seçin</label>
+    <select id="examStatsSelect" class="voice-select" style="width:100%;margin:6px 0 10px;"><option value="">Sınavlar yükleniyor…</option></select>
+    <button class="settings-choice" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">📈 İstatistikleri ve KARVIS değerlendirmesini getir</button>
+    <div id="teacherExamStats" aria-live="polite" style="margin-top:12px;"></div>
+  </section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 <div id="studentExamModal" class="modal exam-modal exam-student-modal" style="max-width:980px;">
@@ -2663,9 +2678,14 @@ function updateSidebar(){
     const adminMenu = $("adminMenu");
     const karahanCoreMenu = $("karahanCoreMenu");
     const sudeMenu = $("sudeMenu");
+    const studentExamTrackingMenu = $("studentExamTrackingMenu");
 
     teacherMenu.style.display =
         currentUser === "ilknur" ? "block" : "none";
+    // Öğretmen dışındaki bütün giriş yapmış profiller (sonradan oluşturulanlar dahil) sınavları takip edebilir.
+    if(studentExamTrackingMenu){
+        studentExamTrackingMenu.style.display = currentUser && currentUser !== "ilknur" ? "flex" : "none";
+    }
 
     if(karahanCoreMenu){
         karahanCoreMenu.style.display =
@@ -2866,10 +2886,23 @@ async function saveTeacherExam(published){
 }
 async function loadTeacherExams(){
  const box=$('teacherExamList');if(!box)return;
- try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';}
+ try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button><button class="settings-choice" onclick="selectExamForAnalysis('${e.id}')">📊 Öğrenci istatistikleri</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';
+ const sel=$('examStatsSelect');if(sel){const previous=sel.value;sel.innerHTML='<option value="">Sınav seçin…</option>'+(d.exams||[]).map(e=>`<option value="${e.id}">${escapeHTML(e.title)}</option>`).join('');if((d.exams||[]).some(e=>e.id===previous))sel.value=previous;}}
  catch(e){box.textContent='Hata: '+e.message;}
 }
 async function toggleTeacherExamPublish(id,published){try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,published})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Durum değiştirilemedi.');await loadTeacherExams();}catch(e){alert(e.message);}}
+function selectExamForAnalysis(id){const sel=$('examStatsSelect');if(sel)sel.value=id;loadTeacherExamAnalysis();}
+async function loadTeacherExamAnalysis(){
+ if(currentUser!=='ilknur'){alert('Öğrenci istatistikleri yalnızca İlknur öğretmen profiline açıktır.');return;}
+ const id=$('examStatsSelect')?.value,box=$('teacherExamStats');if(!id){if(box)box.textContent='Önce bir sınav seçin.';return;}
+ const btn=$('examStatsRunBtn');if(btn)btn.disabled=true;if(box)box.textContent='Sınıf yanıtları analiz ediliyor…';
+ try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'İstatistikler alınamadı.');const s=d.summary||{};
+ const cards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0"><div class="sude-card"><small>Katılım</small><h3>${s.submission_count||0}</h3></div><div class="sude-card"><small>Sınıf ortalaması</small><h3>%${s.average_percent||0}</h3></div><div class="sude-card"><small>En yüksek</small><h3>%${s.highest_percent||0}</h3></div><div class="sude-card"><small>Başarı oranı (≥%50)</small><h3>%${s.pass_rate_percent||0}</h3></div><div class="sude-card"><small>Açık uçlu bekleyen</small><h3>${s.pending_open_answers||0}</h3></div></div>`;
+ const rows=(d.question_stats||[]).map((q,i)=>`<tr><td>${i+1}</td><td>${escapeHTML(q.prompt||'')}</td><td>${q.responses||0}</td><td>${q.incorrect_percent===null?'—':('%'+q.incorrect_percent)}</td><td>${q.unanswered||0}</td><td>${q.manual_review_count||0}</td></tr>`).join('');
+ box.innerHTML=cards+`<h4>📉 Soru bazlı sınıf başarısı</h4><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">#</th><th style="text-align:left">Soru</th><th>Yanıt</th><th>Yanlış</th><th>Boş</th><th>İnceleme</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Henüz teslim edilmiş yanıt yok.</td></tr>'}</tbody></table></div><h4 style="margin-top:16px">🧠 KARVIS değerlendirmesi</h4><div class="sude-card" style="white-space:pre-wrap;line-height:1.6">${escapeHTML(d.karvis_evaluation||'Değerlendirme bulunamadı.')}</div><p style="font-size:12px;opacity:.75">Analiz, teslim edilen yanıtların toplu istatistiklerine dayanır. Az katılım varsa konu çıkarımları kesin kabul edilmemelidir.</p>`;
+ }catch(e){if(box)box.textContent='Hata: '+e.message;}finally{if(btn)btn.disabled=false;}
+}
+
 async function showTeacherExamResults(id){
  try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/results?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sonuçlar alınamadı.');const s=d.summary;let text=`${d.exam.title}\nKatılım: ${s.submission_count}\nOrtalama: %${s.average_percent}\nEn yüksek: %${s.highest_percent}\nEn düşük: %${s.lowest_percent}\n\n`;
  for(const sub of (d.submissions||[])){text+=`${sub.username}: ${sub.score}/${sub.max_score} (%${sub.percent}) — ${sub.status}\n`;for(const a of (sub.answers||[])){if(a.type==='open_ended'&&a.manual_review){text+=`\nSoru: ${a.prompt}\nCevap: ${a.answer||'(boş)'}\n`;const raw=prompt(`${sub.username} — açık uçlu cevap\n${a.prompt}\nCevap: ${a.answer||'(boş)'}\n0-${a.max_points} arası puan girin:`,String(a.earned_points||0));if(raw!==null){const points=Number(raw);if(Number.isFinite(points)&&points>=0&&points<=Number(a.max_points)){const feedback=prompt('Öğrenciye geri bildirim (isteğe bağlı):','')||'';const gr=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/grade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,submission_id:sub.id,question_id:a.question_id,points_awarded:Math.floor(points),feedback})});const gd=await gr.json();if(!gr.ok)alert(gd.detail||'Puan kaydedilemedi.');else text+='Açık uçlu puan kaydedildi.\n';}}}}
