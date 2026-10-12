@@ -1400,11 +1400,28 @@ body.voice-speaking .ring.three{
     </button>
 
     <button
+        class="modal-button"
+        onclick="openRegisterModal()">
+        Yeni Hesap Oluştur
+    </button>
+
+    <button
         class="modal-button secondary-button"
         onclick="closeModals()">
         Vazgeç
     </button>
 
+</div>
+
+<div id="registerModal" class="modal">
+    <h2>Yeni KARVIS Hesabı</h2>
+    <p style="opacity:.8;font-size:13px">Yeni hesaplar standart kullanıcı olarak açılır.</p>
+    <input id="registerDisplayName" placeholder="Adınız / görünen ad" autocomplete="name" maxlength="60">
+    <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter)" autocomplete="username" maxlength="24">
+    <input id="registerPassword" type="password" placeholder="Şifre (en az 8 karakter, harf ve rakam)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
+    <input id="registerPasswordConfirm" type="password" placeholder="Şifreyi tekrar girin" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
+    <button id="registerButton" class="modal-button" onclick="registerAccount()">Hesap Oluştur</button>
+    <button class="modal-button secondary-button" onclick="backToLoginModal()">Giriş Ekranına Dön</button>
 </div>
 
 <!-- ============================================================
@@ -1944,6 +1961,52 @@ function openProfile(){
     );
 }
 
+function openRegisterModal(){
+    $("profileModal").classList.remove("show");
+    $("registerModal").classList.add("show");
+    setTimeout(() => $("registerDisplayName").focus(), 100);
+}
+
+function backToLoginModal(){
+    $("registerModal").classList.remove("show");
+    $("profileModal").classList.add("show");
+}
+
+let registerInProgress = false;
+async function registerAccount(){
+    if(registerInProgress) return;
+    const display_name = $("registerDisplayName").value.trim();
+    const username = $("registerUsername").value.trim().toLowerCase();
+    const password = $("registerPassword").value;
+    const confirm = $("registerPasswordConfirm").value;
+    if(!display_name || !username || !password){ alert("Tüm alanları doldurun."); return; }
+    if(password !== confirm){ alert("Şifreler birbiriyle eşleşmiyor."); return; }
+    const button = $("registerButton");
+    registerInProgress = true;
+    if(button){ button.disabled = true; button.textContent = "Hesap oluşturuluyor…"; }
+    try{
+        const response = await fetch(API + "/register", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({display_name, username, password})
+        });
+        const data = await response.json();
+        if(!response.ok || data.success !== true){ alert(data.detail || data.message || "Hesap oluşturulamadı."); return; }
+        $("usernameInput").value = username;
+        $("passwordInput").value = password;
+        $("registerDisplayName").value = "";
+        $("registerUsername").value = "";
+        $("registerPassword").value = "";
+        $("registerPasswordConfirm").value = "";
+        backToLoginModal();
+        alert("Hesabınız oluşturuldu. Şimdi giriş yapabilirsiniz.");
+    }catch(error){
+        alert("Sunucuya ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.");
+    }finally{
+        registerInProgress = false;
+        if(button){ button.disabled = false; button.textContent = "Hesap Oluştur"; }
+    }
+}
+
 function handleLoginKey(e){
 
     if(e.key === "Enter"){
@@ -2017,20 +2080,6 @@ async function login(){
             )
             .trim()
             .toLowerCase();
-
-        if(
-            ![
-                "karahan",
-                "betul",
-                "sinem",
-                "ilknur",
-                "murat",
-                "sude"
-            ].includes(currentUser)
-        ){
-
-            currentUser = username;
-        }
 
         currentMode =
             currentUser === "ilknur"
