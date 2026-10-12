@@ -1258,6 +1258,21 @@ body.voice-speaking .ring.three{
 @media(min-width:700px){.exam-modal #teacherExamList .sude-card { grid-template-columns:minmax(0,1fr) auto auto auto; align-items:center; }.exam-modal #teacherExamList .sude-card p { grid-column:1/-1; }}
 @media(max-width:620px){.exam-modal .exam-answer-option { grid-template-columns:18px 28px minmax(0,1fr); padding:12px; gap:8px; }.exam-modal .exam-option-text { font-size:14px; }.exam-modal .exam-submit-bar { position:static; }.exam-modal .exam-editor-head { align-items:flex-start; }.exam-modal .exam-remove-question { flex:0 0 auto; }}
 
+
+/* KARVIS Exam Builder — polished responsive redesign */
+.exam-manager-hero{display:flex;align-items:center;gap:15px;padding:18px;margin:0 0 14px;border:1px solid rgba(0,190,220,.35);border-radius:20px;background:linear-gradient(125deg,rgba(0,170,220,.13),rgba(0,210,180,.045))}
+.exam-manager-icon{display:grid;place-items:center;flex:0 0 58px;height:58px;border-radius:17px;background:rgba(0,190,220,.14);border:1px solid rgba(0,190,220,.35);font-size:30px;color:#12d8e8}
+.exam-manager-hero h2{margin:2px 0 6px!important}.exam-manager-hero p{margin:0;opacity:.76;font-size:13px;line-height:1.5}.exam-manager-eyebrow{font-size:10px!important;letter-spacing:.16em;font-weight:900;color:#21d2e3;opacity:1!important;margin-bottom:5px!important}
+.exam-manager-note{padding:12px 14px;margin:10px 0 18px;border-radius:12px;background:rgba(0,170,210,.07);font-size:12px;line-height:1.55;opacity:.9}
+.exam-manager-section,.exam-ai-builder{min-width:0;padding:clamp(14px,2.6vw,22px);margin:14px 0;border:1px solid var(--border-color,rgba(128,128,128,.23));border-radius:19px;background:var(--card-bg,rgba(128,128,128,.035))}
+.exam-ai-builder{border-color:rgba(0,190,220,.34);background:linear-gradient(145deg,rgba(0,160,210,.07),rgba(0,190,160,.025))}
+.exam-section-heading{display:flex;align-items:center;gap:12px;margin-bottom:16px}.exam-section-heading>span{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:12px;background:rgba(0,180,220,.14);color:#20cfe0;font-weight:900}.exam-section-heading h3{margin:0 0 4px!important;font-size:16px}.exam-section-heading p{margin:0;font-size:12px;line-height:1.5;opacity:.72}.exam-section-heading .exam-ai-spark{font-size:25px}
+.exam-field-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px}.exam-field-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.exam-field-wide{grid-column:1/-1}
+.exam-modal .exam-modern-field{display:block!important;min-width:0;margin:10px 0!important;font-size:12px!important;font-weight:800;line-height:1.5}.exam-modal .exam-modern-field input,.exam-modal .exam-modern-field select,.exam-modal .exam-modern-field textarea{display:block;width:100%;min-width:0;max-width:100%;margin-top:7px;padding:13px 14px;border:1px solid rgba(130,160,180,.25);border-radius:12px;background:rgba(100,130,150,.07);color:inherit;font:inherit;font-size:14px;line-height:1.5;outline:none}.exam-modal .exam-modern-field input:focus,.exam-modal .exam-modern-field select:focus,.exam-modal .exam-modern-field textarea:focus{border-color:#11bfd0;box-shadow:0 0 0 3px rgba(17,191,208,.1)}.exam-modal .exam-modern-field textarea{resize:vertical;min-height:82px;white-space:pre-wrap;overflow-wrap:anywhere}.exam-modal .exam-modern-field small{display:block;margin-top:5px;font-size:11px;font-weight:500;opacity:.65}.exam-optional{font-weight:500;opacity:.6;margin-left:5px}
+.exam-choice-fieldset{border:0;padding:0;margin:13px 0}.exam-choice-fieldset legend{font-size:12px;font-weight:800;margin-bottom:9px}.exam-type-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.exam-type-choice{position:relative;display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;min-height:120px;padding:13px!important;border:1px solid rgba(130,160,180,.23);border-radius:14px;background:rgba(100,130,150,.045);cursor:pointer}.exam-type-choice:has(input:checked){border-color:#11c9d9;background:rgba(0,190,220,.1);box-shadow:inset 0 0 0 1px rgba(0,190,220,.18)}.exam-type-choice input{position:absolute;right:10px;top:10px;width:18px!important;height:18px!important;accent-color:#08c8d8}.exam-type-symbol{font-size:24px;color:#25cfdf;line-height:1.2}.exam-type-choice strong{font-size:12px;line-height:1.4}.exam-type-choice small{font-size:10px;line-height:1.4;opacity:.68}
+.exam-modal .exam-generate-button{display:flex!important;width:100%!important;align-items:center;justify-content:center;gap:10px;min-height:52px;margin:14px 0 5px!important;padding:13px 16px!important;border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#078edb,#0bb9ad)!important;color:#fff!important;font-weight:900;font-size:14px;box-shadow:0 8px 22px rgba(0,160,200,.16)}.exam-generate-button span{font-size:20px}.exam-generate-button:disabled{opacity:.65}.exam-modal .exam-add-question-button{width:100%;padding:12px;border:1px dashed rgba(0,190,220,.45);border-radius:12px;background:rgba(0,190,220,.055);color:inherit;font-weight:800}.exam-publish-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.exam-publish-actions .modal-button,.exam-publish-actions .exam-generate-button{width:100%!important;margin:0!important}.exam-empty-builder{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px 12px;border:1px dashed rgba(130,160,180,.25);border-radius:14px}.exam-empty-builder span{font-size:25px;color:#1ac8d9}.exam-empty-builder strong{font-size:13px}.exam-empty-builder p{margin:0;font-size:12px;opacity:.7;line-height:1.5}.exam-status-message{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+@media(max-width:600px){.exam-manager-hero{align-items:flex-start;padding:14px}.exam-manager-icon{flex-basis:46px;height:46px;font-size:24px}.exam-manager-hero h2{font-size:19px!important}.exam-field-grid,.exam-field-grid-2{grid-template-columns:minmax(0,1fr)}.exam-field-wide{grid-column:auto}.exam-type-grid{grid-template-columns:1fr}.exam-type-choice{min-height:82px;padding-right:42px!important}.exam-publish-actions{grid-template-columns:1fr}.exam-section-heading{align-items:flex-start}.exam-manager-section,.exam-ai-builder{padding:14px}}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1914,37 +1929,51 @@ body.voice-speaking .ring.three{
 
 <!-- ILKNUR SINAV SISTEMI -->
 <div id="teacherExamModal" class="modal exam-modal" style="max-width:980px;">
-  <h2>🗂️ İlknur — Sınav Yönetimi</h2>
-  <p style="opacity:.75;font-size:12px">Sınav süresi dakika cinsindendir. 0, süre sınırı olmadığı anlamına gelir. Tarih/saat alanları yerel cihaz saatine göre girilir.</p>
-  <input id="examTitle" placeholder="Sınav başlığı">
-  <input id="examSubject" placeholder="Ders / konu">
-  <input id="examDescription" placeholder="Açıklama">
-  <section class="sude-card" style="margin:12px 0;padding:14px;">
-    <h3>🤖 Yapay zekâyla sınav taslağı hazırla</h3>
-    <p>Üretilen sorular aşağıda düzenlenebilir. Taslak kendiliğinden yayımlanmaz.</p>
-    <input id="examAITopic" placeholder="Konu (ör. Hücre bölünmesi)">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <label>Soru sayısı <input id="examAIQuestionCount" type="number" min="1" max="50" value="10"></label>
-      <label>Sınıf / düzey <input id="examAIGrade" placeholder="Örn. 10. sınıf"></label>
-      <label>Zorluk <select id="examAIDifficulty" class="voice-select"><option value="kolay">Kolay</option><option value="orta" selected>Orta</option><option value="zor">Zor</option><option value="karma">Karma</option></select></label>
+  <header class="exam-manager-hero">
+    <div class="exam-manager-icon">✦</div>
+    <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Yönetimi</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
+  </header>
+  <div class="exam-manager-note">⏱ Süre dakika cinsindendir. <strong>0 = sınırsız</strong>. Tarihler cihazının yerel saatine göre ayarlanır.</div>
+  <section class="exam-manager-section">
+    <div class="exam-section-heading"><span>01</span><div><h3>Sınav bilgileri</h3><p>Öğrencilerin göreceği temel bilgiler</p></div></div>
+    <div class="exam-field-grid">
+      <label class="exam-modern-field exam-field-wide">Sınav başlığı<input id="examTitle" placeholder="Örn. 1. dönem konu değerlendirmesi" autocomplete="off"></label>
+      <label class="exam-modern-field">Ders adı<input id="examSubject" placeholder="Örn. Biyoloji" autocomplete="off"></label>
+      <label class="exam-modern-field exam-field-wide">Açıklama<textarea id="examDescription" rows="2" placeholder="Sınav kapsamı ve öğrenciye notlar"></textarea></label>
     </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;">
-      <label><input type="checkbox" id="examAITypeMC" checked> Çoktan seçmeli</label>
-      <label><input type="checkbox" id="examAITypeTF"> Doğru / yanlış</label>
-      <label><input type="checkbox" id="examAITypeOpen"> Açık uçlu</label>
-    </div>
-    <textarea id="examAIInstructions" rows="2" placeholder="Ek talimat (isteğe bağlı): kazanım, kapsam, özellikle sorulmasını istediğiniz noktalar" style="width:100%;"></textarea>
-    <button class="settings-choice" id="examAIGenerateBtn" onclick="generateTeacherExamWithAI()">✨ Soruları üret ve düzenlemeye aç</button>
-    <div id="examAIStatus" aria-live="polite"></div>
   </section>
-  <label>Süre (dakika; 0 = sınırsız)<input id="examDuration" type="number" min="0" max="600" value="0"></label>
-  <label>Başlangıç zamanı (isteğe bağlı)<input id="examStartsAt" type="datetime-local"></label>
-  <label>Bitiş zamanı (isteğe bağlı)<input id="examEndsAt" type="datetime-local"></label>
-  <div id="examQuestionBuilder"></div>
-  <button class="settings-choice" onclick="addExamQuestion()">＋ Soru ekle</button>
-  <button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button>
-  <button class="modal-button" onclick="saveTeacherExam(true)">Yayımla</button>
-  <div id="teacherExamStatus" aria-live="polite"></div>
+  <section class="exam-ai-builder">
+    <div class="exam-section-heading"><span class="exam-ai-spark">✧</span><div><h3>Yapay zekâyla sınav oluştur</h3><p>KARVIS soru taslağını hazırlar; yayımlamadan önce tüm soruları düzenleyebilirsin.</p></div></div>
+    <label class="exam-modern-field">Konu / kazanım<input id="examAITopic" placeholder="Örn. Hücre bölünmesi"></label>
+    <div class="exam-field-grid exam-field-grid-2">
+      <label class="exam-modern-field">Soru sayısı<input id="examAIQuestionCount" type="number" min="1" max="50" value="10"></label>
+      <label class="exam-modern-field">Sınıf / düzey<input id="examAIGrade" placeholder="Örn. 10. sınıf"></label>
+    </div>
+    <fieldset class="exam-choice-fieldset"><legend>Soru türleri</legend><div class="exam-type-grid">
+      <label class="exam-type-choice"><input type="checkbox" id="examAITypeMC" checked><span class="exam-type-symbol">☷</span><strong>Çoktan seçmeli</strong><small>A, B, C, D seçenekleri</small></label>
+      <label class="exam-type-choice"><input type="checkbox" id="examAITypeTF"><span class="exam-type-symbol">✓</span><strong>Doğru / yanlış</strong><small>İki seçenekli sorular</small></label>
+      <label class="exam-type-choice"><input type="checkbox" id="examAITypeOpen"><span class="exam-type-symbol">▤</span><strong>Açık uçlu</strong><small>Kısa veya uzun cevap</small></label>
+    </div></fieldset>
+    <label class="exam-modern-field">Zorluk seviyesi<select id="examAIDifficulty" class="voice-select"><option value="kolay">Kolay</option><option value="orta" selected>Orta</option><option value="zor">Zor</option><option value="karma">Karma</option></select></label>
+    <label class="exam-modern-field">Ek talimatlar <span class="exam-optional">İsteğe bağlı</span><textarea id="examAIInstructions" rows="3" maxlength="500" placeholder="Kazanım, kapsam veya özellikle sorulmasını istediğin noktalar…"></textarea></label>
+    <button class="exam-generate-button" id="examAIGenerateBtn" onclick="generateTeacherExamWithAI()"><span>✦</span> Soruları oluştur</button>
+    <div id="examAIStatus" aria-live="polite" class="exam-status-message"></div>
+  </section>
+  <section class="exam-manager-section">
+    <div class="exam-section-heading"><span>02</span><div><h3>Sınav ayarları</h3><p>Süre ve erişim tarihlerini belirle</p></div></div>
+    <div class="exam-field-grid exam-field-grid-2">
+      <label class="exam-modern-field">Süre (dakika)<input id="examDuration" type="number" min="0" max="600" value="0"><small>0 = sınırsız süre</small></label>
+      <label class="exam-modern-field">Başlangıç zamanı<input id="examStartsAt" type="datetime-local"><small>Boş bırakılırsa hemen erişilebilir</small></label>
+      <label class="exam-modern-field exam-field-wide">Bitiş zamanı<input id="examEndsAt" type="datetime-local"><small>Boş bırakılırsa bitiş tarihi uygulanmaz</small></label>
+    </div>
+  </section>
+  <section class="exam-manager-section">
+    <div class="exam-section-heading"><span>03</span><div><h3>Soru düzenleyici</h3><p>Oluşturulan soruları ve cevap anahtarlarını kontrol et</p></div></div>
+    <div id="examQuestionBuilder"><div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>Yukarıdan KARVIS ile soru oluştur veya kendin yeni soru ekle.</p></div></div>
+    <button class="exam-add-question-button" onclick="addExamQuestion()">＋ Yeni soru ekle</button>
+  </section>
+  <div class="exam-publish-actions"><button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button><button class="exam-generate-button" onclick="saveTeacherExam(true)">✓ Sınavı yayımla</button></div>
+  <div id="teacherExamStatus" aria-live="polite" class="exam-status-message"></div>
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
   <section class="sude-card" style="margin-top:16px;padding:14px;">
     <h3>📊 Öğrenci İstatistikleri ve KARVIS Değerlendirmesi</h3>
@@ -2900,7 +2929,7 @@ function addExamQuestion(){
 }
 function renderExamQuestionBuilder(){
   const box=$("examQuestionBuilder"); if(!box)return;
-  box.innerHTML=examDraftQuestions.map((q,i)=>`<section class="exam-editor-card"><header class="exam-editor-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div><h3>${i+1}. Soru</h3><small>${q.type==='multiple_choice'?'Çoktan seçmeli':q.type==='true_false'?'Doğru / Yanlış':'Açık uçlu'}</small></div><button type="button" class="exam-remove-question" onclick="if(confirm('Bu soruyu silmek istiyor musunuz?')){examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()}">Sil</button></header><label class="exam-editor-label">Soru metni<textarea class="exam-prompt-editor" rows="4" placeholder="Soruyu tam metniyle yazın…" oninput="examDraftQuestions[${i}].prompt=this.value">${escapeHTML(q.prompt||'')}</textarea></label><div class="exam-editor-grid"><label class="exam-editor-label">Soru türü<select onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu</option></select></label><label class="exam-editor-label">Puan<input type="number" min="1" max="100" value="${Number(q.points)||1}" oninput="examDraftQuestions[${i}].points=Math.max(1,Math.min(100,Number(this.value)||1))"></label></div>${q.type==='multiple_choice'?`<div class="exam-editor-options-title">Cevap seçenekleri</div><div class="exam-editor-options">${(q.options||[]).map((o,j)=>`<label class="exam-editor-option"><span>${String.fromCharCode(65+j)}</span><input value="${escapeHTML(o)}" placeholder="${String.fromCharCode(65+j)} seçeneği" oninput="examDraftQuestions[${i}].options[${j}]=this.value"></label>`).join('')}</div><label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${(q.options||[]).map((o,j)=>`<option value="${j}" ${Number(q.correct_index)===j?'selected':''}>${String.fromCharCode(65+j)} seçeneği</option>`).join('')}</select></label>`:q.type==='true_false'?`<label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select></label>`:`<label class="exam-editor-label">Örnek cevap / değerlendirme ölçütü<textarea rows="3" placeholder="Öğretmen değerlendirmesi için not (isteğe bağlı)" oninput="examDraftQuestions[${i}].correct_answer=this.value">${escapeHTML(q.correct_answer||'')}</textarea></label>`}</section>`).join('');
+  box.innerHTML=examDraftQuestions.length ? examDraftQuestions.map((q,i)=>`<section class="exam-editor-card"><header class="exam-editor-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div><h3>${i+1}. Soru</h3><small>${q.type==='multiple_choice'?'Çoktan seçmeli':q.type==='true_false'?'Doğru / Yanlış':'Açık uçlu'}</small></div><button type="button" class="exam-remove-question" onclick="if(confirm('Bu soruyu silmek istiyor musunuz?')){examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()}">Sil</button></header><label class="exam-editor-label">Soru metni<textarea class="exam-prompt-editor" rows="4" placeholder="Soruyu tam metniyle yazın…" oninput="examDraftQuestions[${i}].prompt=this.value">${escapeHTML(q.prompt||'')}</textarea></label><div class="exam-editor-grid"><label class="exam-editor-label">Soru türü<select onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu</option></select></label><label class="exam-editor-label">Puan<input type="number" min="1" max="100" value="${Number(q.points)||1}" oninput="examDraftQuestions[${i}].points=Math.max(1,Math.min(100,Number(this.value)||1))"></label></div>${q.type==='multiple_choice'?`<div class="exam-editor-options-title">Cevap seçenekleri</div><div class="exam-editor-options">${(q.options||[]).map((o,j)=>`<label class="exam-editor-option"><span>${String.fromCharCode(65+j)}</span><input value="${escapeHTML(o)}" placeholder="${String.fromCharCode(65+j)} seçeneği" oninput="examDraftQuestions[${i}].options[${j}]=this.value"></label>`).join('')}</div><label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${(q.options||[]).map((o,j)=>`<option value="${j}" ${Number(q.correct_index)===j?'selected':''}>${String.fromCharCode(65+j)} seçeneği</option>`).join('')}</select></label>`:q.type==='true_false'?`<label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select></label>`:`<label class="exam-editor-label">Örnek cevap / değerlendirme ölçütü<textarea rows="3" placeholder="Öğretmen değerlendirmesi için not (isteğe bağlı)" oninput="examDraftQuestions[${i}].correct_answer=this.value">${escapeHTML(q.correct_answer||'')}</textarea></label>`}</section>`).join('') : '<div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>KARVIS ile soru oluştur veya yeni soru ekle.</p></div>';
 }
 function changeExamQuestionType(i,type){examDraftQuestions[i].type=type;if(type==='true_false')examDraftQuestions[i].correct_answer=true;if(type==='open_ended')examDraftQuestions[i].correct_answer='';renderExamQuestionBuilder();}
 async function saveTeacherExam(published){
