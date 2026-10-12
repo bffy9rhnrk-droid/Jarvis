@@ -4792,11 +4792,11 @@ async function loadArenaDuels(){
    if(active.status==="active" && q && !active.answered){
     if(arenaDuelRenderedKey!==renderKey){
      arenaDuelRenderedKey=renderKey;
-     area.innerHTML=`<div class="sude-card"><h3>⚔️ Özel Düello · Soru ${Number(active.question_index)+1}/5</h3><p>${arenaEscape(arenaDuelName(active.challenger===currentUser?active.opponent:active.challenger))} ile ${Number(active.stake)} puan için yarışıyorsun.</p><p><strong>${arenaEscape(q.prompt)}</strong></p><div>${(q.options||[]).map((o,i)=>`<button class="arena-option arena-duel-answer" onclick="answerArenaDuel(${i},'${arenaEscape(active.duel_id)}',${Number(active.question_index)})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaDuelFeedback" aria-live="polite"></p></div>`;
+     area.innerHTML=`<div class="sude-card"><h3>⚔️ Özel Düello · Soru ${Number(active.question_index)+1}/5</h3><p>${arenaEscape(arenaDuelName(active.challenger===currentUser?active.opponent:active.challenger))} ile ${Number(active.stake)} puan için yarışıyorsun.</p><p><strong>${arenaEscape(q.prompt)}</strong></p><div>${(q.options||[]).map((o,i)=>`<button class="arena-option arena-duel-answer" onclick="answerArenaDuel(${i},'${arenaEscape(active.duel_id)}',${Number(active.question_index)})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaDuelFeedback" aria-live="polite"></p><button class="sude-btn" style="width:100%;margin-top:12px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button></div>`;
     }
    }else if(active.status==="active" && active.answered){
     arenaDuelRenderedKey=renderKey;
-    area.innerHTML=`<div class="sude-card"><h3>⏳ Cevabın kaydedildi</h3><p>Rakibin aynı soruyu cevaplayana kadar bekle. Sonraki soru otomatik yüklenecek.</p><p>Tur ${Number(active.question_index)+1}/5</p></div>`;
+    area.innerHTML=`<div class="sude-card"><h3>⏳ Cevabın kaydedildi</h3><p>Rakibin aynı soruyu cevaplayana kadar bekle. Sonraki soru otomatik yüklenecek.</p><p>Tur ${Number(active.question_index)+1}/5</p><button class="sude-btn" style="width:100%;margin-top:12px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button></div>`;
    }
   }else{
    arenaDuelRenderedKey="";
