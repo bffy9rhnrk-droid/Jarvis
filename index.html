@@ -1203,9 +1203,14 @@ body.voice-speaking .ring.three{
 
     <button
         class="menu-item"
-        onclick="openProfile()">
+        onclick="toggleProfileOptions()">
         ◉ Profil Değiştir
     </button>
+
+    <div id="profileSidebarOptions" style="display:none;padding-left:14px;">
+        <button class="menu-item" onclick="openProfileLoginFromSidebar()">↪ Profile Giriş</button>
+        <button class="menu-item" onclick="openRegisterFromSidebar()">＋ Yeni Profil</button>
+    </div>
 
     <button
         class="menu-item"
@@ -1363,7 +1368,7 @@ body.voice-speaking .ring.three{
         class="menu-item"
         onclick="returnToKarahan()"
         style="margin-top:14px;">
-        🏢 KARAHAN INC. — Ana Profil
+        Ana Profil
     </button>
 
 </div>
@@ -1951,10 +1956,24 @@ function closeModals(){
    PROFILE
    ============================================================ */
 
+function toggleProfileOptions(){
+    const options = $("profileSidebarOptions");
+    if(!options) return;
+    options.style.display = options.style.display === "none" ? "block" : "none";
+}
+
 function openProfile(){
+    toggleProfileOptions();
+}
+
+function openProfileLoginFromSidebar(){
     closeSidebar();
-    closeModals();
-    $("profileChoiceModal").classList.add("show");
+    openProfileLogin();
+}
+
+function openRegisterFromSidebar(){
+    closeSidebar();
+    openRegisterModal();
 }
 
 function openProfileLogin(){
