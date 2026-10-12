@@ -1034,7 +1034,8 @@ async def arena_duel_answer(payload: dict):
         raise HTTPException(status_code=400, detail="Geçersiz cevap.")
     with arena_lock:
         data = _arena_load()
-        duel = data.setdefault("duels", {}).get(duel_id)
+        duels = data.setdefault("duels", {})
+        duel = duels.get(duel_id)
         if not duel or duel.get("status") != "active":
             raise HTTPException(status_code=404, detail="Aktif düello bulunamadı.")
         if username not in (duel.get("challenger"), duel.get("opponent")):
