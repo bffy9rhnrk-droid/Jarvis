@@ -920,6 +920,8 @@ def _duel_public(duel, username):
         "answered": username in duel.get("round_answers", {}),
         "round_result": duel.get("round_result"),
         "result": duel.get("result"),
+        "round_age_seconds": max(0, int(time.time() - min((float(v) for v in duel.get("round_started_at", {}).values()), default=time.time()))) if duel.get("status") == "active" else 0,
+        "round_answer_count": len(duel.get("round_answers", {})),
     }
     if duel.get("status") == "active":
         idx = int(duel.get("question_index", 0))
@@ -986,7 +988,7 @@ async def arena_duel_request(payload: dict):
         chosen = random.sample(mixed, min(5, len(mixed)))
         duels[duel_id] = {
             "duel_id": duel_id, "challenger": username, "opponent": opponent, "stake": stake,
-            "status": "pending", "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "status": "pending", "created_at": time.strftime("%Y-%m-%d %H:%M:%S"), "created_at_epoch": time.time(),
             "questions": chosen, "question_index": 0, "round_answers": {},
             "round_started_at": {}, "round_result": None, "results": [],
             "accepted_at": None, "result": None
@@ -1024,37 +1026,40 @@ async def arena_duel_respond(payload: dict):
         _arena_save(data)
         return {"success": True, "message": "Düello kabul edildi." if accept else "Düello isteği reddedildi."}
 
-@app.post("/arena/duel/clear")
-async def arena_duel_clear(payload: dict):
-    """Cancel pending/active duels for a player without transferring stake points.
-
-    Intended as a recovery action for stuck games. Both participants will see the
-    duel disappear on their next refresh; completed duels and their history remain.
-    """
+@app.post("/arena/duel/reset")
+async def arena_duel_reset(payload: dict):
+    """Cancel a genuinely stuck pending/active duel without transferring points."""
     username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
     if username not in USERS:
         raise HTTPException(status_code=401, detail="Geçersiz profil.")
     with arena_lock:
         data = _arena_load()
-        duels = data.setdefault("duels", {})
-        cancelled = []
-        for duel in duels.values():
-            if duel.get("status") in ("pending", "active") and username in (duel.get("challenger"), duel.get("opponent")):
-                duel["status"] = "cancelled"
-                duel["result"] = {
-                    "winner": None,
-                    "reason": "Oyuncu isteğiyle takılan düello iptal edildi; bahis puanı aktarılmadı.",
-                    "cancelled_by": username,
-                }
-                duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-                cancelled.append(duel.get("duel_id"))
+        duel = data.setdefault("duels", {}).get(duel_id)
+        if not duel or duel.get("status") not in ("pending", "active"):
+            raise HTTPException(status_code=404, detail="Sıfırlanabilecek bekleyen veya aktif düello bulunamadı.")
+        if username not in (duel.get("challenger"), duel.get("opponent")):
+            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
+        if duel.get("status") == "pending":
+            created = duel.get("created_at_epoch")
+            if created is None:
+                raise HTTPException(status_code=409, detail="Bekleyen istek henüz takılmış olarak doğrulanmadı. Önce durumu yenile.")
+            age = max(0, time.time() - float(created))
+            stuck = age >= 180
+        else:
+            starts = [float(v) for v in duel.get("round_started_at", {}).values()]
+            age = max(0, time.time() - min(starts)) if starts else 0
+            answers = duel.get("round_answers", {})
+            # A round is stuck only when it has been idle for at least 60s and
+            # one player has answered without the other, or it has exceeded 120s.
+            stuck = age >= 60 and (len(answers) == 1 or age >= 120)
+        if not stuck:
+            raise HTTPException(status_code=409, detail="Düello henüz takılmış görünmüyor. Normal akış için yenileme yapabilirsin.")
+        duel["status"] = "cancelled"
+        duel["result"] = {"winner": None, "reason": "Takıldığı için kullanıcı tarafından sıfırlandı; puan aktarılmadı."}
+        duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
         _arena_save(data)
-        return {
-            "success": True,
-            "cancelled_count": len(cancelled),
-            "message": (f"{len(cancelled)} bekleyen/aktif düello iptal edildi. Puan aktarılmadı." if cancelled
-                        else "Bu profil için iptal edilecek bekleyen veya aktif düello bulunamadı."),
-        }
+        return {"success": True, "message": "Takılan düello sıfırlandı. Puan aktarılmadı; yeni düello başlatabilirsin."}
 
 
 @app.post("/arena/duel/answer")
@@ -1142,10 +1147,14 @@ async def arena_duel_answer(payload: dict):
                 player = _arena_player(data, player_name)
                 outcome = "Berabere" if not winner else ("Kazandı" if player_name == winner else "Kaybetti")
                 delta = 0 if not winner else (stake if player_name == winner else -stake)
+                is_challenger = player_name == duel["challenger"]
+                correct_count = sum(1 for item in duel.get("results", []) if item.get("challenger_correct" if is_challenger else "opponent_correct"))
+                wrong_count = max(0, len(duel.get("results", [])) - correct_count)
                 player.setdefault("duel_history", []).append({
-                    "duel_id": duel_id, "opponent": duel["opponent"] if player_name == duel["challenger"] else duel["challenger"],
+                    "duel_id": duel_id, "opponent": duel["opponent"] if is_challenger else duel["challenger"],
                     "outcome": outcome, "stake": stake, "points_delta": delta,
-                    "date": finished_at, "correct_wins": totals[player_name], "opponent_wins": totals[duel["opponent"] if player_name == duel["challenger"] else duel["challenger"]]
+                    "date": finished_at, "correct_wins": totals[player_name], "opponent_wins": totals[duel["opponent"] if is_challenger else duel["challenger"]],
+                    "correct_answers": correct_count, "wrong_answers": wrong_count, "total_questions": len(duel.get("results", []))
                 })
                 player["duel_history"] = player["duel_history"][-3:]
             # Keep active/pending duels and only the three most recently completed duel records globally.
