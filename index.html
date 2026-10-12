@@ -1725,7 +1725,7 @@ body.voice-speaking .ring.three{
     <div id="arenaDuelStatus" aria-live="polite" style="margin-top:10px;font-size:13px"></div>
     <div id="arenaDuelRequests" style="margin-top:10px"></div>
     <div id="arenaDuelActive" style="margin-top:10px"></div>
-    <button id="arenaDuelRefreshButton" class="sude-btn" style="width:100%;margin-top:10px;display:none" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button>
+    <button id="arenaDuelRefreshButton" type="button" class="sude-btn" style="width:100%;margin-top:10px;display:block!important;position:relative;z-index:5;min-height:48px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile / takıldıysa yenile</button>
     <h3 style="margin-top:16px">🕘 Son 3 düellom</h3>
     <div id="arenaDuelHistory">Henüz düello oynanmadı.</div>
   </section>
@@ -4761,20 +4761,21 @@ async function answerArenaDuel(choice,duelId,questionIndex){
 }
 async function refreshArenaDuel(forceRender=false){
  const button=$("arenaDuelRefreshButton");
- if(button){button.disabled=true;button.textContent="⏳ Düello yenileniyor…";}
+ const status=$("arenaDuelStatus");
+ if(button){button.disabled=true;button.textContent="⏳ Düello durumu alınıyor…";}
+ if(status) status.textContent="Sunucudaki düello durumu kontrol ediliyor…";
  if(forceRender) arenaDuelRenderedKey="";
  try{
-  await loadArenaDuels();
-  const status=$("arenaDuelStatus");
-  if(status) status.textContent="🔄 Düello durumu sunucudan yenilendi.";
+  await loadArenaDuels({manualRefresh:true});
+  try{await loadArenaOverview({fromRefresh:true});}catch(_){}
+  if(status) status.textContent="✅ Düello durumu sunucudan yenilendi.";
  }catch(e){
-  const status=$("arenaDuelStatus");
   if(status) status.textContent="⚠️ Düello yenilenemedi: "+(e.message||"Bağlantı hatası");
  }finally{
-  if(button){button.disabled=false;button.textContent="🔄 Düelloyu yenile";}
+  if(button){button.disabled=false;button.textContent="🔄 Düelloyu yenile / takıldıysa yenile";button.style.display="block";}
  }
 }
-async function loadArenaDuels(){
+async function loadArenaDuels(options={}){
  try{
   const r=await fetch(API+"/arena/duels?username="+encodeURIComponent(currentUser));
   const d=await r.json();if(!r.ok)throw new Error(d.detail||"Düellolar yüklenemedi.");
@@ -4785,7 +4786,7 @@ async function loadArenaDuels(){
   requests.innerHTML=requestHtml;
   const active=d.active_duel, area=$("arenaDuelActive");
   const duelRefreshButton=$("arenaDuelRefreshButton");
-  if(duelRefreshButton) duelRefreshButton.style.display=active ? "block" : "none";
+  if(duelRefreshButton){duelRefreshButton.style.display="block";duelRefreshButton.disabled=false;}
   if(active){
    const q=active.question;
    const renderKey=active.duel_id+":"+active.question_index+":"+(active.answered?"answered":"question");
