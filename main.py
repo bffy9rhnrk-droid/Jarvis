@@ -1024,6 +1024,39 @@ async def arena_duel_respond(payload: dict):
         _arena_save(data)
         return {"success": True, "message": "Düello kabul edildi." if accept else "Düello isteği reddedildi."}
 
+@app.post("/arena/duel/clear")
+async def arena_duel_clear(payload: dict):
+    """Cancel pending/active duels for a player without transferring stake points.
+
+    Intended as a recovery action for stuck games. Both participants will see the
+    duel disappear on their next refresh; completed duels and their history remain.
+    """
+    username = str(payload.get("username", "")).strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with arena_lock:
+        data = _arena_load()
+        duels = data.setdefault("duels", {})
+        cancelled = []
+        for duel in duels.values():
+            if duel.get("status") in ("pending", "active") and username in (duel.get("challenger"), duel.get("opponent")):
+                duel["status"] = "cancelled"
+                duel["result"] = {
+                    "winner": None,
+                    "reason": "Oyuncu isteğiyle takılan düello iptal edildi; bahis puanı aktarılmadı.",
+                    "cancelled_by": username,
+                }
+                duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+                cancelled.append(duel.get("duel_id"))
+        _arena_save(data)
+        return {
+            "success": True,
+            "cancelled_count": len(cancelled),
+            "message": (f"{len(cancelled)} bekleyen/aktif düello iptal edildi. Puan aktarılmadı." if cancelled
+                        else "Bu profil için iptal edilecek bekleyen veya aktif düello bulunamadı."),
+        }
+
+
 @app.post("/arena/duel/answer")
 async def arena_duel_answer(payload: dict):
     username = str(payload.get("username", "")).strip().lower()
