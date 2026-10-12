@@ -1193,8 +1193,6 @@ body.voice-speaking .ring.three{
         ＋ Yeni Sohbet
     </button>
 
-    <button class="menu-item" onclick="openStudentExams()">🧾 Sınavlar</button>
-
     <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
 
     <button
@@ -1300,7 +1298,6 @@ body.voice-speaking .ring.three{
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
         <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
-        <button class="menu-item" onclick="openActiveUsers()">🟢 Aktif Kullanıcılar</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
         <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
         <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
@@ -1353,7 +1350,9 @@ body.voice-speaking .ring.three{
             onclick="selectAcademicMode('quiz')">
             🧪 Sınav / Quiz
         </button>
-        <button class="menu-item" onclick="openExamManager()">📝 Sınav Oluştur / Sonuçlar</button>
+        <button class="menu-item" onclick="openStudentExams()">📝 Yayımlanan Sınavlar</button>
+
+        <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
 
         <button
             class="menu-item academic-menu-item"
@@ -1489,7 +1488,7 @@ body.voice-speaking .ring.three{
         <label style="display:block;margin-bottom:6px;opacity:.8;">Alıcı</label>
         <select id="notificationTarget" class="voice-select" style="width:100%;">
             <option value="all">📢 Tüm kullanıcılar</option>
-            <option value="karahan">Ana Profil</option>
+            <option value="karahan">KARAHAN INC.</option>
             <option value="betul">Betül</option>
             <option value="sinem">Sinem</option>
             <option value="ilknur">İlknur</option>
@@ -1697,7 +1696,7 @@ body.voice-speaking .ring.three{
 
 </div>
 
-<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">Ana Profil</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
+<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">KARAHAN INC.</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
 <!-- ACCOUNT PASSWORD MODAL -->
 <div id="passwordModal" class="modal">
   <h2>🔐 Şifre Değiştir</h2>
@@ -1744,7 +1743,7 @@ body.voice-speaking .ring.three{
     <div class="sude-grid">
       <div><label for="arenaDuelOpponent">Rakip profil</label>
         <select id="arenaDuelOpponent" class="sude-field">
-          <option value="karahan">Ana Profil</option><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="murat">Murat</option><option value="sude">Sude</option>
+          <option value="karahan">KARAHAN INC.</option><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="murat">Murat</option><option value="sude">Sude</option>
         </select>
       </div>
       <div><label for="arenaDuelStake">Bahis puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
@@ -1776,6 +1775,48 @@ body.voice-speaking .ring.three{
     <p>Bu işlem bütün profillerin Arena puanlarını, rozetlerini, sıralamasını ve oyun geçmişini kalıcı olarak siler.</p>
     <button class="sude-btn" style="background:#9f2424;color:white" onclick="adminResetArena()">🗑️ Arena tablosunu sıfırla</button>
   </section>
+  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<!-- ILKNUR SINAV SISTEMI -->
+<div id="teacherExamModal" class="modal" style="max-width:820px;">
+  <h2>🗂️ İlknur — Sınav Yönetimi</h2>
+  <p style="opacity:.75;font-size:12px">Sınav süresi dakika cinsindendir. 0, süre sınırı olmadığı anlamına gelir. Tarih/saat alanları yerel cihaz saatine göre girilir.</p>
+  <input id="examTitle" placeholder="Sınav başlığı">
+  <input id="examSubject" placeholder="Ders / konu">
+  <input id="examDescription" placeholder="Açıklama">
+  <section class="sude-card" style="margin:12px 0;padding:14px;">
+    <h3>🤖 Yapay zekâyla sınav taslağı hazırla</h3>
+    <p>Üretilen sorular aşağıda düzenlenebilir. Taslak kendiliğinden yayımlanmaz.</p>
+    <input id="examAITopic" placeholder="Konu (ör. Hücre bölünmesi)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <label>Soru sayısı <input id="examAIQuestionCount" type="number" min="1" max="50" value="10"></label>
+      <label>Sınıf / düzey <input id="examAIGrade" placeholder="Örn. 10. sınıf"></label>
+      <label>Zorluk <select id="examAIDifficulty" class="voice-select"><option value="kolay">Kolay</option><option value="orta" selected>Orta</option><option value="zor">Zor</option><option value="karma">Karma</option></select></label>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;">
+      <label><input type="checkbox" id="examAITypeMC" checked> Çoktan seçmeli</label>
+      <label><input type="checkbox" id="examAITypeTF"> Doğru / yanlış</label>
+      <label><input type="checkbox" id="examAITypeOpen"> Açık uçlu</label>
+    </div>
+    <textarea id="examAIInstructions" rows="2" placeholder="Ek talimat (isteğe bağlı): kazanım, kapsam, özellikle sorulmasını istediğiniz noktalar" style="width:100%;"></textarea>
+    <button class="settings-choice" id="examAIGenerateBtn" onclick="generateTeacherExamWithAI()">✨ Soruları üret ve düzenlemeye aç</button>
+    <div id="examAIStatus" aria-live="polite"></div>
+  </section>
+  <label>Süre (dakika; 0 = sınırsız)<input id="examDuration" type="number" min="0" max="600" value="0"></label>
+  <label>Başlangıç zamanı (isteğe bağlı)<input id="examStartsAt" type="datetime-local"></label>
+  <label>Bitiş zamanı (isteğe bağlı)<input id="examEndsAt" type="datetime-local"></label>
+  <div id="examQuestionBuilder"></div>
+  <button class="settings-choice" onclick="addExamQuestion()">＋ Soru ekle</button>
+  <button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button>
+  <button class="modal-button" onclick="saveTeacherExam(true)">Yayımla</button>
+  <div id="teacherExamStatus" aria-live="polite"></div>
+  <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
+  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+<div id="studentExamModal" class="modal" style="max-width:820px;">
+  <h2>📝 Sınavlar</h2><div id="studentExamList">Sınavlar yükleniyor…</div>
+  <div id="studentExamWork" style="display:none"></div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -2685,6 +2726,79 @@ function selectAcademicMode(mode){
 
     updateStatus();
 }
+
+/* ============================================================
+   TEACHER EXAM MANAGER
+   ============================================================ */
+let examDraftQuestions = [];
+function openTeacherExamManager(){
+  if(currentUser !== "ilknur"){alert("Sınav yönetimi yalnızca İlknur öğretmen profiline açıktır.");return;}
+  closeSidebar(); closeModals(); $("teacherExamModal").classList.add("show");
+  examDraftQuestions=[]; renderExamQuestionBuilder(); loadTeacherExams();
+}
+async function generateTeacherExamWithAI(){
+ if(currentUser!=='ilknur'){alert('Bu özellik yalnızca İlknur öğretmen profiline açıktır.');return;}
+ const subject=$('examSubject').value.trim(),topic=$('examAITopic').value.trim();
+ if(!subject||!topic){alert('Önce ders ve konu alanlarını doldurun.');return;}
+ const question_types=[];if($('examAITypeMC').checked)question_types.push('multiple_choice');if($('examAITypeTF').checked)question_types.push('true_false');if($('examAITypeOpen').checked)question_types.push('open_ended');
+ if(!question_types.length){alert('En az bir soru türü seçin.');return;}
+ const btn=$('examAIGenerateBtn'),status=$('examAIStatus');btn.disabled=true;status.textContent='KARVIS soruları hazırlıyor…';
+ try{const r=await fetch(API+'/teacher/exams/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,subject,topic,question_count:Number($('examAIQuestionCount').value)||10,difficulty:$('examAIDifficulty').value,question_types,grade_level:$('examAIGrade').value,instructions:$('examAIInstructions').value})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Soru üretilemedi.');
+ $('examTitle').value=d.title||`${subject} — ${topic}`;$('examDescription').value=d.description||'';examDraftQuestions=Array.isArray(d.questions)?d.questions:[];renderExamQuestionBuilder();status.textContent=`${examDraftQuestions.length} soru taslak olarak hazırlandı. Soruları, seçenekleri ve cevap anahtarını düzenleyebilirsiniz; kontrol etmeden yayımlamayın.`;document.getElementById('examQuestionBuilder').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){status.textContent='Üretim başarısız: '+e.message;}finally{btn.disabled=false;}
+}
+function addExamQuestion(){
+  examDraftQuestions.push({type:"multiple_choice",prompt:"",options:["","","",""],correct_index:0,correct_answer:"",points:1});
+  renderExamQuestionBuilder();
+}
+function renderExamQuestionBuilder(){
+  const box=$("examQuestionBuilder"); if(!box)return;
+  box.innerHTML=examDraftQuestions.map((q,i)=>`<div class="sude-card" style="margin:10px 0;"><h3>Soru ${i+1}</h3><input value="${escapeHTML(q.prompt)}" placeholder="Soru metni" oninput="examDraftQuestions[${i}].prompt=this.value"><select class="voice-select" style="width:100%;margin:5px 0;" onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu (öğretmen değerlendirecek)</option></select><label>Puan <input type="number" min="1" max="100" value="${Number(q.points)||1}" oninput="examDraftQuestions[${i}].points=Math.max(1,Math.min(100,Number(this.value)||1))"></label>${q.type==='multiple_choice'?q.options.map((o,j)=>`<input value="${escapeHTML(o)}" placeholder="Seçenek ${String.fromCharCode(65+j)}" oninput="examDraftQuestions[${i}].options[${j}]=this.value">`).join('')+`<label>Doğru seçenek <select class="voice-select" onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${q.options.map((o,j)=>`<option value="${j}" ${q.correct_index===j?'selected':''}>${String.fromCharCode(65+j)}</option>`).join('')}</select></label>`:q.type==='true_false'?`<select class="voice-select" onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select>`:`<input value="${escapeHTML(q.correct_answer||'')}" placeholder="Açık uçlu cevap öğretmen tarafından puanlanacak" oninput="examDraftQuestions[${i}].correct_answer=this.value">`}<button class="settings-action" onclick="examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()">Soruyu kaldır</button></div>`).join('');
+}
+function changeExamQuestionType(i,type){examDraftQuestions[i].type=type;if(type==='true_false')examDraftQuestions[i].correct_answer=true;if(type==='open_ended')examDraftQuestions[i].correct_answer='';renderExamQuestionBuilder();}
+async function saveTeacherExam(published){
+ if(currentUser!=='ilknur')return;
+ const title=$("examTitle").value.trim();
+ if(!title||examDraftQuestions.length===0){alert('Sınav başlığını girin ve en az bir soru ekleyin.');return;}
+ const questions=examDraftQuestions.map(q=>({...q,options:q.type==='multiple_choice'?q.options.filter(x=>String(x).trim()):q.options}));
+ try{const r=await fetch(API+'/teacher/exams',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,title,subject:$('examSubject').value,description:$('examDescription').value,questions,published,duration_minutes:Number($('examDuration').value)||0,starts_at:$('examStartsAt').value?new Date($('examStartsAt').value).toISOString():'',ends_at:$('examEndsAt').value?new Date($('examEndsAt').value).toISOString():''})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınav kaydedilemedi.');$('teacherExamStatus').textContent=d.message; $('examTitle').value='';$('examSubject').value='';$('examDescription').value='';$('examDuration').value='0';$('examStartsAt').value='';$('examEndsAt').value='';examDraftQuestions=[];renderExamQuestionBuilder();await loadTeacherExams();}catch(e){alert(e.message);}
+}
+async function loadTeacherExams(){
+ const box=$('teacherExamList');if(!box)return;
+ try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';}
+ catch(e){box.textContent='Hata: '+e.message;}
+}
+async function toggleTeacherExamPublish(id,published){try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,published})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Durum değiştirilemedi.');await loadTeacherExams();}catch(e){alert(e.message);}}
+async function showTeacherExamResults(id){
+ try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/results?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sonuçlar alınamadı.');const s=d.summary;let text=`${d.exam.title}\nKatılım: ${s.submission_count}\nOrtalama: %${s.average_percent}\nEn yüksek: %${s.highest_percent}\nEn düşük: %${s.lowest_percent}\n\n`;
+ for(const sub of (d.submissions||[])){text+=`${sub.username}: ${sub.score}/${sub.max_score} (%${sub.percent}) — ${sub.status}\n`;for(const a of (sub.answers||[])){if(a.type==='open_ended'&&a.manual_review){text+=`\nSoru: ${a.prompt}\nCevap: ${a.answer||'(boş)'}\n`;const raw=prompt(`${sub.username} — açık uçlu cevap\n${a.prompt}\nCevap: ${a.answer||'(boş)'}\n0-${a.max_points} arası puan girin:`,String(a.earned_points||0));if(raw!==null){const points=Number(raw);if(Number.isFinite(points)&&points>=0&&points<=Number(a.max_points)){const feedback=prompt('Öğrenciye geri bildirim (isteğe bağlı):','')||'';const gr=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/grade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,submission_id:sub.id,question_id:a.question_id,points_awarded:Math.floor(points),feedback})});const gd=await gr.json();if(!gr.ok)alert(gd.detail||'Puan kaydedilemedi.');else text+='Açık uçlu puan kaydedildi.\n';}}}}
+ text+='\n';}alert(text);
+ }catch(e){alert(e.message);}}
+
+async function openStudentExams(){
+  closeSidebar();closeModals();$('studentExamModal').classList.add('show');$('studentExamWork').style.display='none';$('studentExamList').style.display='block';
+  if(currentUser==='ilknur'){$('studentExamList').innerHTML='<p>Öğretmen profili için Sınav Yönetimi bölümünü kullanın.</p>';return;}
+  try{const r=await fetch(API+'/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar alınamadı.');$('studentExamList').innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${Number(e.duration_minutes)||'Sınırsız'} ${Number(e.duration_minutes)?'dakika':''}</p><p>${escapeHTML(e.description||'')}</p>${e.starts_at?`<p>Başlangıç: ${escapeHTML(new Date(e.starts_at).toLocaleString())}</p>`:''}${e.ends_at?`<p>Bitiş: ${escapeHTML(new Date(e.ends_at).toLocaleString())}</p>`:''}${e.submitted?'<strong>✅ Teslim edildi</strong>':`<button class="settings-choice" onclick="startStudentExam('${e.id}')">Sınava gir</button>`}</div>`).join('')||'<p>Şu anda yayımlanmış sınav yok.</p>';}
+  catch(e){$('studentExamList').textContent='Hata: '+e.message;}
+}
+let activeExamTimer=null;
+async function startStudentExam(id){
+ try{
+  const sr=await fetch(API+'/exams/'+encodeURIComponent(id)+'/start?username='+encodeURIComponent(currentUser),{method:'POST'});const sd=await sr.json();if(!sr.ok)throw new Error(sd.detail||'Sınav başlatılamadı.');
+  const r=await fetch(API+'/exams/'+encodeURIComponent(id)+'?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınav açılamadı.');
+  const exam=d.exam;$('studentExamList').style.display='none';const work=$('studentExamWork');work.style.display='block';
+  work.innerHTML=`<h3>${escapeHTML(exam.title)}</h3><p>${escapeHTML(exam.description||'')}</p><p id="examCountdown" style="font-weight:800;color:#00e5ff"></p><form id="studentExamForm">${exam.questions.map((q,i)=>`<div class="sude-card" style="margin:10px 0"><strong>${i+1}. ${escapeHTML(q.prompt)}</strong><p>${q.points} puan</p>${q.type==='multiple_choice'?q.options.map((o,j)=>`<label style="display:block;margin:8px 0"><input type="radio" name="q_${q.id}" value="${j}"> ${escapeHTML(o)}</label>`).join(''):q.type==='true_false'?`<label><input type="radio" name="q_${q.id}" value="true"> Doğru</label> <label><input type="radio" name="q_${q.id}" value="false"> Yanlış</label>`:`<textarea name="q_${q.id}" rows="3" placeholder="Yanıtınızı yazın" style="width:100%;margin-top:8px"></textarea>`}</div>`).join('')}<button type="button" class="modal-button" onclick="submitStudentExam('${exam.id}',${JSON.stringify(exam.questions).replace(/</g,'\\u003c')})">Sınavı teslim et</button></form>`;
+  let remaining=Number(sd.remaining_seconds)||0;const duration=Number(sd.duration_minutes)||0;const ends=exam.ends_at?new Date(exam.ends_at).getTime():0;
+  if(activeExamTimer)clearInterval(activeExamTimer);
+  const tick=()=>{if(!duration&&!ends){$('examCountdown').textContent='Süre sınırı yok';return;}if(!duration&&ends)remaining=Math.max(0,Math.floor((ends-Date.now())/1000));$('examCountdown').textContent='Kalan süre: '+Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');if(remaining<=0){clearInterval(activeExamTimer);submitStudentExam(exam.id,exam.questions,true);}else if(duration)remaining--;};tick();activeExamTimer=setInterval(tick,1000);
+ }catch(e){alert(e.message);}
+}
+async function submitStudentExam(id,questions,automatic=false){
+ if(window.examSubmitting)return;window.examSubmitting=true;if(activeExamTimer)clearInterval(activeExamTimer);
+ try{const form=$('studentExamForm');const answers=questions.map(q=>{const el=form.querySelector(`[name="q_${q.id}"]`);if(q.type==='open_ended'){const t=form.querySelector(`textarea[name="q_${q.id}"]`);return {question_id:q.id,answer:t?t.value:''};}const selected=form.querySelector(`input[name="q_${q.id}"]:checked`);if(!selected)return {question_id:q.id,answer:null};return {question_id:q.id,answer:q.type==='multiple_choice'?Number(selected.value):selected.value==='true'};});const r=await fetch(API+'/exams/'+encodeURIComponent(id)+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,answers,submitted_automatically:automatic})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınav teslim edilemedi.');$('studentExamWork').innerHTML=`<h3>Sonuç: ${d.result.score}/${d.result.max_score} (%${d.result.percent})</h3><p>${automatic?'Süre dolduğu için otomatik teslim edildi.':'Sınavınız teslim edildi.'}</p><p>Açık uçlu cevaplar öğretmen değerlendirmesi bekleyebilir.</p><button class="settings-choice" onclick="openStudentExams()">Sınav listesine dön</button>`;
+ }catch(e){window.examSubmitting=false;alert(e.message);}finally{window.examSubmitting=false;}
+}
+
 
 /* ============================================================
    GREETING
@@ -4969,151 +5083,8 @@ function initialize(){
 
 initialize();
 
-document.addEventListener("DOMContentLoaded", startPresenceHeartbeat);
-window.addEventListener("focus", sendPresencePing);
 </script>
 
-<script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });
-// ============================================================
-// BIG UPDATE: ACTIVE PRESENCE + EXAM SYSTEM
-// ============================================================
-let karvisPresenceTimer = null;
-async function sendPresencePing(){
-    if(!currentUser) return;
-    try{
-        await fetch(API + "/presence/ping", {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({username:currentUser, name:currentUser, role:currentUser==="murat"?"admin":"user"})
-        });
-    }catch(e){ /* presence is best-effort; chat must keep working */ }
-}
-function startPresenceHeartbeat(){
-    sendPresencePing();
-    if(karvisPresenceTimer) clearInterval(karvisPresenceTimer);
-    karvisPresenceTimer=setInterval(sendPresencePing,25000);
-}
-async function openActiveUsers(){
-    if(currentUser!=="murat") return;
-    closeSidebar();
-    $("activeUsersModal").classList.add("show");
-    const box=$("activeUsersContent");
-    box.textContent="Aktif kullanıcılar yükleniyor...";
-    try{
-        const r=await fetch(API+"/admin/active-users?username=murat");
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail||"Kullanıcı listesi alınamadı.");
-        const rows=d.users||[];
-        box.innerHTML=`<p>🟢 Çevrimiçi: <strong>${d.online||0}</strong> · Görülmüş profil: <strong>${d.total_seen||0}</strong></p>`+
-          (rows.length?rows.map(u=>`<div style="padding:10px;margin:6px 0;border:1px solid rgba(255,255,255,.1);border-radius:10px;">
-            ${u.status==="online"?"🟢":"⚪"} <strong>${escapeHTML(u.name)}</strong> <small>@${escapeHTML(u.username)}</small>
-            <div style="opacity:.65;font-size:11px;">Rol: ${escapeHTML(u.role)} · ${u.status==="online"?"Şu an çevrimiçi":`Son görülme: ${Math.floor((u.seconds_ago||0)/60)} dk önce`}</div></div>`).join(""):"Henüz heartbeat gönderen profil yok.");
-    }catch(e){box.textContent="Aktif kullanıcı listesi alınamadı: "+e.message;}
-}
-function parseExamLines(raw){
-    return raw.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map((line,i)=>{
-        const p=line.split("|").map(x=>x.trim());
-        if(p.length!==6) throw new Error(`${i+1}. satırda 6 alan olmalı: Soru | A | B | C | D | doğru şık`);
-        const answer=p[5].toUpperCase();
-        if(!["A","B","C","D"].includes(answer)) throw new Error(`${i+1}. satırın doğru şıkkı A, B, C veya D olmalı.`);
-        return {question:p[0],options:p.slice(1,5),answer};
-    });
-}
-async function openExamManager(){
-    if(currentUser!=="ilknur") return;
-    closeSidebar();
-    $("examManagerModal").classList.add("show");
-    $("examManagerStatus").textContent="";
-    await loadTeacherExams();
-}
-async function loadTeacherExams(){
-    const box=$("teacherExamList"); box.textContent="Sınavlar yükleniyor...";
-    try{
-        const r=await fetch(API+"/exams?username=ilknur"); const d=await r.json();
-        if(!r.ok) throw new Error(d.detail||"Sınavlar alınamadı.");
-        box.innerHTML=(d.exams||[]).length?(d.exams||[]).map(e=>`<div style="padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;margin:6px 0;"><strong>${escapeHTML(e.title)}</strong><div style="opacity:.65;font-size:11px;">${escapeHTML(e.subject||"Genel")} · ${e.question_count} soru</div><button class="menu-item" onclick="showExamResults('${String(e.id).replace(/[^a-f0-9]/g,'')}')">📊 Sonuç analizi</button></div>`).join(""):"Henüz sınav oluşturulmadı.";
-    }catch(e){box.textContent="Sınavlar alınamadı: "+e.message;}
-}
-async function createExamFromForm(){
-    if(currentUser!=="ilknur") return;
-    const status=$("examManagerStatus"); status.textContent="Sınav oluşturuluyor...";
-    try{
-        const questions=parseExamLines($("examQuestionsInput").value);
-        const r=await fetch(API+"/exams",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"ilknur",title:$("examTitle").value,subject:$("examSubject").value,questions})});
-        const d=await r.json(); if(!r.ok) throw new Error(d.detail||"Sınav oluşturulamadı.");
-        status.textContent="Sınav oluşturuldu.";
-        $("examTitle").value=""; $("examSubject").value=""; $("examQuestionsInput").value="";
-        await loadTeacherExams();
-    }catch(e){status.textContent="Hata: "+e.message;}
-}
-async function showExamResults(id){
-    const box=$("teacherExamList");
-    try{
-        const r=await fetch(API+`/exams/${encodeURIComponent(id)}/results?username=ilknur`);
-        const d=await r.json(); if(!r.ok) throw new Error(d.detail||"Sonuçlar alınamadı.");
-        const rows=d.results||[];
-        box.innerHTML=`<button class="menu-item" onclick="loadTeacherExams()">← Sınav listesi</button><p>Katılım: <strong>${d.count}</strong> · Ortalama: <strong>%${d.average_percent}</strong></p>`+
-        (rows.length?rows.map(x=>`<div style="padding:9px;border-bottom:1px solid rgba(255,255,255,.1)"><strong>${escapeHTML(x.name||x.username)}</strong> — ${x.correct}/${x.total} doğru (%${x.percent})</div>`).join(""):"Henüz sonuç yok.");
-    }catch(e){box.textContent="Sonuçlar alınamadı: "+e.message;}
-}
-async function openStudentExams(){
-    closeSidebar(); $("studentExamsModal").classList.add("show");
-    $("takingExamArea").innerHTML="";
-    const box=$("studentExamList"); box.textContent="Sınavlar yükleniyor...";
-    try{
-        const r=await fetch(API+"/exams?username="+encodeURIComponent(currentUser)); const d=await r.json();
-        if(!r.ok) throw new Error(d.detail||"Sınavlar alınamadı.");
-        box.innerHTML=(d.exams||[]).length?(d.exams||[]).map(e=>`<div style="padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;margin:6px 0;"><strong>${escapeHTML(e.title)}</strong><div style="opacity:.65;font-size:11px;">${escapeHTML(e.subject||"Genel")} · ${e.question_count} soru</div><button class="menu-item" onclick="startTakingExam('${String(e.id).replace(/[^a-f0-9]/g,'')}')">Sınava Başla</button></div>`).join(""):"Henüz yayınlanmış sınav yok.";
-    }catch(e){box.textContent="Sınavlar alınamadı: "+e.message;}
-}
-async function startTakingExam(id){
-    const area=$("takingExamArea"); area.textContent="Sınav açılıyor...";
-    try{
-        const r=await fetch(API+`/exams/${encodeURIComponent(id)}?username=${encodeURIComponent(currentUser)}`);
-        const d=await r.json(); if(!r.ok) throw new Error(d.detail||"Sınav açılamadı.");
-        const e=d.exam;
-        area.innerHTML=`<h3>${escapeHTML(e.title)}</h3>`+(e.questions||[]).map((q,i)=>`<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)"><strong>${i+1}. ${escapeHTML(q.question)}</strong>`+
-          q.options.map((o,j)=>`<label style="display:block;padding:6px;"><input type="radio" name="examq${i}" value="${"ABCD"[j]}"> ${"ABCD"[j]}. ${escapeHTML(o)}</label>`).join("")+`</div>`).join("")+
-          `<button class="modal-button" onclick="submitTakingExam('${String(id).replace(/[^a-f0-9]/g,'')}',${e.questions.length})">Sınavı Bitir</button>`;
-        $("studentExamList").innerHTML="";
-    }catch(err){area.textContent="Sınav açılamadı: "+err.message;}
-}
-async function submitTakingExam(id,count){
-    const answers={}; for(let i=0;i<count;i++){const el=document.querySelector(`input[name="examq${i}"]:checked`);answers[String(i)]=el?el.value:"";}
-    const area=$("takingExamArea");
-    try{
-        const r=await fetch(API+"/exams/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,exam_id:id,answers})});
-        const d=await r.json();if(!r.ok)throw new Error(d.detail||"Sınav gönderilemedi.");
-        const x=d.result;area.innerHTML=`<h3>Sonuç</h3><p>Doğru: <strong>${x.correct}</strong> · Yanlış: <strong>${x.wrong}</strong> · Toplam: <strong>${x.total}</strong></p><p>Başarı: <strong>%${x.percent}</strong></p>`;
-    }catch(e){area.textContent="Sonuç gönderilemedi: "+e.message;}
-}
-
-</script>
-
-<div id="activeUsersModal" class="modal" style="max-width:760px;">
-  <h2>🟢 Aktif Kullanıcılar</h2>
-  <div id="activeUsersContent" class="error-list">Yükleniyor...</div>
-  <button class="modal-button" onclick="openActiveUsers()">↻ Yenile</button>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-<div id="examManagerModal" class="modal" style="max-width:760px;">
-  <h2>📝 Sınav Yönetimi</h2>
-  <p style="opacity:.75;font-size:12px;">Her satıra şu formatta bir soru yaz: Soru metni | A seçeneği | B seçeneği | C seçeneği | D seçeneği | Doğru şık (A/B/C/D)</p>
-  <input id="examTitle" placeholder="Sınav başlığı">
-  <input id="examSubject" placeholder="Ders / konu">
-  <textarea id="examQuestionsInput" placeholder="Türkiye'nin başkenti? | İstanbul | Ankara | İzmir | Bursa | B" style="width:100%;min-height:150px;background:rgba(255,255,255,.05);color:white;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px;"></textarea>
-  <button class="modal-button" onclick="createExamFromForm()">Sınavı Oluştur</button>
-  <div id="examManagerStatus" style="margin:10px 0;"></div>
-  <h3>Oluşturulan sınavlar</h3>
-  <div id="teacherExamList" class="error-list">Yükleniyor...</div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-<div id="studentExamsModal" class="modal" style="max-width:760px;">
-  <h2>🧾 Sınavlar</h2>
-  <div id="studentExamList" class="error-list">Yükleniyor...</div>
-  <div id="takingExamArea"></div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
+<script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
