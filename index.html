@@ -1131,6 +1131,107 @@ body.voice-speaking .ring.three{
 .sude-stat{font-size:24px;font-weight:900;}
 .arena-panel{width:min(96vw,760px);max-height:92vh;} .arena-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0;} .arena-card{border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:16px;padding:14px;background:var(--card-bg,rgba(128,128,128,.06));min-width:0;} .arena-stat{font-size:25px;font-weight:900;} .arena-option{width:100%;text-align:left;margin:5px 0;padding:12px;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:12px;background:var(--button-bg,rgba(128,128,128,.08));color:inherit;} .arena-option:disabled{opacity:.6;} @media(max-width:520px){.sude-grid,.arena-grid{grid-template-columns:1fr;}.sude-panel,.arena-panel{padding:16px;}}
 
+
+
+/* KARVIS Exam Management — responsive layout polish */
+.exam-modal {
+  width: min(980px, calc(100vw - 28px)) !important;
+  max-width: 980px !important;
+  max-height: min(90dvh, 920px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: clamp(16px, 3vw, 30px) !important;
+  border-radius: 22px !important;
+  scrollbar-gutter: stable;
+}
+.exam-modal * { box-sizing: border-box; }
+.exam-modal h2 { margin: 0 0 8px; line-height: 1.3; font-size: clamp(20px, 3vw, 27px); }
+.exam-modal h3 { line-height: 1.35; }
+.exam-modal > p { margin: 0 0 18px; line-height: 1.55; }
+.exam-modal > input:not([type="checkbox"]),
+.exam-modal > textarea,
+.exam-modal input:not([type="checkbox"]),
+.exam-modal textarea,
+.exam-modal select {
+  max-width: 100%; min-width: 0; font: inherit;
+}
+.exam-modal > input:not([type="checkbox"]) {
+  display: block; width: 100%; margin: 10px 0; padding: 12px 14px;
+  border: 1px solid var(--border-color, rgba(128,128,128,.3)); border-radius: 12px;
+}
+.exam-modal label { min-width: 0; line-height: 1.5; }
+.exam-modal button {
+  max-width: 100%; min-height: 42px; white-space: normal; overflow-wrap: anywhere;
+  line-height: 1.35; margin: 4px 4px 4px 0;
+}
+.exam-modal .settings-choice,
+.exam-modal .settings-action,
+.exam-modal .modal-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  width: auto; min-width: 0; padding: 10px 14px; vertical-align: middle;
+}
+.exam-modal #examAIGenerateBtn { width: 100%; margin-top: 12px; }
+.exam-modal #examAIStatus,
+.exam-modal #teacherExamStatus { margin: 10px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.exam-modal #examQuestionBuilder,
+.exam-modal #teacherExamList,
+.exam-modal #studentExamList,
+.exam-modal #studentExamWork { min-width: 0; }
+.exam-modal #examQuestionBuilder > .sude-card,
+.exam-modal #teacherExamList > .sude-card,
+.exam-modal #studentExamList > .sude-card,
+.exam-modal #studentExamWork .sude-card {
+  padding: clamp(12px, 2vw, 20px); margin: 12px 0 !important; border-radius: 16px;
+  overflow-wrap: anywhere;
+}
+.exam-modal #examQuestionBuilder input:not([type="checkbox"]),
+.exam-modal #examQuestionBuilder select,
+.exam-modal #examQuestionBuilder textarea {
+  display: block; width: 100%; margin: 8px 0; padding: 11px 12px;
+  border-radius: 10px; min-height: 42px;
+}
+.exam-modal #examQuestionBuilder label { display: block; margin: 8px 0; }
+.exam-modal #examQuestionBuilder label input { margin-top: 5px; }
+.exam-modal #examQuestionBuilder .settings-action { margin-top: 10px; }
+.exam-modal #examAIInstructions { display:block; min-height:76px; padding:12px; border-radius:12px; }
+.exam-modal #examAIQuestionCount,
+.exam-modal #examAIGrade,
+.exam-modal #examAIDifficulty,
+.exam-modal #examDuration,
+.exam-modal #examStartsAt,
+.exam-modal #examEndsAt { display:block; width:100%; margin-top:6px; }
+.exam-modal #examDuration,
+.exam-modal #examStartsAt,
+.exam-modal #examEndsAt { padding:11px 12px; border-radius:10px; }
+.exam-modal #examQuestionBuilder + button { margin: 12px 0; }
+.exam-modal #teacherExamList > .sude-card > button,
+.exam-modal #studentExamList > .sude-card > button { margin-top: 8px; }
+.exam-modal #studentExamWork form > button { width:100%; margin:16px 0 0; }
+.exam-modal #studentExamWork textarea { width:100%; max-width:100%; padding:12px; border-radius:12px; }
+.exam-modal > .secondary-button { margin-top: 18px; }
+@media (min-width: 700px) {
+  .exam-modal #examAIQuestionCount { width: 120px; }
+  .exam-modal #examAIGrade { width: 190px; }
+  .exam-modal #examAIDifficulty { width: 150px; }
+  .exam-modal > label:has(#examDuration),
+  .exam-modal > label:has(#examStartsAt),
+  .exam-modal > label:has(#examEndsAt) { display:inline-block; width:calc(33.333% - 12px); margin:8px 10px 8px 0; vertical-align:top; }
+}
+@media (max-width: 600px) {
+  .exam-modal { width: calc(100vw - 16px) !important; max-height: 94dvh; padding: 14px !important; border-radius: 16px !important; }
+  .exam-modal .settings-choice,
+  .exam-modal .settings-action,
+  .exam-modal .modal-button { width: 100%; margin: 5px 0; }
+  .exam-modal #examAIInstructions { font-size: 16px; }
+  .exam-modal #examAIQuestionCount,
+  .exam-modal #examAIGrade,
+  .exam-modal #examAIDifficulty { width:100%; }
+  .exam-modal > label:has(#examDuration),
+  .exam-modal > label:has(#examStartsAt),
+  .exam-modal > label:has(#examEndsAt) { display:block; width:100%; margin:10px 0; }
+}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1779,7 +1880,7 @@ body.voice-speaking .ring.three{
 </div>
 
 <!-- ILKNUR SINAV SISTEMI -->
-<div id="teacherExamModal" class="modal" style="max-width:820px;">
+<div id="teacherExamModal" class="modal exam-modal" style="max-width:980px;">
   <h2>🗂️ İlknur — Sınav Yönetimi</h2>
   <p style="opacity:.75;font-size:12px">Sınav süresi dakika cinsindendir. 0, süre sınırı olmadığı anlamına gelir. Tarih/saat alanları yerel cihaz saatine göre girilir.</p>
   <input id="examTitle" placeholder="Sınav başlığı">
@@ -1814,7 +1915,7 @@ body.voice-speaking .ring.three{
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
-<div id="studentExamModal" class="modal" style="max-width:820px;">
+<div id="studentExamModal" class="modal exam-modal exam-student-modal" style="max-width:980px;">
   <h2>📝 Sınavlar</h2><div id="studentExamList">Sınavlar yükleniyor…</div>
   <div id="studentExamWork" style="display:none"></div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
