@@ -1725,7 +1725,10 @@ body.voice-speaking .ring.three{
     <div id="arenaDuelStatus" aria-live="polite" style="margin-top:10px;font-size:13px"></div>
     <div id="arenaDuelRequests" style="margin-top:10px"></div>
     <div id="arenaDuelActive" style="margin-top:10px"></div>
-    <button id="arenaDuelRefreshButton" type="button" class="sude-btn" style="width:100%;margin-top:10px;display:block!important;position:relative;z-index:5;min-height:48px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile / takıldıysa yenile</button>
+    <div class="sude-grid" id="arenaDuelRecoveryControls" style="margin-top:10px;display:none">
+      <button id="arenaDuelRefreshButton" class="sude-btn" onclick="refreshArenaDuel(true)">🔄 Durumu yenile</button>
+      <button id="arenaDuelClearButton" class="sude-btn" onclick="clearStuckArenaDuel()">🛑 Takılan düelloyu sıfırla</button>
+    </div>
     <h3 style="margin-top:16px">🕘 Son 3 düellom</h3>
     <div id="arenaDuelHistory">Henüz düello oynanmadı.</div>
   </section>
@@ -4759,23 +4762,37 @@ async function answerArenaDuel(choice,duelId,questionIndex){
   }
  }catch(e){if(feedback)feedback.textContent=e.message;buttons.forEach(b=>b.disabled=false);}
 }
+async function clearStuckArenaDuel(){
+ const ok=confirm("Takılan veya bekleyen düello istekleri iptal edilsin mi? İptal edilen düelloda puan aktarılmaz ve rakip de düellodan çıkar.");
+ if(!ok)return;
+ const button=$("arenaDuelClearButton"), status=$("arenaDuelStatus");
+ if(button){button.disabled=true;button.textContent="⏳ Düello temizleniyor…";}
+ try{
+  const r=await fetch(API+"/arena/duel/clear",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser})});
+  const d=await r.json(); if(!r.ok)throw new Error(d.detail||"Düello temizlenemedi.");
+  arenaDuelRenderedKey="";
+  if(status)status.textContent="✅ "+(d.message||"Düello durumu sıfırlandı.");
+  await loadArenaDuels();
+  await loadArenaOverview({fromRefresh:true});
+ }catch(e){if(status)status.textContent="⚠️ "+(e.message||"Düello temizlenemedi.");}
+ finally{if(button){button.disabled=false;button.textContent="🛑 Takılan düelloyu sıfırla";}}
+}
 async function refreshArenaDuel(forceRender=false){
  const button=$("arenaDuelRefreshButton");
- const status=$("arenaDuelStatus");
- if(button){button.disabled=true;button.textContent="⏳ Düello durumu alınıyor…";}
- if(status) status.textContent="Sunucudaki düello durumu kontrol ediliyor…";
+ if(button){button.disabled=true;button.textContent="⏳ Yenileniyor…";}
  if(forceRender) arenaDuelRenderedKey="";
  try{
-  await loadArenaDuels({manualRefresh:true});
-  try{await loadArenaOverview({fromRefresh:true});}catch(_){}
-  if(status) status.textContent="✅ Düello durumu sunucudan yenilendi.";
+  await loadArenaDuels();
+  const status=$("arenaDuelStatus");
+  if(status) status.textContent="🔄 Düello durumu sunucudan yenilendi.";
  }catch(e){
+  const status=$("arenaDuelStatus");
   if(status) status.textContent="⚠️ Düello yenilenemedi: "+(e.message||"Bağlantı hatası");
  }finally{
-  if(button){button.disabled=false;button.textContent="🔄 Düelloyu yenile / takıldıysa yenile";button.style.display="block";}
+  if(button){button.disabled=false;button.textContent="🔄 Durumu yenile";}
  }
 }
-async function loadArenaDuels(options={}){
+async function loadArenaDuels(){
  try{
   const r=await fetch(API+"/arena/duels?username="+encodeURIComponent(currentUser));
   const d=await r.json();if(!r.ok)throw new Error(d.detail||"Düellolar yüklenemedi.");
@@ -4785,23 +4802,27 @@ async function loadArenaDuels(options={}){
   (d.pending_outgoing||[]).forEach(x=>{requestHtml+=`<div class="sude-card">⏳ ${arenaEscape(arenaDuelName(x.opponent))} profilinin ${Number(x.stake)} puanlık düello isteğini yanıtlaması bekleniyor.</div>`;});
   requests.innerHTML=requestHtml;
   const active=d.active_duel, area=$("arenaDuelActive");
-  const duelRefreshButton=$("arenaDuelRefreshButton");
-  if(duelRefreshButton){duelRefreshButton.style.display="block";duelRefreshButton.disabled=false;}
+  const recoveryControls=$("arenaDuelRecoveryControls");
+  const hasPending=(d.pending_incoming||[]).length>0||(d.pending_outgoing||[]).length>0;
+  if(recoveryControls) recoveryControls.style.display=(active||hasPending)?"grid":"none";
   if(active){
    const q=active.question;
    const renderKey=active.duel_id+":"+active.question_index+":"+(active.answered?"answered":"question");
    if(active.status==="active" && q && !active.answered){
     if(arenaDuelRenderedKey!==renderKey){
      arenaDuelRenderedKey=renderKey;
-     area.innerHTML=`<div class="sude-card"><h3>⚔️ Özel Düello · Soru ${Number(active.question_index)+1}/5</h3><p>${arenaEscape(arenaDuelName(active.challenger===currentUser?active.opponent:active.challenger))} ile ${Number(active.stake)} puan için yarışıyorsun.</p><p><strong>${arenaEscape(q.prompt)}</strong></p><div>${(q.options||[]).map((o,i)=>`<button class="arena-option arena-duel-answer" onclick="answerArenaDuel(${i},'${arenaEscape(active.duel_id)}',${Number(active.question_index)})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaDuelFeedback" aria-live="polite"></p><button class="sude-btn" style="width:100%;margin-top:12px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button></div>`;
+     area.innerHTML=`<div class="sude-card"><h3>⚔️ Özel Düello · Soru ${Number(active.question_index)+1}/5</h3><p>${arenaEscape(arenaDuelName(active.challenger===currentUser?active.opponent:active.challenger))} ile ${Number(active.stake)} puan için yarışıyorsun.</p><p><strong>${arenaEscape(q.prompt)}</strong></p><div>${(q.options||[]).map((o,i)=>`<button class="arena-option arena-duel-answer" onclick="answerArenaDuel(${i},'${arenaEscape(active.duel_id)}',${Number(active.question_index)})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaDuelFeedback" aria-live="polite"></p></div>`;
     }
    }else if(active.status==="active" && active.answered){
     arenaDuelRenderedKey=renderKey;
-    area.innerHTML=`<div class="sude-card"><h3>⏳ Cevabın kaydedildi</h3><p>Rakibin aynı soruyu cevaplayana kadar bekle. Sonraki soru otomatik yüklenecek.</p><p>Tur ${Number(active.question_index)+1}/5</p><button class="sude-btn" style="width:100%;margin-top:12px" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button></div>`;
+    area.innerHTML=`<div class="sude-card"><h3>⏳ Cevabın kaydedildi</h3><p>Rakibin aynı soruyu cevaplayana kadar bekle. Sonraki soru otomatik yüklenecek.</p><p>Tur ${Number(active.question_index)+1}/5</p></div>`;
    }
   }else{
    arenaDuelRenderedKey="";
    area.innerHTML="";
+   const recoveryControls=$("arenaDuelRecoveryControls");
+   const hasPending=(d.pending_incoming||[]).length>0||(d.pending_outgoing||[]).length>0;
+   if(recoveryControls)recoveryControls.style.display=hasPending?"grid":"none";
    // Surface most recently completed outcome from the personal three-game history.
    const recent=(d.duel_history||[])[0];
    if(recent && $("arenaDuelStatus").textContent==="") $("arenaDuelStatus").textContent=`Son düello: ${recent.outcome} (${recent.points_delta>0?"+":""}${recent.points_delta} puan).`;
