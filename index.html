@@ -605,19 +605,8 @@ button:active{
 }
 
 .modal.show{
-    display:block;
-    /* Mobilde pencereyi ön plana çıkar; arka ekrandaki sohbet tıklanamaz ve dikkat dağıtmaz. */
-    box-shadow: 0 0 0 100vmax rgba(0, 5, 8, .78), 0 20px 80px rgba(0,0,0,.65);
-    isolation:isolate;
+    display:block
 }
-
-/* Profil pencerelerinde başlık, açıklama ve düğmeler arasında net boşluk */
-#profileChoiceModal h2{font-size:clamp(24px,5vw,32px);line-height:1.2;margin:0 0 18px;}
-#profileChoiceModal p{font-size:clamp(14px,3.8vw,17px)!important;line-height:1.5;margin:0 0 20px;}
-#profileChoiceModal .modal-button{min-height:54px;height:auto;padding:14px 16px;margin:0 0 10px;white-space:normal;line-height:1.25;}
-#profileChoiceModal .modal-button:last-child{margin-bottom:0;}
-#profileModal h2,#registerModal h2{font-size:clamp(24px,5vw,32px);line-height:1.2;margin-bottom:18px;}
-#profileModal .modal-button,#registerModal .modal-button{min-height:50px;height:auto;padding:13px 16px;margin-top:6px;white-space:normal;}
 
 .modal h2{
     margin-top:0;
@@ -1326,7 +1315,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 .exam-modal #teacherExamList .sude-card{min-width:0;overflow-wrap:anywhere}
 .exam-modal #teacherExamList .sude-card button{max-width:100%;white-space:normal}
 @media(max-width:700px){
- .modal{width:calc(100vw - 28px);max-width:calc(100vw - 28px);padding:18px 16px;max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px);overflow-y:auto;overscroll-behavior:contain}
+ .modal{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px;max-height:92dvh}
  .exam-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;padding:12px!important}
  .exam-modal .exam-field-grid,.exam-modal .exam-field-grid-2{grid-template-columns:minmax(0,1fr)!important}
  .exam-modal .exam-field-wide{grid-column:auto!important}
@@ -1429,6 +1418,8 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         ⚙ Ayarlar
     </button>
 
+    <button class="menu-item" onclick="openMyFeatures()">✨ KARVIS Özelliklerim</button>
+
     <button
         id="funButton"
         class="menu-item"
@@ -1505,12 +1496,12 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         </div>
 
         <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
-        <button class="menu-item" onclick="openActiveProfiles()">🟢 Aktif Profiller</button>
+        <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
         <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
-        
+        <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
         <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
 
     </div>
@@ -1644,12 +1635,20 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 <div id="registerModal" class="modal">
     <h2>Yeni KARVIS Hesabı</h2>
     <p style="opacity:.8;font-size:13px">Yeni hesaplar standart kullanıcı olarak açılır.</p>
-    <input id="registerDisplayName" placeholder="Adınız / görünen ad" autocomplete="name" maxlength="60">
-    <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter)" autocomplete="username" maxlength="24">
-    <input id="registerPassword" type="password" placeholder="Şifre (en az 8 karakter, harf ve rakam)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
+    <input id="registerDisplayName" placeholder="Adınız / görünen ad (2-60 karakter)" autocomplete="name" maxlength="60">
+    <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter, İngilizce harf/rakam)" autocomplete="username" maxlength="24">
+    <input id="registerPassword" type="password" placeholder="Şifre (8+ karakter, harf ve rakam)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
     <input id="registerPasswordConfirm" type="password" placeholder="Şifreyi tekrar girin" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
+    <div id="registerError" role="alert" aria-live="polite" style="display:none;color:#ff7b86;background:rgba(255,70,90,.08);border:1px solid rgba(255,70,90,.35);border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13px;line-height:1.45"></div>
     <button id="registerButton" class="modal-button" onclick="registerAccount()">Hesap Oluştur</button>
     <button class="modal-button secondary-button" onclick="backToLoginModal()">Giriş Ekranına Dön</button>
+</div>
+
+<div id="myFeaturesModal" class="modal" style="max-width:760px;">
+    <h2 id="myFeaturesTitle">✨ KARVIS Özelliklerim</h2>
+    <p id="myFeaturesIntro" style="opacity:.82;">Bu profil için kullanılabilen özellikler.</p>
+    <div id="myFeaturesContent" class="error-list"></div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
 <!-- ============================================================
@@ -1668,11 +1667,9 @@ select option:checked{background:#087f9b!important;color:#fff!important}
     <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
-<div id="activeProfilesModal" class="modal" style="max-width:760px;">
-    <h2>🟢 Aktif Profiller</h2>
-    <p style="opacity:.8">Son 90 saniyede sunucuya sinyal gönderen profiller çevrimiçi kabul edilir.</p>
-    <div id="activeProfilesContent" class="error-list">Profiller yükleniyor...</div>
-    <button class="modal-button" onclick="loadActiveProfiles()">🔄 Yenile</button>
+<div id="karvisBrainModal" class="modal" style="max-width:760px;">
+    <h2>🧠 Sistem Beyni</h2>
+    <div id="karvisBrainContent" class="error-list">Sistem durumu okunuyor...</div>
     <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -2240,6 +2237,34 @@ function closeModals(){
 }
 
 /* ============================================================
+   PROFILE-SPECIFIC KARVIS FEATURES
+   ============================================================ */
+function openMyFeatures(){
+    const user = String(currentUser || "").toLowerCase();
+    const names = {karahan:"KARAHAN INC.",murat:"Murat",sinem:"Sinem",betul:"Betül",ilknur:"İlknur",sude:"Sude"};
+    const title = $("myFeaturesTitle");
+    const intro = $("myFeaturesIntro");
+    const content = $("myFeaturesContent");
+    if(!content) return;
+    const common = ["KARVIS ile sohbet", "Yeni sohbet başlatma", "Kişisel ayarlar ve görünüm", "KARVIS Arena", "Sınav takibi"];
+    const byProfile = {
+        karahan:["K.A.R.V.I.S. CORE", "Dedektif Modu", "Canlı Konuşma", "Sistem araçları"],
+        murat:["Yönetici Merkezi", "K.A.R.V.I.S. LIVE", "Kullanıcı istekleri", "Bildirim gönderme", "Kullanım istatistikleri", "Sistem hataları", "Kullanıcı şifresi sıfırlama"],
+        sinem:["Sinem profiline özel görünüm", "KARVIS ile kişisel sohbet", "Ortak genel özellikler"],
+        betul:["Betül Eğlence Merkezi", "Instagram analizi", "Tarot falı", "Fal bakma"],
+        ilknur:["Akademik Asistan", "Araştırma ve bilgi derleme", "Makale hazırlama", "Ders asistanı", "Sınav / quiz", "Sınav yönetimi"],
+        sude:["Beslenme günlüğü", "VKİ hesaplama", "Günlük görevler"]
+    };
+    const profileItems = byProfile[user] || ["Standart profil özellikleri", "KARVIS ile genel amaçlı sohbet", "Profil ayarları"];
+    title.textContent = "✨ " + (names[user] || user || "Profil") + " — KARVIS Özelliklerim";
+    intro.textContent = "Bu liste yalnızca giriş yaptığınız profilin özelliklerini gösterir.";
+    const unique = [...new Set([...common, ...profileItems])];
+    content.innerHTML = unique.map(item => '<div class="error-item" style="margin:8px 0;padding:12px 14px;border:1px solid rgba(0,220,245,.18);border-radius:12px;background:rgba(0,220,245,.035)">✦ ' + escapeHTML(item) + '</div>').join("");
+    closeModals();
+    $("myFeaturesModal").classList.add("show");
+}
+
+/* ============================================================
    PROFILE
    ============================================================ */
 
@@ -2287,8 +2312,17 @@ async function registerAccount(){
     const username = $("registerUsername").value.trim().toLowerCase();
     const password = $("registerPassword").value;
     const confirm = $("registerPasswordConfirm").value;
-    if(!display_name || !username || !password){ alert("Tüm alanları doldurun."); return; }
-    if(password !== confirm){ alert("Şifreler birbiriyle eşleşmiyor."); return; }
+    const errorBox = $("registerError");
+    const showError = (message) => {
+        if(errorBox){ errorBox.textContent = message; errorBox.style.display = "block"; }
+        else alert(message);
+    };
+    if(errorBox){ errorBox.textContent = ""; errorBox.style.display = "none"; }
+    if(!display_name || !username || !password || !confirm){ showError("Lütfen tüm alanları doldurun."); return; }
+    if(display_name.length < 2 || display_name.length > 60){ showError("Görünen ad 2-60 karakter arasında olmalı."); return; }
+    if(!/^[a-z0-9_.-]{3,24}$/.test(username)){ showError("Kullanıcı adı 3-24 karakter olmalı; İngilizce harf, rakam, nokta, alt çizgi ve tire kullanın."); return; }
+    if(password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)){ showError("Şifre en az 8 karakter olmalı ve en az bir harf ile bir rakam içermeli."); return; }
+    if(password !== confirm){ showError("Şifreler birbiriyle eşleşmiyor."); return; }
     const button = $("registerButton");
     registerInProgress = true;
     if(button){ button.disabled = true; button.textContent = "Hesap oluşturuluyor…"; }
@@ -2297,18 +2331,24 @@ async function registerAccount(){
             method:"POST", headers:{"Content-Type":"application/json"},
             body:JSON.stringify({display_name, username, password})
         });
-        const data = await response.json();
-        if(!response.ok || data.success !== true){ alert(data.detail || data.message || "Hesap oluşturulamadı."); return; }
+        let data = {};
+        const raw = await response.text();
+        try{ data = raw ? JSON.parse(raw) : {}; }catch(_){ data = {}; }
+        if(!response.ok || data.success !== true){
+            const message = data.detail || data.message || (response.status ? `Sunucu kayıt isteğini reddetti (HTTP ${response.status}).` : "Hesap oluşturulamadı.");
+            showError(message);
+            return;
+        }
         $("usernameInput").value = username;
-        $("passwordInput").value = password;
+        $("passwordInput").value = "";
         $("registerDisplayName").value = "";
         $("registerUsername").value = "";
         $("registerPassword").value = "";
         $("registerPasswordConfirm").value = "";
         backToLoginModal();
-        alert("Hesabınız oluşturuldu. Şimdi giriş yapabilirsiniz.");
+        alert("Hesabınız oluşturuldu. Şimdi kullanıcı adınız ve belirlediğiniz şifreyle giriş yapabilirsiniz.");
     }catch(error){
-        alert("Sunucuya ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.");
+        showError("Sunucuya ulaşılamadı. İnternet bağlantısını ve KARVIS API adresini kontrol edin.");
     }finally{
         registerInProgress = false;
         if(button){ button.disabled = false; button.textContent = "Hesap Oluştur"; }
@@ -2401,7 +2441,6 @@ async function login(){
             "karvis_user",
             currentUser
         );
-        sendPresenceHeartbeat();
 
         localStorage.setItem(
             "karvis_mode",
@@ -4976,44 +5015,6 @@ async function openAdminStats(){
     }catch(e){ box.textContent = "Hata: " + e.message; }
 }
 
-async function openActiveProfiles(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    closeModals();
-    $("activeProfilesModal").classList.add("show");
-    await loadActiveProfiles();
-}
-
-async function loadActiveProfiles(){
-    const box = $("activeProfilesContent");
-    if(!box || currentUser !== "murat") return;
-    box.textContent = "Profiller yükleniyor...";
-    try{
-        const response = await fetch(API + "/admin/active-profiles?username=murat", {cache:"no-store"});
-        const data = await response.json();
-        if(!response.ok) throw new Error(data.detail || "Aktif profiller alınamadı.");
-        const profiles = Array.isArray(data.profiles) ? data.profiles : [];
-        if(!profiles.length){ box.textContent = "Henüz profil kaydı bulunamadı."; return; }
-        box.innerHTML = profiles.map(p => {
-            const online = !!p.online;
-            const label = online ? "Çevrimiçi" : "Çevrimdışı";
-            return `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(0,220,240,.14)">
-                <span style="font-weight:600">${escapeHTML(p.name || p.username)}</span>
-                <span style="display:flex;align-items:center;gap:8px;white-space:nowrap;color:${online ? '#25d366' : '#9aa5aa'}">
-                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${online ? '#25d366' : '#78858a'};box-shadow:${online ? '0 0 8px #25d366' : 'none'}"></span>${label}
-                </span></div>`;
-        }).join("");
-    }catch(e){ box.textContent = "Aktif profiller yüklenemedi: " + e.message; }
-}
-
-async function sendPresenceHeartbeat(){
-    const username = String(currentUser || localStorage.getItem("karvis_user") || "").trim().toLowerCase();
-    if(!username) return;
-    try{
-        await fetch(API + "/presence/heartbeat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username}), keepalive:true});
-    }catch(e){}
-}
-
 function openDevelopmentMemory(){
     if(currentUser !== "murat") return;
     closeSidebar();
@@ -5397,8 +5398,3 @@ initialize();
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
-
-<script>
-setInterval(() => { if (typeof currentUser !== "undefined" && currentUser) sendPresenceHeartbeat(); }, 30000);
-window.addEventListener("focus", () => { if (typeof currentUser !== "undefined" && currentUser) sendPresenceHeartbeat(); });
-</script>
