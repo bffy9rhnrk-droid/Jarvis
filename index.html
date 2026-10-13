@@ -1527,47 +1527,12 @@ select option:checked{background:#087f9b!important;color:#fff!important}
             AKADEMİK ASİSTAN
         </div>
 
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="research"
-            onclick="selectAcademicMode('research')">
-            🔬 Araştırma Modu
+        <button class="menu-item" onclick="openTeacherFeatures()">
+            ✨ Özellikler
         </button>
 
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="academic"
-            onclick="selectAcademicMode('academic')">
-            📚 Akademik Mod
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="article"
-            onclick="selectAcademicMode('article')">
-            📝 Makale Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="lesson"
-            onclick="selectAcademicMode('lesson')">
-            🎓 Ders Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="quiz"
-            onclick="selectAcademicMode('quiz')">
-            🧪 Sınav / Quiz
-        </button>
-        <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="presentation"
-            onclick="selectAcademicMode('presentation')">
-            📊 Sunum Hazırlama
+        <button class="menu-item" onclick="openTeacherExamManager()">
+            🗂️ Sınav Yönetimi
         </button>
 
     </div>
@@ -2975,6 +2940,34 @@ function selectAcademicMode(mode){
     updateStatus();
 }
 
+function openTeacherFeatures(){
+    if(currentUser !== "ilknur") return;
+    closeSidebar();
+    addMessage(
+        "Hocam, akademik asistan olarak şu konularda yardımcı olabilirim:\n\n" +
+        "• Akademik araştırma ve kaynakları değerlendirme\n" +
+        "• Akademik makale ve rapor taslağı hazırlama\n" +
+        "• Ders ve konu anlatımı\n" +
+        "• Soru, quiz ve sınav taslağı oluşturma\n" +
+        "• Sunum ve slayt dosyası hazırlama\n" +
+        "• Metin düzenleme, özetleme ve geliştirme\n\n" +
+        "İstediğiniz işlemi sohbet alanına normal cümleyle yazmanız yeterli. Örneğin: “Hücre bölünmesi hakkında 10 slaytlık bir sunum hazırla.”",
+        "ai"
+    );
+}
+
+function inferAcademicMode(message){
+    if(currentUser !== "ilknur") return null;
+    const text = String(message || "").toLocaleLowerCase("tr-TR");
+    if(/\b(sunum|slayt|powerpoint|pptx?|pdf sunum)\b/.test(text)) return "presentation";
+    if(/\b(makale|akademik yazı|literatür|tez|bildiri)\b/.test(text)) return "article";
+    if(/\b(quiz|çoktan seçmeli|soru hazırla|soru oluştur|deneme sınavı|test hazırla)\b/.test(text)) return "quiz";
+    if(/\b(ders anlat|konu anlat|ders planı|öğretim planı)\b/.test(text)) return "lesson";
+    if(/\b(araştır|kaynak bul|literatür tara|bilimsel kaynak)\b/.test(text)) return "research";
+    if(/\b(özetle|düzenle|akademik dil|metni geliştir|rapor hazırla)\b/.test(text)) return "academic";
+    return null;
+}
+
 /* ============================================================
    TEACHER EXAM MANAGER
    ============================================================ */
@@ -3198,6 +3191,9 @@ function isPresentationRequest(message){
     const words = [
 
         "sunum hazırla",
+        "bana sunum hazırla",
+        "bir sunum hazırla",
+        "sunum hazırlayabilir misin",
         "sunum hazırlar",
         "sunum oluştur",
         "sunum oluşturur",
@@ -3850,7 +3846,7 @@ async function sendMessage(){
                                 currentUser,
 
                             mode:
-                                currentMode,
+                                inferAcademicMode(message) || currentMode,
 
                             conversation_id:
                                 currentConversationId,
