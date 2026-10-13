@@ -250,6 +250,14 @@ USERS = {
         "role": "teacher",
         "style": "academic",
     },
+
+    # Murat'ın yetkili profil hesabı
+    "murat": {
+        "name": "Murat",
+        "password": "0000",
+        "role": "admin",
+        "style": "professional",
+    },
 }
 
 
