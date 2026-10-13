@@ -1538,57 +1538,9 @@ body.voice-speaking .ring.three{
          SADECE İLKNUR
          ======================================================== -->
 
-    <div
-        id="teacherMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            AKADEMİK ASİSTAN
-        </div>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="research"
-            onclick="selectAcademicMode('research')">
-            🔬 Araştırma Modu
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="academic"
-            onclick="selectAcademicMode('academic')">
-            📚 Akademik Mod
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="article"
-            onclick="selectAcademicMode('article')">
-            📝 Makale Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="lesson"
-            onclick="selectAcademicMode('lesson')">
-            🎓 Ders Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="quiz"
-            onclick="selectAcademicMode('quiz')">
-            🧪 Sınav / Quiz
-        </button>
+    <div id="teacherMenu" style="display:none;">
+        <div class="academic-title">İLKNUR HOCA</div>
         <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="presentation"
-            onclick="selectAcademicMode('presentation')">
-            📊 Sunum Hazırlama
-        </button>
-
     </div>
 
     <!-- ========================================================
@@ -2409,13 +2361,7 @@ async function login(){
 
         window.currentProfileName = String((data.user && (data.user.name || data.user.display_name)) || data.name || "").trim();
 
-        currentMode =
-            currentUser === "ilknur"
-                ? (
-                    localStorage.getItem("karvis_mode") ||
-                    "lesson"
-                )
-                : "normal";
+        currentMode = "normal";
 
         localStorage.setItem(
             "karvis_user",
@@ -2949,48 +2895,13 @@ async function deleteUserRequest(id){
    ============================================================ */
 
 function selectAcademicMode(mode){
-
-    if(currentUser !== "ilknur")
-        return;
-
-    currentMode = mode;
-
-    localStorage.setItem(
-        "karvis_mode",
-        currentMode
-    );
-
+    // Eski arayüz kayıtları için geriye dönük uyumluluk.
+    // KARVIS artık makale, araştırma, ders ve sunum için ayrı mod istemez.
+    currentMode = "normal";
+    localStorage.setItem("karvis_mode", "normal");
     updateSidebar();
-
     closeSidebar();
-
-    const names = {
-
-        research:
-            "Araştırma Modu aktif. Hocam, akademik araştırma ve değerlendirme çalışmalarınıza hazırım.",
-
-        academic:
-            "Akademik Mod aktif. Hocam, akademik çalışmalarınızda yardımcı olmaya hazırım.",
-
-        article:
-            "Makale Asistanı aktif. Hocam, akademik makale çalışmalarınıza hazırım.",
-
-        lesson:
-            "Ders Asistanı aktif. Hocam, ders anlatımı ve konu çalışmalarına hazırım.",
-
-        quiz:
-            "Sınav / Quiz modu aktif. Hocam, sınav çalışmalarınızı başlatabiliriz.",
-
-        presentation:
-            "Sunum Hazırlama modu aktif. Hocam, akademik sunumunuzu hazırlayabilirim."
-    };
-
-    addMessage(
-        names[mode] ||
-        "Akademik mod aktif.",
-        "ai"
-    );
-
+    addMessage("Elbette hocam. Ne hazırlamamı istediğinizi doğal şekilde yazmanız yeterli; isteğinize göre makale, araştırma, ders içeriği veya sunum hazırlayabilirim.", "ai");
     updateStatus();
 }
 
@@ -3243,7 +3154,17 @@ function isPresentationRequest(message){
         "sunum pdf",
         "sunum dosyası",
         "sunum hazırlamak",
-        "sunum istiyorum"
+        "sunum istiyorum",
+        "pdf hazırla",
+        "pdf hazirla",
+        "pdf oluştur",
+        "pdf olustur",
+        "pdf dosyası hazırla",
+        "pdf dosyasi hazirla",
+        "pdf olarak hazırla",
+        "pdf olarak oluştur",
+        "konuyu pdf yap",
+        "bunu pdf yap"
     ];
 
     return (
@@ -3821,7 +3742,9 @@ async function sendMessage(){
     }
 
     /*
-       NORMAL AI
+       TEK KARVIS ASİSTANI
+       Makale/araştırma/ders talepleri normal sohbet akışında doğal dille yorumlanır.
+       Sunum veya PDF dosyası talepleri mevcut dosya üretim akışına yönlendirilir.
     */
 
     const waiting =
@@ -3877,7 +3800,7 @@ async function sendMessage(){
                                 currentUser,
 
                             mode:
-                                currentMode,
+                                "normal",
 
                             conversation_id:
                                 currentConversationId,
@@ -5353,16 +5276,9 @@ function initialize(){
             savedUser;
     }
 
-    currentMode =
-        currentUser === "ilknur"
-            ? (
-                localStorage.getItem(
-                    "karvis_mode"
-                ) || "lesson"
-            )
-            : currentUser === "karahan"
-                ? (localStorage.getItem("karvis_mode") || "normal")
-                : "normal";
+    // Tek KARVIS asistanı: eski kayıtlı modları yok say.
+    currentMode = "normal";
+    localStorage.setItem("karvis_mode", "normal");
 
     applyUserTheme();
 
