@@ -5781,6 +5781,117 @@ async def startup():
 
 
 # ============================================================
+# TEACHER EXAM QUESTION GENERATION API
+# ============================================================
+
+def _teacher_only(username):
+    if str(username or "").strip().lower() != "ilknur":
+        raise HTTPException(status_code=403, detail="Bu işlem yalnızca İlknur öğretmen profiline açıktır.")
+
+
+def _validate_exam_questions(questions):
+    if not isinstance(questions, list) or not 1 <= len(questions) <= 100:
+        raise HTTPException(status_code=400, detail="Sınav 1 ile 100 arasında soru içermelidir.")
+    cleaned = []
+    for idx, q in enumerate(questions, 1):
+        if not isinstance(q, dict): raise HTTPException(status_code=400, detail=f"{idx}. soru geçersiz.")
+        prompt = str(q.get("prompt", "")).strip()[:1000]
+        qtype = str(q.get("type", "multiple_choice")).strip().lower()
+        if not prompt: raise HTTPException(status_code=400, detail=f"{idx}. sorunun metni boş olamaz.")
+        if qtype not in {"multiple_choice", "true_false", "open_ended"}:
+            raise HTTPException(status_code=400, detail=f"{idx}. soru türü desteklenmiyor.")
+        item = {"id": str(q.get("id") or uuid.uuid4().hex), "prompt": prompt, "type": qtype, "points": max(1, min(100, int(q.get("points", 1))))}
+        if qtype == "multiple_choice":
+            opts = [str(x).strip()[:300] for x in q.get("options", []) if str(x).strip()]
+            if len(opts) < 2 or len(opts) > 6: raise HTTPException(status_code=400, detail=f"{idx}. soru 2-6 seçenek içermelidir.")
+            correct = q.get("correct_index")
+            if not isinstance(correct, int) or correct < 0 or correct >= len(opts): raise HTTPException(status_code=400, detail=f"{idx}. sorunun doğru seçeneğini belirleyin.")
+            item.update({"options": opts, "correct_index": correct})
+        elif qtype == "true_false":
+            correct = q.get("correct_answer")
+            if not isinstance(correct, bool): raise HTTPException(status_code=400, detail=f"{idx}. soru için doğru/yanlış cevabını seçin.")
+            item["correct_answer"] = correct
+        else:
+            answer = str(q.get("correct_answer", "")).strip()[:1000]
+            item["correct_answer"] = answer
+        cleaned.append(item)
+    return cleaned
+
+
+class ExamGenerateRequest(BaseModel):
+    username: str
+    subject: str
+    topic: str
+    question_count: int = 10
+    difficulty: str = "orta"
+    question_types: list[str] = ["multiple_choice"]
+    grade_level: str = ""
+    instructions: str = ""
+
+
+@app.post("/teacher/exams/generate")
+async def teacher_generate_exam(req: ExamGenerateRequest):
+    # Generate a draft; teacher reviews and edits before publishing.
+    _teacher_only(req.username)
+    subject = str(req.subject or "").strip()[:100]
+    topic = str(req.topic or "").strip()[:300]
+    if not subject or not topic:
+        raise HTTPException(status_code=400, detail="Ders ve konu alanlarını doldurun.")
+    count = max(1, min(50, int(req.question_count or 10)))
+    difficulty = str(req.difficulty or "orta").lower()
+    if difficulty not in {"kolay", "orta", "zor", "karma"}: difficulty = "orta"
+    allowed = {"multiple_choice", "true_false", "open_ended"}
+    types = [t for t in req.question_types if t in allowed]
+    if not types: types = ["multiple_choice"]
+    prompt = f'''Sen deneyimli bir öğretmen ve ölçme-değerlendirme uzmanı gibi gerçek bir okul sınavı hazırla. Sorular ezbere ve yüzeysel bilgiye dayanmamalı; dersin kazanımlarını ölçmeli ve öğretmenin sınıfta sorabileceği nitelikte olmalı.
+
+GİRDİLER
+Ders: {subject}
+Konu/kapsam: {topic}
+Sınıf/düzey: {str(req.grade_level or "belirtilmedi")[:100]}
+İstenen zorluk: {difficulty}
+Soru sayısı: tam olarak {count}
+İzin verilen soru türleri: {", ".join(types)}
+Öğretmen talimatları: {str(req.instructions or "yok")[:1000]}
+
+KALİTE STANDARTLARI
+1. Her soru açıkça ölçülebilir bir kazanıma odaklansın; konu dışına çıkma ve düzeyin gerektirdiği bilgi sınırlarını aşma.
+2. Sorular doğal, akıcı, dil bilgisi açısından doğru ve gerçek sınav kitapçığı üslubunda yazılsın. Gereksiz uzunluk, yapay ifadeler, ipuçları ve muğlak anlatım kullanma.
+3. Sorular birbirinden farklı olsun; aynı bilgiyi küçük kelime değişiklikleriyle tekrar sorma. Soru kökü tek başına anlaşılır ve kendi içinde yeterli olsun.
+4. Çoktan seçmeli sorularda tam 4 makul seçenek kullan. Çeldiriciler konuya hâkim olmayan öğrencinin yapabileceği gerçek hatalara dayansın; saçma, komik, alakasız veya bariz yanlış seçenekler üretme. Yalnızca bir seçenek tartışmasız doğru olsun. Seçenekler benzer uzunluk ve dil yapısında olsun; doğru seçenek sürekli aynı harfte olmasın.
+5. Doğru cevap gerçekten soru kökünü karşılasın. Cevap anahtarını her soru için bağımsız kontrol et; soru ile cevap anahtarı çelişmesin. Sayısal sorularda hesabı kontrol et ve gerekli birimleri yaz.
+6. Zorluk düzeyini gerçekten uygula: kolay temel kavrama; orta bilgiyi yorumlama/uygulama; zor birden fazla adım, analiz veya ince ayrım gerektirsin. Karma seçildiyse kolay-orta-zor soruları dengeli dağıt. Zorluğu yalnızca soru metnini uzatarak artırma.
+7. Ders uygunsa yalnızca hatırlamayı değil, yorumlama, uygulama, analiz ve problem çözmeyi de ölç. Ancak konu dışı veya verilen kapsamın gerektirmediği bilgi isteme.
+8. Doğru/yanlış sorularında yalnızca tek bir temel yargı bulunsun; ifade yoruma açık olmasın. Açık uçlu sorularda beklenen cevabı ve temel değerlendirme ölçütünü correct_answer alanında kısa ve net ver.
+9. Bir soru için güvenilir, tek bir cevap belirlenemiyorsa o soruyu üretme; yerine sağlam bir soru yaz. Kaynak, mevzuat maddesi, tarih veya istatistik uydurma.
+10. Soruların puanları pozitif tam sayı olsun. İstenen soru türlerinin tümünü kullanmaya çalış; türler arasında sayı dağılımı mümkün olduğunca dengeli olsun. Toplam soru sayısı tam olarak {count} olmalı.
+
+ÇIKTI KURALLARI
+Yalnızca geçerli JSON döndür. Markdown, kod çiti veya açıklama ekleme. Şema:
+{{"title":"sınavın kısa ve profesyonel başlığı","description":"kapsamı ve ölçülen becerileri belirten kısa açıklama","questions":[{{"type":"multiple_choice|true_false|open_ended","prompt":"tam soru kökü","points":1,"options":["A seçeneği","B seçeneği","C seçeneği","D seçeneği"],"correct_index":0,"correct_answer":"açık uçlu cevap anahtarı veya doğru/yanlış için boolean"}}]}}
+
+Şema uygulaması: multiple_choice için options dizisinde tam 4 seçenek ve 0-3 arası correct_index ver; true_false için correct_answer alanı yalnızca true veya false olsun; open_ended için correct_answer alanına beklenen cevap ile gerekiyorsa temel puanlama ölçütünü yaz. Kullanılmayan türe ait alanları eklemek zorunda değilsin. JSON kaçış karakterleri ve tırnakları doğru olsun. Soru sayısı tam olarak {count} olsun.'''
+    result = ask_ai(prompt, system_prompt="Kıdemli bir branş öğretmeni, sınav yazarı ve ölçme-değerlendirme uzmanı gibi davran. Akademik doğruluğu, kazanım uyumunu, tek doğru cevabı, güçlü çeldiricileri ve gerçek sınav dilini önceliklendir. Çıktı biçimi talimatlarına eksiksiz uy.", fast=False)
+    if not result:
+        raise HTTPException(status_code=503, detail="Yapay zekâ sağlayıcısı yanıt vermedi. API anahtarlarını ve sunucu günlüklerini kontrol edin.")
+    try:
+        raw = str(result).strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        left, right = raw.find("{"), raw.rfind("}")
+        payload = json.loads(raw[left:right+1])
+        questions = _validate_exam_questions(payload.get("questions", []))
+        if len(questions) != count:
+            raise ValueError(f"Beklenen {count} soru, gelen {len(questions)}")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Yapay zekâ geçerli sınav JSON'u üretemedi. Lütfen yeniden deneyin. Ayrıntı: " + str(exc)[:180])
+    return {"success": True, "title": str(payload.get("title") or f"{subject} — {topic}")[:140], "description": str(payload.get("description") or f"{subject}: {topic}")[:1000], "subject": subject, "questions": questions, "message": "Taslak üretildi. Yayımlamadan önce soruları ve cevap anahtarını düzenleyip kontrol edin."}
+
+
+
+# ============================================================
 # LOCAL RUN
 # ============================================================
 
