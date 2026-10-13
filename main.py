@@ -1392,26 +1392,95 @@ USERS = {
 }
 
 
-# Self-registered user profiles are kept separately so built-in profiles and roles stay intact.
+# Self-registered profiles are stored in PostgreSQL when DATABASE_URL is configured.
+# Render's temporary filesystem is not durable across restarts, so JSON is only a local fallback.
 REGISTERED_USERS_FILE = BASE_DIR / "registered_users.json"
+PROFILE_DB_LOCK = threading.Lock()
+
+def _profile_db_configured():
+    return bool(DATABASE_URL and psycopg2)
+
+def _profile_db_connect():
+    if not _profile_db_configured():
+        return None
+    return psycopg2.connect(DATABASE_URL, connect_timeout=8, sslmode="require")
+
+def _init_profile_database():
+    if not _profile_db_configured():
+        return False
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS karvis_user_profiles (
+                        username TEXT PRIMARY KEY,
+                        display_name TEXT NOT NULL,
+                        password_record JSONB NOT NULL,
+                        role TEXT NOT NULL DEFAULT 'user',
+                        style TEXT NOT NULL DEFAULT 'professional',
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+        conn.close()
+        return True
+    except Exception as exc:
+        print(f"KARVIS profile database init failed: {exc}", flush=True)
+        return False
+
+def _migrate_local_profiles_to_db():
+    """Import any surviving JSON-created profiles into PostgreSQL without overwriting DB accounts."""
+    if not (_profile_db_configured() and _init_profile_database()):
+        return
+    local_profiles = read_json_file(REGISTERED_USERS_FILE, {})
+    local_passwords = read_json_file(BASE_DIR / "user_passwords.json", {})
+    if not isinstance(local_profiles, dict): local_profiles = {}
+    if not isinstance(local_passwords, dict): local_passwords = {}
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                for username, profile in local_profiles.items():
+                    username = str(username).strip().lower()
+                    if username in USERS or not re.fullmatch(r"[a-z0-9_.-]{3,24}", username) or not isinstance(profile, dict):
+                        continue
+                    password_record = local_passwords.get(username)
+                    if not isinstance(password_record, dict) or not password_record.get("salt") or not password_record.get("hash"):
+                        continue
+                    cur.execute("""
+                        INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                        VALUES (%s, %s, %s, 'user', 'professional')
+                        ON CONFLICT (username) DO NOTHING
+                    """, (username, str(profile.get("name") or username)[:60], json.dumps(password_record)))
+        conn.close()
+    except Exception as exc:
+        print(f"KARVIS local profile migration failed: {exc}", flush=True)
+
+def _read_persistent_profiles():
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn.cursor() as cur:
+                cur.execute("SELECT username, display_name, password_record FROM karvis_user_profiles")
+                rows = cur.fetchall()
+            conn.close()
+            result = {}
+            for username, display_name, password_record in rows:
+                result[str(username)] = {"name": str(display_name), "role": "user", "style": "professional", "password_record": password_record}
+            return result
+        except Exception as exc:
+            print(f"KARVIS profile database read failed: {exc}", flush=True)
+    records = read_json_file(REGISTERED_USERS_FILE, {})
+    return records if isinstance(records, dict) else {}
 
 def _load_registered_users():
     """Load registered standard-user profiles without overriding trusted built-in accounts."""
-    records = read_json_file(REGISTERED_USERS_FILE, {})
-    if not isinstance(records, dict):
-        records = {}
-    for uname, profile in records.items():
+    for uname, profile in _read_persistent_profiles().items():
         uname = str(uname).strip().lower()
-        if not re.fullmatch(r"[a-z0-9_.-]{3,24}", uname) or uname in USERS:
+        if not re.fullmatch(r"[a-z0-9_.-]{3,24}", uname) or uname in USERS or not isinstance(profile, dict):
             continue
-        if not isinstance(profile, dict):
-            continue
-        USERS[uname] = {
-            "name": str(profile.get("name") or uname)[:60],
-            "password": "",
-            "role": "user",
-            "style": "professional",
-        }
+        USERS[uname] = {"name": str(profile.get("name") or uname)[:60], "password": "", "role": "user", "style": "professional"}
 
 _load_registered_users()
 
@@ -1440,25 +1509,44 @@ def _verify_password(password, record):
 
 def _load_password_store():
     with password_lock:
-        records = read_json_file(PASSWORD_FILE, {})
-        if not isinstance(records, dict): records = {}
-        changed = False
+        records = {}
+        if _profile_db_configured() and _init_profile_database():
+            try:
+                conn = _profile_db_connect()
+                with conn.cursor() as cur:
+                    cur.execute("SELECT username, password_record FROM karvis_user_profiles")
+                    records.update({str(u): rec for u, rec in cur.fetchall()})
+                conn.close()
+            except Exception as exc:
+                print(f"KARVIS profile password read failed: {exc}", flush=True)
+        local_records = read_json_file(PASSWORD_FILE, {})
+        if isinstance(local_records, dict):
+            records.update(local_records)
         for uname, info in USERS.items():
             if uname not in records:
                 legacy = str(info.get("password", ""))
                 records[uname] = _password_hash(legacy)
-                changed = True
             info["password"] = ""  # don't keep plaintext credentials in the active user map
-        if changed or not PASSWORD_FILE.exists():
+        if not PASSWORD_FILE.exists():
             write_json_file(PASSWORD_FILE, records)
         return records
 
 
 def _set_password(username, password):
+    record = _password_hash(password)
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE karvis_user_profiles SET password_record=%s, updated_at=NOW() WHERE username=%s", (json.dumps(record), username))
+            conn.close()
+        except Exception as exc:
+            print(f"KARVIS profile password write failed: {exc}", flush=True)
     with password_lock:
         records = read_json_file(PASSWORD_FILE, {})
         if not isinstance(records, dict): records = {}
-        records[username] = _password_hash(password)
+        records[username] = record
         write_json_file(PASSWORD_FILE, records)
 
 
@@ -1707,24 +1795,47 @@ async def register_account(data: RegisterRequest):
     if not any(ch.isalpha() for ch in password) or not any(ch.isdigit() for ch in password):
         raise HTTPException(status_code=400, detail="Şifre en az bir harf ve bir rakam içermeli.")
 
-    # Recheck and write under the same lock to avoid duplicate registrations.
+    # Persist profile + salted password hash in PostgreSQL when configured.
+    # If the database is unavailable, use local JSON but explicitly report that it is not durable on Render.
     with password_lock:
         if username in USERS:
             raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
-        registered = read_json_file(REGISTERED_USERS_FILE, {})
-        if not isinstance(registered, dict):
-            registered = {}
-        if username in registered:
-            raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
-        registered[username] = {"name": display_name, "role": "user", "style": "professional"}
-        write_json_file(REGISTERED_USERS_FILE, registered)
-        password_records = read_json_file(PASSWORD_FILE, {})
-        if not isinstance(password_records, dict):
-            password_records = {}
-        password_records[username] = _password_hash(password)
-        write_json_file(PASSWORD_FILE, password_records)
+        password_record = _password_hash(password)
+        if _profile_db_configured():
+            if not _init_profile_database():
+                raise HTTPException(status_code=503, detail="Profil veritabanına bağlanılamadı. DATABASE_URL ve veritabanı bağlantısını kontrol edin; hesap oluşturulmadı.")
+            try:
+                conn = _profile_db_connect()
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                            VALUES (%s, %s, %s, 'user', 'professional')
+                            ON CONFLICT (username) DO NOTHING
+                            RETURNING username
+                        """, (username, display_name, json.dumps(password_record)))
+                        inserted = cur.fetchone()
+                conn.close()
+                if not inserted:
+                    raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            except HTTPException:
+                raise
+            except Exception as exc:
+                print(f"KARVIS profile registration failed: {exc}", flush=True)
+                raise HTTPException(status_code=503, detail="Profil kalıcı olarak kaydedilemedi. Veritabanı bağlantısını kontrol edin.")
+        else:
+            registered = read_json_file(REGISTERED_USERS_FILE, {})
+            if not isinstance(registered, dict): registered = {}
+            if username in registered:
+                raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            registered[username] = {"name": display_name, "role": "user", "style": "professional"}
+            write_json_file(REGISTERED_USERS_FILE, registered)
+            password_records = read_json_file(PASSWORD_FILE, {})
+            if not isinstance(password_records, dict): password_records = {}
+            password_records[username] = password_record
+            write_json_file(PASSWORD_FILE, password_records)
         USERS[username] = {"name": display_name, "password": "", "role": "user", "style": "professional"}
-    return {"success": True, "message": "Hesap oluşturuldu. Giriş yapabilirsiniz.", "username": username}
+    return {"success": True, "message": "Hesap oluşturuldu. Giriş yapabilirsiniz.", "username": username, "persistent": _profile_db_configured()}
 
 
 # ============================================================
@@ -2116,7 +2227,7 @@ async def teacher_exam_results(exam_id: str, username: str = "ilknur"):
         if not exam: raise HTTPException(status_code=404,detail="Sınav bulunamadı.")
         submissions=[s for s in data["submissions"] if s.get("exam_id")==exam_id]
     scores=[s.get("percent",0) for s in submissions]
-    return {"success":True,"exam":{"id":exam_id,"title":exam["title"],"question_count":len(exam.get("questions",[]))},"summary":{"submission_count":len(submissions),"average_percent":round(sum(scores)/len(scores),2) if scores else 0,"highest_percent":max(scores) if scores else 0,"lowest_percent":min(scores) if scores else 0},"submissions":[{"id":s["id"],"username":s["username"],"submitted_at":s["submitted_at"],"score":s["score"],"max_score":s["max_score"],"percent":s["percent"],"status":s.get("status","graded"),"answers":[{**a,"prompt":next((q.get("prompt","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"type":next((q.get("type","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"options":next((q.get("options",[]) for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),[]),"correct_index":next((q.get("correct_index") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),None),"correct_answer":next((q.get("correct_answer") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),None)} for a in s["answers"]]} for s in submissions]}
+    return {"success":True,"exam":{"id":exam_id,"title":exam["title"],"question_count":len(exam.get("questions",[]))},"summary":{"submission_count":len(submissions),"average_percent":round(sum(scores)/len(scores),2) if scores else 0,"highest_percent":max(scores) if scores else 0,"lowest_percent":min(scores) if scores else 0},"submissions":[{"id":s["id"],"username":s["username"],"submitted_at":s["submitted_at"],"score":s["score"],"max_score":s["max_score"],"percent":s["percent"],"status":s.get("status","graded"),"answers":[{**a,"prompt":next((q.get("prompt","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"type":next((q.get("type","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),"")} for a in s["answers"]]} for s in submissions]}
 
 
 @app.get("/teacher/exams/{exam_id}/analysis")
@@ -8265,6 +8376,14 @@ async def startup():
     GENERATED_DIR.mkdir(
         exist_ok=True
     )
+
+    if _profile_db_configured():
+        if _init_profile_database():
+            _migrate_local_profiles_to_db()
+            _load_registered_users()
+            print("KARVIS profiles: PostgreSQL persistence enabled.", flush=True)
+        else:
+            print("KARVIS profiles: database unavailable; new account creation will be blocked rather than lost.", flush=True)
 
     if push_database_configured():
         init_push_database()
