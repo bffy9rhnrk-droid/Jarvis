@@ -605,8 +605,19 @@ button:active{
 }
 
 .modal.show{
-    display:block
+    display:block;
+    /* Mobilde pencereyi ön plana çıkar; arka ekrandaki sohbet tıklanamaz ve dikkat dağıtmaz. */
+    box-shadow: 0 0 0 100vmax rgba(0, 5, 8, .78), 0 20px 80px rgba(0,0,0,.65);
+    isolation:isolate;
 }
+
+/* Profil pencerelerinde başlık, açıklama ve düğmeler arasında net boşluk */
+#profileChoiceModal h2{font-size:clamp(24px,5vw,32px);line-height:1.2;margin:0 0 18px;}
+#profileChoiceModal p{font-size:clamp(14px,3.8vw,17px)!important;line-height:1.5;margin:0 0 20px;}
+#profileChoiceModal .modal-button{min-height:54px;height:auto;padding:14px 16px;margin:0 0 10px;white-space:normal;line-height:1.25;}
+#profileChoiceModal .modal-button:last-child{margin-bottom:0;}
+#profileModal h2,#registerModal h2{font-size:clamp(24px,5vw,32px);line-height:1.2;margin-bottom:18px;}
+#profileModal .modal-button,#registerModal .modal-button{min-height:50px;height:auto;padding:13px 16px;margin-top:6px;white-space:normal;}
 
 .modal h2{
     margin-top:0;
@@ -1315,7 +1326,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 .exam-modal #teacherExamList .sude-card{min-width:0;overflow-wrap:anywhere}
 .exam-modal #teacherExamList .sude-card button{max-width:100%;white-space:normal}
 @media(max-width:700px){
- .modal{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px;max-height:92dvh}
+ .modal{width:calc(100vw - 28px);max-width:calc(100vw - 28px);padding:18px 16px;max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px);overflow-y:auto;overscroll-behavior:contain}
  .exam-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;padding:12px!important}
  .exam-modal .exam-field-grid,.exam-modal .exam-field-grid-2{grid-template-columns:minmax(0,1fr)!important}
  .exam-modal .exam-field-wide{grid-column:auto!important}
@@ -1331,24 +1342,6 @@ select option:checked{background:#087f9b!important;color:#fff!important}
  .exam-modal .exam-field-wide{grid-column:1/-1}
 }
 
-
-/* İlknur Hoca — Özellikler penceresi */
-.ilknur-features-modal{width:min(94vw,760px)!important;max-width:760px!important;max-height:90dvh;overflow-y:auto;overflow-x:hidden;padding:clamp(14px,3vw,26px)!important}
-.ilknur-features-hero{display:flex;align-items:flex-start;gap:14px;padding:16px;margin-bottom:16px;border:1px solid rgba(0,190,220,.32);border-radius:18px;background:linear-gradient(125deg,rgba(0,170,220,.13),rgba(0,210,180,.04))}
-.ilknur-features-icon{display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:14px;background:rgba(0,190,220,.14);color:#21d2e3;font-size:25px}
-.ilknur-features-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:900;color:#21d2e3;line-height:1.5}
-.ilknur-features-hero h2{margin:5px 0 7px!important;font-size:clamp(20px,3vw,27px)}
-.ilknur-features-hero p{margin:0;font-size:13px;line-height:1.55;opacity:.78}
-.ilknur-features-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ilknur-feature{display:flex;align-items:flex-start;gap:11px;min-width:0;padding:14px;border:1px solid rgba(130,160,180,.22);border-radius:14px;background:rgba(100,130,150,.045)}
-.ilknur-feature>span{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:10px;background:rgba(0,180,220,.13);color:#22cfe0;font-size:11px;font-weight:900}
-.ilknur-feature>div{min-width:0}
-.ilknur-feature strong{display:block;font-size:13px;line-height:1.45}
-.ilknur-feature p{margin:6px 0;font-size:12px;line-height:1.55;opacity:.82;overflow-wrap:anywhere}
-.ilknur-feature small{display:block;font-size:11px;line-height:1.5;color:#54d8e4;overflow-wrap:anywhere}
-.ilknur-features-footnote{font-size:11px;line-height:1.55;opacity:.65;margin:14px 0}
-.ilknur-features-modal>.modal-button{margin-top:4px}
-@media(max-width:600px){.ilknur-features-list{grid-template-columns:minmax(0,1fr)}.ilknur-features-hero{padding:13px}.ilknur-feature{padding:12px}}
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,12 +1505,12 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         </div>
 
         <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
-        <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
+        <button class="menu-item" onclick="openActiveProfiles()">🟢 Aktif Profiller</button>
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
         <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
         <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
-        <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
+        
         <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
 
     </div>
@@ -1534,8 +1527,48 @@ select option:checked{background:#087f9b!important;color:#fff!important}
             AKADEMİK ASİSTAN
         </div>
 
-        <button class="menu-item" onclick="openIlknurFeatures()">✨ Özellikler</button>
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="research"
+            onclick="selectAcademicMode('research')">
+            🔬 Araştırma Modu
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="academic"
+            onclick="selectAcademicMode('academic')">
+            📚 Akademik Mod
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="article"
+            onclick="selectAcademicMode('article')">
+            📝 Makale Asistanı
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="lesson"
+            onclick="selectAcademicMode('lesson')">
+            🎓 Ders Asistanı
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="quiz"
+            onclick="selectAcademicMode('quiz')">
+            🧪 Sınav / Quiz
+        </button>
         <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="presentation"
+            onclick="selectAcademicMode('presentation')">
+            📊 Sunum Hazırlama
+        </button>
 
     </div>
 
@@ -1635,9 +1668,11 @@ select option:checked{background:#087f9b!important;color:#fff!important}
     <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
-<div id="karvisBrainModal" class="modal" style="max-width:760px;">
-    <h2>🧠 Sistem Beyni</h2>
-    <div id="karvisBrainContent" class="error-list">Sistem durumu okunuyor...</div>
+<div id="activeProfilesModal" class="modal" style="max-width:760px;">
+    <h2>🟢 Aktif Profiller</h2>
+    <p style="opacity:.8">Son 90 saniyede sunucuya sinyal gönderen profiller çevrimiçi kabul edilir.</p>
+    <div id="activeProfilesContent" class="error-list">Profiller yükleniyor...</div>
+    <button class="modal-button" onclick="loadActiveProfiles()">🔄 Yenile</button>
     <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -2080,29 +2115,6 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
 </div>
 
-<!-- İlknur Hoca: KARVIS özellikleri -->
-<div id="ilknurFeaturesModal" class="modal ilknur-features-modal" aria-labelledby="ilknurFeaturesTitle">
-  <div class="ilknur-features-hero">
-    <div class="ilknur-features-icon">✦</div>
-    <div>
-      <div class="ilknur-features-eyebrow">K.A.R.V.I.S. · AKADEMİK ASİSTAN</div>
-      <h2 id="ilknurFeaturesTitle">Neler yapabilirim?</h2>
-      <p>Bir özellik seçmek için menü kullanmanız gerekmez. İsteğinizi doğrudan KARVIS'e yazmanız yeterli.</p>
-    </div>
-  </div>
-  <div class="ilknur-features-list">
-    <article class="ilknur-feature"><span>01</span><div><strong>Akademik araştırma</strong><p>Belirttiğiniz konuda araştırma yapar; ilgili kaynakları ayıklar ve desteklenen bilgileri kısa, anlaşılır biçimde sunar.</p><small>Örnek: “Çocuk gelişiminde oyunun etkisini kaynaklarla araştır.”</small></div></article>
-    <article class="ilknur-feature"><span>02</span><div><strong>Makale hazırlama</strong><p>İstediğiniz konuya bağlı, giriş-gelişme-sonuç düzeninde makale taslağı hazırlar; konu dışı kaynakları kullanmamaya dikkat eder.</p><small>Örnek: “İş sağlığı ve güvenliği hakkında kısa bir makale yaz.”</small></div></article>
-    <article class="ilknur-feature"><span>03</span><div><strong>Ders anlatımı ve konu özeti</strong><p>Konuları seviyeye uygun açıklar; özet, anahtar kavramlar ve çalışma notları hazırlar.</p><small>Örnek: “Bu konuyu öğrencilere sade bir dille anlat ve özetle.”</small></div></article>
-    <article class="ilknur-feature"><span>04</span><div><strong>Sunum taslağı</strong><p>İstenen konu için slayt başlıkları, kısa maddeler ve sunucu notları oluşturur.</p><small>Örnek: “İlk yardım konusunda 8 slaytlık sunum taslağı hazırla.”</small></div></article>
-    <article class="ilknur-feature"><span>05</span><div><strong>Soru ve etkinlik hazırlama</strong><p>Konuya göre çalışma soruları, cevap anahtarı, sınıf etkinlikleri ve tekrar çalışmaları hazırlar.</p><small>Örnek: “Bu konu için 10 soru ve cevap anahtarı oluştur.”</small></div></article>
-    <article class="ilknur-feature"><span>06</span><div><strong>Metin düzenleme ve kaynakça</strong><p>Verdiğiniz metni dil ve anlatım açısından düzenler; sağlanan kaynaklardan kaynakça taslağı oluşturur. Doğrulayamadığı kaynak bilgisini kesinmiş gibi göstermez.</p><small>Örnek: “Bu metni akademik bir dille düzenle ve kaynakçayı kontrol et.”</small></div></article>
-    <article class="ilknur-feature"><span>07</span><div><strong>Sınav yönetimi</strong><p>Sınav taslağı oluşturma, soru düzenleme, sınav yayımlama ve mevcut sistemin sunduğu öğrenci sonuçlarını takip etme.</p><small>Bu işlemler için menüdeki “Sınav Yönetimi” bölümünü açın.</small></div></article>
-  </div>
-  <p class="ilknur-features-footnote">Not: Araştırma ve kaynak doğruluğu, erişilebilen kaynaklara bağlıdır. Önemli akademik bilgileri yayımlamadan önce kontrol edin.</p>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
 <script>
 
 /* ============================================================
@@ -2389,6 +2401,7 @@ async function login(){
             "karvis_user",
             currentUser
         );
+        sendPresenceHeartbeat();
 
         localStorage.setItem(
             "karvis_mode",
@@ -2915,16 +2928,6 @@ async function deleteUserRequest(id){
 /* ============================================================
    İLKNUR AKADEMİK MODLARI
    ============================================================ */
-
-function openIlknurFeatures(){
-    if(currentUser !== "ilknur"){
-        alert("Bu bölüm yalnızca İlknur öğretmen profiline açıktır.");
-        return;
-    }
-    closeSidebar();
-    closeModals();
-    $("ilknurFeaturesModal").classList.add("show");
-}
 
 function selectAcademicMode(mode){
 
@@ -4973,6 +4976,44 @@ async function openAdminStats(){
     }catch(e){ box.textContent = "Hata: " + e.message; }
 }
 
+async function openActiveProfiles(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    closeModals();
+    $("activeProfilesModal").classList.add("show");
+    await loadActiveProfiles();
+}
+
+async function loadActiveProfiles(){
+    const box = $("activeProfilesContent");
+    if(!box || currentUser !== "murat") return;
+    box.textContent = "Profiller yükleniyor...";
+    try{
+        const response = await fetch(API + "/admin/active-profiles?username=murat", {cache:"no-store"});
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "Aktif profiller alınamadı.");
+        const profiles = Array.isArray(data.profiles) ? data.profiles : [];
+        if(!profiles.length){ box.textContent = "Henüz profil kaydı bulunamadı."; return; }
+        box.innerHTML = profiles.map(p => {
+            const online = !!p.online;
+            const label = online ? "Çevrimiçi" : "Çevrimdışı";
+            return `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(0,220,240,.14)">
+                <span style="font-weight:600">${escapeHTML(p.name || p.username)}</span>
+                <span style="display:flex;align-items:center;gap:8px;white-space:nowrap;color:${online ? '#25d366' : '#9aa5aa'}">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${online ? '#25d366' : '#78858a'};box-shadow:${online ? '0 0 8px #25d366' : 'none'}"></span>${label}
+                </span></div>`;
+        }).join("");
+    }catch(e){ box.textContent = "Aktif profiller yüklenemedi: " + e.message; }
+}
+
+async function sendPresenceHeartbeat(){
+    const username = String(currentUser || localStorage.getItem("karvis_user") || "").trim().toLowerCase();
+    if(!username) return;
+    try{
+        await fetch(API + "/presence/heartbeat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username}), keepalive:true});
+    }catch(e){}
+}
+
 function openDevelopmentMemory(){
     if(currentUser !== "murat") return;
     closeSidebar();
@@ -5356,3 +5397,8 @@ initialize();
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
+
+<script>
+setInterval(() => { if (typeof currentUser !== "undefined" && currentUser) sendPresenceHeartbeat(); }, 30000);
+window.addEventListener("focus", () => { if (typeof currentUser !== "undefined" && currentUser) sendPresenceHeartbeat(); });
+</script>
