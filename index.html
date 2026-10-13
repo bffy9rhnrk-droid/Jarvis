@@ -1365,6 +1365,93 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 @media(min-width:620px){.karvis-stats-modal .stats-results>div[style*="grid-template-columns"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}.stats-filter{grid-template-columns:minmax(0,1fr) auto auto}.stats-filter label{grid-column:1/-1}}
 @media(max-width:420px){.stats-hero{padding:10px}.stats-hero-icon{flex-basis:42px;height:42px;font-size:23px}.stats-filter{grid-template-columns:minmax(0,1fr)}.stats-filter label{grid-column:auto}.stats-run{width:100%}.karvis-stats-modal .stats-results .sude-card h3{font-size:17px}}
 
+
+/* Öğrenci istatistikleri — referans tasarıma yakın mobil ekran */
+.karvis-stats-modal{width:min(96vw,760px)!important;max-height:94dvh!important;padding:clamp(12px,3vw,22px)!important;background:linear-gradient(160deg,#041521 0%,#031019 58%,#041721 100%)!important;border:1px solid rgba(0,207,235,.28)!important;border-radius:24px!important;color:#f3fbff}
+.karvis-stats-modal .stats-hero{display:flex;align-items:center;gap:12px;padding:2px 2px 14px;margin-bottom:12px;border:0;border-bottom:1px solid rgba(0,210,240,.18);border-radius:0;background:transparent}
+.karvis-stats-modal .stats-hero-icon{flex:0 0 48px;height:48px;border-radius:14px;background:rgba(0,210,240,.13);font-size:27px}
+.karvis-stats-modal .stats-eyebrow{display:none}
+.karvis-stats-modal .stats-hero h2{font-size:clamp(19px,4.5vw,27px);letter-spacing:.01em}
+.karvis-stats-modal .stats-hero p:last-child{font-size:12px}
+.karvis-stats-modal .stats-filter{grid-template-columns:minmax(0,1fr) auto;align-items:end;padding:10px 0;margin-bottom:14px;border:0;background:transparent}
+.karvis-stats-modal .stats-filter label{grid-column:1/-1;color:#9cb6c7}
+.karvis-stats-modal .stats-filter select{min-height:44px;border-radius:13px;background:#0b2331!important}
+.karvis-stats-modal .stats-run{min-height:44px;border-radius:13px;padding:0 13px}
+.karvis-stats-modal .stats-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px}
+.karvis-stats-modal .stats-metric{min-width:0;padding:14px;border:1px solid rgba(0,207,235,.24);border-radius:19px;background:linear-gradient(145deg,rgba(7,35,49,.96),rgba(3,20,30,.96));box-shadow:inset 0 1px rgba(255,255,255,.025)}
+.karvis-stats-modal .stats-metric-top{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.karvis-stats-modal .stats-metric-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:12px;background:rgba(0,215,235,.12);color:#11d9eb;font-size:23px}
+.karvis-stats-modal .stats-metric-label{font-size:12px;color:#9eb6c8;line-height:1.3}
+.karvis-stats-modal .stats-metric>strong{display:block;font-size:clamp(21px,5vw,29px);line-height:1.2;margin-bottom:10px;overflow-wrap:anywhere}
+.karvis-stats-modal .stats-progress{height:9px;border-radius:99px;background:#152f40;overflow:hidden}
+.karvis-stats-modal .stats-progress span{display:block;height:100%;border-radius:99px;background:#08d4e8;box-shadow:0 0 10px rgba(0,220,240,.2)}
+.karvis-stats-modal .stats-metric.green{border-color:rgba(0,230,170,.24)}.karvis-stats-modal .stats-metric.green .stats-metric-icon,.karvis-stats-modal .stats-metric.green .stats-progress span{background:#0ad8ad;color:#032a25}
+.karvis-stats-modal .stats-metric.blue .stats-metric-icon{color:#31baff;background:rgba(20,160,255,.13)}.karvis-stats-modal .stats-metric.blue .stats-progress span{background:#19b8f4}
+.karvis-stats-modal .stats-metric.red{border-color:rgba(255,91,112,.27)}.karvis-stats-modal .stats-metric.red .stats-metric-icon{color:#ff6979;background:rgba(255,76,100,.12)}.karvis-stats-modal .stats-metric.red .stats-progress span{background:#ff6377}
+.karvis-stats-modal .stats-exam-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+.karvis-stats-modal .stats-subject-pill,.karvis-stats-modal .stats-question-count{font-size:11px;color:#a8c2d3;border:1px solid rgba(0,210,240,.2);border-radius:99px;padding:7px 10px;background:rgba(0,210,240,.055)}
+.karvis-stats-modal .stats-question-section{padding:14px 12px;border:1px solid rgba(0,210,240,.18);border-radius:21px;background:rgba(3,19,29,.62)}
+.karvis-stats-modal .stats-section-heading{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.karvis-stats-modal .stats-section-icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:13px;background:rgba(0,210,240,.13);color:#12d7ea;font-size:25px}
+.karvis-stats-modal .stats-section-heading h3{font-size:17px;margin:0 0 4px}
+.karvis-stats-modal .stats-section-heading p{font-size:11px;line-height:1.4;margin:0;color:#9db5c5}
+.karvis-stats-modal .stats-question-list{display:grid;gap:12px}
+.karvis-stats-modal .stats-question-card{position:relative;min-width:0;padding:14px 12px 12px;border:1px solid rgba(37,121,148,.35);border-radius:18px;background:linear-gradient(145deg,rgba(7,30,43,.96),rgba(5,24,35,.94))}
+.karvis-stats-modal .stats-question-head{display:grid;grid-template-columns:44px minmax(0,1fr);gap:9px;align-items:start}
+.karvis-stats-modal .stats-question-number{display:grid;place-items:center;width:44px;height:48px;border-radius:13px;background:rgba(0,210,240,.12);font-size:22px;font-weight:850;color:#eafaff}
+.karvis-stats-modal .stats-question-text{font-size:15px;font-weight:650;line-height:1.5;overflow-wrap:anywhere;padding-top:2px}
+.karvis-stats-modal .stats-status{grid-column:2;justify-self:start;margin-top:2px;border-radius:99px;padding:6px 10px;font-size:10px;font-weight:800;border:1px solid}
+.karvis-stats-modal .stats-status.good{color:#16e0b1;border-color:rgba(0,230,170,.35);background:rgba(0,220,160,.08)}
+.karvis-stats-modal .stats-status.mid{color:#ffc65a;border-color:rgba(255,190,65,.35);background:rgba(255,190,65,.08)}
+.karvis-stats-modal .stats-status.bad{color:#ff7180;border-color:rgba(255,90,110,.4);background:rgba(255,90,110,.08)}
+.karvis-stats-modal .stats-status.neutral{color:#9cb6c7;border-color:rgba(150,180,200,.3)}
+.karvis-stats-modal .stats-question-progress{height:9px;margin:14px 42px 5px 4px;border-radius:99px;background:#183244;overflow:hidden}
+.karvis-stats-modal .stats-question-progress>div{height:100%;border-radius:99px;background:#08d4e8}
+.karvis-stats-modal .stats-question-progress>div.mid{background:#ffc454}.karvis-stats-modal .stats-question-progress>div.bad{background:#ff6478}
+.karvis-stats-modal .stats-question-percent{text-align:right;margin-top:-18px;margin-bottom:13px;font-weight:850;font-size:16px}
+.karvis-stats-modal .stats-answer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.karvis-stats-modal .stats-answer{display:flex;align-items:center;gap:6px;min-width:0;padding:9px 7px;border:1px solid rgba(90,140,160,.17);border-radius:13px;background:rgba(15,39,53,.8)}
+.karvis-stats-modal .stats-answer-icon{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:50%;font-size:17px;font-weight:900}
+.karvis-stats-modal .stats-answer.correct .stats-answer-icon{color:#00e2ac;background:rgba(0,220,160,.13)}
+.karvis-stats-modal .stats-answer.wrong .stats-answer-icon{color:#ff657a;background:rgba(255,80,105,.12)}
+.karvis-stats-modal .stats-answer.blank .stats-answer-icon{color:#9cb8ca;background:rgba(150,180,200,.12)}
+.karvis-stats-modal .stats-answer-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.karvis-stats-modal .stats-answer-copy small{font-size:10px;color:#9eb7c7}
+.karvis-stats-modal .stats-answer-copy strong{font-size:17px;line-height:1.1}
+.karvis-stats-modal .stats-answer-percent{margin-left:auto;font-size:10px;color:#a9c0ce;white-space:nowrap}
+.karvis-stats-modal .stats-review-note{margin-top:10px;font-size:11px;color:#ffc65a;line-height:1.4}
+.karvis-stats-modal .stats-karvis-evaluation{display:flex;gap:12px;margin-top:14px;padding:15px 13px;border:1px solid rgba(0,215,240,.58);border-radius:21px;background:linear-gradient(130deg,rgba(0,190,220,.11),rgba(4,23,34,.9));box-shadow:0 0 18px rgba(0,210,240,.05)}
+.karvis-stats-modal .stats-karvis-icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:13px;background:rgba(0,210,240,.13);color:#18d8ee;font-size:27px}
+.karvis-stats-modal .stats-karvis-content{min-width:0}
+.karvis-stats-modal .stats-karvis-content h3{font-size:17px;margin:3px 0 10px}
+.karvis-stats-modal .stats-karvis-content p{font-size:13px;line-height:1.65;margin:0;padding:12px;border:1px solid rgba(80,150,175,.24);border-radius:13px;background:rgba(2,15,24,.5);white-space:pre-wrap;overflow-wrap:anywhere}
+.karvis-stats-modal .stats-karvis-content small{display:block;margin-top:9px;font-size:10px;line-height:1.45;color:#91aabb}
+.karvis-stats-modal .stats-run:disabled{opacity:.55}
+@media(max-width:420px){
+ .karvis-stats-modal{width:calc(100vw - 14px)!important;padding:10px!important;border-radius:19px!important}
+ .karvis-stats-modal .stats-metrics{gap:8px}
+ .karvis-stats-modal .stats-metric{padding:10px;border-radius:15px}
+ .karvis-stats-modal .stats-metric-icon{flex-basis:31px;height:31px;font-size:19px}
+ .karvis-stats-modal .stats-metric-label{font-size:10px}
+ .karvis-stats-modal .stats-metric>strong{font-size:21px}
+ .karvis-stats-modal .stats-question-section{padding:10px 8px}
+ .karvis-stats-modal .stats-question-card{padding:11px 9px}
+ .karvis-stats-modal .stats-question-head{grid-template-columns:37px minmax(0,1fr);gap:8px}
+ .karvis-stats-modal .stats-question-number{width:37px;height:42px;font-size:19px}
+ .karvis-stats-modal .stats-question-text{font-size:13px}
+ .karvis-stats-modal .stats-status{font-size:9px}
+ .karvis-stats-modal .stats-answer-grid{gap:5px}
+ .karvis-stats-modal .stats-answer{gap:4px;padding:7px 5px;flex-wrap:wrap}
+ .karvis-stats-modal .stats-answer-icon{flex-basis:23px;width:23px;height:23px;font-size:14px}
+ .karvis-stats-modal .stats-answer-copy small{font-size:9px}
+ .karvis-stats-modal .stats-answer-copy strong{font-size:15px}
+ .karvis-stats-modal .stats-answer-percent{font-size:9px}
+ .karvis-stats-modal .stats-karvis-evaluation{gap:8px;padding:11px 9px}
+ .karvis-stats-modal .stats-karvis-icon{flex-basis:34px;height:34px;font-size:22px}
+ .karvis-stats-modal .stats-karvis-content h3{font-size:15px}
+ .karvis-stats-modal .stats-karvis-content p{font-size:12px;padding:10px}
+}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3042,14 +3129,39 @@ function selectExamForAnalysis(id){
  const sel=$('examStatsSelect');if(sel)sel.value=id;loadTeacherExamAnalysis();
 }
 async function loadTeacherExamAnalysis(){
- if(currentUser!=='ilknur'){alert('Öğrenci istatistikleri yalnızca İlknur öğretmen profiline açıktır.');return;}
- const id=$('examStatsSelect')?.value,box=$('teacherExamStats');if(!id){if(box)box.textContent='Önce bir sınav seçin.';return;}
- const btn=$('examStatsRunBtn');if(btn)btn.disabled=true;if(box)box.textContent='Sınıf yanıtları analiz ediliyor…';
- try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'İstatistikler alınamadı.');const s=d.summary||{};
- const cards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0"><div class="sude-card"><small>Katılım</small><h3>${s.submission_count||0}</h3></div><div class="sude-card"><small>Sınıf ortalaması</small><h3>%${s.average_percent||0}</h3></div><div class="sude-card"><small>En yüksek</small><h3>%${s.highest_percent||0}</h3></div><div class="sude-card"><small>Başarı oranı (≥%50)</small><h3>%${s.pass_rate_percent||0}</h3></div><div class="sude-card"><small>Açık uçlu bekleyen</small><h3>${s.pending_open_answers||0}</h3></div></div>`;
- const rows=(d.question_stats||[]).map((q,i)=>`<tr><td>${i+1}</td><td>${escapeHTML(q.prompt||'')}</td><td>${q.responses||0}</td><td>${q.incorrect_percent===null?'—':('%'+q.incorrect_percent)}</td><td>${q.unanswered||0}</td><td>${q.manual_review_count||0}</td></tr>`).join('');
- box.innerHTML=cards+`<h4>📉 Soru bazlı sınıf başarısı</h4><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">#</th><th style="text-align:left">Soru</th><th>Yanıt</th><th>Yanlış</th><th>Boş</th><th>İnceleme</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Henüz teslim edilmiş yanıt yok.</td></tr>'}</tbody></table></div><h4 style="margin-top:16px">🧠 KARVIS değerlendirmesi</h4><div class="sude-card" style="white-space:pre-wrap;line-height:1.6">${escapeHTML(d.karvis_evaluation||'Değerlendirme bulunamadı.')}</div><p style="font-size:12px;opacity:.75">Analiz, teslim edilen yanıtların toplu istatistiklerine dayanır. Az katılım varsa konu çıkarımları kesin kabul edilmemelidir.</p>`;
- }catch(e){if(box)box.textContent='Hata: '+e.message;}finally{if(btn)btn.disabled=false;}
+  if(currentUser!=='ilknur'){alert('Öğrenci istatistikleri yalnızca İlknur öğretmen profiline açıktır.');return;}
+  const id=$('examStatsSelect')?.value,box=$('teacherExamStats');
+  if(!id){if(box)box.innerHTML='<div class="stats-empty">📊<strong>Bir sınav seç</strong><span>Analizi görüntülemek için yukarıdan bir sınav seç.</span></div>';return;}
+  const btn=$('examStatsRunBtn');if(btn)btn.disabled=true;
+  if(box)box.innerHTML='<div class="stats-empty"><strong>Analiz hazırlanıyor…</strong><span>Sınav yanıtları inceleniyor.</span></div>';
+  try{
+    const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));
+    const d=await r.json();if(!r.ok)throw new Error(d.detail||'İstatistikler alınamadı.');
+    const summary=d.summary||{}, questions=d.question_stats||[];
+    const submitted=Number(summary.submission_count)||0;
+    const avg=Number(summary.average_percent)||0;
+    const best=questions.length?Math.max(...questions.map(q=>{
+      const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
+      return n?Math.max(0,Math.min(100,Math.round((n-wrong-blank-review)/n*100))):0;
+    })):0;
+    const weak=questions.filter(q=>q.incorrect_percent!==null&&q.incorrect_percent!==undefined).sort((a,b)=>(Number(b.incorrect_percent)||0)-(Number(a.incorrect_percent)||0));
+    const weakCount=weak.filter(q=>Number(q.incorrect_percent)>=40).length;
+    const metric=(icon,label,value,pct,color='cyan')=>`<article class="stats-metric ${color}"><div class="stats-metric-top"><span class="stats-metric-icon">${icon}</span><span class="stats-metric-label">${label}</span></div><strong>${value}</strong><div class="stats-progress"><span style="width:${Math.max(0,Math.min(100,Number(pct)||0))}%"></span></div></article>`;
+    const cards=`<div class="stats-metrics">${metric('▥','Sınıf ortalaması','%'+avg,avg)}${metric('♧','Katılım',submitted+' öğrenci',Math.min(100,submitted*10),'blue')}${metric('🏆','En başarılı soru','%'+best,best,'green')}${metric('⚠','Tekrar gerekli',weakCount+' konu',weakCount?Math.min(100,weakCount*20):0,'red')}</div>`;
+    const questionCards=questions.map((q,i)=>{
+      const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
+      const correct=Math.max(0,n-wrong-blank-review);
+      const pct=n?Math.round(correct/n*100):0;
+      const status=n===0?['Yanıt bekleniyor','neutral']:pct>=70?['İyi anlaşıldı','good']:pct>=50?['Kısmen anlaşıldı','mid']:['Tekrar gerekli','bad'];
+      const color=pct>=70?'good':pct>=50?'mid':'bad';
+      const part=(cls,icon,label,count,percent)=>`<div class="stats-answer ${cls}"><span class="stats-answer-icon">${icon}</span><div class="stats-answer-copy"><small>${label}</small><strong>${count}</strong></div><span class="stats-answer-percent">%${percent}</span></div>`;
+      const correctPct=n?Math.round(correct/n*100):0, wrongPct=n?Math.round(wrong/n*100):0, blankPct=n?Math.round(blank/n*100):0;
+      return `<article class="stats-question-card"><div class="stats-question-head"><span class="stats-question-number">${i+1}</span><div class="stats-question-text">${escapeHTML(q.prompt||'Soru metni bulunamadı')}</div><span class="stats-status ${status[1]}">${status[0]}</span></div><div class="stats-question-progress"><div class="${color}" style="width:${pct}%"></div></div><div class="stats-question-percent">%${pct}</div><div class="stats-answer-grid">${part('correct','✓','Doğru',correct,correctPct)}${part('wrong','×','Yanlış',wrong,wrongPct)}${part('blank','−','Boş',blank,blankPct)}</div>${review?`<div class="stats-review-note">✎ ${review} açık uçlu yanıt öğretmen değerlendirmesi bekliyor.</div>`:''}</article>`;
+    }).join('');
+    const evaluation=escapeHTML(d.karvis_evaluation||'Henüz yeterli yanıt verisi yok.');
+    const subject=escapeHTML(d.exam?.subject||'Seçilen sınav');
+    box.innerHTML=`<div class="stats-exam-heading"><span class="stats-subject-pill">${subject}</span><span class="stats-question-count">${questions.length} soru</span></div>${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section><section class="stats-karvis-evaluation"><div class="stats-karvis-icon">♧</div><div class="stats-karvis-content"><h3>KARVIS değerlendirmesi</h3><p>${evaluation}</p><small>Değerlendirme yalnızca mevcut sınav yanıtlarına dayanır; az katılımda sonuçlar kesin kabul edilmemelidir.</small></div></section>`;
+  }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>İstatistikler yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}finally{if(btn)btn.disabled=false;}
 }
 
 async function showTeacherExamResults(id){
