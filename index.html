@@ -1274,98 +1274,68 @@ body.voice-speaking .ring.three{
 @media(max-width:600px){.exam-manager-hero{align-items:flex-start;padding:14px}.exam-manager-icon{flex-basis:46px;height:46px;font-size:24px}.exam-manager-hero h2{font-size:19px!important}.exam-field-grid,.exam-field-grid-2{grid-template-columns:minmax(0,1fr)}.exam-field-wide{grid-column:auto}.exam-type-grid{grid-template-columns:1fr}.exam-type-choice{min-height:82px;padding-right:42px!important}.exam-publish-actions{grid-template-columns:1fr}.exam-section-heading{align-items:flex-start}.exam-manager-section,.exam-ai-builder{padding:14px}}
 
 
-/* KARVIS exam screens: clean professional layout and readable analytics */
-.exam-modal{color:var(--text-color,inherit)}
-.exam-modal .exam-manager-hero{box-shadow:0 12px 32px rgba(0,0,0,.10)}
-.exam-modal .exam-manager-section,.exam-modal .exam-ai-builder{box-shadow:0 8px 24px rgba(0,0,0,.07)}
-.exam-modal .exam-modern-field input:focus,.exam-modal .exam-modern-field select:focus,.exam-modal .exam-modern-field textarea:focus{outline:2px solid rgba(0,205,225,.55);outline-offset:1px;border-color:#00bcd4}
-.exam-modal .exam-publish-actions{position:sticky;bottom:0;z-index:4;padding:12px;margin:12px -2px;background:rgba(5,16,23,.94);backdrop-filter:blur(14px);border:1px solid rgba(0,190,220,.22);border-radius:16px}
-.exam-modal .exam-stats-panel{margin:22px 0 14px;padding:clamp(14px,2.6vw,22px);border:1px solid rgba(0,190,220,.35);border-radius:20px;background:linear-gradient(150deg,rgba(0,155,200,.08),rgba(0,190,160,.025))}
-.exam-stats-hero{display:flex;align-items:center;gap:12px;margin-bottom:18px}.exam-stats-icon{display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:14px;background:rgba(0,190,220,.14);color:#15d5e6;font-size:27px}.exam-stats-hero h3{margin:0 0 4px!important;font-size:19px}.exam-stats-hero p:not(.exam-manager-eyebrow){margin:0;font-size:12px;line-height:1.5;opacity:.75}
-.exam-stats-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.35fr);align-items:end;gap:12px;padding:14px;border:1px solid rgba(130,160,180,.18);border-radius:15px;background:rgba(100,130,150,.045)}.exam-stats-controls label{display:block;font-size:12px;font-weight:800}.exam-stats-controls select{display:block;width:100%;margin-top:7px;padding:12px;border-radius:11px}.exam-stats-controls .exam-generate-button{margin:0!important;min-height:44px}
-.exam-stats-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}.exam-stat-summary-card{min-width:0;padding:14px;border:1px solid rgba(0,190,220,.22);border-radius:15px;background:rgba(0,140,180,.06)}.exam-stat-summary-card small{font-size:11px;opacity:.75}.exam-stat-summary-card h3{margin:6px 0 0!important;font-size:23px;color:#24d2e2}
-.exam-stats-question-section{margin-top:18px}.exam-stats-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}.exam-stats-section-head h4{margin:0 0 4px!important;font-size:16px}.exam-stats-section-head p{margin:0;font-size:12px;opacity:.7}.exam-stats-section-head>span{flex:none;padding:7px 10px;border:1px solid rgba(0,190,220,.25);border-radius:10px;font-size:11px;font-weight:800}
-.exam-question-stat-list{display:grid;gap:12px}.exam-question-stat-card{min-width:0;padding:14px;border:1px solid rgba(130,160,180,.20);border-radius:16px;background:rgba(100,130,150,.035)}.exam-question-stat-head{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:start;gap:11px}.exam-question-stat-prompt{font-size:14px;font-weight:750;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.exam-stat-status{align-self:start;padding:7px 9px;border-radius:999px;font-size:10px;font-weight:850;white-space:nowrap}.exam-stat-status.good{color:#00d7a2;background:rgba(0,215,162,.10);border:1px solid rgba(0,215,162,.3)}.exam-stat-status.mid{color:#ffbf4a;background:rgba(255,191,74,.09);border:1px solid rgba(255,191,74,.3)}.exam-stat-status.low{color:#ff6c7a;background:rgba(255,108,122,.09);border:1px solid rgba(255,108,122,.3)}
-.exam-stat-progress-row{display:flex;align-items:center;gap:12px;margin:14px 0}.exam-stat-progress{height:9px;flex:1;overflow:hidden;border-radius:999px;background:rgba(130,160,180,.16)}.exam-stat-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#08b7dc,#10d4b4)}.exam-stat-progress-row strong{min-width:40px;text-align:right;font-size:13px}.exam-stat-mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.exam-stat-mini-grid>div{min-width:0;padding:10px;border:1px solid rgba(130,160,180,.13);border-radius:11px;background:rgba(100,130,150,.045)}.exam-stat-mini-grid span{display:block;font-size:10px;opacity:.72;line-height:1.4}.exam-stat-mini-grid strong{display:block;margin-top:4px;font-size:17px;overflow-wrap:anywhere}.exam-stats-empty{padding:22px 14px;text-align:center;border:1px dashed rgba(0,190,220,.3);border-radius:14px;opacity:.8;font-size:13px;line-height:1.6}
-.exam-karvis-evaluation{display:grid;grid-template-columns:48px minmax(0,1fr);gap:13px;margin-top:16px;padding:16px;border:1px solid rgba(0,190,220,.4);border-radius:17px;background:linear-gradient(120deg,rgba(0,180,220,.11),rgba(0,190,150,.045))}.exam-karvis-brain{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:rgba(0,190,220,.13);color:#1bd8e8;font-size:27px}.exam-karvis-evaluation h4{margin:0 0 7px!important;font-size:16px}.exam-karvis-evaluation p:not(.exam-manager-eyebrow){margin:0;font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}.exam-stats-footnote{font-size:11px;line-height:1.6;opacity:.65;margin:12px 2px 0}
-@media(max-width:600px){.exam-stats-controls{grid-template-columns:minmax(0,1fr)}.exam-stats-controls .exam-generate-button{width:100%!important}.exam-question-stat-head{grid-template-columns:34px minmax(0,1fr)}.exam-stat-status{grid-column:2;justify-self:start}.exam-stat-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.exam-stats-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.exam-modal .exam-publish-actions{position:static}.exam-stats-hero{align-items:flex-start}}
+
+/* KARVIS layout repair: consistent sizing, no clipped controls, readable selects */
+html{width:100%;max-width:100%;overflow-x:hidden}
+body{width:100%;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box}
+.modal{width:min(94vw,980px);max-width:980px;max-height:90dvh;overflow-x:hidden;overscroll-behavior:contain}
+.modal.show{display:block}
+.modal :where(section,article,div,fieldset,label,form,header,footer){min-width:0}
+.modal :where(input,select,textarea,button){max-width:100%;min-width:0;box-sizing:border-box}
+.modal :where(input,select,textarea){width:100%}
+.modal select,.modal .voice-select,select.voice-select,select{
+  color:#f4fbff!important;
+  background-color:#10232d!important;
+  border:1px solid rgba(40,205,230,.48)!important;
+  color-scheme:dark;
+  min-height:44px;
+  padding:10px 38px 10px 12px;
+  border-radius:12px;
+  line-height:1.35;
+  max-width:100%;
+}
+select option,select optgroup{
+  background:#10232d!important;
+  color:#f4fbff!important;
+}
+select option:checked{background:#087f9b!important;color:#fff!important}
+.exam-modal{width:min(94vw,980px)!important;max-width:980px!important;padding:clamp(12px,2.5vw,24px)!important}
+.exam-modal .exam-manager-section,.exam-modal .exam-ai-builder,.exam-modal .exam-manager-hero{width:100%;max-width:100%;min-width:0}
+.exam-modal .exam-field-grid,.exam-modal .exam-type-grid,.exam-modal .exam-editor-grid,.exam-modal .exam-editor-options{width:100%;max-width:100%;min-width:0}
+.exam-modal .exam-type-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.exam-modal .exam-type-choice{width:100%;overflow-wrap:anywhere;word-break:normal}
+.exam-modal .exam-type-choice strong,.exam-modal .exam-type-choice small{max-width:100%;overflow-wrap:anywhere}
+.exam-modal .exam-modern-field input,.exam-modal .exam-modern-field select,.exam-modal .exam-modern-field textarea,
+.exam-modal .exam-editor-label input,.exam-modal .exam-editor-label select,.exam-modal .exam-editor-label textarea{width:100%!important;max-width:100%!important;min-width:0!important}
+.exam-modal .exam-publish-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.exam-modal .exam-publish-actions>*{min-width:0;width:100%;white-space:normal;overflow-wrap:anywhere}
+.exam-modal .exam-section-heading>div{min-width:0;flex:1}
+.exam-modal .exam-section-heading p,.exam-modal .exam-manager-hero p{overflow-wrap:anywhere}
+.exam-modal #teacherExamList .sude-card{min-width:0;overflow-wrap:anywhere}
+.exam-modal #teacherExamList .sude-card button{max-width:100%;white-space:normal}
+@media(max-width:700px){
+ .modal{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px;max-height:92dvh}
+ .exam-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;padding:12px!important}
+ .exam-modal .exam-field-grid,.exam-modal .exam-field-grid-2{grid-template-columns:minmax(0,1fr)!important}
+ .exam-modal .exam-field-wide{grid-column:auto!important}
+ .exam-modal .exam-type-grid{grid-template-columns:minmax(0,1fr)!important}
+ .exam-modal .exam-type-choice{min-height:80px;padding-right:42px!important}
+ .exam-modal .exam-publish-actions{grid-template-columns:minmax(0,1fr)!important}
+ .exam-modal .exam-section-heading{align-items:flex-start}
+ .exam-modal .exam-section-heading h3{overflow-wrap:anywhere}
+ .exam-modal .exam-editor-grid{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(min-width:701px){
+ .exam-modal .exam-field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .exam-modal .exam-field-wide{grid-column:1/-1}
+}
 
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
 <meta name="theme-color" content="#050b12">
-
-<style id="karvis-profile-modal-polish">
-/* Profile dialogs: prevent overlapping controls and improve small-screen layout */
-#profileChoiceModal, #profileModal, #registerModal {
-  box-sizing:border-box; display:none; flex-direction:column; gap:12px;
-  width:min(92vw,460px); max-height:min(86dvh,760px); overflow-y:auto;
-  padding:clamp(18px,4vw,26px); border-radius:24px;
-}
-#profileChoiceModal.show, #profileModal.show, #registerModal.show { display:flex; }
-#profileChoiceModal h2, #profileModal h2, #registerModal h2 { margin:0 0 2px; line-height:1.2; overflow-wrap:anywhere; }
-#profileChoiceModal p, #registerModal p { margin:0 0 4px; line-height:1.55; overflow-wrap:anywhere; }
-#profileChoiceModal .modal-button, #profileModal .modal-button, #registerModal .modal-button {
-  box-sizing:border-box; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
-  width:100%; min-height:50px; height:auto; margin:0; padding:12px 16px;
-  line-height:1.35; white-space:normal; overflow-wrap:anywhere; text-align:center;
-}
-#profileModal input, #registerModal input { box-sizing:border-box; width:100%; min-width:0; height:50px; margin:0; padding:0 14px; }
-#profileChoiceModal .secondary-button, #profileModal .secondary-button, #registerModal .secondary-button { margin-top:2px; }
-#registerModal input:focus, #profileModal input:focus { border-color:#00d9ef; box-shadow:0 0 0 3px rgba(0,217,239,.12); }
-@media(max-width:480px){
- #profileChoiceModal, #profileModal, #registerModal { width:calc(100vw - 28px); max-height:82dvh; padding:18px; gap:11px; border-radius:20px; }
- #profileChoiceModal h2, #profileModal h2, #registerModal h2 { font-size:22px; }
- #profileChoiceModal .modal-button, #profileModal .modal-button, #registerModal .modal-button { min-height:48px; font-size:15px; }
-}
-
-/* Desktop visibility + compact, mobile-safe exam analytics */
-.exam-modal{width:min(1120px,calc(100vw - 32px))!important;max-width:1120px!important;max-height:92vh;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;}
-.exam-manager-shortcuts{position:sticky;top:-1px;z-index:6;display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:10px 0;background:rgba(5,16,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,190,220,.18)}
-.exam-manager-shortcuts button{flex:1 1 180px;min-width:0;min-height:42px;padding:10px 14px;border:1px solid rgba(0,190,220,.3);border-radius:12px;background:rgba(0,170,210,.08);color:inherit;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
-.exam-manager-shortcuts button:hover,.exam-manager-shortcuts button:focus-visible{border-color:#12c7d8;background:rgba(0,190,220,.15);outline:none}
-#examStatsPanel{scroll-margin-top:72px;display:block!important;visibility:visible!important;width:100%;min-width:0;clear:both}
-#teacherExamStats{min-width:0;width:100%;overflow-wrap:anywhere}
-.exam-stats-summary-grid{grid-template-columns:repeat(auto-fit,minmax(115px,1fr))}
-.exam-question-stat-card{padding:12px}
-.exam-question-stat-prompt{font-size:13px;line-height:1.5}
-@media(min-width:900px){.exam-modal{width:min(1120px,calc(100vw - 56px))!important}.exam-stats-summary-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.exam-question-stat-list{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
-@media(max-width:600px){
- .exam-modal{width:calc(100vw - 12px)!important;max-height:94dvh;padding:12px!important;border-radius:16px!important}
- .exam-manager-shortcuts{gap:7px;padding:8px 0}.exam-manager-shortcuts button{flex:1 1 130px;padding:9px 8px;font-size:12px}
- .exam-modal .exam-stats-panel{padding:11px;margin:14px 0;border-radius:15px}
- .exam-stats-hero{gap:9px;margin-bottom:12px}.exam-stats-icon{flex-basis:36px;width:36px;height:36px;font-size:20px;border-radius:11px}.exam-stats-hero h3{font-size:16px!important}.exam-stats-hero p:not(.exam-manager-eyebrow){font-size:11px}
- .exam-stats-controls{grid-template-columns:minmax(0,1fr);gap:8px;padding:10px}.exam-stats-controls select{padding:10px;font-size:14px}.exam-stats-controls .exam-generate-button{min-height:42px}
- .exam-stats-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}.exam-stat-summary-card{padding:10px;border-radius:12px}.exam-stat-summary-card small{font-size:10px}.exam-stat-summary-card h3{font-size:19px!important;margin-top:4px!important}
- .exam-stats-question-section{margin-top:13px}.exam-stats-section-head h4{font-size:14px!important}.exam-stats-section-head p{font-size:10px}.exam-stats-section-head>span{font-size:10px;padding:6px 7px}
- .exam-question-stat-list{gap:8px}.exam-question-stat-card{padding:10px;border-radius:12px}.exam-question-stat-head{grid-template-columns:28px minmax(0,1fr);gap:8px}.exam-question-stat-head .exam-question-number{min-width:28px;height:28px;border-radius:9px;font-size:11px}.exam-question-stat-prompt{font-size:12px;line-height:1.45;overflow-wrap:anywhere;word-break:normal}.exam-stat-status{grid-column:2;justify-self:start;padding:5px 7px;font-size:9px}
- .exam-stat-progress-row{gap:7px;margin:9px 0}.exam-stat-progress{height:7px}.exam-stat-progress-row strong{min-width:34px;font-size:11px}.exam-stat-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.exam-stat-mini-grid>div{padding:7px;border-radius:9px}.exam-stat-mini-grid span{font-size:9px}.exam-stat-mini-grid strong{font-size:14px;margin-top:3px}
- .exam-karvis-evaluation{grid-template-columns:32px minmax(0,1fr);gap:9px;padding:11px;margin-top:12px;border-radius:13px}.exam-karvis-brain{width:32px;height:32px;border-radius:10px;font-size:19px}.exam-karvis-evaluation h4{font-size:14px!important}.exam-karvis-evaluation p:not(.exam-manager-eyebrow){font-size:12px;line-height:1.55}.exam-stats-footnote{font-size:10px}
-}
-
-/* Cross-device parity: keep the same exam tools available on desktop and mobile. */
-.exam-modal .exam-manager-shortcuts{display:flex!important;visibility:visible!important;opacity:1!important}
-.exam-modal #examStatsPanel{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important}
-.exam-modal .exam-stats-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px}
-.exam-modal .exam-stats-controls label{display:block;min-width:0}
-.exam-modal .exam-stats-controls select{display:block;width:100%;min-width:0;max-width:100%;margin-top:7px}
-.exam-modal .exam-stats-question-section,.exam-modal .exam-karvis-evaluation{min-width:0;max-width:100%}
-.exam-modal .exam-question-stat-list{grid-template-columns:repeat(2,minmax(0,1fr))}
-.exam-modal .exam-question-stat-card{min-width:0;overflow:hidden}
-.exam-modal .exam-question-stat-prompt{overflow-wrap:anywhere;word-break:normal}
-@media(max-width:760px){
- .exam-modal .exam-stats-controls{grid-template-columns:minmax(0,1fr)}
- .exam-modal .exam-question-stat-list{grid-template-columns:minmax(0,1fr)}
- .exam-modal .exam-stats-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .exam-modal .exam-question-stat-head{grid-template-columns:30px minmax(0,1fr)}
- .exam-modal .exam-stat-status{grid-column:2;justify-self:start;white-space:normal}
- .exam-modal .exam-stats-panel{padding:12px}
-}
-@media(min-width:761px) and (max-width:1000px){.exam-modal .exam-question-stat-list{grid-template-columns:minmax(0,1fr)}}
-
-</style>
-
 </head>
 
 <body>
@@ -1538,9 +1508,57 @@ body.voice-speaking .ring.three{
          SADECE İLKNUR
          ======================================================== -->
 
-    <div id="teacherMenu" style="display:none;">
-        <div class="academic-title">İLKNUR HOCA</div>
+    <div
+        id="teacherMenu"
+        style="display:none;">
+
+        <div class="academic-title">
+            AKADEMİK ASİSTAN
+        </div>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="research"
+            onclick="selectAcademicMode('research')">
+            🔬 Araştırma Modu
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="academic"
+            onclick="selectAcademicMode('academic')">
+            📚 Akademik Mod
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="article"
+            onclick="selectAcademicMode('article')">
+            📝 Makale Asistanı
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="lesson"
+            onclick="selectAcademicMode('lesson')">
+            🎓 Ders Asistanı
+        </button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="quiz"
+            onclick="selectAcademicMode('quiz')">
+            🧪 Sınav / Quiz
+        </button>
         <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
+
+        <button
+            class="menu-item academic-menu-item"
+            data-mode="presentation"
+            onclick="selectAcademicMode('presentation')">
+            📊 Sunum Hazırlama
+        </button>
+
     </div>
 
     <!-- ========================================================
@@ -1974,11 +1992,7 @@ body.voice-speaking .ring.three{
     <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Yönetimi</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
   </header>
   <div class="exam-manager-note">⏱ Süre dakika cinsindendir. <strong>0 = sınırsız</strong>. Tarihler cihazının yerel saatine göre ayarlanır.</div>
-  <nav class="exam-manager-shortcuts" aria-label="Sınav yönetimi bölümleri">
-    <button type="button" onclick="document.getElementById('examBuilderTop').scrollIntoView({behavior:'smooth',block:'start'})">✦ Sınav hazırlama</button>
-    <button type="button" onclick="document.getElementById('examStatsPanel').scrollIntoView({behavior:'smooth',block:'start'});loadTeacherExams()">▥ Sınav istatistikleri</button>
-  </nav>
-  <section class="exam-manager-section" id="examBuilderTop">
+  <section class="exam-manager-section">
     <div class="exam-section-heading"><span>01</span><div><h3>Sınav bilgileri</h3><p>Öğrencilerin göreceği temel bilgiler</p></div></div>
     <div class="exam-field-grid">
       <label class="exam-modern-field exam-field-wide">Sınav başlığı<input id="examTitle" placeholder="Örn. 1. dönem konu değerlendirmesi" autocomplete="off"></label>
@@ -2019,9 +2033,12 @@ body.voice-speaking .ring.three{
   <div class="exam-publish-actions"><button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button><button class="exam-generate-button" onclick="saveTeacherExam(true)">✓ Sınavı yayımla</button></div>
   <div id="teacherExamStatus" aria-live="polite" class="exam-status-message"></div>
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
-  <section class="exam-stats-panel" id="examStatsPanel">
-    <header class="exam-stats-hero"><span class="exam-stats-icon">▥</span><div><p class="exam-manager-eyebrow">KARVIS • RAPORLAMA</p><h3>Öğrenci istatistikleri</h3><p>Sınıf başarısını ve tekrar edilmesi gereken konuları inceleyin.</p></div></header>
-    <div class="exam-stats-controls"><label for="examStatsSelect">Analiz edilecek sınav<select id="examStatsSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select></label><button class="exam-generate-button" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">⌁ Analizi görüntüle</button></div>
+  <section class="sude-card" style="margin-top:16px;padding:14px;">
+    <h3>📊 Öğrenci İstatistikleri ve KARVIS Değerlendirmesi</h3>
+    <p>Bir sınavın sonuçlarını seçerek sınıf başarısını, soru bazlı zorlanma oranlarını ve KARVIS'in olası konu eksikliği analizini görüntüleyin.</p>
+    <label for="examStatsSelect">Sınav seçin</label>
+    <select id="examStatsSelect" class="voice-select" style="width:100%;margin:6px 0 10px;"><option value="">Sınavlar yükleniyor…</option></select>
+    <button class="settings-choice" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">📈 İstatistikleri ve KARVIS değerlendirmesini getir</button>
     <div id="teacherExamStats" aria-live="polite" style="margin-top:12px;"></div>
   </section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
@@ -2359,9 +2376,13 @@ async function login(){
             .trim()
             .toLowerCase();
 
-        window.currentProfileName = String((data.user && (data.user.name || data.user.display_name)) || data.name || "").trim();
-
-        currentMode = "normal";
+        currentMode =
+            currentUser === "ilknur"
+                ? (
+                    localStorage.getItem("karvis_mode") ||
+                    "lesson"
+                )
+                : "normal";
 
         localStorage.setItem(
             "karvis_user",
@@ -2895,13 +2916,48 @@ async function deleteUserRequest(id){
    ============================================================ */
 
 function selectAcademicMode(mode){
-    // Eski arayüz kayıtları için geriye dönük uyumluluk.
-    // KARVIS artık makale, araştırma, ders ve sunum için ayrı mod istemez.
-    currentMode = "normal";
-    localStorage.setItem("karvis_mode", "normal");
+
+    if(currentUser !== "ilknur")
+        return;
+
+    currentMode = mode;
+
+    localStorage.setItem(
+        "karvis_mode",
+        currentMode
+    );
+
     updateSidebar();
+
     closeSidebar();
-    addMessage("Elbette hocam. Ne hazırlamamı istediğinizi doğal şekilde yazmanız yeterli; isteğinize göre makale, araştırma, ders içeriği veya sunum hazırlayabilirim.", "ai");
+
+    const names = {
+
+        research:
+            "Araştırma Modu aktif. Hocam, akademik araştırma ve değerlendirme çalışmalarınıza hazırım.",
+
+        academic:
+            "Akademik Mod aktif. Hocam, akademik çalışmalarınızda yardımcı olmaya hazırım.",
+
+        article:
+            "Makale Asistanı aktif. Hocam, akademik makale çalışmalarınıza hazırım.",
+
+        lesson:
+            "Ders Asistanı aktif. Hocam, ders anlatımı ve konu çalışmalarına hazırım.",
+
+        quiz:
+            "Sınav / Quiz modu aktif. Hocam, sınav çalışmalarınızı başlatabiliriz.",
+
+        presentation:
+            "Sunum Hazırlama modu aktif. Hocam, akademik sunumunuzu hazırlayabilirim."
+    };
+
+    addMessage(
+        names[mode] ||
+        "Akademik mod aktif.",
+        "ai"
+    );
+
     updateStatus();
 }
 
@@ -2955,8 +3011,8 @@ async function loadTeacherExamAnalysis(){
  const btn=$('examStatsRunBtn');if(btn)btn.disabled=true;if(box)box.textContent='Sınıf yanıtları analiz ediliyor…';
  try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'İstatistikler alınamadı.');const s=d.summary||{};
  const cards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0"><div class="sude-card"><small>Katılım</small><h3>${s.submission_count||0}</h3></div><div class="sude-card"><small>Sınıf ortalaması</small><h3>%${s.average_percent||0}</h3></div><div class="sude-card"><small>En yüksek</small><h3>%${s.highest_percent||0}</h3></div><div class="sude-card"><small>Başarı oranı (≥%50)</small><h3>%${s.pass_rate_percent||0}</h3></div><div class="sude-card"><small>Açık uçlu bekleyen</small><h3>${s.pending_open_answers||0}</h3></div></div>`;
- const questions=(d.question_stats||[]).map((q,i)=>{const incorrect=Number(q.incorrect_percent)||0;const success=Math.max(0,Math.min(100,100-incorrect));const status=success>=75?['İyi anlaşıldı','good']:success>=50?['Kısmen anlaşıldı','mid']:['Tekrar gerekli','low'];return `<article class="exam-question-stat-card"><div class="exam-question-stat-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div class="exam-question-stat-prompt">${escapeHTML(q.prompt||'Soru metni bulunamadı')}</div><span class="exam-stat-status ${status[1]}">${status[0]}</span></div><div class="exam-stat-progress-row"><div class="exam-stat-progress"><span style="width:${success}%;"></span></div><strong>%${Math.round(success)}</strong></div><div class="exam-stat-mini-grid"><div><span>Yanıt</span><strong>${Number(q.responses)||0}</strong></div><div><span>Yanlış oranı</span><strong>${q.incorrect_percent===null||q.incorrect_percent===undefined?'—':'%'+q.incorrect_percent}</strong></div><div><span>Boş</span><strong>${Number(q.unanswered)||0}</strong></div><div><span>İnceleme</span><strong>${Number(q.manual_review_count)||0}</strong></div></div></article>`;}).join('');
- box.innerHTML=`${cards.replace(/style="display:grid;grid-template-columns:repeat\(auto-fit,minmax\(130px,1fr\)\);gap:8px;margin:10px 0"/,'class="exam-stats-summary-grid"').replace(/class="sude-card"/g,'class="exam-stat-summary-card"')}<section class="exam-stats-question-section"><header class="exam-stats-section-head"><div><h4>Soru bazlı başarı</h4><p>Her sorudaki cevap dağılımını ve başarı düzeyini inceleyin.</p></div><span>${(d.question_stats||[]).length} soru</span></header><div class="exam-question-stat-list">${questions||'<div class="exam-stats-empty">Henüz teslim edilmiş yanıt yok. Öğrenciler sınavı tamamladığında analiz burada görünecek.</div>'}</div></section><section class="exam-karvis-evaluation"><div class="exam-karvis-brain">✧</div><div><p class="exam-manager-eyebrow">KARVIS ANALİZİ</p><h4>KARVIS değerlendirmesi</h4><p>${escapeHTML(d.karvis_evaluation||'Yeterli veri oluştuğunda değerlendirme burada gösterilecek.')}</p></div></section><p class="exam-stats-footnote">Analiz teslim edilen yanıtların toplu istatistiklerine dayanır. Katılım azsa konu çıkarımları kesin kabul edilmemelidir.</p>`;
+ const rows=(d.question_stats||[]).map((q,i)=>`<tr><td>${i+1}</td><td>${escapeHTML(q.prompt||'')}</td><td>${q.responses||0}</td><td>${q.incorrect_percent===null?'—':('%'+q.incorrect_percent)}</td><td>${q.unanswered||0}</td><td>${q.manual_review_count||0}</td></tr>`).join('');
+ box.innerHTML=cards+`<h4>📉 Soru bazlı sınıf başarısı</h4><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">#</th><th style="text-align:left">Soru</th><th>Yanıt</th><th>Yanlış</th><th>Boş</th><th>İnceleme</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Henüz teslim edilmiş yanıt yok.</td></tr>'}</tbody></table></div><h4 style="margin-top:16px">🧠 KARVIS değerlendirmesi</h4><div class="sude-card" style="white-space:pre-wrap;line-height:1.6">${escapeHTML(d.karvis_evaluation||'Değerlendirme bulunamadı.')}</div><p style="font-size:12px;opacity:.75">Analiz, teslim edilen yanıtların toplu istatistiklerine dayanır. Az katılım varsa konu çıkarımları kesin kabul edilmemelidir.</p>`;
  }catch(e){if(box)box.textContent='Hata: '+e.message;}finally{if(btn)btn.disabled=false;}
 }
 
@@ -3055,14 +3111,6 @@ function showGreeting(){
             "ai"
         );
     }
-    else {
-        // Newly created standard profiles receive the requested respectful greeting.
-        const profileName = (window.currentProfileName || "").trim();
-        addMessage(
-            profileName ? `Hoş geldiniz efendim, ${profileName}. K.A.R.V.I.S. hizmetinizde.` : "Hoş geldiniz efendim. K.A.R.V.I.S. hizmetinizde.",
-            "ai"
-        );
-    }
 }
 
 /* ============================================================
@@ -3154,17 +3202,7 @@ function isPresentationRequest(message){
         "sunum pdf",
         "sunum dosyası",
         "sunum hazırlamak",
-        "sunum istiyorum",
-        "pdf hazırla",
-        "pdf hazirla",
-        "pdf oluştur",
-        "pdf olustur",
-        "pdf dosyası hazırla",
-        "pdf dosyasi hazirla",
-        "pdf olarak hazırla",
-        "pdf olarak oluştur",
-        "konuyu pdf yap",
-        "bunu pdf yap"
+        "sunum istiyorum"
     ];
 
     return (
@@ -3742,9 +3780,7 @@ async function sendMessage(){
     }
 
     /*
-       TEK KARVIS ASİSTANI
-       Makale/araştırma/ders talepleri normal sohbet akışında doğal dille yorumlanır.
-       Sunum veya PDF dosyası talepleri mevcut dosya üretim akışına yönlendirilir.
+       NORMAL AI
     */
 
     const waiting =
@@ -3800,7 +3836,7 @@ async function sendMessage(){
                                 currentUser,
 
                             mode:
-                                "normal",
+                                currentMode,
 
                             conversation_id:
                                 currentConversationId,
@@ -5276,9 +5312,16 @@ function initialize(){
             savedUser;
     }
 
-    // Tek KARVIS asistanı: eski kayıtlı modları yok say.
-    currentMode = "normal";
-    localStorage.setItem("karvis_mode", "normal");
+    currentMode =
+        currentUser === "ilknur"
+            ? (
+                localStorage.getItem(
+                    "karvis_mode"
+                ) || "lesson"
+            )
+            : currentUser === "karahan"
+                ? (localStorage.getItem("karvis_mode") || "normal")
+                : "normal";
 
     applyUserTheme();
 
