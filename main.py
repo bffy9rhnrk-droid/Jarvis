@@ -179,7 +179,7 @@ def _arena_load_state_from_db():
                 cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
                 row = cur.fetchone()
                 if not row:
-                    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+                    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
                 state = row[0]
                 if isinstance(state, str):
                     state = json.loads(state)
@@ -187,7 +187,6 @@ def _arena_load_state_from_db():
                     state = {}
                 state.setdefault("players", {})
                 state.setdefault("attempts", {})
-                state.setdefault("duels", {})
                 return state
     finally:
         conn.close()
@@ -767,7 +766,7 @@ ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["
 
 
 def _arena_default():
-    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 def _arena_load():
     if arena_database_configured():
@@ -778,7 +777,7 @@ def _arena_load():
             raise HTTPException(status_code=503, detail="Arena veritabanına erişilemiyor.")
     data = read_json_file(ARENA_FILE, {})
     if not isinstance(data, dict): data = {}
-    data.setdefault("players", {}); data.setdefault("attempts", {}); data.setdefault("duels", {})
+    data.setdefault("players", {}); data.setdefault("attempts", {})
     return data
 
 
@@ -837,7 +836,7 @@ async def arena_leaderboard():
 async def arena_reset(username: str = ""):
     """Reset Arena scores/history; only the Murat admin profile may invoke this."""
     require_admin(username)
-    empty_state = {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    empty_state = {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
     with arena_lock:
         if arena_database_configured():
             conn = get_arena_db_connection()
@@ -863,273 +862,6 @@ async def arena_reset(username: str = ""):
         else:
             write_json_file(ARENA_FILE, empty_state)
         return {"success": True, "message": "Arena puan tablosu, rozetler ve oyun geçmişi sıfırlandı."}
-
-def _duel_public(duel, username):
-    """Return only the caller's current question and public duel status."""
-    result = {
-        "duel_id": duel.get("duel_id"),
-        "challenger": duel.get("challenger"),
-        "opponent": duel.get("opponent"),
-        "stake": int(duel.get("stake", 0)),
-        "status": duel.get("status"),
-        "created_at": duel.get("created_at"),
-        "question_index": int(duel.get("question_index", 0)),
-        "total_questions": 5,
-        "answered": username in duel.get("round_answers", {}),
-        "round_result": duel.get("round_result"),
-        "result": duel.get("result"),
-        "round_age_seconds": max(0, int(time.time() - min((float(v) for v in duel.get("round_started_at", {}).values()), default=time.time()))) if duel.get("status") == "active" else 0,
-        "round_answer_count": len(duel.get("round_answers", {})),
-    }
-    if duel.get("status") == "active":
-        idx = int(duel.get("question_index", 0))
-        questions = duel.get("questions", [])
-        if idx < len(questions) and username not in duel.get("round_answers", {}):
-            q = questions[idx]
-            result["question"] = {"prompt": q["prompt"], "options": q["options"], "category": q.get("category", "Genel")}
-    return result
-
-@app.get("/arena/duels")
-async def arena_duels(username: str = "karahan"):
-    username = username.strip().lower()
-    if username not in USERS:
-        raise HTTPException(status_code=401, detail="Geçersiz profil.")
-    with arena_lock:
-        data = _arena_load()
-        _arena_player(data, username)
-        duels = data.setdefault("duels", {})
-        pending_incoming = []
-        pending_outgoing = []
-        active = None
-        for duel in duels.values():
-            if duel.get("status") == "pending":
-                if duel.get("opponent") == username:
-                    pending_incoming.append(_duel_public(duel, username))
-                elif duel.get("challenger") == username:
-                    pending_outgoing.append(_duel_public(duel, username))
-            elif duel.get("status") == "active" and username in (duel.get("challenger"), duel.get("opponent")):
-                if active is None:
-                    active = _duel_public(duel, username)
-        return {"success": True, "pending_incoming": pending_incoming, "pending_outgoing": pending_outgoing, "active_duel": active,
-                "duel_history": list(reversed(_arena_player(data, username).get("duel_history", [])[-3:]))}
-
-@app.post("/arena/duel/request")
-async def arena_duel_request(payload: dict):
-    username = str(payload.get("username", "")).strip().lower()
-    opponent = str(payload.get("opponent", "")).strip().lower()
-    try:
-        stake = int(payload.get("stake"))
-    except Exception:
-        raise HTTPException(status_code=400, detail="Geçerli bir bahis puanı girin.")
-    if username not in USERS or opponent not in USERS:
-        raise HTTPException(status_code=401, detail="Geçersiz profil.")
-    if username == opponent:
-        raise HTTPException(status_code=400, detail="Kendine düello gönderemezsin.")
-    if stake < 1 or stake > 1000000:
-        raise HTTPException(status_code=400, detail="Bahis 1 ile 1.000.000 puan arasında olmalı.")
-    with arena_lock:
-        data = _arena_load()
-        challenger_player = _arena_player(data, username)
-        opponent_player = _arena_player(data, opponent)
-        if int(challenger_player.get("points", 0)) < stake:
-            raise HTTPException(status_code=400, detail="Bahis miktarı için yeterli puanın yok.")
-        if int(opponent_player.get("points", 0)) < stake:
-            raise HTTPException(status_code=400, detail="Rakibin bu bahsi karşılayacak kadar puana sahip değil.")
-        duels = data.setdefault("duels", {})
-        if any(d.get("status") in ("pending", "active") and username in (d.get("challenger"), d.get("opponent")) for d in duels.values()):
-            raise HTTPException(status_code=409, detail="Önce mevcut düello isteğini veya aktif düellonu tamamla.")
-        duel_id = uuid.uuid4().hex
-        mixed = []
-        for category in ("knowledge", "logic", "speed", "memory"):
-            for q in ARENA_QUESTIONS.get(category, []):
-                mixed.append({**q, "category": {"knowledge":"Genel kültür ve vatandaşlık","logic":"Mantık ve bilmeceler","speed":"Hız ve sayısal bilgiler","memory":"Genel bilgiler"}[category]})
-        chosen = random.sample(mixed, min(5, len(mixed)))
-        duels[duel_id] = {
-            "duel_id": duel_id, "challenger": username, "opponent": opponent, "stake": stake,
-            "status": "pending", "created_at": time.strftime("%Y-%m-%d %H:%M:%S"), "created_at_epoch": time.time(),
-            "questions": chosen, "question_index": 0, "round_answers": {},
-            "round_started_at": {}, "round_result": None, "results": [],
-            "accepted_at": None, "result": None
-        }
-        _arena_save(data)
-        return {"success": True, "message": "Düello isteği gönderildi.", "duel_id": duel_id}
-
-@app.post("/arena/duel/respond")
-async def arena_duel_respond(payload: dict):
-    username = str(payload.get("username", "")).strip().lower()
-    duel_id = str(payload.get("duel_id", ""))
-    accept = bool(payload.get("accept"))
-    with arena_lock:
-        data = _arena_load()
-        duel = data.setdefault("duels", {}).get(duel_id)
-        if not duel or duel.get("status") != "pending":
-            raise HTTPException(status_code=404, detail="Bekleyen düello isteği bulunamadı.")
-        if duel.get("opponent") != username:
-            raise HTTPException(status_code=403, detail="Bu düello isteği sana gönderilmedi.")
-        if accept:
-            challenger_player = _arena_player(data, duel["challenger"])
-            opponent_player = _arena_player(data, duel["opponent"])
-            stake = int(duel["stake"])
-            if int(challenger_player.get("points", 0)) < stake or int(opponent_player.get("points", 0)) < stake:
-                duel["status"] = "declined"
-                duel["result"] = {"winner": None, "reason": "Puan yetersizliği nedeniyle düello başlatılamadı."}
-                _arena_save(data)
-                raise HTTPException(status_code=409, detail="Oyunculardan birinin puanı artık bu bahsi karşılamıyor.")
-            duel["status"] = "active"
-            duel["accepted_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
-        else:
-            duel["status"] = "declined"
-            duel["result"] = {"winner": None, "reason": "İstek reddedildi."}
-        _arena_save(data)
-        return {"success": True, "message": "Düello kabul edildi." if accept else "Düello isteği reddedildi."}
-
-@app.post("/arena/duel/reset")
-async def arena_duel_reset(payload: dict):
-    """Cancel a genuinely stuck pending/active duel without transferring points."""
-    username = str(payload.get("username", "")).strip().lower()
-    duel_id = str(payload.get("duel_id", ""))
-    if username not in USERS:
-        raise HTTPException(status_code=401, detail="Geçersiz profil.")
-    with arena_lock:
-        data = _arena_load()
-        duel = data.setdefault("duels", {}).get(duel_id)
-        if not duel or duel.get("status") not in ("pending", "active"):
-            raise HTTPException(status_code=404, detail="Sıfırlanabilecek bekleyen veya aktif düello bulunamadı.")
-        if username not in (duel.get("challenger"), duel.get("opponent")):
-            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
-        if duel.get("status") == "pending":
-            created = duel.get("created_at_epoch")
-            if created is None:
-                raise HTTPException(status_code=409, detail="Bekleyen istek henüz takılmış olarak doğrulanmadı. Önce durumu yenile.")
-            age = max(0, time.time() - float(created))
-            stuck = age >= 180
-        else:
-            starts = [float(v) for v in duel.get("round_started_at", {}).values()]
-            age = max(0, time.time() - min(starts)) if starts else 0
-            answers = duel.get("round_answers", {})
-            # A round is stuck only when it has been idle for at least 60s and
-            # one player has answered without the other, or it has exceeded 120s.
-            stuck = age >= 60 and (len(answers) == 1 or age >= 120)
-        if not stuck:
-            raise HTTPException(status_code=409, detail="Düello henüz takılmış görünmüyor. Normal akış için yenileme yapabilirsin.")
-        duel["status"] = "cancelled"
-        duel["result"] = {"winner": None, "reason": "Takıldığı için kullanıcı tarafından sıfırlandı; puan aktarılmadı."}
-        duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-        _arena_save(data)
-        return {"success": True, "message": "Takılan düello sıfırlandı. Puan aktarılmadı; yeni düello başlatabilirsin."}
-
-
-@app.post("/arena/duel/answer")
-async def arena_duel_answer(payload: dict):
-    username = str(payload.get("username", "")).strip().lower()
-    duel_id = str(payload.get("duel_id", ""))
-    try:
-        answer = int(payload.get("answer"))
-    except Exception:
-        raise HTTPException(status_code=400, detail="Geçersiz cevap.")
-    with arena_lock:
-        data = _arena_load()
-        duels = data.setdefault("duels", {})
-        duel = duels.get(duel_id)
-        if not duel or duel.get("status") != "active":
-            raise HTTPException(status_code=404, detail="Aktif düello bulunamadı.")
-        if username not in (duel.get("challenger"), duel.get("opponent")):
-            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
-        idx = int(duel.get("question_index", 0))
-        questions = duel.get("questions", [])
-        if idx >= len(questions):
-            raise HTTPException(status_code=409, detail="Düello soruları tamamlandı.")
-        q = questions[idx]
-        if answer < 0 or answer >= len(q["options"]):
-            raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
-        round_answers = duel.setdefault("round_answers", {})
-        if username in round_answers:
-            raise HTTPException(status_code=409, detail="Bu soruyu zaten cevapladın.")
-        started = float(duel.setdefault("round_started_at", {}).get(username, time.time()))
-        elapsed_ms = max(0, int((time.time() - started) * 1000))
-        round_answers[username] = {"answer": answer, "correct": answer == int(q["answer"]), "elapsed_ms": elapsed_ms}
-        other = duel["opponent"] if username == duel["challenger"] else duel["challenger"]
-        response = {"success": True, "waiting": other not in round_answers, "question_index": idx}
-        if other not in round_answers:
-            _arena_save(data)
-            return response
-        a = round_answers[duel["challenger"]]
-        b = round_answers[duel["opponent"]]
-        if a["correct"] != b["correct"]:
-            round_winner = duel["challenger"] if a["correct"] else duel["opponent"]
-        elif a["correct"] and b["correct"] and a["elapsed_ms"] != b["elapsed_ms"]:
-            round_winner = duel["challenger"] if a["elapsed_ms"] < b["elapsed_ms"] else duel["opponent"]
-        else:
-            round_winner = None
-        duel.setdefault("results", []).append({"question": idx + 1, "challenger_correct": a["correct"], "opponent_correct": b["correct"], "challenger_ms": a["elapsed_ms"], "opponent_ms": b["elapsed_ms"], "round_winner": round_winner})
-        duel["round_result"] = {"question": idx + 1, "winner": round_winner, "challenger_correct": a["correct"], "opponent_correct": b["correct"]}
-        next_idx = idx + 1
-        if next_idx >= len(questions):
-            correct_totals = {
-                duel["challenger"]: sum(1 for x in duel["results"] if x["challenger_correct"]),
-                duel["opponent"]: sum(1 for x in duel["results"] if x["opponent_correct"]),
-            }
-            time_totals = {
-                duel["challenger"]: sum(int(x["challenger_ms"]) for x in duel["results"]),
-                duel["opponent"]: sum(int(x["opponent_ms"]) for x in duel["results"]),
-            }
-            if correct_totals[duel["challenger"]] > correct_totals[duel["opponent"]]:
-                winner, loser = duel["challenger"], duel["opponent"]
-            elif correct_totals[duel["opponent"]] > correct_totals[duel["challenger"]]:
-                winner, loser = duel["opponent"], duel["challenger"]
-            elif time_totals[duel["challenger"]] < time_totals[duel["opponent"]]:
-                winner, loser = duel["challenger"], duel["opponent"]
-            elif time_totals[duel["opponent"]] < time_totals[duel["challenger"]]:
-                winner, loser = duel["opponent"], duel["challenger"]
-            else:
-                winner = loser = None
-            totals = correct_totals
-            stake = int(duel["stake"])
-            if winner:
-                winner_player = _arena_player(data, winner)
-                loser_player = _arena_player(data, loser)
-                # Recheck funds at settlement to prevent negative balances.
-                if int(loser_player.get("points", 0)) < stake:
-                    winner = loser = None
-                    duel["result"] = {"winner": None, "reason": "Sonuçlandırma sırasında bahis puanı yetersizdi; puan aktarılmadı.", "wins": totals}
-                else:
-                    winner_player["points"] = int(winner_player.get("points", 0)) + stake
-                    loser_player["points"] = int(loser_player.get("points", 0)) - stake
-                    duel["result"] = {"winner": winner, "loser": loser, "stake": stake, "wins": totals}
-            else:
-                duel["result"] = {"winner": None, "loser": None, "stake": stake, "wins": totals, "reason": "Berabere"}
-            duel["status"] = "completed"
-            finished_at = time.strftime("%Y-%m-%d %H:%M")
-            for player_name in (duel["challenger"], duel["opponent"]):
-                player = _arena_player(data, player_name)
-                outcome = "Berabere" if not winner else ("Kazandı" if player_name == winner else "Kaybetti")
-                delta = 0 if not winner else (stake if player_name == winner else -stake)
-                is_challenger = player_name == duel["challenger"]
-                correct_count = sum(1 for item in duel.get("results", []) if item.get("challenger_correct" if is_challenger else "opponent_correct"))
-                wrong_count = max(0, len(duel.get("results", [])) - correct_count)
-                player.setdefault("duel_history", []).append({
-                    "duel_id": duel_id, "opponent": duel["opponent"] if is_challenger else duel["challenger"],
-                    "outcome": outcome, "stake": stake, "points_delta": delta,
-                    "date": finished_at, "correct_wins": totals[player_name], "opponent_wins": totals[duel["opponent"] if is_challenger else duel["challenger"]],
-                    "correct_answers": correct_count, "wrong_answers": wrong_count, "total_questions": len(duel.get("results", []))
-                })
-                player["duel_history"] = player["duel_history"][-3:]
-            # Keep active/pending duels and only the three most recently completed duel records globally.
-            completed_ids = [did for did, item in sorted(duels.items(), key=lambda pair: pair[1].get("created_at", ""), reverse=True) if item.get("status") == "completed"]
-            for old_id in completed_ids[3:]:
-                duels.pop(old_id, None)
-            response["finished"] = True
-            response["result"] = duel["result"]
-        else:
-            duel["question_index"] = next_idx
-            duel["round_answers"] = {}
-            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
-            response["finished"] = False
-            response["next_question_index"] = next_idx
-        _arena_save(data)
-        return response
-
 
 @app.post("/arena/start")
 async def arena_start(payload: dict):
@@ -1817,6 +1549,46 @@ def requests_answer_for_admin():
 # ============================================================
 # LOGIN
 # ============================================================
+
+# ============================================================
+# ACTIVE PROFILE PRESENCE
+# ============================================================
+
+_active_profile_presence = {}
+_active_profile_presence_lock = threading.Lock()
+
+class PresenceHeartbeatRequest(BaseModel):
+    username: str
+
+@app.post("/presence/heartbeat")
+async def presence_heartbeat(request: PresenceHeartbeatRequest):
+    username = (request.username or "").strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz profil.")
+    now = time.time()
+    with _active_profile_presence_lock:
+        _active_profile_presence[username] = now
+    return {"success": True, "online": True}
+
+@app.get("/admin/active-profiles")
+async def admin_active_profiles(username: str = ""):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Bu alan yalnızca yetkili profile açıktır.")
+    now = time.time()
+    with _active_profile_presence_lock:
+        presence = dict(_active_profile_presence)
+    profiles = []
+    for key, user in USERS.items():
+        seen = presence.get(key, 0)
+        profiles.append({
+            "username": key,
+            "name": user.get("name", key),
+            "online": bool(seen and now - seen <= 90),
+            "last_seen_seconds": int(now - seen) if seen else None,
+        })
+    profiles.sort(key=lambda p: (not p["online"], str(p["name"]).casefold()))
+    return {"success": True, "profiles": profiles, "online_count": sum(1 for p in profiles if p["online"])}
+
 
 @app.post("/login")
 async def login(
