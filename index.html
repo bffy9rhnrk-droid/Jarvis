@@ -1977,7 +1977,11 @@ body.voice-speaking .ring.three{
     <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Yönetimi</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
   </header>
   <div class="exam-manager-note">⏱ Süre dakika cinsindendir. <strong>0 = sınırsız</strong>. Tarihler cihazının yerel saatine göre ayarlanır.</div>
-  <section class="exam-manager-section">
+  <nav class="exam-manager-shortcuts" aria-label="Sınav yönetimi bölümleri">
+    <button type="button" onclick="document.getElementById('examBuilderTop').scrollIntoView({behavior:'smooth',block:'start'})">✦ Sınav hazırlama</button>
+    <button type="button" onclick="document.getElementById('examStatsPanel').scrollIntoView({behavior:'smooth',block:'start'});loadTeacherExams()">▥ Sınav istatistikleri</button>
+  </nav>
+  <section class="exam-manager-section" id="examBuilderTop">
     <div class="exam-section-heading"><span>01</span><div><h3>Sınav bilgileri</h3><p>Öğrencilerin göreceği temel bilgiler</p></div></div>
     <div class="exam-field-grid">
       <label class="exam-modern-field exam-field-wide">Sınav başlığı<input id="examTitle" placeholder="Örn. 1. dönem konu değerlendirmesi" autocomplete="off"></label>
@@ -2018,7 +2022,7 @@ body.voice-speaking .ring.three{
   <div class="exam-publish-actions"><button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button><button class="exam-generate-button" onclick="saveTeacherExam(true)">✓ Sınavı yayımla</button></div>
   <div id="teacherExamStatus" aria-live="polite" class="exam-status-message"></div>
   <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
-  <section class="exam-stats-panel">
+  <section class="exam-stats-panel" id="examStatsPanel">
     <header class="exam-stats-hero"><span class="exam-stats-icon">▥</span><div><p class="exam-manager-eyebrow">KARVIS • RAPORLAMA</p><h3>Öğrenci istatistikleri</h3><p>Sınıf başarısını ve tekrar edilmesi gereken konuları inceleyin.</p></div></header>
     <div class="exam-stats-controls"><label for="examStatsSelect">Analiz edilecek sınav<select id="examStatsSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select></label><button class="exam-generate-button" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">⌁ Analizi görüntüle</button></div>
     <div id="teacherExamStats" aria-live="polite" style="margin-top:12px;"></div>
@@ -5337,3 +5341,28 @@ initialize();
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
+
+
+/* Desktop visibility + compact, mobile-safe exam analytics */
+.exam-modal{width:min(1120px,calc(100vw - 32px))!important;max-width:1120px!important;max-height:92vh;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;}
+.exam-manager-shortcuts{position:sticky;top:-1px;z-index:6;display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:10px 0;background:rgba(5,16,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,190,220,.18)}
+.exam-manager-shortcuts button{flex:1 1 180px;min-width:0;min-height:42px;padding:10px 14px;border:1px solid rgba(0,190,220,.3);border-radius:12px;background:rgba(0,170,210,.08);color:inherit;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.exam-manager-shortcuts button:hover,.exam-manager-shortcuts button:focus-visible{border-color:#12c7d8;background:rgba(0,190,220,.15);outline:none}
+#examStatsPanel{scroll-margin-top:72px;display:block!important;visibility:visible!important;width:100%;min-width:0;clear:both}
+#teacherExamStats{min-width:0;width:100%;overflow-wrap:anywhere}
+.exam-stats-summary-grid{grid-template-columns:repeat(auto-fit,minmax(115px,1fr))}
+.exam-question-stat-card{padding:12px}
+.exam-question-stat-prompt{font-size:13px;line-height:1.5}
+@media(min-width:900px){.exam-modal{width:min(1120px,calc(100vw - 56px))!important}.exam-stats-summary-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.exam-question-stat-list{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
+@media(max-width:600px){
+ .exam-modal{width:calc(100vw - 12px)!important;max-height:94dvh;padding:12px!important;border-radius:16px!important}
+ .exam-manager-shortcuts{gap:7px;padding:8px 0}.exam-manager-shortcuts button{flex:1 1 130px;padding:9px 8px;font-size:12px}
+ .exam-modal .exam-stats-panel{padding:11px;margin:14px 0;border-radius:15px}
+ .exam-stats-hero{gap:9px;margin-bottom:12px}.exam-stats-icon{flex-basis:36px;width:36px;height:36px;font-size:20px;border-radius:11px}.exam-stats-hero h3{font-size:16px!important}.exam-stats-hero p:not(.exam-manager-eyebrow){font-size:11px}
+ .exam-stats-controls{grid-template-columns:minmax(0,1fr);gap:8px;padding:10px}.exam-stats-controls select{padding:10px;font-size:14px}.exam-stats-controls .exam-generate-button{min-height:42px}
+ .exam-stats-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}.exam-stat-summary-card{padding:10px;border-radius:12px}.exam-stat-summary-card small{font-size:10px}.exam-stat-summary-card h3{font-size:19px!important;margin-top:4px!important}
+ .exam-stats-question-section{margin-top:13px}.exam-stats-section-head h4{font-size:14px!important}.exam-stats-section-head p{font-size:10px}.exam-stats-section-head>span{font-size:10px;padding:6px 7px}
+ .exam-question-stat-list{gap:8px}.exam-question-stat-card{padding:10px;border-radius:12px}.exam-question-stat-head{grid-template-columns:28px minmax(0,1fr);gap:8px}.exam-question-stat-head .exam-question-number{min-width:28px;height:28px;border-radius:9px;font-size:11px}.exam-question-stat-prompt{font-size:12px;line-height:1.45;overflow-wrap:anywhere;word-break:normal}.exam-stat-status{grid-column:2;justify-self:start;padding:5px 7px;font-size:9px}
+ .exam-stat-progress-row{gap:7px;margin:9px 0}.exam-stat-progress{height:7px}.exam-stat-progress-row strong{min-width:34px;font-size:11px}.exam-stat-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.exam-stat-mini-grid>div{padding:7px;border-radius:9px}.exam-stat-mini-grid span{font-size:9px}.exam-stat-mini-grid strong{font-size:14px;margin-top:3px}
+ .exam-karvis-evaluation{grid-template-columns:32px minmax(0,1fr);gap:9px;padding:11px;margin-top:12px;border-radius:13px}.exam-karvis-brain{width:32px;height:32px;border-radius:10px;font-size:19px}.exam-karvis-evaluation h4{font-size:14px!important}.exam-karvis-evaluation p:not(.exam-manager-eyebrow){font-size:12px;line-height:1.55}.exam-stats-footnote{font-size:10px}
+}
