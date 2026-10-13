@@ -1510,57 +1510,10 @@ select option:checked{background:#087f9b!important;color:#fff!important}
          SADECE İLKNUR
          ======================================================== -->
 
-    <div
-        id="teacherMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            AKADEMİK ASİSTAN
-        </div>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="research"
-            onclick="selectAcademicMode('research')">
-            🔬 Araştırma Modu
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="academic"
-            onclick="selectAcademicMode('academic')">
-            📚 Akademik Mod
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="article"
-            onclick="selectAcademicMode('article')">
-            📝 Makale Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="lesson"
-            onclick="selectAcademicMode('lesson')">
-            🎓 Ders Asistanı
-        </button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="quiz"
-            onclick="selectAcademicMode('quiz')">
-            🧪 Sınav / Quiz
-        </button>
+    <div id="teacherMenu" style="display:none;">
+        <div class="academic-title">AKADEMİK ASİSTAN</div>
+        <button class="menu-item" onclick="openMyFeatures()">✨ Özellikler</button>
         <button class="menu-item" onclick="openTeacherExamManager()">🗂️ Sınav Yönetimi</button>
-
-        <button
-            class="menu-item academic-menu-item"
-            data-mode="presentation"
-            onclick="selectAcademicMode('presentation')">
-            📊 Sunum Hazırlama
-        </button>
-
     </div>
 
     <!-- ========================================================
@@ -2334,7 +2287,7 @@ async function registerAccount(){
         let data = {};
         const raw = await response.text();
         try{ data = raw ? JSON.parse(raw) : {}; }catch(_){ data = {}; }
-        if(!response.ok || data.success !== true){
+        if(!response.ok || data.success === false || (raw && !Object.keys(data).length)){
             const message = data.detail || data.message || (response.status ? `Sunucu kayıt isteğini reddetti (HTTP ${response.status}).` : "Hesap oluşturulamadı.");
             showError(message);
             return;
