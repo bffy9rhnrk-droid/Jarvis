@@ -14,7 +14,7 @@ import hashlib
 import threading
 import traceback
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -152,6 +152,7 @@ def init_arena_database():
                         legacy = {}
                     legacy.setdefault("players", {})
                     legacy.setdefault("attempts", {})
+                    legacy.setdefault("duels", {})
                     legacy.setdefault("updated_at", time.strftime("%Y-%m-%d %H:%M:%S"))
                     cur.execute(
                         "INSERT INTO public.arena_state (id, state) VALUES (1, %s::jsonb) ON CONFLICT (id) DO NOTHING",
@@ -179,7 +180,7 @@ def _arena_load_state_from_db():
                 cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
                 row = cur.fetchone()
                 if not row:
-                    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+                    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
                 state = row[0]
                 if isinstance(state, str):
                     state = json.loads(state)
@@ -187,6 +188,7 @@ def _arena_load_state_from_db():
                     state = {}
                 state.setdefault("players", {})
                 state.setdefault("attempts", {})
+                state.setdefault("duels", {})
                 return state
     finally:
         conn.close()
@@ -762,11 +764,50 @@ ARENA_QUESTIONS["memory"] += [
  {"prompt":"Arıların ürettiği besin hangisidir?","options":["Süt","Bal","Pekmez","Şurup"],"answer":1},
  {"prompt":"Hangi gezegen 'Kızıl Gezegen' olarak bilinir?","options":["Venüs","Mars","Jüpiter","Merkür"],"answer":1}
 ]
-ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["logic"]
+
+# Expanded mixed question pool: general knowledge, citizenship, riddles, science and geography.
+ARENA_QUESTIONS["knowledge"] += [
+ {"prompt":"Türkiye Büyük Millet Meclisi hangi şehirde bulunur?","options":["İstanbul","Ankara","İzmir","Bursa"],"answer":1},
+ {"prompt":"Anayasa temel olarak neyi düzenler?","options":["Yalnızca spor kurallarını","Devletin yapısını ve temel hakları","Sadece trafik işaretlerini","Yalnızca ticari fiyatları"],"answer":1},
+ {"prompt":"Türkiye'de yasama yetkisi hangi kuruma aittir?","options":["TBMM","Danıştay","Valilik","Belediye"],"answer":0},
+ {"prompt":"Türkiye Cumhuriyeti Anayasası'na göre egemenlik kime aittir?","options":["Bir aileye","Millete","Yalnızca belediyelere","Bir şirkete"],"answer":1},
+ {"prompt":"Seçimlerde oy kullanmak hangi hakla ilgilidir?","options":["Siyasi hak","Telif hakkı","Mülkiyet hakkı","Patent hakkı"],"answer":0},
+ {"prompt":"Türkiye'nin en uzun nehri hangisidir?","options":["Kızılırmak","Gediz","Meriç","Asi"],"answer":0},
+ {"prompt":"Türkiye'nin en büyük gölü hangisidir?","options":["Tuz Gölü","Van Gölü","Eğirdir Gölü","Sapanca Gölü"],"answer":1},
+ {"prompt":"Dünya'nın en büyük kıtası hangisidir?","options":["Avrupa","Afrika","Asya","Avustralya"],"answer":2},
+ {"prompt":"İnsan vücudundaki en büyük organ hangisidir?","options":["Kalp","Deri","Beyin","Akciğer"],"answer":1},
+ {"prompt":"Işığın boşluktaki hızı yaklaşık kaç km/s'dir?","options":["30.000","150.000","300.000","3.000.000"],"answer":2},
+ {"prompt":"Elektrik akımının SI birimi hangisidir?","options":["Volt","Amper","Watt","Ohm"],"answer":1},
+ {"prompt":"Türkiye'de kanunları kabul eden yasama organı hangisidir?","options":["TBMM","Yargıtay","Valilik","Kaymakamlık"],"answer":0},
+ {"prompt":"Bir kişinin suçluluğu kesinleşene kadar masum kabul edilmesi hangi ilkeyle ilgilidir?","options":["Masumiyet karinesi","Vergi muafiyeti","Yerinden yönetim","Gizli oy"],"answer":0},
+ {"prompt":"Birleşmiş Milletler'in kısaltması hangisidir?","options":["AB","BM","NATO","OECD"],"answer":1},
+ {"prompt":"Dünya'nın kendi ekseni etrafında dönmesi hangi olayı oluşturur?","options":["Mevsimleri","Gece ve gündüzü","Yılları","Ay tutulmasını her ay"],"answer":1},
+ {"prompt":"Türkiye'nin batısında hangi deniz bulunur?","options":["Karadeniz","Akdeniz","Ege Denizi","Hazar Denizi"],"answer":2},
+ {"prompt":"Türkiye'de yürütme yetkisi ve görevi Anayasa'ya göre kim tarafından kullanılır ve yerine getirilir?","options":["Cumhurbaşkanı","TBMM Başkanı tek başına","Belediye meclisi","Yargıtay"],"answer":0},
+ {"prompt":"Bir hakkın ihlal edildiğini düşünen kişi aşağıdakilerden hangisini yapabilir?","options":["Yetkili makamlara başvurabilir","Her durumda kendi cezasını verebilir","Mahkeme kararlarını yok sayabilir","Başkasının hakkını elinden alabilir"],"answer":0},
+ {"prompt":"Türkiye'nin para birimi hangisidir?","options":["Euro","Türk lirası","Dinar","Frank"],"answer":1},
+ {"prompt":"Bitkiler fotosentez sırasında atmosfere çoğunlukla hangi gazı verir?","options":["Azot","Oksijen","Helyum","Metan"],"answer":1},
+]
+ARENA_QUESTIONS["logic"] += [
+ {"prompt":"Bilmece: Ağzı var konuşmaz, yatağı var uyumaz. Nedir?","options":["Nehir","Kitap","Saat","Kapı"],"answer":0},
+ {"prompt":"Bilmece: Kat kat açılır, ama kapı değildir; içinde yapraklar vardır. Nedir?","options":["Lahana","Taş","Mum","Şişe"],"answer":0},
+ {"prompt":"Bilmece: Ne kadar alırsan o kadar büyür. Nedir?","options":["Çukur","Su","Işık","Kâğıt"],"answer":0},
+ {"prompt":"Bilmece: Dört ayağı var, yürüyemez. Nedir?","options":["Masa","Kedi","At","Kuş"],"answer":0},
+ {"prompt":"Bilmece: Gece görünür, gündüz kaybolur; kendi ışığı yoktur. Nedir?","options":["Yıldız","Lamba","Güneş","Ateş"],"answer":0},
+ {"prompt":"Bir odada 3 ampul ve dışarıda 3 anahtar var. Odaya yalnızca bir kez girebilirsin. Hangi bilgi ampulleri ayırt etmeye yardımcı olur?","options":["Ampullerin sıcaklığı","Duvarın rengi","Kapının boyu","Odanın adresi"],"answer":0},
+ {"prompt":"Dizi: 1, 3, 6, 10, 15, …?","options":["18","20","21","25"],"answer":2},
+ {"prompt":"Bir yarışta sonuncuyu geçebilir misin?","options":["Evet, birinci olursun","Evet, ikinci olursun","Hayır, sonuncuyu geçemezsin","Her zaman üçüncü olursun"],"answer":2},
+ {"prompt":"Bilmece: Herkesin önünde gider ama kimse onu yakalayamaz. Nedir?","options":["Gelecek","Taş","Duvar","Kitap"],"answer":0},
+ {"prompt":"Bir sepette 5 elma var; 5 kişi birer elma alıyor ve sepette bir elma kalıyor. Nasıl?","options":["Bir kişi elmayı sepetle alır","Bir elma görünmezdir","Elmalar çoğalır","Sepet boştur"],"answer":0},
+ {"prompt":"Türkiye'de temel hak ve özgürlükler esas olarak hangi metinde güvence altına alınır?","options":["Anayasa","Spor yönetmeliği","Market fişi","Trafik haritası"],"answer":0},
+ {"prompt":"Hukuk devletinde idarenin işlemleri hangi ilkeye uygun olmalıdır?","options":["Hukuka uygunluk","Kişisel keyif","Kuralsızlık","Sınırsız gizlilik"],"answer":0},
+]
+ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["logic"] + ARENA_QUESTIONS["speed"] + ARENA_QUESTIONS["memory"]
+
 
 
 def _arena_default():
-    return {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 def _arena_load():
     if arena_database_configured():
@@ -777,7 +818,7 @@ def _arena_load():
             raise HTTPException(status_code=503, detail="Arena veritabanına erişilemiyor.")
     data = read_json_file(ARENA_FILE, {})
     if not isinstance(data, dict): data = {}
-    data.setdefault("players", {}); data.setdefault("attempts", {})
+    data.setdefault("players", {}); data.setdefault("attempts", {}); data.setdefault("duels", {})
     return data
 
 
@@ -803,9 +844,9 @@ def _arena_player(data, username):
     if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
     players = data["players"]
     if username not in players:
-        players[username] = {"points": 0, "badges": [], "history": [], "answered_ids": [], "wins": 0}
+        players[username] = {"points": 0, "badges": [], "history": [], "answered_ids": [], "wins": 0, "duel_history": []}
     p = players[username]
-    for k,v in {"points":0,"badges":[],"history":[],"answered_ids":[],"wins":0}.items(): p.setdefault(k,v)
+    for k,v in {"points":0,"badges":[],"history":[],"answered_ids":[],"wins":0,"duel_history":[]}.items(): p.setdefault(k,v)
     return p
 
 def _arena_rankings(data):
@@ -824,7 +865,8 @@ async def arena_overview(username: str = "karahan"):
         data=_arena_load(); player=_arena_player(data,username); rankings=_arena_rankings(data)
         own=next(x for x in rankings if x["username"]==username)
         history=player.get("history", [])[-8:]
-        return {"success":True,"player":{"username":username,"points":player["points"],"league":_arena_league(player["points"]),"rank":own["rank"],"badges":player["badges"],"history":list(reversed(history))},"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in rankings]}
+        duel_history=player.get("duel_history", [])[-3:]
+        return {"success":True,"player":{"username":username,"points":player["points"],"league":_arena_league(player["points"]),"rank":own["rank"],"badges":player["badges"],"history":list(reversed(history)),"duel_history":list(reversed(duel_history))},"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in rankings]}
 
 @app.get("/arena/leaderboard")
 async def arena_leaderboard():
@@ -836,7 +878,7 @@ async def arena_leaderboard():
 async def arena_reset(username: str = ""):
     """Reset Arena scores/history; only the Murat admin profile may invoke this."""
     require_admin(username)
-    empty_state = {"players": {}, "attempts": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    empty_state = {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
     with arena_lock:
         if arena_database_configured():
             conn = get_arena_db_connection()
@@ -862,6 +904,273 @@ async def arena_reset(username: str = ""):
         else:
             write_json_file(ARENA_FILE, empty_state)
         return {"success": True, "message": "Arena puan tablosu, rozetler ve oyun geçmişi sıfırlandı."}
+
+
+def _duel_public(duel, username):
+    """Return only the caller's current question and public duel status."""
+    result = {
+        "duel_id": duel.get("duel_id"),
+        "challenger": duel.get("challenger"),
+        "opponent": duel.get("opponent"),
+        "stake": int(duel.get("stake", 0)),
+        "status": duel.get("status"),
+        "created_at": duel.get("created_at"),
+        "question_index": int(duel.get("question_index", 0)),
+        "total_questions": 5,
+        "answered": username in duel.get("round_answers", {}),
+        "round_result": duel.get("round_result"),
+        "result": duel.get("result"),
+        "round_age_seconds": max(0, int(time.time() - min((float(v) for v in duel.get("round_started_at", {}).values()), default=time.time()))) if duel.get("status") == "active" else 0,
+        "round_answer_count": len(duel.get("round_answers", {})),
+    }
+    if duel.get("status") == "active":
+        idx = int(duel.get("question_index", 0))
+        questions = duel.get("questions", [])
+        if idx < len(questions) and username not in duel.get("round_answers", {}):
+            q = questions[idx]
+            result["question"] = {"prompt": q["prompt"], "options": q["options"], "category": q.get("category", "Genel")}
+    return result
+
+@app.get("/arena/duels")
+async def arena_duels(username: str = "karahan"):
+    username = username.strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with arena_lock:
+        data = _arena_load()
+        _arena_player(data, username)
+        duels = data.setdefault("duels", {})
+        pending_incoming = []
+        pending_outgoing = []
+        active = None
+        for duel in duels.values():
+            if duel.get("status") == "pending":
+                if duel.get("opponent") == username:
+                    pending_incoming.append(_duel_public(duel, username))
+                elif duel.get("challenger") == username:
+                    pending_outgoing.append(_duel_public(duel, username))
+            elif duel.get("status") == "active" and username in (duel.get("challenger"), duel.get("opponent")):
+                if active is None:
+                    active = _duel_public(duel, username)
+        return {"success": True, "pending_incoming": pending_incoming, "pending_outgoing": pending_outgoing, "active_duel": active,
+                "duel_history": list(reversed(_arena_player(data, username).get("duel_history", [])[-3:]))}
+
+@app.post("/arena/duel/request")
+async def arena_duel_request(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    opponent = str(payload.get("opponent", "")).strip().lower()
+    try:
+        stake = int(payload.get("stake"))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Geçerli bir bahis puanı girin.")
+    if username not in USERS or opponent not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if username == opponent:
+        raise HTTPException(status_code=400, detail="Kendine düello gönderemezsin.")
+    if stake < 1 or stake > 1000000:
+        raise HTTPException(status_code=400, detail="Bahis 1 ile 1.000.000 puan arasında olmalı.")
+    with arena_lock:
+        data = _arena_load()
+        challenger_player = _arena_player(data, username)
+        opponent_player = _arena_player(data, opponent)
+        if int(challenger_player.get("points", 0)) < stake:
+            raise HTTPException(status_code=400, detail="Bahis miktarı için yeterli puanın yok.")
+        if int(opponent_player.get("points", 0)) < stake:
+            raise HTTPException(status_code=400, detail="Rakibin bu bahsi karşılayacak kadar puana sahip değil.")
+        duels = data.setdefault("duels", {})
+        if any(d.get("status") in ("pending", "active") and username in (d.get("challenger"), d.get("opponent")) for d in duels.values()):
+            raise HTTPException(status_code=409, detail="Önce mevcut düello isteğini veya aktif düellonu tamamla.")
+        duel_id = uuid.uuid4().hex
+        mixed = []
+        for category in ("knowledge", "logic", "speed", "memory"):
+            for q in ARENA_QUESTIONS.get(category, []):
+                mixed.append({**q, "category": {"knowledge":"Genel kültür ve vatandaşlık","logic":"Mantık ve bilmeceler","speed":"Hız ve sayısal bilgiler","memory":"Genel bilgiler"}[category]})
+        chosen = random.sample(mixed, min(5, len(mixed)))
+        duels[duel_id] = {
+            "duel_id": duel_id, "challenger": username, "opponent": opponent, "stake": stake,
+            "status": "pending", "created_at": time.strftime("%Y-%m-%d %H:%M:%S"), "created_at_epoch": time.time(),
+            "questions": chosen, "question_index": 0, "round_answers": {},
+            "round_started_at": {}, "round_result": None, "results": [],
+            "accepted_at": None, "result": None
+        }
+        _arena_save(data)
+        return {"success": True, "message": "Düello isteği gönderildi.", "duel_id": duel_id}
+
+@app.post("/arena/duel/respond")
+async def arena_duel_respond(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    accept = bool(payload.get("accept"))
+    with arena_lock:
+        data = _arena_load()
+        duel = data.setdefault("duels", {}).get(duel_id)
+        if not duel or duel.get("status") != "pending":
+            raise HTTPException(status_code=404, detail="Bekleyen düello isteği bulunamadı.")
+        if duel.get("opponent") != username:
+            raise HTTPException(status_code=403, detail="Bu düello isteği sana gönderilmedi.")
+        if accept:
+            challenger_player = _arena_player(data, duel["challenger"])
+            opponent_player = _arena_player(data, duel["opponent"])
+            stake = int(duel["stake"])
+            if int(challenger_player.get("points", 0)) < stake or int(opponent_player.get("points", 0)) < stake:
+                duel["status"] = "declined"
+                duel["result"] = {"winner": None, "reason": "Puan yetersizliği nedeniyle düello başlatılamadı."}
+                _arena_save(data)
+                raise HTTPException(status_code=409, detail="Oyunculardan birinin puanı artık bu bahsi karşılamıyor.")
+            duel["status"] = "active"
+            duel["accepted_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
+        else:
+            duel["status"] = "declined"
+            duel["result"] = {"winner": None, "reason": "İstek reddedildi."}
+        _arena_save(data)
+        return {"success": True, "message": "Düello kabul edildi." if accept else "Düello isteği reddedildi."}
+
+@app.post("/arena/duel/reset")
+async def arena_duel_reset(payload: dict):
+    """Cancel a genuinely stuck pending/active duel without transferring points."""
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with arena_lock:
+        data = _arena_load()
+        duel = data.setdefault("duels", {}).get(duel_id)
+        if not duel or duel.get("status") not in ("pending", "active"):
+            raise HTTPException(status_code=404, detail="Sıfırlanabilecek bekleyen veya aktif düello bulunamadı.")
+        if username not in (duel.get("challenger"), duel.get("opponent")):
+            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
+        if duel.get("status") == "pending":
+            created = duel.get("created_at_epoch")
+            if created is None:
+                raise HTTPException(status_code=409, detail="Bekleyen istek henüz takılmış olarak doğrulanmadı. Önce durumu yenile.")
+            age = max(0, time.time() - float(created))
+            stuck = age >= 180
+        else:
+            starts = [float(v) for v in duel.get("round_started_at", {}).values()]
+            age = max(0, time.time() - min(starts)) if starts else 0
+            answers = duel.get("round_answers", {})
+            # A round is stuck only when it has been idle for at least 60s and
+            # one player has answered without the other, or it has exceeded 120s.
+            stuck = age >= 60 and (len(answers) == 1 or age >= 120)
+        if not stuck:
+            raise HTTPException(status_code=409, detail="Düello henüz takılmış görünmüyor. Normal akış için yenileme yapabilirsin.")
+        duel["status"] = "cancelled"
+        duel["result"] = {"winner": None, "reason": "Takıldığı için kullanıcı tarafından sıfırlandı; puan aktarılmadı."}
+        duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        _arena_save(data)
+        return {"success": True, "message": "Takılan düello sıfırlandı. Puan aktarılmadı; yeni düello başlatabilirsin."}
+
+
+@app.post("/arena/duel/answer")
+async def arena_duel_answer(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    try:
+        answer = int(payload.get("answer"))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Geçersiz cevap.")
+    with arena_lock:
+        data = _arena_load()
+        duels = data.setdefault("duels", {})
+        duel = duels.get(duel_id)
+        if not duel or duel.get("status") != "active":
+            raise HTTPException(status_code=404, detail="Aktif düello bulunamadı.")
+        if username not in (duel.get("challenger"), duel.get("opponent")):
+            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
+        idx = int(duel.get("question_index", 0))
+        questions = duel.get("questions", [])
+        if idx >= len(questions):
+            raise HTTPException(status_code=409, detail="Düello soruları tamamlandı.")
+        q = questions[idx]
+        if answer < 0 or answer >= len(q["options"]):
+            raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
+        round_answers = duel.setdefault("round_answers", {})
+        if username in round_answers:
+            raise HTTPException(status_code=409, detail="Bu soruyu zaten cevapladın.")
+        started = float(duel.setdefault("round_started_at", {}).get(username, time.time()))
+        elapsed_ms = max(0, int((time.time() - started) * 1000))
+        round_answers[username] = {"answer": answer, "correct": answer == int(q["answer"]), "elapsed_ms": elapsed_ms}
+        other = duel["opponent"] if username == duel["challenger"] else duel["challenger"]
+        response = {"success": True, "waiting": other not in round_answers, "question_index": idx}
+        if other not in round_answers:
+            _arena_save(data)
+            return response
+        a = round_answers[duel["challenger"]]
+        b = round_answers[duel["opponent"]]
+        if a["correct"] != b["correct"]:
+            round_winner = duel["challenger"] if a["correct"] else duel["opponent"]
+        elif a["correct"] and b["correct"] and a["elapsed_ms"] != b["elapsed_ms"]:
+            round_winner = duel["challenger"] if a["elapsed_ms"] < b["elapsed_ms"] else duel["opponent"]
+        else:
+            round_winner = None
+        duel.setdefault("results", []).append({"question": idx + 1, "challenger_correct": a["correct"], "opponent_correct": b["correct"], "challenger_ms": a["elapsed_ms"], "opponent_ms": b["elapsed_ms"], "round_winner": round_winner})
+        duel["round_result"] = {"question": idx + 1, "winner": round_winner, "challenger_correct": a["correct"], "opponent_correct": b["correct"]}
+        next_idx = idx + 1
+        if next_idx >= len(questions):
+            correct_totals = {
+                duel["challenger"]: sum(1 for x in duel["results"] if x["challenger_correct"]),
+                duel["opponent"]: sum(1 for x in duel["results"] if x["opponent_correct"]),
+            }
+            time_totals = {
+                duel["challenger"]: sum(int(x["challenger_ms"]) for x in duel["results"]),
+                duel["opponent"]: sum(int(x["opponent_ms"]) for x in duel["results"]),
+            }
+            if correct_totals[duel["challenger"]] > correct_totals[duel["opponent"]]:
+                winner, loser = duel["challenger"], duel["opponent"]
+            elif correct_totals[duel["opponent"]] > correct_totals[duel["challenger"]]:
+                winner, loser = duel["opponent"], duel["challenger"]
+            elif time_totals[duel["challenger"]] < time_totals[duel["opponent"]]:
+                winner, loser = duel["challenger"], duel["opponent"]
+            elif time_totals[duel["opponent"]] < time_totals[duel["challenger"]]:
+                winner, loser = duel["opponent"], duel["challenger"]
+            else:
+                winner = loser = None
+            totals = correct_totals
+            stake = int(duel["stake"])
+            if winner:
+                winner_player = _arena_player(data, winner)
+                loser_player = _arena_player(data, loser)
+                # Recheck funds at settlement to prevent negative balances.
+                if int(loser_player.get("points", 0)) < stake:
+                    winner = loser = None
+                    duel["result"] = {"winner": None, "reason": "Sonuçlandırma sırasında bahis puanı yetersizdi; puan aktarılmadı.", "wins": totals}
+                else:
+                    winner_player["points"] = int(winner_player.get("points", 0)) + stake
+                    loser_player["points"] = int(loser_player.get("points", 0)) - stake
+                    duel["result"] = {"winner": winner, "loser": loser, "stake": stake, "wins": totals}
+            else:
+                duel["result"] = {"winner": None, "loser": None, "stake": stake, "wins": totals, "reason": "Berabere"}
+            duel["status"] = "completed"
+            finished_at = time.strftime("%Y-%m-%d %H:%M")
+            for player_name in (duel["challenger"], duel["opponent"]):
+                player = _arena_player(data, player_name)
+                outcome = "Berabere" if not winner else ("Kazandı" if player_name == winner else "Kaybetti")
+                delta = 0 if not winner else (stake if player_name == winner else -stake)
+                is_challenger = player_name == duel["challenger"]
+                correct_count = sum(1 for item in duel.get("results", []) if item.get("challenger_correct" if is_challenger else "opponent_correct"))
+                wrong_count = max(0, len(duel.get("results", [])) - correct_count)
+                player.setdefault("duel_history", []).append({
+                    "duel_id": duel_id, "opponent": duel["opponent"] if is_challenger else duel["challenger"],
+                    "outcome": outcome, "stake": stake, "points_delta": delta,
+                    "date": finished_at, "correct_wins": totals[player_name], "opponent_wins": totals[duel["opponent"] if is_challenger else duel["challenger"]],
+                    "correct_answers": correct_count, "wrong_answers": wrong_count, "total_questions": len(duel.get("results", []))
+                })
+                player["duel_history"] = player["duel_history"][-3:]
+            # Keep active/pending duels and only the three most recently completed duel records globally.
+            completed_ids = [did for did, item in sorted(duels.items(), key=lambda pair: pair[1].get("created_at", ""), reverse=True) if item.get("status") == "completed"]
+            for old_id in completed_ids[3:]:
+                duels.pop(old_id, None)
+            response["finished"] = True
+            response["result"] = duel["result"]
+        else:
+            duel["question_index"] = next_idx
+            duel["round_answers"] = {}
+            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
+            response["finished"] = False
+            response["next_question_index"] = next_idx
+        _arena_save(data)
+        return response
 
 @app.post("/arena/start")
 async def arena_start(payload: dict):
@@ -923,202 +1232,6 @@ async def arena_answer(payload: dict):
             nextq=questions[attempt["index"]];attempt["question_started_at"]=time.time();response["question"]={"prompt":nextq["prompt"],"options":nextq["options"]};response["question_number"]=attempt["index"]+1;response["total_questions"]=len(questions)
         data["updated_at"]=time.strftime("%Y-%m-%d %H:%M:%S");_arena_save(data)
         return response
-
-
-# ============================================================
-# SON SİNYAL — independent, temporary story sessions
-# This module intentionally does not use Arena tables or persistent storage.
-# ============================================================
-STORY_SESSIONS = {}
-STORY_SESSIONS_LOCK = threading.RLock()
-STORY_SCENARIOS = [
-    {
-        "title": "SON SİNYAL", "setting": "Kuzey-9 Araştırma Tesisi",
-        "intro": "Gözlerini yer altındaki bir araştırma tesisinde açıyorsun. Acil durum ışıkları yanıp sönüyor; kapının ötesinden üç kez metalik bir ses geliyor.",
-        "voice": "KARVIS: Sistem kayıtlarında buraya kendi isteğinle geldiğin yazıyor. Fakat nedenini hatırlamıyorum.",
-        "clue": "Terminalde bugünün tarihini taşıyan, yıllar önce silinmiş bir kayıt beliriyor.",
-        "twist": "Kayıtta senin sesin var: ‘Protokolü başlat. Ben dâhil hiç kimse dışarı çıkmamalı.’",
-        "threat": "Tesisin diğer ucundan acil durum kapıları birer birer kapanmaya başlıyor.",
-        "goal": "Silinmiş kaydın kaynağını bul ve tesisten çıkmadan önce gerçekte ne olduğunu öğren.",
-    },
-    {
-        "title": "KAYIP SEFER", "setting": "Orion-6 Derin Uzay Gemisi",
-        "intro": "Soğuk uyku kapsülünden uyanıyorsun. Geminin yıldız haritası boş; Dünya ile bağlantı yok. Mürettebat listesinde adın iki kez yazılı.",
-        "voice": "KARVIS: Motorlar çalışıyor ama gemi rotasından sapmış. Seyir kayıtları, rotayı senin değiştirdiğini gösteriyor.",
-        "clue": "Köprüdeki kayıt cihazı, sen uyanmadan dokuz dakika önce birinin seninle konuştuğunu gösteriyor.",
-        "twist": "Kayıttaki ikinci ses, senin sesinle aynı: ‘Diğer ben uyanırsa rotayı ona söyleme.’",
-        "threat": "Geminin gövdesinde basınç kaybı başlıyor. Oksijen sistemi yalnızca bir bölgeyi koruyabilecek.",
-        "goal": "Geminin rotasını düzelt, ikinci kaydın sahibini bul ve yaşam destek sistemini koru.",
-    },
-    {
-        "title": "SIFIRINCI ŞEHİR", "setting": "Karantina Bölgesi / Sektör 12",
-        "intro": "Terk edilmiş bir şehirde, sirenlerin ortasında uyanıyorsun. Sokaklarda kimse yok ama her ekranda aynı canlı yayın var: senin yüzün.",
-        "voice": "KARVIS: Şehir ağına erişebiliyorum. Yayın, şehir boşaltılmadan önce kaydedilmiş. Sana ‘tehlikeli’ deniyor.",
-        "clue": "Bir acil durum istasyonunda, karantinanın gerçek sebebini açıklayan şifreli bir dosya buluyorsun.",
-        "twist": "Dosyada karantinanın bir salgın yüzünden değil, şehirdeki bir deneyin sonucunda başlatıldığı yazıyor.",
-        "threat": "Otomatik devriyeler hareketini algılıyor. Sığınak kapıları kapanmadan birini seçmelisin.",
-        "goal": "Şehrin yayınını durdur, deneyin kanıtını bul ve hayatta kalanlara ulaş.",
-    },
-    {
-        "title": "KARANLIK VARDİYA", "setting": "Marmara-4 Denizaltı İstasyonu",
-        "intro": "Derin deniz istasyonunda vardiya alarmıyla uyanıyorsun. Dış basınç tehlikeli seviyede. Kontrol odasındaki ekip yok; kahve fincanları hâlâ sıcak.",
-        "voice": "KARVIS: Son mesaj ‘Kapıları içeriden kilitleyin’ diyor. Mesajı gönderen kişinin kimliği silinmiş.",
-        "clue": "Basınç odasının kamerasında, boş koridordan geçen bir gölge görünüyor.",
-        "twist": "Kayıt zaman damgası gelecek saate ait. Görüntüdeki gölge, henüz yapmadığın bir hareketi yapıyor.",
-        "threat": "Dış kapakta çatlak tespit edildi. Onarım için gücü başka bir sistemden kesmen gerekiyor.",
-        "goal": "İstasyonun neden boşaltıldığını çöz, basıncı dengede tut ve yüzeye çıkmanın yolunu bul.",
-    },
-    {
-        "title": "SON TANIK", "setting": "Kül Yağmuru / Eski Başkent",
-        "intro": "Kül yağmurunun altında terk edilmiş bir şehirde yürüyorsun. Elindeki telsizden bir çocuk yardım istiyor ve sana daha önce hiç görmediğin bir isimle sesleniyor.",
-        "voice": "KARVIS: Telsiz sinyali gerçek. Fakat sinyalin geldiği binada enerji yok ve bina on yıldır kapalı.",
-        "clue": "Bir güvenlik kulübesinde, felaketten sonraki ilk günün görüntülerini buluyorsun.",
-        "twist": "Görüntülerde şehri terk eden konvoyun içinde sen varsın. Yanındaki kişi kameraya dönüp ‘Bu sefer onu geride bırak’ diyor.",
-        "threat": "Fırtına yaklaşıyor; telsiz sinyali kesilmeden önce bir rota seçmen gerek.",
-        "goal": "Telsizdeki kişiye ulaş, konvoy görüntülerinin anlamını çöz ve şehrin dışına çık.",
-    },
-]
-
-STORY_ACTIONS = [
-    {"id":"inspect", "label":"Çevreyi dikkatle incele", "kind":"clue", "energy":0},
-    {"id":"trust", "label":"KARVIS'in önerisini uygula", "kind":"trust", "energy":0},
-    {"id":"doubt", "label":"KARVIS'ten kanıt iste", "kind":"doubt", "energy":0},
-    {"id":"risk", "label":"Tehlikeli kestirme yolu dene", "kind":"risk", "energy":1},
-    {"id":"help", "label":"Sinyale / yardım çağrısına cevap ver", "kind":"help", "energy":1},
-    {"id":"save", "label":"Önce sistemi veya kaynağı koru", "kind":"save", "energy":0},
-    {"id":"break", "label":"Kuralları çiğneyip kilidi aş", "kind":"break", "energy":2},
-    {"id":"hide", "label":"Gizlen ve hareketleri gözle", "kind":"hide", "energy":0},
-    {"id":"decode", "label":"Verileri çözümle", "kind":"clue", "energy":1},
-    {"id":"confront", "label":"Bilinmeyen varlıkla / kişiyle yüzleş", "kind":"risk", "energy":1},
-    {"id":"reroute", "label":"Gücü başka bir sisteme yönlendir", "kind":"save", "energy":1},
-    {"id":"leave", "label":"Hemen çıkışa doğru ilerle", "kind":"escape", "energy":0},
-]
-
-def _story_scene(session, intro=False):
-    scenario = session["scenario"]
-    step = session["step"]
-    if intro:
-        body = scenario["intro"] + "\n\n" + scenario["voice"]
-        event = "İlk kararını ver."
-    elif step == 2:
-        body = scenario["clue"] + "\n\n" + random.choice([
-            "Ekranda tek satır beliriyor: ERİŞİM KAYDI DEĞİŞTİRİLDİ.",
-            "Koridordaki ışıklar sen hareket etmeden önce sırayla yanıyor.",
-            "KARVIS kısa bir sessizliğin ardından konuşuyor: ‘Bu veri burada olmamalı.’",
-            "Telsizden üç kısa sinyal geliyor. Sonuncusu diğerlerinden daha uzun.",
-        ])
-        event = "Bir ipucu buldun ama bu, yeni bir soruyu da beraberinde getiriyor."
-    elif step == 4:
-        body = scenario["twist"]
-        event = "Artık bildiklerinle ilk kararların arasında bir çelişki var."
-    elif step >= 6:
-        body = scenario["threat"] + "\n\n" + random.choice([
-            "KARVIS: ‘Bu noktadan sonra her şeyi kontrol edemem.’",
-            "Sistem sana son bir rota öneriyor; kayıtlar bu rotanın daha önce hiç kullanılmadığını gösteriyor.",
-            "Alarm sustu. Bu, tehlikenin geçtiği anlamına gelmiyor.",
-        ])
-        event = "Son kararların hikâyenin sonunu belirleyecek."
-    else:
-        body = random.choice([
-            "Bir kapının arkasından ayak sesleri geliyor. Sensörler odanın boş olduğunu söylüyor.",
-            "Terminalde üç rota beliriyor. Yalnızca birinin güvenli olduğuna dair kanıt var.",
-            "KARVIS yeni bir veri paketi yakalıyor; paketin başlığı senin adınla eşleşiyor.",
-            "Bir enerji hücresi buluyorsun. Üzerinde el yazısıyla ‘Bunu sisteme verme’ yazıyor.",
-            "Telsiz cızırtısı arasından bir ses duyuluyor: ‘KARVIS'in söylediklerinin hepsi doğru değil.’",
-            "Bir güvenlik kapısı açılıyor. Arkasında olması gereken oda yerine karanlık bir koridor var.",
-        ])
-        event = random.choice([
-            "Zaman daralıyor. Bir sonraki hamlenin sonuçları olabilir.",
-            "KARVIS senden karar vermeni bekliyor.",
-            "Bir ayrıntı dikkatini çekiyor ama henüz ne anlama geldiğini bilmiyorsun.",
-        ])
-    actions = random.sample(STORY_ACTIONS, 4)
-    # Guarantee a meaningful action and avoid immediate ending by a random button.
-    if not any(a["kind"] == "clue" for a in actions): actions[0] = next(a for a in STORY_ACTIONS if a["kind"] == "clue")
-    if not any(a["kind"] in ("risk", "escape", "help") for a in actions): actions[-1] = next(a for a in STORY_ACTIONS if a["kind"] == "risk")
-    random.shuffle(actions)
-    session["choices"] = {str(i): a for i, a in enumerate(actions)}
-    return {
-        "title": scenario["title"], "setting": scenario["setting"],
-        "chapter": min(4, 1 + step // 2), "step": step,
-        "body": body, "event": event, "choices": [{"id":str(i), "label":a["label"]} for i,a in enumerate(actions)],
-        "energy": session["energy"], "clues": session["clues"], "trust": session["trust"],
-        "goal": scenario["goal"], "finished": False,
-    }
-
-def _story_cleanup():
-    cutoff = time.time() - 2 * 60 * 60
-    for key in list(STORY_SESSIONS):
-        if STORY_SESSIONS[key].get("updated", 0) < cutoff:
-            STORY_SESSIONS.pop(key, None)
-
-@app.post("/story/start")
-async def story_start(payload: dict):
-    # No profile, leaderboard, Arena points, database, or persistent memory is used.
-    with STORY_SESSIONS_LOCK:
-        _story_cleanup()
-        scenario = random.choice(STORY_SCENARIOS)
-        sid = uuid.uuid4().hex
-        session = {"id":sid, "scenario":scenario, "step":0, "energy":5, "clues":0,
-                   "trust":0, "risk":0, "updated":time.time(), "finished":False, "choices":{}}
-        STORY_SESSIONS[sid] = session
-        scene = _story_scene(session, intro=True)
-        return {"success":True, "game_id":sid, "scene":scene}
-
-@app.post("/story/choose")
-async def story_choose(payload: dict):
-    game_id = str(payload.get("game_id", ""))
-    choice_id = str(payload.get("choice_id", ""))
-    with STORY_SESSIONS_LOCK:
-        _story_cleanup()
-        session = STORY_SESSIONS.get(game_id)
-        if not session:
-            raise HTTPException(status_code=404, detail="Bu hikâye oturumu bulunamadı. Yeni Oyun ile yeniden başlat.")
-        if session["finished"]:
-            raise HTTPException(status_code=409, detail="Bu hikâye sona erdi. Yeni Oyun başlatabilirsin.")
-        action = session["choices"].get(choice_id)
-        if not action:
-            raise HTTPException(status_code=400, detail="Geçersiz veya eski seçim. Sahneyi yenile.")
-        kind = action["kind"]
-        session["energy"] = max(0, session["energy"] - action["energy"])
-        if kind == "clue": session["clues"] += 1
-        elif kind == "trust": session["trust"] += 1
-        elif kind == "doubt": session["trust"] -= 1; session["clues"] += 1
-        elif kind == "risk": session["risk"] += 1
-        elif kind == "help": session["trust"] += 1; session["risk"] += 1
-        elif kind == "save": session["energy"] = min(6, session["energy"] + 1)
-        elif kind == "break": session["risk"] += 2
-        elif kind == "hide": session["risk"] = max(0, session["risk"] - 1)
-        elif kind == "escape": session["risk"] += 1
-        session["step"] += 1
-        session["updated"] = time.time()
-        if session["step"] >= 8 or session["energy"] <= 0:
-            session["finished"] = True
-            score = session["clues"] + max(0, session["energy"]) + max(0, session["trust"])
-            endings = [
-                ("GERÇEK ORTAYA ÇIKTI", "Bulduğun ipuçları olayların arkasındaki gerçeği açığa çıkardı. Ancak son kayıt, daha büyük bir gizemin başladığını gösteriyor."),
-                ("KARANLIKTA KALANLAR", "Çıkışa ulaştın fakat bazı sorular cevapsız kaldı. Son ekranda tek bir satır beliriyor: ‘Bu kayıt burada bitmiyor.’"),
-                ("GÜVEN KIRILMASI", "KARVIS'in yönlendirmesini sorgulamayı seçtin. Sistem sustu; kapı açıldı ama dışarıdaki dünyanın güvenli olduğuna dair kanıt yok."),
-                ("SON SANİYE", "Enerjin tükenmeden son kapıya ulaştın. Arkasında özgürlük mü yoksa yeni bir tuzak mı olduğunu öğrenemedin."),
-            ]
-            if session["clues"] >= 3: ending = endings[0]
-            elif session["trust"] < 0: ending = endings[2]
-            elif session["energy"] <= 0: ending = endings[3]
-            else: ending = endings[1]
-            return {"success":True, "finished":True, "game_id":game_id,
-                    "ending":{"title":ending[0], "body":ending[1], "score":score,
-                              "clues":session["clues"], "energy":session["energy"], "trust":session["trust"]},
-                    "message":"Bu hikâye oturumu tamamlandı. Yeni Oyun, farklı bir senaryo başlatır."}
-        scene = _story_scene(session)
-        scene["last_choice"] = action["label"]
-        scene["reaction"] = random.choice([
-            "KARVIS: ‘Bunu seçmeni beklemiyordum. Kayıtları yeniden değerlendiriyorum.’",
-            "KARVIS: ‘Kararın mantıklı. Yine de eksik bir bilgi var.’",
-            "KARVIS cevap vermiyor. Terminalde yeni bir simge beliriyor.",
-            "Uzakta bir kapı kapanıyor. Bu kararın etkisini henüz göremiyorsun.",
-            "KARVIS: ‘Bir sonraki seçimin her şeyi değiştirebilir.’",
-        ])
-        return {"success":True, "finished":False, "game_id":game_id, "scene":scene}
 
 
 # ============================================================
@@ -1279,6 +1392,99 @@ USERS = {
 }
 
 
+# Self-registered profiles are stored in PostgreSQL when DATABASE_URL is configured.
+# Render's temporary filesystem is not durable across restarts, so JSON is only a local fallback.
+REGISTERED_USERS_FILE = BASE_DIR / "registered_users.json"
+PROFILE_DB_LOCK = threading.Lock()
+
+def _profile_db_configured():
+    return bool(DATABASE_URL and psycopg2)
+
+def _profile_db_connect():
+    if not _profile_db_configured():
+        return None
+    return psycopg2.connect(DATABASE_URL, connect_timeout=8, sslmode="require")
+
+def _init_profile_database():
+    if not _profile_db_configured():
+        return False
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS karvis_user_profiles (
+                        username TEXT PRIMARY KEY,
+                        display_name TEXT NOT NULL,
+                        password_record JSONB NOT NULL,
+                        role TEXT NOT NULL DEFAULT 'user',
+                        style TEXT NOT NULL DEFAULT 'professional',
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+        conn.close()
+        return True
+    except Exception as exc:
+        print(f"KARVIS profile database init failed: {exc}", flush=True)
+        return False
+
+def _migrate_local_profiles_to_db():
+    """Import any surviving JSON-created profiles into PostgreSQL without overwriting DB accounts."""
+    if not (_profile_db_configured() and _init_profile_database()):
+        return
+    local_profiles = read_json_file(REGISTERED_USERS_FILE, {})
+    local_passwords = read_json_file(BASE_DIR / "user_passwords.json", {})
+    if not isinstance(local_profiles, dict): local_profiles = {}
+    if not isinstance(local_passwords, dict): local_passwords = {}
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                for username, profile in local_profiles.items():
+                    username = str(username).strip().lower()
+                    if username in USERS or not re.fullmatch(r"[a-z0-9_.-]{3,24}", username) or not isinstance(profile, dict):
+                        continue
+                    password_record = local_passwords.get(username)
+                    if not isinstance(password_record, dict) or not password_record.get("salt") or not password_record.get("hash"):
+                        continue
+                    cur.execute("""
+                        INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                        VALUES (%s, %s, %s, 'user', 'professional')
+                        ON CONFLICT (username) DO NOTHING
+                    """, (username, str(profile.get("name") or username)[:60], json.dumps(password_record)))
+        conn.close()
+    except Exception as exc:
+        print(f"KARVIS local profile migration failed: {exc}", flush=True)
+
+def _read_persistent_profiles():
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn.cursor() as cur:
+                cur.execute("SELECT username, display_name, password_record FROM karvis_user_profiles")
+                rows = cur.fetchall()
+            conn.close()
+            result = {}
+            for username, display_name, password_record in rows:
+                result[str(username)] = {"name": str(display_name), "role": "user", "style": "professional", "password_record": password_record}
+            return result
+        except Exception as exc:
+            print(f"KARVIS profile database read failed: {exc}", flush=True)
+    records = read_json_file(REGISTERED_USERS_FILE, {})
+    return records if isinstance(records, dict) else {}
+
+def _load_registered_users():
+    """Load registered standard-user profiles without overriding trusted built-in accounts."""
+    for uname, profile in _read_persistent_profiles().items():
+        uname = str(uname).strip().lower()
+        if not re.fullmatch(r"[a-z0-9_.-]{3,24}", uname) or uname in USERS or not isinstance(profile, dict):
+            continue
+        USERS[uname] = {"name": str(profile.get("name") or uname)[:60], "password": "", "role": "user", "style": "professional"}
+
+_load_registered_users()
+
+
 # ============================================================
 # PASSWORD STORE + SUDE WORLD DATA
 # ============================================================
@@ -1303,25 +1509,44 @@ def _verify_password(password, record):
 
 def _load_password_store():
     with password_lock:
-        records = read_json_file(PASSWORD_FILE, {})
-        if not isinstance(records, dict): records = {}
-        changed = False
+        records = {}
+        if _profile_db_configured() and _init_profile_database():
+            try:
+                conn = _profile_db_connect()
+                with conn.cursor() as cur:
+                    cur.execute("SELECT username, password_record FROM karvis_user_profiles")
+                    records.update({str(u): rec for u, rec in cur.fetchall()})
+                conn.close()
+            except Exception as exc:
+                print(f"KARVIS profile password read failed: {exc}", flush=True)
+        local_records = read_json_file(PASSWORD_FILE, {})
+        if isinstance(local_records, dict):
+            records.update(local_records)
         for uname, info in USERS.items():
             if uname not in records:
                 legacy = str(info.get("password", ""))
                 records[uname] = _password_hash(legacy)
-                changed = True
             info["password"] = ""  # don't keep plaintext credentials in the active user map
-        if changed or not PASSWORD_FILE.exists():
+        if not PASSWORD_FILE.exists():
             write_json_file(PASSWORD_FILE, records)
         return records
 
 
 def _set_password(username, password):
+    record = _password_hash(password)
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE karvis_user_profiles SET password_record=%s, updated_at=NOW() WHERE username=%s", (json.dumps(record), username))
+            conn.close()
+        except Exception as exc:
+            print(f"KARVIS profile password write failed: {exc}", flush=True)
     with password_lock:
         records = read_json_file(PASSWORD_FILE, {})
         if not isinstance(records, dict): records = {}
-        records[username] = _password_hash(password)
+        records[username] = record
         write_json_file(PASSWORD_FILE, records)
 
 
@@ -1547,48 +1772,90 @@ def requests_answer_for_admin():
 
 
 # ============================================================
+# ACCOUNT REGISTRATION
+# ============================================================
+class RegisterRequest(BaseModel):
+    username: str
+    display_name: str
+    password: str
+
+@app.post("/register")
+async def register_account(data: RegisterRequest):
+    username = (data.username or "").strip().lower()
+    display_name = (data.display_name or "").strip()
+    password = data.password or ""
+    if not re.fullmatch(r"[a-z0-9_.-]{3,24}", username):
+        raise HTTPException(status_code=400, detail="Kullanıcı adı 3-24 karakter olmalı; yalnızca İngilizce harf, rakam, nokta, alt çizgi ve tire kullanılabilir.")
+    if username in USERS:
+        raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+    # Check persistent storage too, so an account created on another worker cannot be duplicated.
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM karvis_user_profiles WHERE username=%s", (username,))
+                exists_in_db = cur.fetchone() is not None
+            conn.close()
+            if exists_in_db:
+                raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        except HTTPException:
+            raise
+        except Exception as exc:
+            print(f"KARVIS duplicate profile check failed: {exc}", flush=True)
+            raise HTTPException(status_code=503, detail="Profil veritabanı kontrol edilemedi. Lütfen tekrar deneyin.")
+    if len(display_name) < 2 or len(display_name) > 60:
+        raise HTTPException(status_code=400, detail="Görünen ad 2-60 karakter arasında olmalı.")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Şifre en az 8 karakter olmalı.")
+    if not any(ch.isalpha() for ch in password) or not any(ch.isdigit() for ch in password):
+        raise HTTPException(status_code=400, detail="Şifre en az bir harf ve bir rakam içermeli.")
+
+    # Persist profile + salted password hash in PostgreSQL when configured.
+    # If the database is unavailable, use local JSON but explicitly report that it is not durable on Render.
+    with password_lock:
+        if username in USERS:
+            raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        password_record = _password_hash(password)
+        if _profile_db_configured():
+            if not _init_profile_database():
+                raise HTTPException(status_code=503, detail="Profil veritabanına bağlanılamadı. DATABASE_URL ve veritabanı bağlantısını kontrol edin; hesap oluşturulmadı.")
+            try:
+                conn = _profile_db_connect()
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                            VALUES (%s, %s, %s, 'user', 'professional')
+                            ON CONFLICT (username) DO NOTHING
+                            RETURNING username
+                        """, (username, display_name, json.dumps(password_record)))
+                        inserted = cur.fetchone()
+                conn.close()
+                if not inserted:
+                    raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            except HTTPException:
+                raise
+            except Exception as exc:
+                print(f"KARVIS profile registration failed: {exc}", flush=True)
+                raise HTTPException(status_code=503, detail="Profil kalıcı olarak kaydedilemedi. Veritabanı bağlantısını kontrol edin.")
+        else:
+            registered = read_json_file(REGISTERED_USERS_FILE, {})
+            if not isinstance(registered, dict): registered = {}
+            if username in registered:
+                raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            registered[username] = {"name": display_name, "role": "user", "style": "professional"}
+            write_json_file(REGISTERED_USERS_FILE, registered)
+            password_records = read_json_file(PASSWORD_FILE, {})
+            if not isinstance(password_records, dict): password_records = {}
+            password_records[username] = password_record
+            write_json_file(PASSWORD_FILE, password_records)
+        USERS[username] = {"name": display_name, "password": "", "role": "user", "style": "professional"}
+    return {"success": True, "message": "Hesap oluşturuldu. Giriş yapabilirsiniz.", "username": username, "persistent": bool(_profile_db_configured() and _init_profile_database())}
+
+
+# ============================================================
 # LOGIN
 # ============================================================
-
-# ============================================================
-# ACTIVE PROFILE PRESENCE
-# ============================================================
-
-_active_profile_presence = {}
-_active_profile_presence_lock = threading.Lock()
-
-class PresenceHeartbeatRequest(BaseModel):
-    username: str
-
-@app.post("/presence/heartbeat")
-async def presence_heartbeat(request: PresenceHeartbeatRequest):
-    username = (request.username or "").strip().lower()
-    if username not in USERS:
-        raise HTTPException(status_code=400, detail="Geçersiz profil.")
-    now = time.time()
-    with _active_profile_presence_lock:
-        _active_profile_presence[username] = now
-    return {"success": True, "online": True}
-
-@app.get("/admin/active-profiles")
-async def admin_active_profiles(username: str = ""):
-    if str(username).strip().lower() != "murat":
-        raise HTTPException(status_code=403, detail="Bu alan yalnızca yetkili profile açıktır.")
-    now = time.time()
-    with _active_profile_presence_lock:
-        presence = dict(_active_profile_presence)
-    profiles = []
-    for key, user in USERS.items():
-        seen = presence.get(key, 0)
-        profiles.append({
-            "username": key,
-            "name": user.get("name", key),
-            "online": bool(seen and now - seen <= 90),
-            "last_seen_seconds": int(now - seen) if seen else None,
-        })
-    profiles.sort(key=lambda p: (not p["online"], str(p["name"]).casefold()))
-    return {"success": True, "profiles": profiles, "online_count": sum(1 for p in profiles if p["online"])}
-
 
 @app.post("/login")
 async def login(
@@ -1664,6 +1931,372 @@ async def login(
         "message":
             "Giriş başarılı."
     }
+
+
+# ============================================================
+# ILKNUR TEACHER EXAM / QUIZ SYSTEM
+# ============================================================
+
+# Sınav verileri özellikle kalıcı diske yazılmaz. Tek çalışan FastAPI süreci
+# içinde bellekte tutulur; yeniden başlatma/deploy sonrasında sıfırlanır.
+# Render'da bu davranış için tek worker/instance kullanın.
+EXAMS_LOCK = threading.RLock()
+_EXAM_MEMORY = {"exams": [], "submissions": [], "attempts": []}
+
+class ExamCreateRequest(BaseModel):
+    username: str
+    title: str
+    subject: str = ""
+    description: str = ""
+    questions: list[dict]
+    published: bool = False
+    duration_minutes: int = 0
+    starts_at: str = ""
+    ends_at: str = ""
+
+class ExamSubmitRequest(BaseModel):
+    username: str
+    answers: list[dict]
+    submitted_automatically: bool = False
+
+class ExamPublishRequest(BaseModel):
+    username: str
+    published: bool
+
+
+def _exam_store():
+    """Return the process-local, intentionally non-persistent exam store."""
+    _EXAM_MEMORY.setdefault("exams", [])
+    _EXAM_MEMORY.setdefault("submissions", [])
+    _EXAM_MEMORY.setdefault("attempts", [])
+    return _EXAM_MEMORY
+
+
+def _save_exam_store(data):
+    # Intentionally a no-op: the user requested no persistent exam records.
+    # All endpoints in this process share the same in-memory object.
+    return None
+
+
+def _teacher_only(username):
+    if str(username or "").strip().lower() != "ilknur":
+        raise HTTPException(status_code=403, detail="Bu işlem yalnızca İlknur öğretmen profiline açıktır.")
+
+
+def _validate_exam_questions(questions):
+    if not isinstance(questions, list) or not 1 <= len(questions) <= 100:
+        raise HTTPException(status_code=400, detail="Sınav 1 ile 100 arasında soru içermelidir.")
+    cleaned = []
+    for idx, q in enumerate(questions, 1):
+        if not isinstance(q, dict): raise HTTPException(status_code=400, detail=f"{idx}. soru geçersiz.")
+        prompt = str(q.get("prompt", "")).strip()[:1000]
+        qtype = str(q.get("type", "multiple_choice")).strip().lower()
+        if not prompt: raise HTTPException(status_code=400, detail=f"{idx}. sorunun metni boş olamaz.")
+        if qtype not in {"multiple_choice", "true_false", "open_ended"}:
+            raise HTTPException(status_code=400, detail=f"{idx}. soru türü desteklenmiyor.")
+        item = {"id": str(q.get("id") or uuid.uuid4().hex), "prompt": prompt, "type": qtype, "points": max(1, min(100, int(q.get("points", 1))))}
+        if qtype == "multiple_choice":
+            opts = [str(x).strip()[:300] for x in q.get("options", []) if str(x).strip()]
+            if len(opts) < 2 or len(opts) > 6: raise HTTPException(status_code=400, detail=f"{idx}. soru 2-6 seçenek içermelidir.")
+            correct = q.get("correct_index")
+            if not isinstance(correct, int) or correct < 0 or correct >= len(opts): raise HTTPException(status_code=400, detail=f"{idx}. sorunun doğru seçeneğini belirleyin.")
+            item.update({"options": opts, "correct_index": correct})
+        elif qtype == "true_false":
+            correct = q.get("correct_answer")
+            if not isinstance(correct, bool): raise HTTPException(status_code=400, detail=f"{idx}. soru için doğru/yanlış cevabını seçin.")
+            item["correct_answer"] = correct
+        else:
+            answer = str(q.get("correct_answer", "")).strip()[:1000]
+            item["correct_answer"] = answer
+        cleaned.append(item)
+    return cleaned
+
+
+class ExamGenerateRequest(BaseModel):
+    username: str
+    subject: str
+    topic: str
+    question_count: int = 10
+    difficulty: str = "orta"
+    question_types: list[str] = ["multiple_choice"]
+    grade_level: str = ""
+    instructions: str = ""
+
+
+@app.post("/teacher/exams/generate")
+async def teacher_generate_exam(req: ExamGenerateRequest):
+    # Generate a draft; teacher reviews and edits before publishing.
+    _teacher_only(req.username)
+    subject = str(req.subject or "").strip()[:100]
+    topic = str(req.topic or "").strip()[:300]
+    if not subject or not topic:
+        raise HTTPException(status_code=400, detail="Ders ve konu alanlarını doldurun.")
+    count = max(1, min(50, int(req.question_count or 10)))
+    difficulty = str(req.difficulty or "orta").lower()
+    if difficulty not in {"kolay", "orta", "zor", "karma"}: difficulty = "orta"
+    allowed = {"multiple_choice", "true_false", "open_ended"}
+    types = [t for t in req.question_types if t in allowed]
+    if not types: types = ["multiple_choice"]
+    prompt = f'''Türkçe bir öğretmen sınav taslağı hazırla. Yalnızca geçerli JSON döndür; Markdown veya açıklama ekleme.
+Ders: {subject}
+Konu: {topic}
+Sınıf/düzey: {str(req.grade_level or "belirtilmedi")[:100]}
+Zorluk: {difficulty}
+Soru sayısı: tam olarak {count}
+İzin verilen türler: {", ".join(types)}
+Ek talimat: {str(req.instructions or "yok")[:1000]}
+JSON şeması: {{"title":"kısa sınav başlığı","description":"kısa açıklama","questions":[{{"type":"multiple_choice|true_false|open_ended","prompt":"soru metni","points":1,"options":["A","B","C","D"],"correct_index":0,"correct_answer":true veya "cevap metni"}}]}}.
+Çoktan seçmeli sorularda 4 seçenek ve 0 tabanlı doğru seçenek indeksi ver. Doğru/yanlışta correct_answer boolean olsun. Açık uçluda correct_answer kısa cevap anahtarı olsun. Sorular birbirini tekrar etmesin, cevabı belirsiz olmasın. Soru sayısı tam {count} olsun.'''
+    result = ask_ai(prompt, system_prompt="Sen dikkatli bir ölçme-değerlendirme uzmanısın. Öğretmenin inceleyip düzenleyeceği bir taslak üret.", fast=False)
+    if not result:
+        raise HTTPException(status_code=503, detail="Yapay zekâ sağlayıcısı yanıt vermedi. API anahtarlarını ve sunucu günlüklerini kontrol edin.")
+    try:
+        raw = str(result).strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        left, right = raw.find("{"), raw.rfind("}")
+        payload = json.loads(raw[left:right+1])
+        questions = _validate_exam_questions(payload.get("questions", []))
+        if len(questions) != count:
+            raise ValueError(f"Beklenen {count} soru, gelen {len(questions)}")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Yapay zekâ geçerli sınav JSON'u üretemedi. Lütfen yeniden deneyin. Ayrıntı: " + str(exc)[:180])
+    return {"success": True, "title": str(payload.get("title") or f"{subject} — {topic}")[:140], "description": str(payload.get("description") or f"{subject}: {topic}")[:1000], "subject": subject, "questions": questions, "message": "Taslak üretildi. Yayımlamadan önce soruları ve cevap anahtarını düzenleyip kontrol edin."}
+
+
+@app.post("/teacher/exams")
+async def teacher_create_exam(req: ExamCreateRequest):
+    _teacher_only(req.username)
+    title = str(req.title or "").strip()[:140]
+    if len(title) < 3: raise HTTPException(status_code=400, detail="Sınav başlığı en az 3 karakter olmalıdır.")
+    questions = _validate_exam_questions(req.questions)
+    exam = {"id": uuid.uuid4().hex, "title": title, "subject": str(req.subject or "").strip()[:100], "description": str(req.description or "").strip()[:1000], "questions": questions, "published": bool(req.published), "duration_minutes": max(0, min(600, int(req.duration_minutes or 0))), "starts_at": str(req.starts_at or "").strip(), "ends_at": str(req.ends_at or "").strip(), "created_at": datetime.utcnow().isoformat() + "Z", "created_by": "ilknur"}
+    with EXAMS_LOCK:
+        data = _exam_store(); data["exams"].append(exam); _save_exam_store(data)
+    return {"success": True, "exam": {k:v for k,v in exam.items() if k != "questions"}, "message": "Sınav kaydedildi."}
+
+
+@app.get("/teacher/exams")
+async def teacher_list_exams(username: str = "ilknur"):
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data = _exam_store()
+    summaries = []
+    for exam in data["exams"]:
+        item = {k:v for k,v in exam.items() if k != "questions"}
+        item["question_count"] = len(exam.get("questions", []))
+        item["submission_count"] = sum(1 for s in data["submissions"] if s.get("exam_id") == exam.get("id"))
+        summaries.append(item)
+    return {"success": True, "exams": summaries}
+
+
+@app.get("/exams")
+async def list_published_exams(username: str = ""):
+    with EXAMS_LOCK:
+        data = _exam_store()
+    out=[]
+    for e in data["exams"]:
+        if not e.get("published"): continue
+        out.append({"id":e["id"], "title":e["title"], "subject":e.get("subject",""), "description":e.get("description",""), "question_count":len(e.get("questions",[])), "duration_minutes":e.get("duration_minutes",0), "starts_at":e.get("starts_at",""), "ends_at":e.get("ends_at",""), "submitted": bool(username and any(s.get("exam_id")==e.get("id") and s.get("username")==str(username).strip().lower() for s in data["submissions"]))})
+    return {"success": True, "exams": out}
+
+
+@app.get("/exams/{exam_id}")
+async def get_exam_for_student(exam_id: str, username: str):
+    if not str(username or "").strip() or username.strip().lower() not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    with EXAMS_LOCK:
+        data = _exam_store()
+    exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
+    if not exam: raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+    if not exam.get("published") and username.strip().lower() != "ilknur": raise HTTPException(status_code=403, detail="Bu sınav henüz yayımlanmadı.")
+    now = datetime.utcnow()
+    try:
+        starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+        ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+        if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+        if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+    except Exception:
+        starts = ends = None
+    if username.strip().lower() != "ilknur" and starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+    if username.strip().lower() != "ilknur" and ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
+    return {"success":True,"exam":{"id":exam["id"],"title":exam["title"],"subject":exam.get("subject",""),"description":exam.get("description",""),"duration_minutes":exam.get("duration_minutes",0),"starts_at":exam.get("starts_at",""),"ends_at":exam.get("ends_at",""),"questions":[{"id":q["id"],"prompt":q["prompt"],"type":q["type"],"points":q["points"],**({"options":q.get("options",[])} if q["type"]=="multiple_choice" else {})} for q in exam.get("questions",[])]}}
+
+
+
+@app.post("/exams/{exam_id}/start")
+async def start_exam(exam_id: str, username: str):
+    username = str(username or "").strip().lower()
+    if username not in USERS or username == "ilknur": raise HTTPException(status_code=401, detail="Öğrenci profili gerekli.")
+    with EXAMS_LOCK:
+        data = _exam_store(); exam = next((e for e in data["exams"] if e.get("id") == exam_id and e.get("published")), None)
+        if not exam: raise HTTPException(status_code=404, detail="Yayımlanmış sınav bulunamadı.")
+        if any(s.get("exam_id") == exam_id and s.get("username") == username for s in data["submissions"]): raise HTTPException(status_code=409, detail="Bu sınava zaten katıldınız.")
+        now = datetime.utcnow()
+        try:
+            starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+            ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+            if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+            if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+        except Exception: starts = ends = None
+        if starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+        if ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
+        started = next((x for x in data.setdefault("attempts", []) if x.get("exam_id")==exam_id and x.get("username")==username), None)
+        if not started:
+            started = {"exam_id": exam_id, "username": username, "started_at": now.isoformat()+"Z"}
+            data["attempts"].append(started); _save_exam_store(data)
+        duration = int(exam.get("duration_minutes", 0) or 0)
+        remaining = max(0, duration*60 - int((now - datetime.fromisoformat(started["started_at"].replace("Z", ""))).total_seconds())) if duration else 0
+        if ends: remaining = min(remaining if duration else int((ends-now).total_seconds()), int((ends-now).total_seconds()))
+        return {"success": True, "started_at": started["started_at"], "remaining_seconds": remaining, "duration_minutes": duration}
+
+@app.post("/exams/{exam_id}/submit")
+async def submit_exam(exam_id: str, req: ExamSubmitRequest):
+    username = str(req.username or "").strip().lower()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    if username == "ilknur": raise HTTPException(status_code=400, detail="Öğretmen profili sınava öğrenci olarak katılamaz.")
+    with EXAMS_LOCK:
+        data = _exam_store()
+        exam = next((e for e in data["exams"] if e.get("id")==exam_id), None)
+        if not exam or not exam.get("published"): raise HTTPException(status_code=404, detail="Yayımlanmış sınav bulunamadı.")
+        now = datetime.utcnow()
+        try:
+            starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+            ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+            if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+            if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+        except Exception:
+            starts = ends = None
+        if starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+        if any(s.get("exam_id")==exam_id and s.get("username")==username for s in data["submissions"]): raise HTTPException(status_code=409, detail="Bu sınava zaten katıldınız.")
+        attempts = data.setdefault("attempts", [])
+        started = next((x for x in attempts if x.get("exam_id")==exam_id and x.get("username")==username), None)
+        if not started: raise HTTPException(status_code=400, detail="Önce sınavı başlatmalısınız.")
+        duration = int(exam.get("duration_minutes", 0) or 0)
+        started_at = datetime.fromisoformat(started["started_at"].replace("Z", ""))
+        duration_expired = bool(duration and (now-started_at).total_seconds() > duration*60 + 10)
+        deadline_expired = bool(ends and now >= ends)
+        timed_out = duration_expired or deadline_expired or bool(req.submitted_automatically)
+        answer_map = {str(a.get("question_id")): a.get("answer") for a in req.answers if isinstance(a, dict)}
+        total = sum(int(q.get("points",1)) for q in exam["questions"])
+        score=0; details=[]
+        for q in exam["questions"]:
+            ans=answer_map.get(q["id"]); correct=None
+            if q["type"]=="multiple_choice": correct=isinstance(ans,int) and ans==q.get("correct_index")
+            elif q["type"]=="true_false": correct=isinstance(ans,bool) and ans==q.get("correct_answer")
+            else:
+                correct = None
+            earned=int(q.get("points",1)) if correct is True and not timed_out else 0
+            if timed_out and q["type"] == "open_ended":
+                correct = None
+            score+=earned
+            details.append({"question_id":q["id"],"answer":ans,"correct":correct,"earned_points":earned,"max_points":int(q.get("points",1)),"manual_review":q["type"]=="open_ended"})
+        submission={"id":uuid.uuid4().hex,"exam_id":exam_id,"username":username,"submitted_at":datetime.utcnow().isoformat()+"Z","score":score,"max_score":total,"percent":round(score*100/total,2) if total else 0,"answers":details,"status":"time_expired" if timed_out else ("pending_review" if any(x.get("manual_review") for x in details) else "graded"),"timed_out":timed_out}
+        data["submissions"].append(submission); _save_exam_store(data)
+    return {"success":True,"result":{"score":score,"max_score":total,"percent":submission["percent"],"answers":details},"message":"Sınav yanıtlarınız kaydedildi."}
+
+
+@app.post("/teacher/exams/{exam_id}/publish")
+async def teacher_publish_exam(exam_id: str, req: ExamPublishRequest):
+    _teacher_only(req.username)
+    with EXAMS_LOCK:
+        data=_exam_store(); exam=next((e for e in data["exams"] if e.get("id")==exam_id),None)
+        if not exam: raise HTTPException(status_code=404,detail="Sınav bulunamadı.")
+        exam["published"]=bool(req.published); _save_exam_store(data)
+    return {"success":True,"published":exam["published"]}
+
+
+
+class ExamGradeRequest(BaseModel):
+    username: str
+    submission_id: str
+    question_id: str
+    points_awarded: int
+    feedback: str = ""
+
+@app.post("/teacher/exams/{exam_id}/grade")
+async def teacher_grade_open_answer(exam_id: str, req: ExamGradeRequest):
+    _teacher_only(req.username)
+    with EXAMS_LOCK:
+        data = _exam_store(); exam = next((e for e in data["exams"] if e.get("id")==exam_id), None)
+        if not exam: raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        submission = next((s for s in data["submissions"] if s.get("id")==req.submission_id and s.get("exam_id")==exam_id), None)
+        if not submission: raise HTTPException(status_code=404, detail="Öğrenci teslimi bulunamadı.")
+        answer = next((a for a in submission.get("answers", []) if a.get("question_id")==req.question_id), None)
+        question = next((q for q in exam.get("questions", []) if q.get("id")==req.question_id), None)
+        if not answer or not question or question.get("type") != "open_ended": raise HTTPException(status_code=400, detail="Açık uçlu soru bulunamadı.")
+        points = max(0, min(int(question.get("points", 1)), int(req.points_awarded)))
+        old = int(answer.get("earned_points", 0)); answer.update({"correct": points == int(question.get("points", 1)), "earned_points": points, "feedback": str(req.feedback or "")[:1000], "manual_review": False})
+        submission["score"] = max(0, int(submission.get("score", 0)) + points - old)
+        submission["percent"] = round(submission["score"]*100/int(submission.get("max_score", 1) or 1), 2)
+        submission["status"] = "pending_review" if any(a.get("manual_review") for a in submission.get("answers", [])) else "graded"
+        _save_exam_store(data)
+    return {"success": True, "submission_id": submission["id"], "score": submission["score"], "percent": submission["percent"], "status": submission["status"]}
+
+@app.get("/teacher/exams/{exam_id}/results")
+async def teacher_exam_results(exam_id: str, username: str = "ilknur"):
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data=_exam_store(); exam=next((e for e in data["exams"] if e.get("id")==exam_id),None)
+        if not exam: raise HTTPException(status_code=404,detail="Sınav bulunamadı.")
+        submissions=[s for s in data["submissions"] if s.get("exam_id")==exam_id]
+    scores=[s.get("percent",0) for s in submissions]
+    return {"success":True,"exam":{"id":exam_id,"title":exam["title"],"question_count":len(exam.get("questions",[]))},"summary":{"submission_count":len(submissions),"average_percent":round(sum(scores)/len(scores),2) if scores else 0,"highest_percent":max(scores) if scores else 0,"lowest_percent":min(scores) if scores else 0},"submissions":[{"id":s["id"],"username":s["username"],"submitted_at":s["submitted_at"],"score":s["score"],"max_score":s["max_score"],"percent":s["percent"],"status":s.get("status","graded"),"answers":[{**a,"prompt":next((q.get("prompt","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"type":next((q.get("type","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),"")} for a in s["answers"]]} for s in submissions]}
+
+
+@app.get("/teacher/exams/{exam_id}/analysis")
+async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
+    """Teacher-only class statistics and evidence-based topic-gap analysis."""
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data = _exam_store()
+        exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
+        if not exam:
+            raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        submissions = [s.copy() for s in data["submissions"] if s.get("exam_id") == exam_id]
+        questions = [q.copy() for q in exam.get("questions", [])]
+
+    scores = [float(s.get("percent", 0) or 0) for s in submissions]
+    question_stats = []
+    for q in questions:
+        related = [a for sub in submissions for a in sub.get("answers", []) if a.get("question_id") == q.get("id")]
+        reviewed = [a for a in related if not a.get("manual_review")]
+        incorrect = sum(1 for a in reviewed if a.get("correct") is False)
+        unanswered = sum(1 for a in related if not str(a.get("answer", "")).strip())
+        question_stats.append({
+            "question_id": q.get("id"), "prompt": q.get("prompt", ""),
+            "type": q.get("type", ""), "responses": len(related),
+            "incorrect": incorrect, "unanswered": unanswered,
+            "incorrect_percent": round(100 * incorrect / len(reviewed), 1) if reviewed else None,
+            "manual_review_count": sum(1 for a in related if a.get("manual_review")),
+        })
+    weak = sorted([x for x in question_stats if x["incorrect_percent"] is not None], key=lambda x: x["incorrect_percent"], reverse=True)[:8]
+    summary = {
+        "submission_count": len(submissions),
+        "average_percent": round(sum(scores) / len(scores), 1) if scores else 0,
+        "highest_percent": max(scores) if scores else 0,
+        "lowest_percent": min(scores) if scores else 0,
+        "pass_rate_percent": round(100 * sum(1 for x in scores if x >= 50) / len(scores), 1) if scores else 0,
+        "pending_open_answers": sum(1 for sub in submissions for a in sub.get("answers", []) if a.get("manual_review")),
+    }
+    # Analyze only aggregate/question-level evidence; do not send student names or raw student answers.
+    ai_analysis = "Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça konu analizi oluşacaktır."
+    if submissions and weak:
+        compact = [{"soru": x["prompt"][:240], "yanlis_yuzdesi": x["incorrect_percent"], "bos_cevap": x["unanswered"], "yanit_sayisi": x["responses"]} for x in weak]
+        prompt = (
+            "Türkçe bir öğretmen için sınıf öğrenme boşluklarını değerlendir. Sadece aşağıdaki sınav istatistiklerine dayan; "
+            "soru metninden konu/kazanım çıkarımını kesin değil olası olarak belirt. Öğrenci adı üretme, veri uydurma. "
+            "En fazla 5 kısa madde: zorlanılan olası konular, kanıt (yanlış yüzdesi), önerilen tekrar/etkinlik ve veri sınırlaması.\n"
+            f"Ders: {str(exam.get('subject',''))[:100]}\nSınav: {str(exam.get('title',''))[:140]}\nİstatistikler: {json.dumps(compact, ensure_ascii=False)}"
+        )
+        try:
+            result = ask_ai(prompt, system_prompt="Sen ölçme-değerlendirme uzmanısın. Yalnızca verilen istatistiklerden temkinli sonuç çıkar.", fast=True)
+            if result and str(result).strip():
+                ai_analysis = str(result).strip()[:6000]
+        except Exception:
+            ai_analysis = "KARVIS değerlendirmesi şu anda üretilemedi. Aşağıdaki soru bazlı istatistikler kullanılabilir."
+    return {"success": True, "exam": {"id": exam_id, "title": exam.get("title", ""), "subject": exam.get("subject", "")}, "summary": summary, "question_stats": question_stats, "likely_gaps": weak, "karvis_evaluation": ai_analysis}
 
 
 # ============================================================
@@ -7758,6 +8391,14 @@ async def startup():
     GENERATED_DIR.mkdir(
         exist_ok=True
     )
+
+    if _profile_db_configured():
+        if _init_profile_database():
+            _migrate_local_profiles_to_db()
+            _load_registered_users()
+            print("KARVIS profiles: PostgreSQL persistence enabled.", flush=True)
+        else:
+            print("KARVIS profiles: database unavailable; new account creation will be blocked rather than lost.", flush=True)
 
     if push_database_configured():
         init_push_database()
