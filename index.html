@@ -1278,6 +1278,32 @@ body.voice-speaking .ring.three{
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
 <meta name="theme-color" content="#050b12">
+
+<style id="karvis-profile-modal-polish">
+/* Profile dialogs: prevent overlapping controls and improve small-screen layout */
+#profileChoiceModal, #profileModal, #registerModal {
+  box-sizing:border-box; display:none; flex-direction:column; gap:12px;
+  width:min(92vw,460px); max-height:min(86dvh,760px); overflow-y:auto;
+  padding:clamp(18px,4vw,26px); border-radius:24px;
+}
+#profileChoiceModal.show, #profileModal.show, #registerModal.show { display:flex; }
+#profileChoiceModal h2, #profileModal h2, #registerModal h2 { margin:0 0 2px; line-height:1.2; overflow-wrap:anywhere; }
+#profileChoiceModal p, #registerModal p { margin:0 0 4px; line-height:1.55; overflow-wrap:anywhere; }
+#profileChoiceModal .modal-button, #profileModal .modal-button, #registerModal .modal-button {
+  box-sizing:border-box; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  width:100%; min-height:50px; height:auto; margin:0; padding:12px 16px;
+  line-height:1.35; white-space:normal; overflow-wrap:anywhere; text-align:center;
+}
+#profileModal input, #registerModal input { box-sizing:border-box; width:100%; min-width:0; height:50px; margin:0; padding:0 14px; }
+#profileChoiceModal .secondary-button, #profileModal .secondary-button, #registerModal .secondary-button { margin-top:2px; }
+#registerModal input:focus, #profileModal input:focus { border-color:#00d9ef; box-shadow:0 0 0 3px rgba(0,217,239,.12); }
+@media(max-width:480px){
+ #profileChoiceModal, #profileModal, #registerModal { width:calc(100vw - 28px); max-height:82dvh; padding:18px; gap:11px; border-radius:20px; }
+ #profileChoiceModal h2, #profileModal h2, #registerModal h2 { font-size:22px; }
+ #profileChoiceModal .modal-button, #profileModal .modal-button, #registerModal .modal-button { min-height:48px; font-size:15px; }
+}
+</style>
+
 </head>
 
 <body>
@@ -2318,6 +2344,8 @@ async function login(){
             .trim()
             .toLowerCase();
 
+        window.currentProfileName = String((data.user && (data.user.name || data.user.display_name)) || data.name || "").trim();
+
         currentMode =
             currentUser === "ilknur"
                 ? (
@@ -3050,6 +3078,14 @@ function showGreeting(){
 
         addMessage(
             "Hoş geldiniz efendim. Yetkili giriş yaptınız. K.A.R.V.I.S. yönetim ve kullanıcı istekleri sistemi hazır.",
+            "ai"
+        );
+    }
+    else {
+        // Newly created standard profiles receive the requested respectful greeting.
+        const profileName = (window.currentProfileName || "").trim();
+        addMessage(
+            profileName ? `Hoş geldiniz efendim, ${profileName}. K.A.R.V.I.S. hizmetinizde.` : "Hoş geldiniz efendim. K.A.R.V.I.S. hizmetinizde.",
             "ai"
         );
     }
