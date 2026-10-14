@@ -1697,6 +1697,8 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
         <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
         <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
+        <button class="menu-item" onclick="openAdminActiveUsers()">🟢 Aktif Kullanıcılar</button>
+        <button class="menu-item" onclick="openAdminProfileManagement()">🗑️ Profilleri Düzenle</button>
         <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
         <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
         <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
@@ -1750,6 +1752,29 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 <!-- ============================================================
      PROFILE CHOICE + LOGIN MODALS
      ============================================================ -->
+
+<div id="adminActiveUsersModal" class="modal" style="max-width:560px;">
+    <h2>🟢 Aktif Kullanıcılar</h2>
+    <p style="opacity:.72;font-size:13px;">KARVIS'te yakın zamanda aktif olan profiller.</p>
+    <div id="adminActiveUsersList" class="error-list">Kullanıcılar yükleniyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<div id="adminProfileManagementModal" class="modal" style="max-width:560px;">
+    <h2>🗑️ Profilleri Düzenle</h2>
+    <p style="opacity:.72;font-size:13px;">Silme işlemi yalnızca kayıtlı standart profillerde kullanılabilir. Yerleşik sistem profilleri korunur.</p>
+    <div id="adminProfilesList" class="error-list">Profiller yükleniyor...</div>
+    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<div id="adminDeleteProfileModal" class="modal" style="max-width:440px;">
+    <h2>⚠️ Profili Sil</h2>
+    <p id="adminDeleteProfileQuestion">Profili silmek istediğinizden emin misiniz?</p>
+    <p style="opacity:.72;font-size:12px;">Devam etmek için aşağıya tam olarak <strong>EVET</strong> yazın.</p>
+    <input id="adminDeleteProfileConfirm" placeholder="EVET yazın" autocomplete="off" autocapitalize="characters" maxlength="4">
+    <button class="modal-button" onclick="confirmAdminProfileDelete()">Profili Sil</button>
+    <button class="modal-button secondary-button" onclick="cancelAdminProfileDelete()">Vazgeç</button>
+</div>
 
 <div id="profileChoiceModal" class="modal">
     <h2>Profil Değiştir</h2>
@@ -2592,6 +2617,7 @@ async function login(){
             "karvis_mode",
             currentMode
         );
+        sendPresenceHeartbeat();
 
         $("usernameInput").value = "";
         $("passwordInput").value = "";
@@ -5016,6 +5042,141 @@ async function openKarvisRadar(){
         box.textContent="Sistem radarı alınamadı: "+e.message;
     }
 }
+
+let adminPendingDeleteUsername = "";
+
+async function openAdminActiveUsers(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    closeModals();
+    $("adminActiveUsersModal").classList.add("show");
+    $("adminActiveUsersList").textContent = "Kullanıcılar yükleniyor...";
+    try{
+        const r = await fetch(API + "/admin/active-users?username=murat");
+        const d = await r.json();
+        if(!r.ok) throw new Error(d.detail || "Aktif kullanıcılar alınamadı.");
+        const list = $("adminActiveUsersList");
+        list.replaceChildren();
+        const users = d.users || [];
+        if(!users.length){
+            list.textContent = "Henüz aktif kullanıcı görünmüyor.";
+            return;
+        }
+        users.forEach(user => {
+            const row = document.createElement("div");
+            row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);";
+            const name = document.createElement("strong");
+            name.textContent = user.name || user.username;
+            const status = document.createElement("span");
+            status.style.cssText = "white-space:nowrap;font-size:12px;font-weight:700;color:" + (user.online ? "#22c55e" : "rgba(255,255,255,.5)");
+            status.textContent = user.online ? "🟢 Çevrimiçi" : "⚪ Çevrimdışı";
+            row.append(name,status);
+            list.append(row);
+        });
+    }catch(e){
+        $("adminActiveUsersList").textContent = "Kullanıcı listesi alınamadı: " + e.message;
+    }
+}
+
+async function openAdminProfileManagement(){
+    if(currentUser !== "murat") return;
+    closeSidebar();
+    closeModals();
+    $("adminProfileManagementModal").classList.add("show");
+    $("adminProfilesList").textContent = "Profiller yükleniyor...";
+    try{
+        const r = await fetch(API + "/admin/profiles?username=murat");
+        const d = await r.json();
+        if(!r.ok) throw new Error(d.detail || "Profiller alınamadı.");
+        const list = $("adminProfilesList");
+        list.replaceChildren();
+        const profiles = d.profiles || [];
+        if(!profiles.length){
+            list.textContent = "Kayıtlı profil bulunamadı.";
+            return;
+        }
+        profiles.forEach(profile => {
+            const row = document.createElement("div");
+            row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);";
+            const name = document.createElement("strong");
+            name.textContent = profile.name || profile.username;
+            const right = document.createElement("div");
+            right.style.cssText = "display:flex;align-items:center;gap:10px;min-width:0;";
+            if(profile.deletable){
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.setAttribute("aria-label", (profile.name || profile.username) + " profilini sil");
+                btn.textContent = "🗑️";
+                btn.style.cssText = "width:42px;height:42px;border:1px solid rgba(255,90,90,.4);border-radius:11px;background:rgba(255,60,60,.12);color:#ff7777;font-size:18px;";
+                btn.addEventListener("click", () => requestAdminProfileDelete(profile.username, profile.name || profile.username));
+                right.append(btn);
+            }else{
+                const protectedLabel = document.createElement("small");
+                protectedLabel.style.cssText = "opacity:.55;font-size:11px;";
+                protectedLabel.textContent = "Sistem profili";
+                right.append(protectedLabel);
+            }
+            row.append(name,right);
+            list.append(row);
+        });
+    }catch(e){
+        $("adminProfilesList").textContent = "Profil listesi alınamadı: " + e.message;
+    }
+}
+
+function requestAdminProfileDelete(username, displayName){
+    if(currentUser !== "murat") return;
+    adminPendingDeleteUsername = String(username || "").trim().toLowerCase();
+    $("adminDeleteProfileQuestion").textContent = (displayName || username) + " profilini silmek istediğinizden emin misiniz?";
+    $("adminDeleteProfileConfirm").value = "";
+    closeModals();
+    $("adminDeleteProfileModal").classList.add("show");
+    setTimeout(() => $("adminDeleteProfileConfirm").focus(), 100);
+}
+
+function cancelAdminProfileDelete(){
+    adminPendingDeleteUsername = "";
+    closeModals();
+}
+
+async function confirmAdminProfileDelete(){
+    if(currentUser !== "murat") return;
+    if($("adminDeleteProfileConfirm").value.trim().toUpperCase() !== "EVET"){
+        alert("Silme işlemi için EVET yazmalısınız.");
+        return;
+    }
+    if(!adminPendingDeleteUsername) return;
+    const username = adminPendingDeleteUsername;
+    const button = $("adminDeleteProfileModal").querySelector(".modal-button");
+    if(button){button.disabled=true;button.textContent="Siliniyor...";}
+    try{
+        const r = await fetch(API + "/admin/profiles/" + encodeURIComponent(username) + "?username=murat", {method:"DELETE"});
+        const d = await r.json();
+        if(!r.ok || d.success !== true) throw new Error(d.detail || "Profil silinemedi.");
+        adminPendingDeleteUsername = "";
+        closeModals();
+        alert(d.message || "Profil silindi.");
+        await openAdminProfileManagement();
+    }catch(e){
+        alert("Profil silinemedi: " + e.message);
+    }finally{
+        if(button){button.disabled=false;button.textContent="Profili Sil";}
+    }
+}
+
+async function sendPresenceHeartbeat(){
+    const username = String(currentUser || "").trim().toLowerCase();
+    if(!username) return;
+    try{
+        await fetch(API + "/presence/heartbeat", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username})
+        });
+    }catch(_){}
+}
+setInterval(sendPresenceHeartbeat, 30000);
+window.addEventListener("load", () => { sendPresenceHeartbeat(); });
 
 async function openKarvisBrain(){
     if(currentUser !== "murat") return;
