@@ -505,6 +505,8 @@ def send_push_to_all(title, body, url="/"):
     total_failed = 0
     all_errors = []
     for username in list(data):
+        if str(username).strip().lower() == "karahan":
+            continue
         result = send_push_to_user(username, title, body, url)
         total_sent += result.get("sent", 0)
         total_removed += result.get("removed", 0)
@@ -841,7 +843,7 @@ def _arena_league(points):
     return "Elmas" if points >= 5000 else "Altın" if points >= 2500 else "Gümüş" if points >= 1000 else "Bronz"
 
 def _arena_player(data, username):
-    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if username not in USERS or username == "karahan": raise HTTPException(status_code=401, detail="KARVIS Arena için ana profil dışında bir kullanıcı profiline giriş yapmalısınız.")
     players = data["players"]
     if username not in players:
         players[username] = {"points": 0, "badges": [], "history": [], "answered_ids": [], "wins": 0, "duel_history": []}
@@ -852,6 +854,8 @@ def _arena_player(data, username):
 def _arena_rankings(data):
     rows=[]
     for uname in USERS:
+        if uname == "karahan":
+            continue
         p=_arena_player(data, uname)
         rows.append({"username":uname,"name":USERS[uname]["name"],"points":int(p.get("points",0)),"league":_arena_league(p.get("points",0))})
     rows.sort(key=lambda x:(-x["points"], x["name"].casefold()))
@@ -861,6 +865,7 @@ def _arena_rankings(data):
 @app.get("/arena/overview")
 async def arena_overview(username: str = "karahan"):
     username=username.strip().lower()
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     with arena_lock:
         data=_arena_load(); player=_arena_player(data,username); rankings=_arena_rankings(data)
         own=next(x for x in rankings if x["username"]==username)
@@ -934,7 +939,7 @@ def _duel_public(duel, username):
 @app.get("/arena/duels")
 async def arena_duels(username: str = "karahan"):
     username = username.strip().lower()
-    if username not in USERS:
+    if username == "karahan" or username not in USERS:
         raise HTTPException(status_code=401, detail="Geçersiz profil.")
     with arena_lock:
         data = _arena_load()
@@ -963,8 +968,8 @@ async def arena_duel_request(payload: dict):
         stake = int(payload.get("stake"))
     except Exception:
         raise HTTPException(status_code=400, detail="Geçerli bir tecrübe puanı girin.")
-    if username not in USERS or opponent not in USERS:
-        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if username == "karahan" or opponent == "karahan" or username not in USERS or opponent not in USERS:
+        raise HTTPException(status_code=401, detail="Ana profil Arena kullanamaz; geçerli bir kullanıcı profiline giriş yapın.")
     if username == opponent:
         raise HTTPException(status_code=400, detail="Kendine düello gönderemezsin.")
     if stake < 1 or stake > 1000000:
@@ -999,6 +1004,7 @@ async def arena_duel_request(payload: dict):
 @app.post("/arena/duel/respond")
 async def arena_duel_respond(payload: dict):
     username = str(payload.get("username", "")).strip().lower()
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     duel_id = str(payload.get("duel_id", ""))
     accept = bool(payload.get("accept"))
     with arena_lock:
@@ -1030,6 +1036,7 @@ async def arena_duel_respond(payload: dict):
 async def arena_duel_reset(payload: dict):
     """Cancel a genuinely stuck pending/active duel without transferring points."""
     username = str(payload.get("username", "")).strip().lower()
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     duel_id = str(payload.get("duel_id", ""))
     if username not in USERS:
         raise HTTPException(status_code=401, detail="Geçersiz profil.")
@@ -1065,6 +1072,7 @@ async def arena_duel_reset(payload: dict):
 @app.post("/arena/duel/answer")
 async def arena_duel_answer(payload: dict):
     username = str(payload.get("username", "")).strip().lower()
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     duel_id = str(payload.get("duel_id", ""))
     try:
         answer = int(payload.get("answer"))
@@ -1175,7 +1183,7 @@ async def arena_duel_answer(payload: dict):
 @app.post("/arena/start")
 async def arena_start(payload: dict):
     username=str(payload.get("username", "")).strip().lower(); mode=str(payload.get("mode", "knowledge"))
-    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     if mode not in ARENA_MODES: raise HTTPException(status_code=400, detail="Geçersiz oyun türü.")
     with arena_lock:
         data=_arena_load(); _arena_player(data,username)
@@ -1190,6 +1198,7 @@ async def arena_start(payload: dict):
 @app.post("/arena/answer")
 async def arena_answer(payload: dict):
     username=str(payload.get("username", "")).strip().lower(); attempt_id=str(payload.get("attempt_id", ""));
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="KARVIS Arena için giriş yapmalısınız.")
     try: answer=int(payload.get("answer"))
     except Exception: raise HTTPException(status_code=400, detail="Geçersiz cevap.")
     with arena_lock:
@@ -2111,6 +2120,8 @@ async def teacher_list_exams(username: str = "ilknur"):
 
 @app.get("/exams")
 async def list_published_exams(username: str = ""):
+    username = str(username or "").strip().lower()
+    if username == "karahan" or username not in USERS: raise HTTPException(status_code=401, detail="Sınav Takibi için kayıtlı bir profile giriş yapmalısınız.")
     with EXAMS_LOCK:
         data = _exam_store()
     out=[]
@@ -2122,7 +2133,7 @@ async def list_published_exams(username: str = ""):
 
 @app.get("/exams/{exam_id}")
 async def get_exam_for_student(exam_id: str, username: str):
-    if not str(username or "").strip() or username.strip().lower() not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    if not str(username or "").strip() or username.strip().lower() not in USERS or username.strip().lower() == "karahan": raise HTTPException(status_code=401, detail="Sınav Takibi için kayıtlı bir profile giriş yapmalısınız.")
     with EXAMS_LOCK:
         data = _exam_store()
     exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
@@ -2145,7 +2156,7 @@ async def get_exam_for_student(exam_id: str, username: str):
 @app.post("/exams/{exam_id}/start")
 async def start_exam(exam_id: str, username: str):
     username = str(username or "").strip().lower()
-    if username not in USERS or username == "ilknur": raise HTTPException(status_code=401, detail="Öğrenci profili gerekli.")
+    if username not in USERS or username in {"ilknur", "karahan"}: raise HTTPException(status_code=401, detail="Sınav Takibi için giriş yapmış öğrenci profili gerekli.")
     with EXAMS_LOCK:
         data = _exam_store(); exam = next((e for e in data["exams"] if e.get("id") == exam_id and e.get("published")), None)
         if not exam: raise HTTPException(status_code=404, detail="Yayımlanmış sınav bulunamadı.")
@@ -2171,7 +2182,7 @@ async def start_exam(exam_id: str, username: str):
 @app.post("/exams/{exam_id}/submit")
 async def submit_exam(exam_id: str, req: ExamSubmitRequest):
     username = str(req.username or "").strip().lower()
-    if username not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    if username not in USERS or username == "karahan": raise HTTPException(status_code=401, detail="Sınav Takibi için giriş yapmalısınız.")
     if username == "ilknur": raise HTTPException(status_code=400, detail="Öğretmen profili sınava öğrenci olarak katılamaz.")
     with EXAMS_LOCK:
         data = _exam_store()
@@ -2519,8 +2530,8 @@ async def admin_send_notification(request: AdminNotificationRequest):
     url = str(request.url or "/").strip()[:500]
     if not body:
         raise HTTPException(status_code=400, detail="Bildirim mesajı boş olamaz.")
-    if target != "all" and target not in USERS:
-        raise HTTPException(status_code=400, detail="Geçersiz hedef profil.")
+    if target != "all" and (target not in USERS or target == "karahan"):
+        raise HTTPException(status_code=400, detail="Geçersiz hedef profil. Ana profil bildirim alıcısı olarak seçilemez.")
     if target == "all":
         result = send_push_to_all(title, body, url)
     else:
@@ -8411,7 +8422,7 @@ async def list_profile_options():
     profiles = [
         {"username": str(uname), "name": str(info.get("name") or uname)}
         for uname, info in USERS.items()
-        if isinstance(info, dict)
+        if uname != "karahan" and isinstance(info, dict)
     ]
     profiles.sort(key=lambda item: item["name"].casefold())
     return {"success": True, "profiles": profiles}
