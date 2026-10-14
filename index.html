@@ -1481,6 +1481,37 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 .stats-points-detail{margin-top:8px;font-size:10px;opacity:.68}
 @media(max-width:420px){.stats-student-row{padding:10px;gap:7px}.stats-student-main small{font-size:9px}.stats-student-score strong{font-size:13px}.stats-view-tabs button{font-size:11px}}
 
+
+/* Dedicated KARVIS AI class evaluation screen */
+.karvis-evaluation-modal{width:min(1000px,calc(100vw - 24px))!important}
+.karvis-eval-hero{display:flex;align-items:center;gap:16px;padding:20px;margin-bottom:16px;border:1px solid rgba(0,190,220,.38);border-radius:20px;background:linear-gradient(125deg,rgba(0,160,220,.13),rgba(0,210,180,.045))}
+.karvis-eval-orb{display:grid;place-items:center;flex:0 0 58px;height:58px;border:2px solid #15cbe0;border-radius:50%;color:#20d8ee;font-size:28px;font-weight:900;box-shadow:0 0 22px rgba(0,210,240,.18)}
+.karvis-eval-eyebrow{margin:0 0 5px;color:#22cfe0;font-size:10px;letter-spacing:.14em;font-weight:900}
+.karvis-eval-hero h2{margin:0 0 7px!important}
+.karvis-eval-hero p:last-child{margin:0;font-size:13px;line-height:1.55;opacity:.76}
+.karvis-eval-filter{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding:15px;margin-bottom:16px;border:1px solid var(--border-color,rgba(128,128,128,.22));border-radius:16px;background:var(--card-bg,rgba(128,128,128,.035))}
+.karvis-eval-filter label{font-size:12px;font-weight:800}
+.karvis-eval-filter select{width:100%;max-width:none}
+.karvis-eval-filter .exam-generate-button{margin:0!important}
+.karvis-eval-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.karvis-eval-metric{min-width:0;padding:14px;border:1px solid rgba(0,190,220,.22);border-radius:15px;background:linear-gradient(145deg,rgba(0,160,210,.08),rgba(128,128,128,.025))}
+.karvis-eval-metric small{display:block;font-size:11px;opacity:.72;line-height:1.4}
+.karvis-eval-metric strong{display:block;margin-top:7px;font-size:clamp(19px,3vw,27px);overflow-wrap:anywhere}
+.karvis-eval-section{margin:14px 0;padding:clamp(14px,2.5vw,21px);border:1px solid var(--border-color,rgba(128,128,128,.22));border-radius:18px;background:var(--card-bg,rgba(128,128,128,.035))}
+.karvis-eval-section h3{margin:0 0 7px;font-size:16px}
+.karvis-eval-section .karvis-eval-intro{margin:0 0 13px;font-size:12px;line-height:1.5;opacity:.7}
+.karvis-eval-report{font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+.karvis-eval-question{padding:12px 0;border-bottom:1px solid var(--border-color,rgba(128,128,128,.15))}
+.karvis-eval-question:last-child{border-bottom:0}
+.karvis-eval-question-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.karvis-eval-question strong{font-size:13px;line-height:1.5}
+.karvis-eval-pill{flex:none;padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800;background:rgba(240,80,80,.12);color:#ff8585}
+.karvis-eval-pill.good{background:rgba(35,190,130,.12);color:#46d8a0}
+.karvis-eval-bar{height:6px;margin:10px 0;border-radius:99px;background:rgba(128,128,128,.16);overflow:hidden}
+.karvis-eval-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#078edb,#15d0bf)}
+.karvis-eval-question small{font-size:11px;opacity:.72;line-height:1.5}
+@media(max-width:620px){.karvis-eval-hero{align-items:flex-start;padding:14px}.karvis-eval-orb{flex-basis:44px;height:44px;font-size:22px}.karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.karvis-eval-report{font-size:12px}}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1669,6 +1700,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         <button class="menu-item" onclick="openIlknurFeatures()">✨ Özellikler</button>
         <button class="menu-item" onclick="openTeacherExamManager()">📝 Sınav Hazırla</button>
         <button class="menu-item" onclick="openTeacherStudentStats()">📊 Öğrenci İstatistikleri</button>
+        <button class="menu-item" onclick="openKarvisEvaluation()">🧠 KARVIS Değerlendirmesi</button>
 
     </div>
 
@@ -2151,6 +2183,19 @@ select option:checked{background:#087f9b!important;color:#fff!important}
   <header class="stats-hero"><div class="stats-hero-icon">▥</div><div class="stats-hero-copy"><p class="stats-eyebrow">KARVIS • ANALİTİK</p><h2>Öğrenci İstatistikleri</h2><p>Öğrenci performansını ve tekrar gereken konuları incele.</p></div></header>
   <div class="stats-filter"><label for="examStatsSelect">Sınav seç</label><select id="examStatsSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select><button class="stats-run" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">Analizi göster <span>↗</span></button></div>
   <div id="teacherExamStats" aria-live="polite" class="stats-results"><div class="stats-empty">📊<strong>Bir sınav seç</strong><span>Sonuçlar ve soru bazlı analiz burada görünecek.</span></div></div>
+  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+<div id="karvisEvaluationModal" class="modal exam-modal karvis-evaluation-modal">
+  <header class="karvis-eval-hero">
+    <div class="karvis-eval-orb">K</div>
+    <div><p class="karvis-eval-eyebrow">KARVIS • YAPAY ZEKÂ ANALİZİ</p><h2>KARVIS Değerlendirmesi</h2><p>Sınav verilerini yorumlar, sınıfın eksik konularını belirler ve uygulanabilir öğretim önerileri sunar.</p></div>
+  </header>
+  <div class="karvis-eval-filter">
+    <label for="karvisEvaluationExamSelect">Analiz edilecek sınav</label>
+    <select id="karvisEvaluationExamSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select>
+    <button class="exam-generate-button" id="karvisEvaluationRunBtn" onclick="loadKarvisEvaluation()">🧠 KARVIS ile değerlendir</button>
+  </div>
+  <div id="karvisEvaluationResults" aria-live="polite"><div class="stats-empty"><strong>Bir sınav seç</strong><span>KARVIS, yanıtlar geldikten sonra sınıfın güçlü ve geliştirilmesi gereken yönlerini analiz edecek.</span></div></div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 <div id="studentExamModal" class="modal exam-modal exam-student-modal" style="max-width:980px;">
@@ -3113,6 +3158,11 @@ function openTeacherStudentStats(){
   closeSidebar(); closeModals(); $("teacherStudentStatsModal").classList.add("show");
   loadTeacherExams();
 }
+function openKarvisEvaluation(){
+  if(currentUser !== "ilknur"){alert("KARVIS Değerlendirmesi yalnızca İlknur öğretmen profiline açıktır.");return;}
+  closeSidebar(); closeModals(); $("karvisEvaluationModal").classList.add("show");
+  loadTeacherExams();
+}
 function openTeacherExamManager(){
   if(currentUser !== "ilknur"){alert("Sınav yönetimi yalnızca İlknur öğretmen profiline açıktır.");return;}
   closeSidebar(); closeModals(); $("teacherExamModal").classList.add("show");
@@ -3148,7 +3198,8 @@ async function saveTeacherExam(published){
 async function loadTeacherExams(){
  const box=$('teacherExamList');if(!box)return;
  try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button><button class="settings-choice" onclick="selectExamForAnalysis('${e.id}')">📊 Öğrenci istatistikleri</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';
- const sel=$('examStatsSelect');if(sel){const previous=sel.value;sel.innerHTML='<option value="">Sınav seçin…</option>'+(d.exams||[]).map(e=>`<option value="${e.id}">${escapeHTML(e.title)}</option>`).join('');if((d.exams||[]).some(e=>e.id===previous))sel.value=previous;}}
+ const optionMarkup='<option value="">Sınav seçin…</option>'+(d.exams||[]).map(e=>`<option value="${e.id}">${escapeHTML(e.title)}</option>`).join('');
+ for(const selectId of ['examStatsSelect','karvisEvaluationExamSelect']){const sel=$(selectId);if(sel){const previous=sel.value;sel.innerHTML=optionMarkup;if((d.exams||[]).some(e=>e.id===previous))sel.value=previous;}}}
  catch(e){box.textContent='Hata: '+e.message;}
 }
 async function toggleTeacherExamPublish(id,published){try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,published})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Durum değiştirilemedi.');await loadTeacherExams();}catch(e){alert(e.message);}}
@@ -3187,17 +3238,44 @@ async function loadTeacherExamAnalysis(){
       const correctPct=n?Math.round(correct/n*100):0, wrongPct=n?Math.round(wrong/n*100):0, blankPct=n?Math.round(blank/n*100):0;
       return `<article class="stats-question-card"><div class="stats-question-head"><span class="stats-question-number">${i+1}</span><div class="stats-question-text">${escapeHTML(q.prompt||'Soru metni bulunamadı')}</div><span class="stats-status ${status[1]}">${status[0]}</span></div><div class="stats-question-progress"><div class="${color}" style="width:${pct}%"></div></div><div class="stats-question-percent">%${pct}</div><div class="stats-answer-grid">${part('correct','✓','Doğru',correct,correctPct)}${part('wrong','×','Yanlış',wrong,wrongPct)}${part('blank','−','Boş',blank,blankPct)}</div>${review?`<div class="stats-review-note">✎ ${review} açık uçlu yanıt öğretmen değerlendirmesi bekliyor.</div>`:''}</article>`;
     }).join('');
-    const evaluation=escapeHTML(d.karvis_evaluation||'Henüz yeterli yanıt verisi yok.');
     const subject=escapeHTML(d.exam?.subject||'Seçilen sınav');
     const students=d.student_stats||[];
     window.currentExamStudentStats=students;
     const studentCards=students.map((s,i)=>`<button type="button" class="stats-student-row" onclick="showStudentAnswerDetails(${i})"><span class="stats-student-rank">${i+1}</span><span class="stats-student-main"><strong>${escapeHTML(s.username||'Öğrenci')}</strong><small>${Number(s.correct_count)||0} doğru · ${Number(s.wrong_count)||0} yanlış · ${Number(s.blank_count)||0} boş</small></span><span class="stats-student-score"><strong>%${Math.round(Number(s.percent)||0)}</strong><small>${Number(s.score)||0}/${Number(s.max_score)||0} puan</small></span><span class="stats-student-chevron">›</span></button>`).join('');
-    const generalPanel=`<div id="statsGeneralPanel">${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section><section class="stats-karvis-evaluation"><div class="stats-karvis-icon">♧</div><div class="stats-karvis-content"><h3>KARVIS Değerlendirmesi</h3><p>${evaluation}</p><small>Yorumlar mevcut yanıt verilerine dayanır. Açık uçlu ve henüz puanlanmamış cevaplar kesin başarı hesabına katılmaz.</small></div></section></div>`;
+    const generalPanel=`<div id="statsGeneralPanel">${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section></div>`;
     const individualPanel=`<div id="statsIndividualPanel" style="display:none"><section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">♙</span><div><h3>Bireysel öğrenci sonuçları</h3><p>Başarı sırasına göre. Öğrenciye dokunarak verdiği cevapları ve cevap anahtarını görüntüle.</p></div></header><div class="stats-student-list">${studentCards||'<div class="stats-empty"><strong>Henüz öğrenci sonucu yok</strong><span>Öğrenciler sınavı teslim ettikçe burada listelenecek.</span></div>'}</div><div id="statsStudentDetail"></div></section></div>`;
     box.innerHTML=`<div class="stats-exam-heading"><span class="stats-subject-pill">${subject}</span><span class="stats-question-count">${questions.length} soru · ${students.length} öğrenci</span></div><div class="stats-view-tabs"><button type="button" class="active" onclick="switchStatsView('general',this)">Genel istatistik</button><button type="button" onclick="switchStatsView('individual',this)">Bireysel istatistik</button></div>${generalPanel}${individualPanel}`;
   }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>İstatistikler yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}finally{if(btn)btn.disabled=false;}
 }
 
+async function loadKarvisEvaluation(){
+ if(currentUser!=='ilknur'){alert('KARVIS Değerlendirmesi yalnızca İlknur öğretmen profiline açıktır.');return;}
+ const id=$('karvisEvaluationExamSelect')?.value, box=$('karvisEvaluationResults'), btn=$('karvisEvaluationRunBtn');
+ if(!id){if(box)box.innerHTML='<div class="stats-empty"><strong>Bir sınav seç</strong><span>Önce analiz edilecek sınavı seç.</span></div>';return;}
+ if(btn)btn.disabled=true;
+ if(box)box.innerHTML='<div class="stats-empty"><strong>KARVIS analiz ediyor…</strong><span>Sınav yanıtları inceleniyor, eksik alanlar ve öğretim önerileri hazırlanıyor.</span></div>';
+ try{
+  const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));
+  const d=await r.json();if(!r.ok)throw new Error(d.detail||'KARVIS analizi alınamadı.');
+  const s=d.summary||{}, qs=d.question_stats||[];
+  const submitted=Number(s.submission_count)||0, avg=Number(s.average_percent)||0;
+  const metric=(label,value,sub='')=>`<article class="karvis-eval-metric"><small>${label}</small><strong>${value}</strong>${sub?`<small>${sub}</small>`:''}</article>`;
+  const questionHtml=qs.map((q,i)=>{
+   const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
+   const evaluable=Math.max(0,n-review), correct=Math.max(0,evaluable-wrong-blank), pct=evaluable?Math.round(correct/evaluable*100):0;
+   const weakness=evaluable>0&&pct<60;
+   return `<article class="karvis-eval-question"><div class="karvis-eval-question-head"><strong>${i+1}. ${escapeHTML(q.prompt||'Soru metni bulunamadı')}</strong><span class="karvis-eval-pill ${weakness?'':'good'}">${evaluable===0?'Yetersiz veri':weakness?'Gelişim alanı':'Olumlu sonuç'}</span></div><div class="karvis-eval-bar"><span style="width:${pct}%"></span></div><small>Başarı: %${pct} · Yanlış: ${wrong} · Boş: ${blank}${review?` · Öğretmen değerlendirmesi bekleyen: ${review}`:''}</small></article>`;
+  }).join('');
+  const evaluation=String(d.karvis_evaluation||'Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça KARVIS sınıfın gelişim alanlarını belirleyebilir.');
+  const safeEvaluation=escapeHTML(evaluation);
+  const title=escapeHTML(d.exam?.title||'Seçilen sınav'), subject=escapeHTML(d.exam?.subject||'Ders belirtilmedi');
+  box.innerHTML=`<div class="karvis-eval-metrics">${metric('Sınav',title,subject)}${metric('Sınıf ortalaması','%'+avg)}${metric('Katılım',submitted+' öğrenci')}${metric('Öğretmen kontrolü',Number(s.pending_open_answers)||0,'Açık uçlu yanıt')}</div>
+  <section class="karvis-eval-section"><h3>🧠 KARVIS yapay zekâ değerlendirmesi</h3><p class="karvis-eval-intro">Sınav yanıtlarından üretilen sınıf düzeyinde yorum, eksik alanlar ve uygulanabilir geliştirme yöntemleri.</p><div class="karvis-eval-report">${safeEvaluation}</div></section>
+  <section class="karvis-eval-section"><h3>🎯 Soru bazlı gelişim alanları</h3><p class="karvis-eval-intro">Başarı oranı otomatik değerlendirilebilen yanıtlardan hesaplanır. Soru metinleri konu kazanımını açıkça göstermiyorsa konu adı kesin kabul edilmemelidir.</p>${questionHtml||'<div class="stats-empty"><strong>Soru verisi bulunamadı</strong><span>Bu sınavda analiz edilecek soru yok.</span></div>'}</section>
+  ${submitted===0?'<div class="stats-empty"><strong>Henüz öğrenci yanıtı yok</strong><span>Öğrenciler sınavı tamamladıktan sonra KARVIS değerlendirmesini tekrar çalıştır.</span></div>':''}`;
+ }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>KARVIS analizi yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}
+ finally{if(btn)btn.disabled=false;}
+}
 function switchStatsView(view,button){
  const general=$('statsGeneralPanel'), individual=$('statsIndividualPanel');
  if(general)general.style.display=view==='general'?'block':'none';
