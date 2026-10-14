@@ -1509,19 +1509,21 @@ def _verify_password(password, record):
 
 def _load_password_store():
     with password_lock:
-        records = {}
+        # Load local records first, then overlay PostgreSQL records. A stale JSON
+        # hash must never replace the authoritative password hash for a profile
+        # that is stored in the persistent database.
+        local_records = read_json_file(PASSWORD_FILE, {})
+        records = dict(local_records) if isinstance(local_records, dict) else {}
         if _profile_db_configured() and _init_profile_database():
             try:
                 conn = _profile_db_connect()
                 with conn.cursor() as cur:
                     cur.execute("SELECT username, password_record FROM karvis_user_profiles")
-                    records.update({str(u): rec for u, rec in cur.fetchall()})
+                    database_records = {str(u): rec for u, rec in cur.fetchall()}
                 conn.close()
+                records.update(database_records)  # PostgreSQL is authoritative for registered accounts.
             except Exception as exc:
                 print(f"KARVIS profile password read failed: {exc}", flush=True)
-        local_records = read_json_file(PASSWORD_FILE, {})
-        if isinstance(local_records, dict):
-            records.update(local_records)
         for uname, info in USERS.items():
             if uname not in records:
                 legacy = str(info.get("password", ""))
