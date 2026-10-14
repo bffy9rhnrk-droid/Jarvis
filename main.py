@@ -962,7 +962,7 @@ async def arena_duel_request(payload: dict):
     try:
         stake = int(payload.get("stake"))
     except Exception:
-        raise HTTPException(status_code=400, detail="Geçerli bir bahis puanı girin.")
+        raise HTTPException(status_code=400, detail="Geçerli bir tecrübe puanı girin.")
     if username not in USERS or opponent not in USERS:
         raise HTTPException(status_code=401, detail="Geçersiz profil.")
     if username == opponent:
@@ -974,9 +974,9 @@ async def arena_duel_request(payload: dict):
         challenger_player = _arena_player(data, username)
         opponent_player = _arena_player(data, opponent)
         if int(challenger_player.get("points", 0)) < stake:
-            raise HTTPException(status_code=400, detail="Bahis miktarı için yeterli puanın yok.")
+            raise HTTPException(status_code=400, detail="Tecrübe miktarı için yeterli puanın yok.")
         if int(opponent_player.get("points", 0)) < stake:
-            raise HTTPException(status_code=400, detail="Rakibin bu bahsi karşılayacak kadar puana sahip değil.")
+            raise HTTPException(status_code=400, detail="Rakibin bu Tecrübe puanını karşılayacak kadar puana sahip değil.")
         duels = data.setdefault("duels", {})
         if any(d.get("status") in ("pending", "active") and username in (d.get("challenger"), d.get("opponent")) for d in duels.values()):
             raise HTTPException(status_code=409, detail="Önce mevcut düello isteğini veya aktif düellonu tamamla.")
@@ -1134,7 +1134,7 @@ async def arena_duel_answer(payload: dict):
                 # Recheck funds at settlement to prevent negative balances.
                 if int(loser_player.get("points", 0)) < stake:
                     winner = loser = None
-                    duel["result"] = {"winner": None, "reason": "Sonuçlandırma sırasında bahis puanı yetersizdi; puan aktarılmadı.", "wins": totals}
+                    duel["result"] = {"winner": None, "reason": "Sonuçlandırma sırasında tecrübe puanı yetersizdi; puan aktarılmadı.", "wins": totals}
                 else:
                     winner_player["points"] = int(winner_player.get("points", 0)) + stake
                     loser_player["points"] = int(loser_player.get("points", 0)) - stake
