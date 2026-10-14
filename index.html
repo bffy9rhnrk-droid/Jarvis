@@ -1884,12 +1884,6 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         <label style="display:block;margin-bottom:6px;opacity:.8;">Alıcı</label>
         <select id="notificationTarget" class="voice-select" style="width:100%;">
             <option value="all">📢 Tüm kullanıcılar</option>
-            <option value="karahan">KARAHAN INC.</option>
-            <option value="betul">Betül</option>
-            <option value="sinem">Sinem</option>
-            <option value="ilknur">İlknur</option>
-            <option value="murat">Murat</option>
-            <option value="sude">Sude</option>
         </select>
     </div>
     <input id="notificationTitle" placeholder="Bildirim başlığı" maxlength="120" value="K.A.R.V.I.S.">
@@ -2138,8 +2132,8 @@ select option:checked{background:#087f9b!important;color:#fff!important}
     <p>Bir rakip seç, bahis puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
     <div class="sude-grid">
       <div><label for="arenaDuelOpponent">Rakip profil</label>
-        <select id="arenaDuelOpponent" class="sude-field">
-          <option value="karahan">KARAHAN INC.</option><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="murat">Murat</option><option value="sude">Sude</option>
+        <select id="arenaDuelOpponent" class="sude-field" aria-label="Rakip profil">
+          <option value="">Profiller yükleniyor…</option>
         </select>
       </div>
       <div><label for="arenaDuelStake">Bahis puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
@@ -5380,13 +5374,60 @@ setTimeout(() => {
     syncKarvisPushSubscription(true);
 }, 1200);
 
+async function refreshKarvisProfileOptions(){
+    const selects = [
+        {el:$("arenaDuelOpponent"), all:false},
+        {el:$("notificationTarget"), all:true}
+    ];
+    let profiles = [];
+    try{
+        const response = await fetch(API + "/profiles/list");
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "Profil listesi alınamadı.");
+        profiles = Array.isArray(data.profiles) ? data.profiles : [];
+    }catch(error){
+        selects.forEach(({el})=>{ if(el && !el.options.length) el.innerHTML='<option value="">Profil listesi yüklenemedi</option>'; });
+        throw error;
+    }
+    for(const {el,all} of selects){
+        if(!el) continue;
+        const previous = el.value;
+        el.replaceChildren();
+        if(all){
+            const allOption = document.createElement("option");
+            allOption.value = "all";
+            allOption.textContent = "📢 Tüm kullanıcılar";
+            el.appendChild(allOption);
+        }
+        profiles.forEach(profile=>{
+            const option = document.createElement("option");
+            option.value = String(profile.username || "");
+            option.textContent = String(profile.name || profile.username || "Profil");
+            el.appendChild(option);
+        });
+        if(previous && [...el.options].some(option=>option.value===previous)){
+            el.value = previous;
+        }else if(!all && currentUser && [...el.options].some(option=>option.value!==currentUser)){
+            el.value = [...el.options].find(option=>option.value!==currentUser).value;
+        }
+        if(!all){
+            [...el.options].forEach(option=>{option.disabled = option.value===currentUser;});
+            if(el.value===currentUser){
+                const other=[...el.options].find(option=>option.value!==currentUser);
+                if(other) el.value=other.value;
+            }
+        }
+    }
+}
+
 async function openAdminNotifications(){
     if(currentUser !== "murat") return;
     closeSidebar();
     $("adminNotificationModal").classList.add("show");
     const status=$("notificationSendStatus");
-    status.textContent="Abonelik durumu kontrol ediliyor...";
+    status.textContent="Profil listesi ve abonelik durumu kontrol ediliyor...";
     try{
+        await refreshKarvisProfileOptions();
         const r=await fetch(API+"/admin/push-status?username=murat");
         const d=await r.json();
         if(!r.ok) throw new Error(d.detail || "Bildirim durumu alınamadı.");
@@ -5596,7 +5637,7 @@ async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("s
 let arenaAttemptId=null, arenaQuestionIndex=0, arenaAnswered=false, arenaStartedAt=0;
 let arenaDuelPollTimer=null, arenaDuelRenderedKey="", arenaDuelLoadInFlight=false;
 function arenaEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";const duelSelect=$("arenaDuelOpponent");if(duelSelect){[...duelSelect.options].forEach(o=>o.disabled=o.value===currentUser);if(duelSelect.value===currentUser){const other=[...duelSelect.options].find(o=>o.value!==currentUser);if(other)duelSelect.value=other.value;}}$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";await loadArenaOverview();}
+async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";try{await refreshKarvisProfileOptions();}catch(e){$("arenaDuelStatus").textContent="Profil listesi alınamadı: "+(e.message||"Sunucu hatası");}await loadArenaOverview();}
 async function adminResetArena(){
  if(currentUser!=="murat"){alert("Bu işlem yalnızca yönetici profiline açıktır.");return;}
  const ok=confirm("DİKKAT! Tüm profillerin Arena puanları, rozetleri, sıralaması ve oyun geçmişi kalıcı olarak silinecek. Bildirimler etkilenmeyecek. Devam edilsin mi?");
