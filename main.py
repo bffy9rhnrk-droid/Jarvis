@@ -968,7 +968,7 @@ async def arena_duel_request(payload: dict):
     if username == opponent:
         raise HTTPException(status_code=400, detail="Kendine düello gönderemezsin.")
     if stake < 1 or stake > 1000000:
-        raise HTTPException(status_code=400, detail="Bahis 1 ile 1.000.000 puan arasında olmalı.")
+        raise HTTPException(status_code=400, detail="Tecrübe 1 ile 1.000.000 puan arasında olmalı.")
     with arena_lock:
         data = _arena_load()
         challenger_player = _arena_player(data, username)
