@@ -1,5848 +1,8759 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>K.A.R.V.I.S. - KARAHAN INC.</title>
-<meta name="application-name" content="K.A.R.V.I.S. - KARAHAN INC.">
-<meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
-<meta name="description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="K.A.R.V.I.S. - KARAHAN INC.">
-<meta property="og:description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
-<meta property="og:site_name" content="K.A.R.V.I.S.">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="K.A.R.V.I.S. - KARAHAN INC.">
-<meta name="twitter:description" content="K.A.R.V.I.S. — KARAHAN INC. yapay zeka asistanı.">
-
-<style>
-*{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent
-}
-
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:#02070a;
-    color:#fff
-}
-
-body{
-    background:
-        radial-gradient(circle at center,rgba(0,229,255,.09),transparent 38%),
-        radial-gradient(circle at 50% 100%,rgba(0,229,255,.035),transparent 45%),
-        #02070a
-}
-
-button,input{
-    font:inherit
-}
-
-button{
-    cursor:pointer;
-    -webkit-appearance:none
-}
-
-button:active{
-    transform:scale(.97)
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-
-.header{
-    height:72px;
-    display:flex;
-    align-items:center;
-    padding:0 16px;
-    border-bottom:1px solid rgba(0,229,255,.15);
-    background:rgba(2,7,10,.92);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-    position:relative;
-    z-index:10
-}
-
-.logo-small{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    border:2px solid #00e5ff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#00e5ff;
-    font-size:21px;
-    font-weight:800;
-    box-shadow:
-        0 0 12px rgba(0,229,255,.5),
-        inset 0 0 12px rgba(0,229,255,.12);
-    animation:logoPulse 3s ease-in-out infinite
-}
-
-.brand{
-    margin-left:12px
-}
-
-.brand-title{
-    font-size:18px;
-    font-weight:800;
-    letter-spacing:2px
-}
-
-.brand-subtitle{
-    color:rgba(255,255,255,.5);
-    font-size:9px;
-    letter-spacing:3px;
-    margin-top:2px
-}
-
-.online{
-    margin-left:10px;
-    font-size:9px;
-    color:#00e5ff;
-    letter-spacing:.5px
-}
-
-.menu-button{
-    margin-left:auto;
-    width:44px;
-    height:44px;
-    border:1px solid rgba(0,229,255,.25);
-    border-radius:14px;
-    background:rgba(0,229,255,.05);
-    color:#00e5ff;
-    font-size:22px
-}
-
-/* ============================================================
-   MAIN HUD
-   ============================================================ */
-
-.main{
-    height:calc(100vh - 72px);
-    display:flex;
-    flex-direction:column;
-    position:relative
-}
-
-.hud{
-    flex:1;
-    position:relative;
-    overflow:hidden
-}
-
-.hud-core{
-    position:absolute;
-    left:50%;
-    top:38%;
-    transform:translate(-50%,-50%);
-    width:210px;
-    height:210px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center
-}
-
-.ring{
-    position:absolute;
-    border-radius:50%;
-    border:1px solid rgba(0,229,255,.35);
-    animation:spin 9s linear infinite
-}
-
-.ring.one{
-    width:210px;
-    height:210px
-}
-
-.ring.two{
-    width:170px;
-    height:170px;
-    border-style:dashed;
-    animation-duration:6s;
-    animation-direction:reverse
-}
-
-.ring.three{
-    width:130px;
-    height:130px;
-    border-color:rgba(0,229,255,.7);
-    animation-duration:4s
-}
-
-.core{
-    width:82px;
-    height:82px;
-    border-radius:50%;
-    border:2px solid #00e5ff;
-    color:#00e5ff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:38px;
-    font-weight:900;
-    box-shadow:
-        0 0 25px rgba(0,229,255,.7),
-        inset 0 0 20px rgba(0,229,255,.2);
-    z-index:2
-}
-
-.status{
-    position:absolute;
-    top:calc(38% + 120px);
-    left:50%;
-    transform:translateX(-50%);
-    color:rgba(255,255,255,.5);
-    font-size:10px;
-    letter-spacing:2px;
-    white-space:nowrap;
-    text-align:center
-}
-
-.status.busy{
-    color:#00e5ff;
-    text-shadow:0 0 10px rgba(0,229,255,.5)
-}
-
-/* ============================================================
-   CHAT
-   ============================================================ */
-
-.chat{
-    position:absolute;
-    left:12px;
-    right:12px;
-    bottom:100px;
-    max-height:38%;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding-bottom:4px;
-    scrollbar-width:none;
-    scroll-behavior:auto
-}
-
-.chat::-webkit-scrollbar{
-    display:none
-}
-
-.message{
-    max-width:86%;
-    padding:11px 14px;
-    border-radius:15px;
-    font-size:14px;
-    line-height:1.45;
-    white-space:pre-wrap;
-    word-break:break-word;
-    animation:messageIn .2s ease
-}
-
-.message.ai{
-    align-self:flex-start;
-    background:rgba(0,229,255,.08);
-    border:1px solid rgba(0,229,255,.16)
-}
-
-.message.user{
-    align-self:flex-end;
-    background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.1)
-}
-
-.message a{
-    color:#00e5ff;
-    text-decoration:none
-}
-
-.waiting-message{
-    min-width:190px
-}
-
-.waiting-title{
-    color:#00e5ff;
-    font-weight:700;
-    margin-bottom:4px
-}
-
-.waiting-detail{
-    color:rgba(255,255,255,.55);
-    font-size:11px
-}
-
-/* ============================================================
-   PRESENTATION
-   ============================================================ */
-
-.presentation-box{
-    min-width:min(340px,82vw);
-    padding:14px;
-    border-radius:16px;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0,229,255,.08),
-            rgba(0,229,255,.025)
-        );
-    border:1px solid rgba(0,229,255,.18);
-    box-shadow:
-        inset 0 0 25px rgba(0,229,255,.025),
-        0 0 20px rgba(0,0,0,.12)
-}
-
-.presentation-heading{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    margin-bottom:12px
-}
-
-.presentation-orb{
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:#00e5ff;
-    box-shadow:0 0 12px rgba(0,229,255,.8);
-    animation:liveOrb 1.1s ease-in-out infinite
-}
-
-.presentation-heading-text{
-    color:#00e5ff;
-    font-size:12px;
-    font-weight:800;
-    letter-spacing:1.6px
-}
-
-.presentation-percent{
-    margin-left:auto;
-    color:#00e5ff;
-    font-size:12px;
-    font-weight:800
-}
-
-.presentation-current{
-    min-height:30px;
-    margin-bottom:11px;
-    padding:8px 10px;
-    border-radius:10px;
-    background:rgba(0,229,255,.045);
-    border:1px solid rgba(0,229,255,.10);
-    color:rgba(255,255,255,.78);
-    font-size:11px;
-    line-height:1.45
-}
-
-.presentation-current strong{
-    color:#00e5ff
-}
-
-.presentation-steps{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    margin-bottom:12px
-}
-
-.presentation-step{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    min-height:20px;
-    color:rgba(255,255,255,.28);
-    font-size:10px;
-    transition:.25s ease
-}
-
-.presentation-step-icon{
-    width:17px;
-    height:17px;
-    flex:none;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:9px;
-    font-weight:900;
-    border:1px solid rgba(255,255,255,.12);
-    color:rgba(255,255,255,.25)
-}
-
-.presentation-step.done{
-    color:rgba(255,255,255,.65)
-}
-
-.presentation-step.done .presentation-step-icon{
-    color:#00e5ff;
-    border-color:rgba(0,229,255,.4);
-    background:rgba(0,229,255,.08);
-    box-shadow:0 0 8px rgba(0,229,255,.12)
-}
-
-.presentation-step.active{
-    color:#fff
-}
-
-.presentation-step.active .presentation-step-icon{
-    color:#001014;
-    background:#00e5ff;
-    border-color:#00e5ff;
-    box-shadow:0 0 12px rgba(0,229,255,.55);
-    animation:stepPulse 1.1s ease-in-out infinite
-}
-
-.presentation-progress{
-    height:5px;
-    width:100%;
-    border-radius:99px;
-    overflow:hidden;
-    background:rgba(255,255,255,.08);
-    margin-top:4px
-}
-
-.presentation-progress-inner{
-    height:100%;
-    width:0%;
-    border-radius:99px;
-    background:linear-gradient(
-        90deg,
-        rgba(0,229,255,.45),
-        #00e5ff
-    );
-    box-shadow:0 0 10px rgba(0,229,255,.55);
-    transition:width .45s ease
-}
-
-.presentation-live-footer{
-    margin-top:8px;
-    color:rgba(255,255,255,.32);
-    font-size:9px;
-    letter-spacing:.4px
-}
-
-/* ============================================================
-   INPUT
-   ============================================================ */
-
-.input-area{
-    position:absolute;
-    left:12px;
-    right:12px;
-    bottom:15px;
-    height:58px;
-    display:flex;
-    gap:8px
-}
-
-.input{
-    min-width:0;
-    flex:1;
-    border:1px solid rgba(0,229,255,.22);
-    border-radius:18px;
-    background:rgba(5,15,20,.95);
-    color:white;
-    padding:0 17px;
-    outline:none;
-    font-size:16px
-}
-
-.input::placeholder{
-    color:rgba(255,255,255,.38)
-}
-
-.input:focus{
-    border-color:rgba(0,229,255,.65)
-}
-
-.send{
-    width:58px;
-    border:0;
-    border-radius:18px;
-    background:#00e5ff;
-    color:#001014;
-    font-size:22px;
-    font-weight:900;
-    box-shadow:0 0 15px rgba(0,229,255,.25)
-}
-
-.send:disabled{
-    opacity:.45;
-    cursor:default
-}
-
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
-
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:min(330px,88vw);
-    background:rgba(2,7,10,.98);
-    border-right:1px solid rgba(0,229,255,.2);
-    z-index:100;
-    transform:translateX(-105%);
-    transition:transform .25s ease;
-    padding:22px 15px;
-    overflow-y:auto;
-    box-shadow:10px 0 40px rgba(0,0,0,.35)
-}
-
-.sidebar.open{
-    transform:translateX(0)
-}
-
-.sidebar-title{
-    color:#00e5ff;
-    font-size:16px;
-    font-weight:800;
-    letter-spacing:2px;
-    margin-bottom:20px
-}
-
-.menu-item{
-    width:100%;
-    min-height:48px;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    background:rgba(255,255,255,.035);
-    color:white;
-    text-align:left;
-    padding:12px 14px;
-    margin-bottom:8px;
-    transition:.2s ease
-}
-
-.menu-item:hover,
-.menu-item.active{
-    border-color:rgba(0,229,255,.45);
-    background:rgba(0,229,255,.08);
-    color:#00e5ff
-}
-
-/* Shared Arena menu item with a compact NEW label */
-.menu-item.arena-menu-item{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-}
-.arena-menu-label{white-space:nowrap;}
-.arena-new-badge{
-    flex:0 0 auto;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:3px 6px;
-    border-radius:6px;
-    font-size:9px;
-    line-height:1.2;
-    font-weight:900;
-    letter-spacing:.6px;
-    color:#07140d;
-    background:#78f0a5;
-    border:1px solid rgba(120,240,165,.65);
-}
-
-.academic-title{
-    margin:22px 5px 10px;
-    font-size:10px;
-    letter-spacing:2px;
-    color:rgba(255,255,255,.4)
-}
-
-.close-sidebar{
-    position:absolute;
-    right:14px;
-    top:15px;
-    border:0;
-    background:transparent;
-    color:#00e5ff;
-    font-size:24px
-}
-
-.overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.5);
-    backdrop-filter:blur(2px);
-    z-index:90;
-    display:none
-}
-
-.overlay.show{
-    display:block
-}
-
-/* ============================================================
-   MODALS
-   ============================================================ */
-
-.modal{
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:min(92vw,440px);
-    max-height:85vh;
-    overflow-y:auto;
-    background:#071116;
-    border:1px solid rgba(0,229,255,.25);
-    border-radius:22px;
-    z-index:200;
-    padding:22px;
-    display:none;
-    box-shadow:0 20px 80px rgba(0,0,0,.55)
-}
-
-.modal.show{
-    display:block
-}
-
-.modal h2{
-    margin-top:0;
-    color:#00e5ff
-}
-
-.modal input{
-    width:100%;
-    height:48px;
-    margin-bottom:10px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.05);
-    color:white;
-    padding:0 12px;
-    font-size:16px;
-    outline:none
-}
-
-.modal-button{
-    width:100%;
-    height:46px;
-    border:0;
-    border-radius:12px;
-    background:#00e5ff;
-    color:#001014;
-    font-weight:800
-}
-
-.secondary-button{
-    margin-top:8px;
-    background:rgba(255,255,255,.08);
-    color:white
-}
-
-.error-list{
-    max-height:50vh;
-    overflow-y:auto
-}
-
-.error-item{
-    padding:10px;
-    margin-bottom:8px;
-    border-radius:10px;
-    background:rgba(255,70,70,.06);
-    border:1px solid rgba(255,70,70,.12);
-    color:rgba(255,255,255,.8);
-    font-size:12px;
-    white-space:pre-wrap;
-    word-break:break-word
-}
-
-/* ============================================================
-   BETÜL
-   ============================================================ */
-
-.betul-analysis-box{
-    min-width:min(350px,84vw);
-    padding:14px;
-    border-radius:17px;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,82,170,.10),
-            rgba(0,229,255,.035)
-        );
-    border:1px solid rgba(255,82,170,.25);
-    box-shadow:0 0 24px rgba(255,82,170,.06)
-}
-
-.betul-analysis-title{
-    color:#ff71c2;
-    font-weight:900;
-    letter-spacing:1px;
-    margin-bottom:10px
-}
-
-.betul-analysis-stage{
-    padding:9px 10px;
-    border-radius:10px;
-    background:rgba(255,255,255,.04);
-    color:rgba(255,255,255,.78);
-    font-size:11px
-}
-
-.betul-analysis-progress{
-    height:5px;
-    border-radius:99px;
-    background:rgba(255,255,255,.08);
-    overflow:hidden;
-    margin-top:10px
-}
-
-.betul-analysis-progress>div{
-    height:100%;
-    width:0;
-    background:linear-gradient(90deg,#ff71c2,#00e5ff);
-    transition:width .35s ease
-}
-
-.betul-result{
-    margin-top:12px
-}
-
-.betul-score{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    padding:6px 0;
-    border-bottom:1px solid rgba(255,255,255,.06);
-    font-size:12px
-}
-
-.betul-comment{
-    margin-top:12px;
-    padding:10px;
-    border-radius:11px;
-    background:rgba(255,113,194,.07);
-    border:1px solid rgba(255,113,194,.16);
-    color:#fff;
-    font-size:12px
-}
-
-.betul-disclaimer{
-    margin-top:10px;
-    color:rgba(255,255,255,.4);
-    font-size:9px;
-    line-height:1.4
-}
-
-.betul-modal-note{
-    color:rgba(255,255,255,.5);
-    font-size:11px;
-    line-height:1.5;
-    margin-bottom:12px
-}
-
-.betul-photo-input{
-    width:100%;
-    padding:12px;
-    border:1px dashed rgba(255,113,194,.35);
-    border-radius:12px;
-    background:rgba(255,255,255,.03);
-    color:rgba(255,255,255,.7);
-    margin-bottom:10px
-}
-
-/* ============================================================
-   THEMES
-   ============================================================ */
-
-body.sinem-mode .ring{
-    border-color:rgba(255,80,180,.45)
-}
-
-body.sinem-mode .core{
-    color:#ff5ab4;
-    border-color:#ff5ab4;
-    box-shadow:
-        0 0 25px rgba(255,90,180,.55),
-        inset 0 0 20px rgba(255,90,180,.15)
-}
-
-body.fun-mode .ring{
-    border-color:rgba(255,50,50,.6)
-}
-
-body.fun-mode .core{
-    color:#ff4444;
-    border-color:#ff4444;
-    box-shadow:
-        0 0 25px rgba(255,50,50,.6),
-        inset 0 0 20px rgba(255,50,50,.15)
-}
-
-body.fun-mode .status{
-    color:#ff4444
-}
-
-/* ============================================================
-   SETTINGS
-   ============================================================ */
-
-.settings-modal{
-    max-height:88vh;
-}
-
-.settings-section{
-    padding:13px 0;
-    border-bottom:1px solid rgba(255,255,255,.07);
-}
-
-.settings-label{
-    color:#00e5ff;
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:.8px;
-    margin-bottom:9px;
-}
-
-.theme-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-}
-
-.theme-option,
-.settings-choice,
-.settings-action{
-    min-height:42px;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:11px;
-    background:rgba(255,255,255,.04);
-    color:white;
-    padding:9px 10px;
-    font-size:12px;
-    text-align:left;
-}
-
-.theme-option.active,
-.settings-choice.active{
-    border-color:rgba(0,229,255,.65);
-    background:rgba(0,229,255,.10);
-}
-
-.theme-dot{
-    display:inline-block;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    margin-right:7px;
-    box-shadow:0 0 8px currentColor;
-}
-
-.theme-cyan{color:#00e5ff;background:#00e5ff}
-.theme-pink{color:#ff5ab4;background:#ff5ab4}
-.theme-purple{color:#a66cff;background:#a66cff}
-.theme-red{color:#ff4444;background:#ff4444}
-
-.settings-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-}
-
-.settings-row strong{
-    display:block;
-    font-size:12px;
-}
-
-.settings-row small{
-    display:block;
-    margin-top:3px;
-    color:rgba(255,255,255,.42);
-    font-size:9px;
-    line-height:1.35;
-}
-
-.settings-toggle{
-    min-width:65px;
-    height:34px;
-    border:1px solid rgba(0,229,255,.35);
-    border-radius:10px;
-    background:rgba(0,229,255,.09);
-    color:#00e5ff;
-    font-size:10px;
-    font-weight:800;
-}
-
-.settings-toggle.off{
-    color:rgba(255,255,255,.45);
-    border-color:rgba(255,255,255,.1);
-    background:rgba(255,255,255,.04);
-}
-
-.settings-inline{
-    display:flex;
-    gap:7px;
-}
-
-.settings-choice{
-    flex:1;
-    text-align:center;
-    min-height:38px;
-}
-
-.settings-action{
-    color:#ff7777;
-    border-color:rgba(255,90,90,.25);
-}
-
-.settings-subrow{
-    margin-top:13px;
-}
-
-.voice-select{
-    max-width:145px;
-    height:36px;
-    border-radius:10px;
-    border:1px solid rgba(0,229,255,.2);
-    background:#071116;
-    color:white;
-    padding:0 7px;
-    font-size:10px;
-}
-
-.voice-range{
-    width:110px;
-    accent-color:#00e5ff;
-}
-
-.settings-system{
-    padding:12px 0;
-    color:rgba(255,255,255,.38);
-    font-size:9px;
-    line-height:1.7;
-}
-
-body.theme-pink{
-    --accent:#ff5ab4;
-    --accent-rgb:255,90,180;
-}
-body.theme-purple{
-    --accent:#a66cff;
-    --accent-rgb:166,108,255;
-}
-body.theme-red{
-    --accent:#ff4444;
-    --accent-rgb:255,68,68;
-}
-
-body.theme-pink,
-body.theme-purple,
-body.theme-red{
-    background:
-        radial-gradient(circle at center,rgba(var(--accent-rgb),.09),transparent 38%),
-        radial-gradient(circle at 50% 100%,rgba(var(--accent-rgb),.035),transparent 45%),
-        #02070a;
-}
-
-body.theme-pink .logo-small,
-body.theme-purple .logo-small,
-body.theme-red .logo-small{
-    color:var(--accent);
-    border-color:var(--accent);
-    box-shadow:0 0 12px rgba(var(--accent-rgb),.5),inset 0 0 12px rgba(var(--accent-rgb),.12);
-}
-
-body.theme-pink .ring,
-body.theme-purple .ring,
-body.theme-red .ring{
-    border-color:rgba(var(--accent-rgb),.42);
-}
-body.theme-pink .ring.three,
-body.theme-purple .ring.three,
-body.theme-red .ring.three{
-    border-color:rgba(var(--accent-rgb),.7);
-}
-body.theme-pink .core,
-body.theme-purple .core,
-body.theme-red .core{
-    color:var(--accent);
-    border-color:var(--accent);
-    box-shadow:0 0 25px rgba(var(--accent-rgb),.7),inset 0 0 20px rgba(var(--accent-rgb),.2);
-}
-body.theme-pink .status,
-body.theme-purple .status,
-body.theme-red .status{
-    color:var(--accent);
-}
-body.theme-pink .input,
-body.theme-purple .input,
-body.theme-red .input{
-    border-color:rgba(var(--accent-rgb),.25);
-}
-body.theme-pink .send,
-body.theme-purple .send,
-body.theme-red .send{
-    background:var(--accent);
-    box-shadow:0 0 15px rgba(var(--accent-rgb),.25);
-}
-body.theme-pink .message.ai,
-body.theme-purple .message.ai,
-body.theme-red .message.ai{
-    background:rgba(var(--accent-rgb),.08);
-    border-color:rgba(var(--accent-rgb),.18);
-}
-body.theme-pink .message a,
-body.theme-purple .message a,
-body.theme-red .message a{
-    color:var(--accent);
-}
-
-body.animations-off *,
-body.animations-off *::before,
-body.animations-off *::after{
-    animation:none !important;
-    transition:none !important;
-}
-
-body.text-small .message{font-size:12px}
-body.text-small .input{font-size:14px}
-body.text-large .message{font-size:16px}
-body.text-large .input{font-size:17px}
-
-body.voice-speaking .core{
-    animation:coreSpeak .72s ease-in-out infinite;
-}
-body.voice-speaking .ring.one{
-    animation:voiceRing 1.5s ease-in-out infinite;
-}
-body.voice-speaking .ring.two{
-    animation:voiceRing 1.05s ease-in-out infinite reverse;
-}
-body.voice-speaking .ring.three{
-    animation:voiceRing .8s ease-in-out infinite;
-}
-
-@keyframes coreSpeak{
-    0%,100%{
-        transform:scale(1);
-        box-shadow:0 0 25px rgba(0,229,255,.7),inset 0 0 20px rgba(0,229,255,.2);
-    }
-    50%{
-        transform:scale(1.13);
-        box-shadow:0 0 55px rgba(0,229,255,1),inset 0 0 30px rgba(0,229,255,.45);
-    }
-}
-@keyframes voiceRing{
-    0%,100%{transform:scale(1);opacity:.65}
-    50%{transform:scale(1.09);opacity:1}
-}
-
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-
-@keyframes spin{
-    from{transform:rotate(0)}
-    to{transform:rotate(360deg)}
-}
-
-@keyframes logoPulse{
-    0%,100%{
-        box-shadow:
-            0 0 12px rgba(0,229,255,.5),
-            inset 0 0 12px rgba(0,229,255,.12)
-    }
-
-    50%{
-        box-shadow:
-            0 0 22px rgba(0,229,255,.75),
-            inset 0 0 16px rgba(0,229,255,.18)
-    }
-}
-
-@keyframes messageIn{
-    from{
-        opacity:0;
-        transform:translateY(5px)
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0)
-    }
-}
-
-@keyframes liveOrb{
-    0%,100%{
-        transform:scale(.75);
-        opacity:.55
-    }
-
-    50%{
-        transform:scale(1.15);
-        opacity:1
-    }
-}
-
-@keyframes stepPulse{
-    0%,100%{
-        box-shadow:0 0 6px rgba(0,229,255,.35)
-    }
-
-    50%{
-        box-shadow:0 0 16px rgba(0,229,255,.8)
-    }
-}
-
-@media(max-width:480px){
-    .presentation-box{
-        min-width:0;
-        width:100%
-    }
-
-    .presentation-step{
-        font-size:9.5px
-    }
-
-    .message{
-        max-width:92%
-    }
-}
-
-/* ============================================================
-   SUDE'S WORLD — isolated pastel dashboard
-   ============================================================ */
-/* Sude'nin panelleri diğer profillerin mevcut görünümünü ve arka planını kullanır. */
-.sude-panel{width:min(96vw,620px);max-height:92vh;}
-.sude-subtitle{font-size:12px;margin-top:-5px;opacity:.78;}
-.sude-panel label{display:block;font-size:12px;margin-top:7px;}
-.sude-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0;}
-.sude-card{border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:16px;padding:13px;background:var(--card-bg,rgba(128,128,128,.06));min-width:0;}
-.sude-card h3{font-size:14px;margin:0 0 10px;}
-.sude-card p,.sude-card small{font-size:12px;line-height:1.5;opacity:.8;}
-.sude-field{width:100%;height:40px;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:10px;background:var(--input-bg,transparent);color:inherit;padding:0 10px;margin:4px 0 8px;}
-.sude-btn{border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:10px;background:var(--button-bg,rgba(128,128,128,.12));color:inherit;font-weight:700;padding:10px 12px;width:100%;margin-top:5px;}
-.sude-task{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.15);font-size:12px;}
-.sude-task button{margin-left:auto;border:0;border-radius:8px;padding:7px;}
-.sude-stat{font-size:24px;font-weight:900;}
-.arena-panel{width:min(96vw,760px);max-height:92vh;} .arena-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0;} .arena-card{border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:16px;padding:14px;background:var(--card-bg,rgba(128,128,128,.06));min-width:0;} .arena-stat{font-size:25px;font-weight:900;} .arena-option{width:100%;text-align:left;margin:5px 0;padding:12px;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:12px;background:var(--button-bg,rgba(128,128,128,.08));color:inherit;} .arena-option:disabled{opacity:.6;} @media(max-width:520px){.sude-grid,.arena-grid{grid-template-columns:1fr;}.sude-panel,.arena-panel{padding:16px;}}
-
-
-
-/* KARVIS Exam Management — responsive layout polish */
-.exam-modal {
-  width: min(980px, calc(100vw - 28px)) !important;
-  max-width: 980px !important;
-  max-height: min(90dvh, 920px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  padding: clamp(16px, 3vw, 30px) !important;
-  border-radius: 22px !important;
-  scrollbar-gutter: stable;
-}
-.exam-modal * { box-sizing: border-box; }
-.exam-modal h2 { margin: 0 0 8px; line-height: 1.3; font-size: clamp(20px, 3vw, 27px); }
-.exam-modal h3 { line-height: 1.35; }
-.exam-modal > p { margin: 0 0 18px; line-height: 1.55; }
-.exam-modal > input:not([type="checkbox"]),
-.exam-modal > textarea,
-.exam-modal input:not([type="checkbox"]),
-.exam-modal textarea,
-.exam-modal select {
-  max-width: 100%; min-width: 0; font: inherit;
-}
-.exam-modal > input:not([type="checkbox"]) {
-  display: block; width: 100%; margin: 10px 0; padding: 12px 14px;
-  border: 1px solid var(--border-color, rgba(128,128,128,.3)); border-radius: 12px;
-}
-.exam-modal label { min-width: 0; line-height: 1.5; }
-.exam-modal button {
-  max-width: 100%; min-height: 42px; white-space: normal; overflow-wrap: anywhere;
-  line-height: 1.35; margin: 4px 4px 4px 0;
-}
-.exam-modal .settings-choice,
-.exam-modal .settings-action,
-.exam-modal .modal-button {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  width: auto; min-width: 0; padding: 10px 14px; vertical-align: middle;
-}
-.exam-modal #examAIGenerateBtn { width: 100%; margin-top: 12px; }
-.exam-modal #examAIStatus,
-.exam-modal #teacherExamStatus { margin: 10px 0; line-height: 1.5; overflow-wrap: anywhere; }
-.exam-modal #examQuestionBuilder,
-.exam-modal #teacherExamList,
-.exam-modal #studentExamList,
-.exam-modal #studentExamWork { min-width: 0; }
-.exam-modal #examQuestionBuilder > .sude-card,
-.exam-modal #teacherExamList > .sude-card,
-.exam-modal #studentExamList > .sude-card,
-.exam-modal #studentExamWork .sude-card {
-  padding: clamp(12px, 2vw, 20px); margin: 12px 0 !important; border-radius: 16px;
-  overflow-wrap: anywhere;
-}
-.exam-modal #examQuestionBuilder input:not([type="checkbox"]),
-.exam-modal #examQuestionBuilder select,
-.exam-modal #examQuestionBuilder textarea {
-  display: block; width: 100%; margin: 8px 0; padding: 11px 12px;
-  border-radius: 10px; min-height: 42px;
-}
-.exam-modal #examQuestionBuilder label { display: block; margin: 8px 0; }
-.exam-modal #examQuestionBuilder label input { margin-top: 5px; }
-.exam-modal #examQuestionBuilder .settings-action { margin-top: 10px; }
-.exam-modal #examAIInstructions { display:block; min-height:76px; padding:12px; border-radius:12px; }
-.exam-modal #examAIQuestionCount,
-.exam-modal #examAIGrade,
-.exam-modal #examAIDifficulty,
-.exam-modal #examDuration,
-.exam-modal #examStartsAt,
-.exam-modal #examEndsAt { display:block; width:100%; margin-top:6px; }
-.exam-modal #examDuration,
-.exam-modal #examStartsAt,
-.exam-modal #examEndsAt { padding:11px 12px; border-radius:10px; }
-.exam-modal #examQuestionBuilder + button { margin: 12px 0; }
-.exam-modal #teacherExamList > .sude-card > button,
-.exam-modal #studentExamList > .sude-card > button { margin-top: 8px; }
-.exam-modal #studentExamWork form > button { width:100%; margin:16px 0 0; }
-.exam-modal #studentExamWork textarea { width:100%; max-width:100%; padding:12px; border-radius:12px; }
-.exam-modal > .secondary-button { margin-top: 18px; }
-@media (min-width: 700px) {
-  .exam-modal #examAIQuestionCount { width: 120px; }
-  .exam-modal #examAIGrade { width: 190px; }
-  .exam-modal #examAIDifficulty { width: 150px; }
-  .exam-modal > label:has(#examDuration),
-  .exam-modal > label:has(#examStartsAt),
-  .exam-modal > label:has(#examEndsAt) { display:inline-block; width:calc(33.333% - 12px); margin:8px 10px 8px 0; vertical-align:top; }
-}
-@media (max-width: 600px) {
-  .exam-modal { width: calc(100vw - 16px) !important; max-height: 94dvh; padding: 14px !important; border-radius: 16px !important; }
-  .exam-modal .settings-choice,
-  .exam-modal .settings-action,
-  .exam-modal .modal-button { width: 100%; margin: 5px 0; }
-  .exam-modal #examAIInstructions { font-size: 16px; }
-  .exam-modal #examAIQuestionCount,
-  .exam-modal #examAIGrade,
-  .exam-modal #examAIDifficulty { width:100%; }
-  .exam-modal > label:has(#examDuration),
-  .exam-modal > label:has(#examStartsAt),
-  .exam-modal > label:has(#examEndsAt) { display:block; width:100%; margin:10px 0; }
-}
-
-
-/* Exam interaction and editor refinement */
-.exam-live-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:18px;margin-bottom:18px;border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:18px;background:linear-gradient(135deg,rgba(24,128,255,.10),rgba(0,220,190,.05))}.exam-live-header h2{margin:5px 0 8px}.exam-live-header p{white-space:pre-wrap;overflow-wrap:anywhere}.exam-live-kicker{font-size:11px;letter-spacing:.14em;font-weight:900;opacity:.7}.exam-live-time{flex:0 0 auto;min-width:130px;padding:11px 14px;border-radius:13px;background:rgba(0,190,220,.12);font-weight:900;text-align:center}.exam-live-form{display:grid;gap:14px}.exam-question-card,.exam-editor-card{min-width:0;padding:clamp(14px,2.5vw,22px);border:1px solid var(--border-color,rgba(128,128,128,.24));border-radius:18px;background:var(--card-bg,rgba(128,128,128,.045));box-shadow:0 5px 18px rgba(0,0,0,.045)}.exam-question-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.exam-question-number{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;border-radius:12px;background:rgba(0,180,220,.15);font-weight:900}.exam-question-points{font-size:12px;font-weight:800;opacity:.75}.exam-question-prompt{font-size:clamp(15px,2vw,17px);font-weight:650;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:18px}.exam-answer-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.exam-answer-option{display:flex!important;align-items:flex-start;gap:11px;min-width:0;min-height:58px;padding:13px;border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:14px;background:var(--button-bg,rgba(128,128,128,.055));cursor:pointer;line-height:1.55!important}.exam-answer-option:has(input:checked){border-color:#22b8cf;background:rgba(34,184,207,.13);box-shadow:inset 0 0 0 1px rgba(34,184,207,.28)}.exam-answer-option input{margin:4px 0 0;accent-color:#12a8c2;flex:0 0 auto}.exam-option-letter{display:inline-flex;flex:0 0 28px;width:28px;height:28px;align-items:center;justify-content:center;border-radius:9px;background:rgba(128,128,128,.14);font-weight:900;font-size:12px}.exam-option-text{min-width:0;white-space:pre-wrap;overflow-wrap:anywhere}.exam-open-answer{width:100%;min-height:130px;resize:vertical;line-height:1.65;padding:14px;border:1px solid var(--border-color,rgba(128,128,128,.28));border-radius:13px;background:var(--input-bg,transparent);color:inherit;font:inherit}.exam-submit-bar{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;margin-top:8px;border:1px solid var(--border-color,rgba(128,128,128,.24));border-radius:16px;background:var(--card-bg,rgba(15,20,28,.96));backdrop-filter:blur(12px);z-index:2}.exam-submit-bar>span{font-size:13px;opacity:.8}.exam-submit-button{display:inline-flex;justify-content:center;align-items:center;gap:9px;min-height:48px;padding:12px 20px;border:0;border-radius:13px;background:linear-gradient(135deg,#087f8c,#13a89b);color:white;font-weight:900;cursor:pointer}.exam-submit-button:disabled{opacity:.65;cursor:wait}.exam-submit-success{max-width:560px;margin:22px auto;padding:clamp(20px,4vw,34px);text-align:center;border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:22px}.exam-success-icon{display:grid;place-items:center;margin:0 auto 14px;width:58px;height:58px;border-radius:50%;background:rgba(24,180,120,.16);color:#21b981;font-size:30px;font-weight:900}.exam-result-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0;padding:16px;border-radius:14px;background:rgba(128,128,128,.08)}.exam-result-summary strong{font-size:22px}.exam-editor-card{margin:12px 0!important}.exam-editor-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.exam-editor-head h3{margin:0 0 3px}.exam-editor-head small{opacity:.7}.exam-remove-question{margin-left:auto!important;border:1px solid rgba(220,70,70,.35)!important;border-radius:10px!important;background:rgba(220,70,70,.08)!important;color:inherit;padding:8px 12px!important}.exam-editor-label{display:block!important;min-width:0;margin:12px 0!important;font-size:13px;font-weight:750}.exam-editor-label input,.exam-editor-label select,.exam-editor-label textarea{display:block;width:100%;min-width:0;max-width:100%;margin-top:7px;padding:12px;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:12px;background:var(--input-bg,transparent);color:inherit;font:inherit;line-height:1.6}.exam-editor-label textarea{resize:vertical;min-height:90px;white-space:pre-wrap;overflow-wrap:anywhere}.exam-prompt-editor{min-height:145px!important}.exam-editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.35fr);gap:12px}.exam-editor-options-title{margin:16px 0 8px;font-weight:850}.exam-editor-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.exam-editor-option{display:flex!important;align-items:center;gap:9px;min-width:0;padding:9px 11px;border:1px solid var(--border-color,rgba(128,128,128,.22));border-radius:12px}.exam-editor-option>span{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:8px;background:rgba(0,180,220,.13);font-weight:900}.exam-editor-option input{width:100%;min-width:0;border:0!important;background:transparent!important;color:inherit;padding:8px 2px!important;outline-offset:2px}
-@media(max-width:620px){.exam-live-header{display:block}.exam-live-time{margin-top:12px;width:100%}.exam-answer-options,.exam-editor-options{grid-template-columns:1fr}.exam-submit-bar{align-items:stretch;flex-direction:column}.exam-submit-button{width:100%}.exam-editor-grid{grid-template-columns:1fr}.exam-question-prompt{font-size:15px}}
-/* Hotfix: global form styles were stretching radio buttons across the entire option card. */
-.exam-modal .exam-answer-option { display:grid !important; grid-template-columns:20px 30px minmax(0,1fr); align-items:start; gap:10px; width:100%; min-height:60px; }
-.exam-modal .exam-answer-option input[type="radio"] { appearance:auto !important; -webkit-appearance:radio !important; display:block !important; position:static !important; width:18px !important; min-width:18px !important; max-width:18px !important; height:18px !important; min-height:18px !important; margin:5px 0 0 !important; padding:0 !important; flex:none !important; accent-color:#12a8c2; box-shadow:none !important; }
-.exam-modal .exam-option-letter { width:30px; min-width:30px; height:30px; flex:none; }
-.exam-modal .exam-option-text { display:block !important; min-width:0; width:auto !important; max-width:100%; color:inherit; font-size:15px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
-.exam-modal .exam-answer-option:has(input:checked) .exam-option-letter { background:#087f8c; color:#fff; }
-.exam-modal .exam-live-form { min-width:0; }
-.exam-modal .exam-question-card { overflow:visible; }
-.exam-modal .exam-submit-bar { position:sticky; bottom:0; margin:14px 0 0; box-shadow:0 -8px 24px rgba(0,0,0,.12); }
-.exam-modal .exam-submit-bar>span { line-height:1.5; }
-.exam-modal .exam-editor-card { padding:clamp(14px,3vw,24px); background:linear-gradient(145deg,rgba(128,128,128,.07),rgba(0,180,220,.035)); }
-.exam-modal .exam-editor-head { padding-bottom:12px; border-bottom:1px solid var(--border-color,rgba(128,128,128,.18)); }
-.exam-modal .exam-editor-label { line-height:1.6; }
-.exam-modal .exam-editor-label textarea { min-height:110px; }
-.exam-modal .exam-prompt-editor { min-height:170px !important; }
-.exam-modal .exam-editor-option { background:rgba(128,128,128,.035); }
-.exam-modal #teacherExamList .sude-card { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; border:1px solid var(--border-color,rgba(128,128,128,.2)); }
-.exam-modal #teacherExamList .sude-card button { margin:3px 0; }
-.exam-modal #studentExamList .sude-card { border:1px solid var(--border-color,rgba(128,128,128,.2)); }
-@media(min-width:700px){.exam-modal #teacherExamList .sude-card { grid-template-columns:minmax(0,1fr) auto auto auto; align-items:center; }.exam-modal #teacherExamList .sude-card p { grid-column:1/-1; }}
-@media(max-width:620px){.exam-modal .exam-answer-option { grid-template-columns:18px 28px minmax(0,1fr); padding:12px; gap:8px; }.exam-modal .exam-option-text { font-size:14px; }.exam-modal .exam-submit-bar { position:static; }.exam-modal .exam-editor-head { align-items:flex-start; }.exam-modal .exam-remove-question { flex:0 0 auto; }}
-
-
-/* KARVIS Exam Builder — polished responsive redesign */
-.exam-manager-hero{display:flex;align-items:center;gap:15px;padding:18px;margin:0 0 14px;border:1px solid rgba(0,190,220,.35);border-radius:20px;background:linear-gradient(125deg,rgba(0,170,220,.13),rgba(0,210,180,.045))}
-.exam-manager-icon{display:grid;place-items:center;flex:0 0 58px;height:58px;border-radius:17px;background:rgba(0,190,220,.14);border:1px solid rgba(0,190,220,.35);font-size:30px;color:#12d8e8}
-.exam-manager-hero h2{margin:2px 0 6px!important}.exam-manager-hero p{margin:0;opacity:.76;font-size:13px;line-height:1.5}.exam-manager-eyebrow{font-size:10px!important;letter-spacing:.16em;font-weight:900;color:#21d2e3;opacity:1!important;margin-bottom:5px!important}
-.exam-manager-note{padding:12px 14px;margin:10px 0 18px;border-radius:12px;background:rgba(0,170,210,.07);font-size:12px;line-height:1.55;opacity:.9}
-.exam-manager-section,.exam-ai-builder{min-width:0;padding:clamp(14px,2.6vw,22px);margin:14px 0;border:1px solid var(--border-color,rgba(128,128,128,.23));border-radius:19px;background:var(--card-bg,rgba(128,128,128,.035))}
-.exam-ai-builder{border-color:rgba(0,190,220,.34);background:linear-gradient(145deg,rgba(0,160,210,.07),rgba(0,190,160,.025))}
-.exam-section-heading{display:flex;align-items:center;gap:12px;margin-bottom:16px}.exam-section-heading>span{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:12px;background:rgba(0,180,220,.14);color:#20cfe0;font-weight:900}.exam-section-heading h3{margin:0 0 4px!important;font-size:16px}.exam-section-heading p{margin:0;font-size:12px;line-height:1.5;opacity:.72}.exam-section-heading .exam-ai-spark{font-size:25px}
-.exam-field-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px}.exam-field-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.exam-field-wide{grid-column:1/-1}
-.exam-modal .exam-modern-field{display:block!important;min-width:0;margin:10px 0!important;font-size:12px!important;font-weight:800;line-height:1.5}.exam-modal .exam-modern-field input,.exam-modal .exam-modern-field select,.exam-modal .exam-modern-field textarea{display:block;width:100%;min-width:0;max-width:100%;margin-top:7px;padding:13px 14px;border:1px solid rgba(130,160,180,.25);border-radius:12px;background:rgba(100,130,150,.07);color:inherit;font:inherit;font-size:14px;line-height:1.5;outline:none}.exam-modal .exam-modern-field input:focus,.exam-modal .exam-modern-field select:focus,.exam-modal .exam-modern-field textarea:focus{border-color:#11bfd0;box-shadow:0 0 0 3px rgba(17,191,208,.1)}.exam-modal .exam-modern-field textarea{resize:vertical;min-height:82px;white-space:pre-wrap;overflow-wrap:anywhere}.exam-modal .exam-modern-field small{display:block;margin-top:5px;font-size:11px;font-weight:500;opacity:.65}.exam-optional{font-weight:500;opacity:.6;margin-left:5px}
-.exam-choice-fieldset{border:0;padding:0;margin:13px 0}.exam-choice-fieldset legend{font-size:12px;font-weight:800;margin-bottom:9px}.exam-type-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.exam-type-choice{position:relative;display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;min-height:120px;padding:13px!important;border:1px solid rgba(130,160,180,.23);border-radius:14px;background:rgba(100,130,150,.045);cursor:pointer}.exam-type-choice:has(input:checked){border-color:#11c9d9;background:rgba(0,190,220,.1);box-shadow:inset 0 0 0 1px rgba(0,190,220,.18)}.exam-type-choice input{position:absolute;right:10px;top:10px;width:18px!important;height:18px!important;accent-color:#08c8d8}.exam-type-symbol{font-size:24px;color:#25cfdf;line-height:1.2}.exam-type-choice strong{font-size:12px;line-height:1.4}.exam-type-choice small{font-size:10px;line-height:1.4;opacity:.68}
-.exam-modal .exam-generate-button{display:flex!important;width:100%!important;align-items:center;justify-content:center;gap:10px;min-height:52px;margin:14px 0 5px!important;padding:13px 16px!important;border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#078edb,#0bb9ad)!important;color:#fff!important;font-weight:900;font-size:14px;box-shadow:0 8px 22px rgba(0,160,200,.16)}.exam-generate-button span{font-size:20px}.exam-generate-button:disabled{opacity:.65}.exam-modal .exam-add-question-button{width:100%;padding:12px;border:1px dashed rgba(0,190,220,.45);border-radius:12px;background:rgba(0,190,220,.055);color:inherit;font-weight:800}.exam-publish-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.exam-publish-actions .modal-button,.exam-publish-actions .exam-generate-button{width:100%!important;margin:0!important}.exam-empty-builder{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px 12px;border:1px dashed rgba(130,160,180,.25);border-radius:14px}.exam-empty-builder span{font-size:25px;color:#1ac8d9}.exam-empty-builder strong{font-size:13px}.exam-empty-builder p{margin:0;font-size:12px;opacity:.7;line-height:1.5}.exam-status-message{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
-@media(max-width:600px){.exam-manager-hero{align-items:flex-start;padding:14px}.exam-manager-icon{flex-basis:46px;height:46px;font-size:24px}.exam-manager-hero h2{font-size:19px!important}.exam-field-grid,.exam-field-grid-2{grid-template-columns:minmax(0,1fr)}.exam-field-wide{grid-column:auto}.exam-type-grid{grid-template-columns:1fr}.exam-type-choice{min-height:82px;padding-right:42px!important}.exam-publish-actions{grid-template-columns:1fr}.exam-section-heading{align-items:flex-start}.exam-manager-section,.exam-ai-builder{padding:14px}}
-
-
-
-/* KARVIS layout repair: consistent sizing, no clipped controls, readable selects */
-html{width:100%;max-width:100%;overflow-x:hidden}
-body{width:100%;max-width:100%;overflow-x:hidden}
-*,*::before,*::after{box-sizing:border-box}
-.modal{width:min(94vw,980px);max-width:980px;max-height:90dvh;overflow-x:hidden;overscroll-behavior:contain}
-.modal.show{display:block}
-.modal :where(section,article,div,fieldset,label,form,header,footer){min-width:0}
-.modal :where(input,select,textarea,button){max-width:100%;min-width:0;box-sizing:border-box}
-.modal :where(input,select,textarea){width:100%}
-.modal select,.modal .voice-select,select.voice-select,select{
-  color:#f4fbff!important;
-  background-color:#10232d!important;
-  border:1px solid rgba(40,205,230,.48)!important;
-  color-scheme:dark;
-  min-height:44px;
-  padding:10px 38px 10px 12px;
-  border-radius:12px;
-  line-height:1.35;
-  max-width:100%;
-}
-select option,select optgroup{
-  background:#10232d!important;
-  color:#f4fbff!important;
-}
-select option:checked{background:#087f9b!important;color:#fff!important}
-.exam-modal{width:min(94vw,980px)!important;max-width:980px!important;padding:clamp(12px,2.5vw,24px)!important}
-.exam-modal .exam-manager-section,.exam-modal .exam-ai-builder,.exam-modal .exam-manager-hero{width:100%;max-width:100%;min-width:0}
-.exam-modal .exam-field-grid,.exam-modal .exam-type-grid,.exam-modal .exam-editor-grid,.exam-modal .exam-editor-options{width:100%;max-width:100%;min-width:0}
-.exam-modal .exam-type-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.exam-modal .exam-type-choice{width:100%;overflow-wrap:anywhere;word-break:normal}
-.exam-modal .exam-type-choice strong,.exam-modal .exam-type-choice small{max-width:100%;overflow-wrap:anywhere}
-.exam-modal .exam-modern-field input,.exam-modal .exam-modern-field select,.exam-modal .exam-modern-field textarea,
-.exam-modal .exam-editor-label input,.exam-modal .exam-editor-label select,.exam-modal .exam-editor-label textarea{width:100%!important;max-width:100%!important;min-width:0!important}
-.exam-modal .exam-publish-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
-.exam-modal .exam-publish-actions>*{min-width:0;width:100%;white-space:normal;overflow-wrap:anywhere}
-.exam-modal .exam-section-heading>div{min-width:0;flex:1}
-.exam-modal .exam-section-heading p,.exam-modal .exam-manager-hero p{overflow-wrap:anywhere}
-.exam-modal #teacherExamList .sude-card{min-width:0;overflow-wrap:anywhere}
-.exam-modal #teacherExamList .sude-card button{max-width:100%;white-space:normal}
-@media(max-width:700px){
- .modal{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px;max-height:92dvh}
- .exam-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;padding:12px!important}
- .exam-modal .exam-field-grid,.exam-modal .exam-field-grid-2{grid-template-columns:minmax(0,1fr)!important}
- .exam-modal .exam-field-wide{grid-column:auto!important}
- .exam-modal .exam-type-grid{grid-template-columns:minmax(0,1fr)!important}
- .exam-modal .exam-type-choice{min-height:80px;padding-right:42px!important}
- .exam-modal .exam-publish-actions{grid-template-columns:minmax(0,1fr)!important}
- .exam-modal .exam-section-heading{align-items:flex-start}
- .exam-modal .exam-section-heading h3{overflow-wrap:anywhere}
- .exam-modal .exam-editor-grid{grid-template-columns:minmax(0,1fr)!important}
-}
-@media(min-width:701px){
- .exam-modal .exam-field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .exam-modal .exam-field-wide{grid-column:1/-1}
-}
-
-
-/* İlknur Hoca — Özellikler penceresi */
-.ilknur-features-modal{width:min(94vw,760px)!important;max-width:760px!important;max-height:90dvh;overflow-y:auto;overflow-x:hidden;padding:clamp(14px,3vw,26px)!important}
-.ilknur-features-hero{display:flex;align-items:flex-start;gap:14px;padding:16px;margin-bottom:16px;border:1px solid rgba(0,190,220,.32);border-radius:18px;background:linear-gradient(125deg,rgba(0,170,220,.13),rgba(0,210,180,.04))}
-.ilknur-features-icon{display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:14px;background:rgba(0,190,220,.14);color:#21d2e3;font-size:25px}
-.ilknur-features-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:900;color:#21d2e3;line-height:1.5}
-.ilknur-features-hero h2{margin:5px 0 7px!important;font-size:clamp(20px,3vw,27px)}
-.ilknur-features-hero p{margin:0;font-size:13px;line-height:1.55;opacity:.78}
-.ilknur-features-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ilknur-feature{display:flex;align-items:flex-start;gap:11px;min-width:0;padding:14px;border:1px solid rgba(130,160,180,.22);border-radius:14px;background:rgba(100,130,150,.045)}
-.ilknur-feature>span{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:10px;background:rgba(0,180,220,.13);color:#22cfe0;font-size:11px;font-weight:900}
-.ilknur-feature>div{min-width:0}
-.ilknur-feature strong{display:block;font-size:13px;line-height:1.45}
-.ilknur-feature p{margin:6px 0;font-size:12px;line-height:1.55;opacity:.82;overflow-wrap:anywhere}
-.ilknur-feature small{display:block;font-size:11px;line-height:1.5;color:#54d8e4;overflow-wrap:anywhere}
-.ilknur-features-footnote{font-size:11px;line-height:1.55;opacity:.65;margin:14px 0}
-.ilknur-features-modal>.modal-button{margin-top:4px}
-@media(max-width:600px){.ilknur-features-list{grid-template-columns:minmax(0,1fr)}.ilknur-features-hero{padding:13px}.ilknur-feature{padding:12px}}
-
-/* Öğrenci İstatistikleri — kompakt, telefon öncelikli ekran */
-.karvis-stats-modal{width:min(96vw,900px)!important;padding:clamp(10px,2.5vw,20px)!important;background:#04121c!important;border-color:rgba(0,210,240,.25)!important}
-.stats-hero{display:flex;align-items:center;gap:11px;padding:12px;margin-bottom:12px;border:1px solid rgba(0,210,240,.22);border-radius:15px;background:linear-gradient(120deg,rgba(0,190,230,.12),rgba(0,230,190,.035))}
-.stats-hero-icon{display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:13px;background:rgba(0,210,240,.13);border:1px solid rgba(0,210,240,.28);font-size:27px;color:#27dff2}
-.stats-hero-copy{min-width:0}.stats-eyebrow{margin:0 0 3px!important;color:#29d8ed;font-size:9px!important;letter-spacing:.14em;font-weight:900}.stats-hero h2{font-size:clamp(17px,4vw,23px);margin:0 0 4px!important}.stats-hero p:last-child{font-size:11px;line-height:1.45;margin:0;opacity:.72}
-.stats-filter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 9px;align-items:end;padding:10px;margin-bottom:10px;border:1px solid rgba(0,210,240,.16);border-radius:13px;background:rgba(255,255,255,.025)}
-.stats-filter label{grid-column:1/-1;font-size:11px;font-weight:800;opacity:.8}.stats-filter select{width:100%;min-width:0;height:40px;padding:0 10px;border-radius:10px}.stats-run{min-height:40px;padding:0 12px;border:1px solid rgba(0,220,240,.4);border-radius:10px;background:rgba(0,210,240,.12);color:#65ecf7;font-size:11px;font-weight:850;white-space:nowrap}.stats-run span{margin-left:4px}
-.stats-results{min-width:0}.stats-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:25px 12px;text-align:center;border:1px dashed rgba(0,210,240,.2);border-radius:13px;color:#45dceb}.stats-empty strong{font-size:13px;color:#fff}.stats-empty span{font-size:11px;color:rgba(255,255,255,.58)}
-.karvis-stats-modal .stats-results>div[style*="grid-template-columns"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
-.karvis-stats-modal .stats-results .sude-card{padding:10px!important;margin:0!important;border-radius:12px!important;border-color:rgba(0,210,240,.17)!important;background:rgba(6,28,40,.8)!important;min-width:0}
-.karvis-stats-modal .stats-results .sude-card small{font-size:10px;color:rgba(255,255,255,.65)}.karvis-stats-modal .stats-results .sude-card h3{font-size:19px;margin:4px 0 0;overflow-wrap:anywhere}
-.karvis-stats-modal .stats-results h4{font-size:13px;margin:15px 0 8px}.karvis-stats-modal .stats-results table{font-size:11px;min-width:560px;border-collapse:separate!important;border-spacing:0;overflow:hidden;border:1px solid rgba(0,210,240,.16);border-radius:11px}.karvis-stats-modal .stats-results th{padding:9px 7px;background:#102b3a;color:#d9f9ff;white-space:nowrap}.karvis-stats-modal .stats-results td{padding:9px 7px;border-top:1px solid rgba(255,255,255,.06);vertical-align:top;line-height:1.4}.karvis-stats-modal .stats-results td:nth-child(2){min-width:155px;white-space:normal}.karvis-stats-modal .stats-results>div[style*="overflow-x:auto"]{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-@media(min-width:620px){.karvis-stats-modal .stats-results>div[style*="grid-template-columns"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}.stats-filter{grid-template-columns:minmax(0,1fr) auto auto}.stats-filter label{grid-column:1/-1}}
-@media(max-width:420px){.stats-hero{padding:10px}.stats-hero-icon{flex-basis:42px;height:42px;font-size:23px}.stats-filter{grid-template-columns:minmax(0,1fr)}.stats-filter label{grid-column:auto}.stats-run{width:100%}.karvis-stats-modal .stats-results .sude-card h3{font-size:17px}}
-
-
-/* Öğrenci istatistikleri — referans tasarıma yakın mobil ekran */
-.karvis-stats-modal{width:min(96vw,760px)!important;max-height:94dvh!important;padding:clamp(12px,3vw,22px)!important;background:linear-gradient(160deg,#041521 0%,#031019 58%,#041721 100%)!important;border:1px solid rgba(0,207,235,.28)!important;border-radius:24px!important;color:#f3fbff}
-.karvis-stats-modal .stats-hero{display:flex;align-items:center;gap:12px;padding:2px 2px 14px;margin-bottom:12px;border:0;border-bottom:1px solid rgba(0,210,240,.18);border-radius:0;background:transparent}
-.karvis-stats-modal .stats-hero-icon{flex:0 0 48px;height:48px;border-radius:14px;background:rgba(0,210,240,.13);font-size:27px}
-.karvis-stats-modal .stats-eyebrow{display:none}
-.karvis-stats-modal .stats-hero h2{font-size:clamp(19px,4.5vw,27px);letter-spacing:.01em}
-.karvis-stats-modal .stats-hero p:last-child{font-size:12px}
-.karvis-stats-modal .stats-filter{grid-template-columns:minmax(0,1fr) auto;align-items:end;padding:10px 0;margin-bottom:14px;border:0;background:transparent}
-.karvis-stats-modal .stats-filter label{grid-column:1/-1;color:#9cb6c7}
-.karvis-stats-modal .stats-filter select{min-height:44px;border-radius:13px;background:#0b2331!important}
-.karvis-stats-modal .stats-run{min-height:44px;border-radius:13px;padding:0 13px}
-.karvis-stats-modal .stats-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px}
-.karvis-stats-modal .stats-metric{min-width:0;padding:14px;border:1px solid rgba(0,207,235,.24);border-radius:19px;background:linear-gradient(145deg,rgba(7,35,49,.96),rgba(3,20,30,.96));box-shadow:inset 0 1px rgba(255,255,255,.025)}
-.karvis-stats-modal .stats-metric-top{display:flex;align-items:center;gap:9px;margin-bottom:8px}
-.karvis-stats-modal .stats-metric-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:12px;background:rgba(0,215,235,.12);color:#11d9eb;font-size:23px}
-.karvis-stats-modal .stats-metric-label{font-size:12px;color:#9eb6c8;line-height:1.3}
-.karvis-stats-modal .stats-metric>strong{display:block;font-size:clamp(21px,5vw,29px);line-height:1.2;margin-bottom:10px;overflow-wrap:anywhere}
-.karvis-stats-modal .stats-progress{height:9px;border-radius:99px;background:#152f40;overflow:hidden}
-.karvis-stats-modal .stats-progress span{display:block;height:100%;border-radius:99px;background:#08d4e8;box-shadow:0 0 10px rgba(0,220,240,.2)}
-.karvis-stats-modal .stats-metric.green{border-color:rgba(0,230,170,.24)}.karvis-stats-modal .stats-metric.green .stats-metric-icon,.karvis-stats-modal .stats-metric.green .stats-progress span{background:#0ad8ad;color:#032a25}
-.karvis-stats-modal .stats-metric.blue .stats-metric-icon{color:#31baff;background:rgba(20,160,255,.13)}.karvis-stats-modal .stats-metric.blue .stats-progress span{background:#19b8f4}
-.karvis-stats-modal .stats-metric.red{border-color:rgba(255,91,112,.27)}.karvis-stats-modal .stats-metric.red .stats-metric-icon{color:#ff6979;background:rgba(255,76,100,.12)}.karvis-stats-modal .stats-metric.red .stats-progress span{background:#ff6377}
-.karvis-stats-modal .stats-exam-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
-.karvis-stats-modal .stats-subject-pill,.karvis-stats-modal .stats-question-count{font-size:11px;color:#a8c2d3;border:1px solid rgba(0,210,240,.2);border-radius:99px;padding:7px 10px;background:rgba(0,210,240,.055)}
-.karvis-stats-modal .stats-question-section{padding:14px 12px;border:1px solid rgba(0,210,240,.18);border-radius:21px;background:rgba(3,19,29,.62)}
-.karvis-stats-modal .stats-section-heading{display:flex;align-items:center;gap:11px;margin-bottom:14px}
-.karvis-stats-modal .stats-section-icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:13px;background:rgba(0,210,240,.13);color:#12d7ea;font-size:25px}
-.karvis-stats-modal .stats-section-heading h3{font-size:17px;margin:0 0 4px}
-.karvis-stats-modal .stats-section-heading p{font-size:11px;line-height:1.4;margin:0;color:#9db5c5}
-.karvis-stats-modal .stats-question-list{display:grid;gap:12px}
-.karvis-stats-modal .stats-question-card{position:relative;min-width:0;padding:14px 12px 12px;border:1px solid rgba(37,121,148,.35);border-radius:18px;background:linear-gradient(145deg,rgba(7,30,43,.96),rgba(5,24,35,.94))}
-.karvis-stats-modal .stats-question-head{display:grid;grid-template-columns:44px minmax(0,1fr);gap:9px;align-items:start}
-.karvis-stats-modal .stats-question-number{display:grid;place-items:center;width:44px;height:48px;border-radius:13px;background:rgba(0,210,240,.12);font-size:22px;font-weight:850;color:#eafaff}
-.karvis-stats-modal .stats-question-text{font-size:15px;font-weight:650;line-height:1.5;overflow-wrap:anywhere;padding-top:2px}
-.karvis-stats-modal .stats-status{grid-column:2;justify-self:start;margin-top:2px;border-radius:99px;padding:6px 10px;font-size:10px;font-weight:800;border:1px solid}
-.karvis-stats-modal .stats-status.good{color:#16e0b1;border-color:rgba(0,230,170,.35);background:rgba(0,220,160,.08)}
-.karvis-stats-modal .stats-status.mid{color:#ffc65a;border-color:rgba(255,190,65,.35);background:rgba(255,190,65,.08)}
-.karvis-stats-modal .stats-status.bad{color:#ff7180;border-color:rgba(255,90,110,.4);background:rgba(255,90,110,.08)}
-.karvis-stats-modal .stats-status.neutral{color:#9cb6c7;border-color:rgba(150,180,200,.3)}
-.karvis-stats-modal .stats-question-progress{height:9px;margin:14px 42px 5px 4px;border-radius:99px;background:#183244;overflow:hidden}
-.karvis-stats-modal .stats-question-progress>div{height:100%;border-radius:99px;background:#08d4e8}
-.karvis-stats-modal .stats-question-progress>div.mid{background:#ffc454}.karvis-stats-modal .stats-question-progress>div.bad{background:#ff6478}
-.karvis-stats-modal .stats-question-percent{text-align:right;margin-top:-18px;margin-bottom:13px;font-weight:850;font-size:16px}
-.karvis-stats-modal .stats-answer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.karvis-stats-modal .stats-answer{display:flex;align-items:center;gap:6px;min-width:0;padding:9px 7px;border:1px solid rgba(90,140,160,.17);border-radius:13px;background:rgba(15,39,53,.8)}
-.karvis-stats-modal .stats-answer-icon{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:50%;font-size:17px;font-weight:900}
-.karvis-stats-modal .stats-answer.correct .stats-answer-icon{color:#00e2ac;background:rgba(0,220,160,.13)}
-.karvis-stats-modal .stats-answer.wrong .stats-answer-icon{color:#ff657a;background:rgba(255,80,105,.12)}
-.karvis-stats-modal .stats-answer.blank .stats-answer-icon{color:#9cb8ca;background:rgba(150,180,200,.12)}
-.karvis-stats-modal .stats-answer-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
-.karvis-stats-modal .stats-answer-copy small{font-size:10px;color:#9eb7c7}
-.karvis-stats-modal .stats-answer-copy strong{font-size:17px;line-height:1.1}
-.karvis-stats-modal .stats-answer-percent{margin-left:auto;font-size:10px;color:#a9c0ce;white-space:nowrap}
-.karvis-stats-modal .stats-review-note{margin-top:10px;font-size:11px;color:#ffc65a;line-height:1.4}
-.karvis-stats-modal .stats-karvis-evaluation{display:flex;gap:12px;margin-top:14px;padding:15px 13px;border:1px solid rgba(0,215,240,.58);border-radius:21px;background:linear-gradient(130deg,rgba(0,190,220,.11),rgba(4,23,34,.9));box-shadow:0 0 18px rgba(0,210,240,.05)}
-.karvis-stats-modal .stats-karvis-icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:13px;background:rgba(0,210,240,.13);color:#18d8ee;font-size:27px}
-.karvis-stats-modal .stats-karvis-content{min-width:0}
-.karvis-stats-modal .stats-karvis-content h3{font-size:17px;margin:3px 0 10px}
-.karvis-stats-modal .stats-karvis-content p{font-size:13px;line-height:1.65;margin:0;padding:12px;border:1px solid rgba(80,150,175,.24);border-radius:13px;background:rgba(2,15,24,.5);white-space:pre-wrap;overflow-wrap:anywhere}
-.karvis-stats-modal .stats-karvis-content small{display:block;margin-top:9px;font-size:10px;line-height:1.45;color:#91aabb}
-.karvis-stats-modal .stats-run:disabled{opacity:.55}
-@media(max-width:420px){
- .karvis-stats-modal{width:calc(100vw - 14px)!important;padding:10px!important;border-radius:19px!important}
- .karvis-stats-modal .stats-metrics{gap:8px}
- .karvis-stats-modal .stats-metric{padding:10px;border-radius:15px}
- .karvis-stats-modal .stats-metric-icon{flex-basis:31px;height:31px;font-size:19px}
- .karvis-stats-modal .stats-metric-label{font-size:10px}
- .karvis-stats-modal .stats-metric>strong{font-size:21px}
- .karvis-stats-modal .stats-question-section{padding:10px 8px}
- .karvis-stats-modal .stats-question-card{padding:11px 9px}
- .karvis-stats-modal .stats-question-head{grid-template-columns:37px minmax(0,1fr);gap:8px}
- .karvis-stats-modal .stats-question-number{width:37px;height:42px;font-size:19px}
- .karvis-stats-modal .stats-question-text{font-size:13px}
- .karvis-stats-modal .stats-status{font-size:9px}
- .karvis-stats-modal .stats-answer-grid{gap:5px}
- .karvis-stats-modal .stats-answer{gap:4px;padding:7px 5px;flex-wrap:wrap}
- .karvis-stats-modal .stats-answer-icon{flex-basis:23px;width:23px;height:23px;font-size:14px}
- .karvis-stats-modal .stats-answer-copy small{font-size:9px}
- .karvis-stats-modal .stats-answer-copy strong{font-size:15px}
- .karvis-stats-modal .stats-answer-percent{font-size:9px}
- .karvis-stats-modal .stats-karvis-evaluation{gap:8px;padding:11px 9px}
- .karvis-stats-modal .stats-karvis-icon{flex-basis:34px;height:34px;font-size:22px}
- .karvis-stats-modal .stats-karvis-content h3{font-size:15px}
- .karvis-stats-modal .stats-karvis-content p{font-size:12px;padding:10px}
-}
-
-
-/* Individual student analytics */
-.stats-view-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}
-.stats-view-tabs button{min-height:43px;border:1px solid rgba(0,229,255,.2);border-radius:12px;background:rgba(0,229,255,.035);color:inherit;font-size:12px;font-weight:800}
-.stats-view-tabs button.active{background:rgba(0,229,255,.13);border-color:#00d9ef;color:#25e4f4;box-shadow:inset 0 0 0 1px rgba(0,229,255,.12)}
-.stats-student-list{display:grid;gap:8px}
-.stats-student-row{display:flex;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;padding:12px;border:1px solid rgba(0,229,255,.14);border-radius:14px;background:linear-gradient(120deg,rgba(0,229,255,.055),rgba(255,255,255,.018));color:inherit}
-.stats-student-rank{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:rgba(0,229,255,.12);color:#39e4f2;font-weight:900}
-.stats-student-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
-.stats-student-main strong{font-size:13px;overflow-wrap:anywhere}
-.stats-student-main small,.stats-student-score small{font-size:10px;opacity:.68;line-height:1.4}
-.stats-student-score{display:flex;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap}
-.stats-student-score strong{font-size:15px;color:#38e6f1}
-.stats-student-chevron{font-size:22px;color:#35d8e8}
-.stats-student-detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 10px;padding:13px;border:1px solid rgba(0,229,255,.3);border-radius:14px;background:rgba(0,229,255,.06)}
-.stats-student-detail-head h3{margin:0 0 4px;font-size:15px}
-.stats-student-detail-head p{margin:0;font-size:11px;opacity:.72}
-.stats-student-detail-head button{border:1px solid rgba(0,229,255,.25);border-radius:9px;background:rgba(0,229,255,.07);color:inherit;padding:8px 10px}
-.stats-student-answer-list{display:grid;gap:10px}
-.stats-student-answer{padding:13px;border:1px solid rgba(130,170,190,.18);border-radius:14px;background:rgba(255,255,255,.025);min-width:0}
-.stats-student-answer-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.stats-student-question{font-size:13px;line-height:1.55;margin:10px 0}
-.stats-answer-detail{display:flex;flex-direction:column;gap:4px;padding:9px 10px;border-radius:10px;background:rgba(255,90,110,.06);margin-top:7px;overflow-wrap:anywhere}
-.stats-answer-detail small{font-size:10px;opacity:.7}
-.stats-answer-detail strong{font-size:12px;line-height:1.5;white-space:pre-wrap}
-.correct-answer-detail{background:rgba(0,220,150,.07);border:1px solid rgba(0,220,150,.13)}
-.stats-points-detail{margin-top:8px;font-size:10px;opacity:.68}
-@media(max-width:420px){.stats-student-row{padding:10px;gap:7px}.stats-student-main small{font-size:9px}.stats-student-score strong{font-size:13px}.stats-view-tabs button{font-size:11px}}
-
-
-
-/* KARVIS Evaluation Dashboard — visual hierarchy inspired by the approved concept */
-.karvis-evaluation-modal{width:min(1120px,calc(100vw - 22px))!important;max-width:1120px!important;background:#07111d!important;border-color:rgba(52,195,229,.28)!important}
-.karvis-eval-hero{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;padding:22px;margin-bottom:16px;border:1px solid rgba(47,190,226,.38);border-radius:22px;background:radial-gradient(circle at 90% 0%,rgba(0,221,222,.13),transparent 34%),linear-gradient(125deg,#0c2437,#0a1725 70%)}
-.karvis-eval-orb{display:grid;place-items:center;flex:0 0 62px;height:62px;border:1px solid #37d8e8;border-radius:18px;color:#51e3f2;font-size:29px;font-weight:900;background:rgba(0,211,230,.09);box-shadow:0 0 28px rgba(0,211,230,.14)}
-.karvis-eval-eyebrow{margin:0 0 6px;color:#45d9e9;font-size:10px;letter-spacing:.17em;font-weight:900}
-.karvis-eval-hero h2{margin:0 0 7px!important;color:#f3fbff!important;font-size:clamp(22px,3vw,30px)!important}
-.karvis-eval-hero p:last-child{margin:0;font-size:13px;line-height:1.6;color:#a9c1d1;max-width:680px}
-.karvis-eval-filter{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px;padding:15px;margin-bottom:17px;border:1px solid rgba(114,154,180,.2);border-radius:17px;background:#0b1928}
-.karvis-eval-filter label{grid-column:1/-1;font-size:11px;font-weight:850;color:#b4c9d8;letter-spacing:.04em}
-.karvis-eval-filter select{width:100%;max-width:none;min-width:0;background:#102739!important;border-color:rgba(57,199,222,.32)!important}
-.karvis-eval-filter .exam-generate-button{margin:0!important;min-height:46px;padding:11px 17px!important;white-space:nowrap}
-.karvis-eval-section{margin:16px 0;padding:clamp(15px,2.4vw,22px);border:1px solid rgba(107,148,175,.19);border-radius:19px;background:linear-gradient(145deg,rgba(15,34,51,.96),rgba(8,21,34,.98));box-shadow:0 8px 28px rgba(0,0,0,.12)}
-.karvis-eval-section h3{margin:0 0 6px;font-size:16px;color:#edf8ff}
-.karvis-eval-section .karvis-eval-intro{margin:0 0 15px;font-size:12px;line-height:1.55;color:#8fa9ba}
-.karvis-eval-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:16px 0}
-.karvis-eval-metric{position:relative;overflow:hidden;min-width:0;min-height:112px;padding:15px;border:1px solid rgba(57,190,221,.23);border-radius:17px;background:linear-gradient(145deg,rgba(17,48,68,.95),rgba(10,26,42,.96))}
-.karvis-eval-metric:after{content:"";position:absolute;right:-22px;top:-25px;width:74px;height:74px;border-radius:50%;background:rgba(35,199,222,.07)}
-.karvis-eval-metric small{display:block;font-size:10px;color:#8eaebe;line-height:1.45;letter-spacing:.035em}
-.karvis-eval-metric strong{display:block;margin:10px 0 5px;font-size:clamp(21px,3vw,29px);color:#f3fbff;overflow-wrap:anywhere;line-height:1.1}
-.karvis-eval-metric .metric-foot{font-size:10px;color:#5bd4df}
-.karvis-eval-topic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.karvis-eval-topic{min-width:0;padding:14px;border:1px solid rgba(110,150,175,.18);border-radius:15px;background:rgba(11,28,44,.85)}
-.karvis-eval-topic.good{border-color:rgba(52,211,153,.25);background:linear-gradient(145deg,rgba(16,58,53,.35),rgba(11,28,44,.9))}
-.karvis-eval-topic.mid{border-color:rgba(245,185,75,.25);background:linear-gradient(145deg,rgba(68,49,24,.25),rgba(11,28,44,.9))}
-.karvis-eval-topic.bad{border-color:rgba(255,112,112,.28);background:linear-gradient(145deg,rgba(69,31,43,.34),rgba(11,28,44,.9))}
-.karvis-eval-topic-head{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
-.karvis-eval-topic-name{font-size:12px;line-height:1.5;font-weight:800;color:#e8f5fc;overflow-wrap:anywhere}
-.karvis-eval-topic-pct{flex:none;font-size:16px;font-weight:900;color:#62dce7}
-.karvis-eval-topic.good .karvis-eval-topic-pct{color:#52dfac}
-.karvis-eval-topic.bad .karvis-eval-topic-pct{color:#ff8c9a}
-.karvis-eval-topic-bar{height:6px;margin:12px 0 9px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.08)}
-.karvis-eval-topic-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#0d9dd0,#45e0df)}
-.karvis-eval-topic.good .karvis-eval-topic-bar span{background:linear-gradient(90deg,#16a879,#5be6ad)}
-.karvis-eval-topic.bad .karvis-eval-topic-bar span{background:linear-gradient(90deg,#e34d6a,#ff9b85)}
-.karvis-eval-topic small{font-size:10px;line-height:1.5;color:#8ea7b7}
-.karvis-eval-ai-report{padding:18px;border:1px solid rgba(75,198,223,.24);border-radius:17px;background:radial-gradient(circle at 100% 0%,rgba(37,170,202,.08),transparent 35%),rgba(5,17,29,.72)}
-.karvis-eval-report{font-size:13px;line-height:1.8;color:#d0e0ea;white-space:pre-wrap;overflow-wrap:anywhere}
-.karvis-eval-report strong{color:#5fe0e9}
-.karvis-eval-insight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:12px}
-.karvis-eval-insight{padding:14px;border:1px solid rgba(105,151,178,.17);border-radius:15px;background:rgba(11,27,43,.82)}
-.karvis-eval-insight h4{margin:0 0 8px;font-size:12px;color:#53d8e6}
-.karvis-eval-insight p{margin:0;color:#b6cad7;font-size:12px;line-height:1.65}
-.karvis-eval-question{padding:13px 0;border-bottom:1px solid rgba(120,160,185,.13)}
-.karvis-eval-question:last-child{border-bottom:0}
-.karvis-eval-question-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.karvis-eval-question strong{font-size:12px;line-height:1.55;color:#d9e9f2}
-.karvis-eval-pill{flex:none;padding:5px 8px;border-radius:8px;font-size:9px;font-weight:850;background:rgba(240,80,80,.12);color:#ff9a9a}
-.karvis-eval-pill.good{background:rgba(35,190,130,.12);color:#58dfae}
-.karvis-eval-pill.mid{background:rgba(245,185,75,.12);color:#f1c56e}
-.karvis-eval-bar{height:6px;margin:10px 0;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
-.karvis-eval-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#078edb,#15d0bf)}
-.karvis-eval-question small{font-size:10px;color:#91aaba;line-height:1.6}
-.karvis-eval-empty{padding:20px;border:1px dashed rgba(90,160,185,.25);border-radius:15px;text-align:center;color:#a8bfce;font-size:12px;line-height:1.7}
-@media(max-width:720px){.karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.karvis-eval-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){.karvis-eval-hero{align-items:flex-start;padding:15px;gap:12px}.karvis-eval-orb{flex-basis:46px;height:46px;font-size:22px;border-radius:14px}.karvis-eval-filter{grid-template-columns:1fr}.karvis-eval-filter label{grid-column:auto}.karvis-eval-filter .exam-generate-button{width:100%;white-space:normal}.karvis-eval-metrics{gap:8px}.karvis-eval-metric{padding:12px;min-height:100px}.karvis-eval-topic-grid,.karvis-eval-insight-grid{grid-template-columns:1fr}.karvis-eval-report{font-size:12px}}
-
-</style>
-<link rel="manifest" href="/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="K.A.R.V.I.S.">
-<meta name="theme-color" content="#050b12">
-</head>
-
-<body>
-
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
-
-<div class="header">
-
-    <div class="logo-small">K</div>
-
-    <div class="brand">
-        <div class="brand-title">K.A.R.V.I.S.</div>
-        <div class="brand-subtitle">KARAHAN INC.</div>
-    </div>
-
-    <div id="onlineStatus" class="online">
-        ● ONLINE
-    </div>
-
-    <button
-        class="menu-button"
-        onclick="openSidebar()">
-        ☰
-    </button>
-
-</div>
-
-<div
-    id="overlay"
-    class="overlay"
-    onclick="closeSidebar()">
-</div>
-
-<!-- ============================================================
-     SIDEBAR
-     ============================================================ -->
-
-<div id="sidebar" class="sidebar">
-
-    <button
-        class="close-sidebar"
-        onclick="closeSidebar()">
-        ×
-    </button>
-
-    <div class="sidebar-title">
-        K.A.R.V.I.S.
-    </div>
-
-    <button
-        class="menu-item"
-        onclick="newChat()">
-        ＋ Yeni Sohbet
-    </button>
-
-    <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
-
-    <button
-        class="menu-item"
-        onclick="toggleProfileOptions()">
-        ◉ Profil Değiştir
-    </button>
-
-    <div id="profileSidebarOptions" style="display:none;padding-left:14px;">
-        <button class="menu-item" onclick="openProfileLoginFromSidebar()">↪ Profile Giriş</button>
-        <button class="menu-item" onclick="openRegisterFromSidebar()">＋ Yeni Profil</button>
-    </div>
-
-    <button
-        class="menu-item"
-        onclick="openSettings()">
-        ⚙ Ayarlar
-    </button>
-
-    <button
-        id="funButton"
-        class="menu-item"
-        onclick="toggleFunMode()">
-        ◈ Eğlence Modu
-    </button>
-
-    <!-- ========================================================
-         SADECE BETÜL
-         ======================================================== -->
-
-    <div
-        id="betulMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            BETÜL EĞLENCE MERKEZİ
-        </div>
-
-        <button
-            class="menu-item"
-            onclick="openBetulInstagram()">
-            📱 Instagram Analizi
-        </button>
-
-        <button
-            class="menu-item"
-            onclick="openBetulTarot()">
-            🔮 Tarot Falı
-        </button>
-
-        <button
-            class="menu-item"
-            onclick="openBetulFortune()">
-            🃏 Fal Bak
-        </button>
-
-    </div>
-
-    <div id="sudeMenu" style="display:none;">
-        <div class="academic-title">🌷 SUDE'NİN MENÜSÜ</div>
-        <button class="menu-item" onclick="openSudeSection('food')">🥗 Beslenme günlüğü</button>
-        <button class="menu-item" onclick="openSudeSection('bmi')">📐 VKİ hesaplama</button>
-        <button class="menu-item" onclick="openSudeSection('tasks')">📝 Günlük görevler</button>
-    </div>
-
-    <!-- ========================================================
-         SADECE KARAHAN - K.A.R.V.I.S. CORE
-         ======================================================== -->
-
-    <div
-        id="karahanCoreMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            ◈ K.A.R.V.I.S. CORE
-        </div>
-
-        <button class="menu-item" onclick="setCoreMode('investigator')">🕵️ Dedektif Modu</button>
-        <button class="menu-item" onclick="setCoreMode('live')">🎙️ Canlı Konuşma</button>
-
-    </div>
-
-    <!-- ========================================================
-         SADECE MURAT - YETKİLİ / ADMIN
-         ======================================================== -->
-
-    <div
-        id="adminMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            👑 YETKİLİ MERKEZİ
-        </div>
-
-        <button class="menu-item" onclick="openKarvisLive()">🛰️ K.A.R.V.I.S. LIVE</button>
-        <button class="menu-item" onclick="openKarvisBrain()">🧠 Sistem Beyni</button>
-        <button class="menu-item" onclick="openAdminActiveUsers()">🟢 Aktif Kullanıcılar</button>
-        <button class="menu-item" onclick="openAdminProfileManagement()">🗑️ Profilleri Düzenle</button>
-        <button class="menu-item" onclick="openUserRequests()">📋 Kullanıcı İstekleri <span id="requestBadge" style="float:right;display:none;">🔴</span></button>
-        <button class="menu-item" onclick="openAdminNotifications()">🔔 Bildirim Gönder</button>
-        <button class="menu-item" onclick="openAdminStats()">📊 Kullanım İstatistikleri</button>
-        <button class="menu-item" onclick="openErrors()">🚨 Sistem Hataları</button>
-        <button class="menu-item" onclick="openDevelopmentMemory()">💡 Geliştirme Hafızası</button>
-        <button class="menu-item" onclick="openAdminPasswordReset()">🔐 Kullanıcı Şifresi Sıfırla</button>
-
-    </div>
-
-    <!-- ========================================================
-         SADECE İLKNUR
-         ======================================================== -->
-
-    <div
-        id="teacherMenu"
-        style="display:none;">
-
-        <div class="academic-title">
-            AKADEMİK ASİSTAN
-        </div>
-
-        <button class="menu-item" onclick="openIlknurFeatures()">✨ Özellikler</button>
-        <button class="menu-item" onclick="openTeacherExamManager()">📝 Sınav Hazırla</button>
-        <button class="menu-item" onclick="openTeacherStudentStats()">📊 Öğrenci İstatistikleri</button>
-        <button class="menu-item" onclick="openKarvisEvaluation()">🧠 KARVIS Değerlendirmesi</button>
-
-    </div>
-
-    <!-- ========================================================
-         TÜM ÖĞRENCİ PROFİLLERİ - SINAV TAKİBİ
-         İlknur öğretmen profili sınav yönetimini kullanır.
-         ======================================================== -->
-
-    <button id="studentExamTrackingMenu" class="menu-item" onclick="openStudentExams()" style="display:none;">
-        📝 Sınav Takibi
-    </button>
-
-    <!-- ========================================================
-         TÜM PROFİLLER - ANA PROFİLE DÖN
-         ======================================================== -->
-
-    <button
-        class="menu-item"
-        onclick="returnToKarahan()"
-        style="margin-top:14px;">
-        Ana Profil
-    </button>
-
-</div>
-
-<!-- ============================================================
-     PROFILE CHOICE + LOGIN MODALS
-     ============================================================ -->
-
-<div id="adminActiveUsersModal" class="modal" style="max-width:560px;">
-    <h2>🟢 Aktif Kullanıcılar</h2>
-    <p style="opacity:.72;font-size:13px;">KARVIS'te yakın zamanda aktif olan profiller.</p>
-    <div id="adminActiveUsersList" class="error-list">Kullanıcılar yükleniyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="adminProfileManagementModal" class="modal" style="max-width:560px;">
-    <h2>🗑️ Profilleri Düzenle</h2>
-    <p style="opacity:.72;font-size:13px;">Silme işlemi yalnızca kayıtlı standart profillerde kullanılabilir. Yerleşik sistem profilleri korunur.</p>
-    <div id="adminProfilesList" class="error-list">Profiller yükleniyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="adminDeleteProfileModal" class="modal" style="max-width:440px;">
-    <h2>⚠️ Profili Sil</h2>
-    <p id="adminDeleteProfileQuestion">Profili silmek istediğinizden emin misiniz?</p>
-    <p style="opacity:.72;font-size:12px;">Devam etmek için aşağıya tam olarak <strong>EVET</strong> yazın.</p>
-    <input id="adminDeleteProfileConfirm" placeholder="EVET yazın" autocomplete="off" autocapitalize="characters" maxlength="4">
-    <button class="modal-button" onclick="confirmAdminProfileDelete()">Profili Sil</button>
-    <button class="modal-button secondary-button" onclick="cancelAdminProfileDelete()">Vazgeç</button>
-</div>
-
-<div id="profileChoiceModal" class="modal">
-    <h2>Profil Değiştir</h2>
-    <p style="opacity:.8;font-size:13px">Devam etmek için bir seçenek belirleyin.</p>
-    <button class="modal-button" onclick="openProfileLogin()">Profile Giriş</button>
-    <button class="modal-button" onclick="openRegisterModal()">Yeni Profil</button>
-    <button class="modal-button secondary-button" onclick="closeModals()">Vazgeç</button>
-</div>
-
-<div
-    id="profileModal"
-    class="modal">
-
-    <h2>
-        Profile Giriş
-    </h2>
-
-    <input
-        id="usernameInput"
-        placeholder="Kullanıcı adı"
-        autocomplete="username">
-
-    <input
-        id="passwordInput"
-        type="password"
-        placeholder="Şifre"
-        autocomplete="current-password"
-        onkeydown="handleLoginKey(event)">
-
-    <button
-        id="loginButton"
-        class="modal-button"
-        onclick="login()">
-        Giriş Yap
-    </button>
-
-    <button
-        class="modal-button secondary-button"
-        onclick="closeModals()">
-        Vazgeç
-    </button>
-
-</div>
-
-<div id="registerModal" class="modal">
-    <h2>Yeni KARVIS Hesabı</h2>
-    <p style="opacity:.8;font-size:13px">Yeni hesaplar standart kullanıcı olarak açılır.</p>
-    <input id="registerDisplayName" placeholder="Adınız / görünen ad" autocomplete="name" maxlength="60">
-    <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter)" autocomplete="username" maxlength="24">
-    <input id="registerPassword" type="password" placeholder="Şifre (en az 8 karakter, harf ve rakam)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
-    <input id="registerPasswordConfirm" type="password" placeholder="Şifreyi tekrar girin" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
-    <button id="registerButton" class="modal-button" onclick="registerAccount()">Hesap Oluştur</button>
-    <button class="modal-button secondary-button" onclick="backToLoginModal()">Giriş Ekranına Dön</button>
-</div>
-
-<!-- ============================================================
-     K.A.R.V.I.S. CORE MODALS
-     ============================================================ -->
-
-<div id="karvisLiveModal" class="modal" style="max-width:760px;">
-    <h2>🛰️ K.A.R.V.I.S. LIVE</h2>
-    <div id="karvisLiveContent" class="error-list">Bağlantı kontrol ediliyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="karvisRadarModal" class="modal" style="max-width:760px;">
-    <h2>📡 Sistem Radarı</h2>
-    <div id="karvisRadarContent" class="error-list">Tarama yapılıyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="karvisBrainModal" class="modal" style="max-width:760px;">
-    <h2>🧠 Sistem Beyni</h2>
-    <div id="karvisBrainContent" class="error-list">Sistem durumu okunuyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- ============================================================
-     USER REQUESTS MODAL
-     ============================================================ -->
-
-<div
-    id="userRequestsModal"
-    class="modal"
-    style="max-width:760px;">
-
-    <h2>📋 Kullanıcı İstekleri</h2>
-
-    <div id="userRequestsSummary" class="error-list">
-        Yükleniyor...
-    </div>
-
-    <button
-        class="modal-button secondary-button"
-        onclick="closeModals()">
-        Kapat
-    </button>
-
-</div>
-
-<!-- ============================================================
-     ADMIN DASHBOARD MODAL
-     ============================================================ -->
-<div id="adminNotificationModal" class="modal" style="max-width:760px;">
-    <h2>🔔 Bildirim Gönder</h2>
-    <div class="settings-section">
-        <label style="display:block;margin-bottom:6px;opacity:.8;">Alıcı</label>
-        <select id="notificationTarget" class="voice-select" style="width:100%;">
-            <option value="all">📢 Tüm kullanıcılar</option>
-            <option value="karahan">KARAHAN INC.</option>
-            <option value="betul">Betül</option>
-            <option value="sinem">Sinem</option>
-            <option value="ilknur">İlknur</option>
-            <option value="murat">Murat</option>
-            <option value="sude">Sude</option>
-        </select>
-    </div>
-    <input id="notificationTitle" placeholder="Bildirim başlığı" maxlength="120" value="K.A.R.V.I.S.">
-    <textarea id="notificationBody" placeholder="Göndermek istediğiniz bildirim..." maxlength="1000" style="width:100%;min-height:130px;box-sizing:border-box;"></textarea>
-    <input id="notificationUrl" placeholder="Tıklanınca açılacak adres (opsiyonel)" value="/">
-    <div id="notificationSendStatus" style="margin:10px 0;opacity:.8;"></div>
-    <button class="modal-button" onclick="sendAdminNotification()">🚀 Bildirimi Gönder</button>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="adminStatsModal" class="modal" style="max-width:760px;">
-    <h2>📊 Kullanım İstatistikleri</h2>
-    <div id="adminStatsContent" class="error-list">Yükleniyor...</div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="developmentMemoryModal" class="modal" style="max-width:760px;">
-    <h2>💡 Geliştirme Hafızası</h2>
-    <div class="error-list">
-        <p>🔴 <strong>YÜKSEK ÖNCELİK</strong></p>
-        <p>• Kullanıcı isteklerinin yönetimi</p>
-        <p>• Sistem hata takibi</p>
-        <p>🟡 <strong>PLANLANAN</strong></p>
-        <p>• Kullanıcı istatistiklerinin genişletilmesi</p>
-        <p>• Geliştirme görevlerinin durum takibi</p>
-        <p>🟢 <strong>AKTİF</strong></p>
-        <p>• Profil sistemi • Akademik Mod • Betül Eğlence Merkezi • Dedektif Modu • Canlı Konuşma</p>
-    </div>
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- ============================================================
-     ERROR MODAL
-     ============================================================ -->
-
-<div
-    id="errorModal"
-    class="modal"
-    style="max-width:860px;">
-
-    <h2>🚨 Sistem Hata Merkezi</h2>
-    <div id="errorSummary" class="error-list">Yükleniyor...</div>
-    <div id="errorContent" class="error-list" style="margin-top:12px;">Yükleniyor...</div>
-
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-
-</div>
-
-<!-- ============================================================
-     SETTINGS MODAL
-     ============================================================ -->
-
-<div
-    id="settingsModal"
-    class="modal settings-modal">
-
-    <h2>⚙ K.A.R.V.I.S. Ayarları</h2>
-
-    <div class="settings-section">
-        <div class="settings-label">🎨 K.A.R.V.I.S. Rengi</div>
-
-        <div class="theme-grid">
-            <button class="theme-option" data-theme="default" onclick="setKarvisTheme('default')">
-                <span class="theme-dot theme-cyan"></span>
-                Orijinal
-            </button>
-
-            <button class="theme-option" data-theme="pink" onclick="setKarvisTheme('pink')">
-                <span class="theme-dot theme-pink"></span>
-                Pembe
-            </button>
-
-            <button class="theme-option" data-theme="purple" onclick="setKarvisTheme('purple')">
-                <span class="theme-dot theme-purple"></span>
-                Mor
-            </button>
-
-            <button class="theme-option" data-theme="red" onclick="setKarvisTheme('red')">
-                <span class="theme-dot theme-red"></span>
-                Kırmızı
-            </button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-row">
-            <div>
-                <strong>✨ Animasyonlar</strong>
-                <small>HUD hareketlerini ve efektleri kullan</small>
-            </div>
-            <button id="animationToggle" class="settings-toggle" onclick="toggleAnimations()">AÇIK</button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-label">🔤 Yazı Boyutu</div>
-        <div class="settings-inline">
-            <button class="settings-choice" data-size="small" onclick="setTextSize('small')">Küçük</button>
-            <button class="settings-choice" data-size="normal" onclick="setTextSize('normal')">Normal</button>
-            <button class="settings-choice" data-size="large" onclick="setTextSize('large')">Büyük</button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-label">🗣️ Yanıt Tarzı</div>
-        <div class="settings-inline">
-            <button class="settings-choice" data-style="professional" onclick="setResponseStyle('professional')">Profesyonel</button>
-            <button class="settings-choice" data-style="friendly" onclick="setResponseStyle('friendly')">Samimi</button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-label">📏 Cevap Uzunluğu</div>
-        <div class="settings-inline">
-            <button class="settings-choice" data-length="short" onclick="setResponseLength('short')">Kısa</button>
-            <button class="settings-choice" data-length="normal" onclick="setResponseLength('normal')">Normal</button>
-            <button class="settings-choice" data-length="long" onclick="setResponseLength('long')">Detaylı</button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-row">
-            <div>
-                <strong>🔊 K.A.R.V.I.S. Sesi</strong>
-                <small>Yanıtları sesli olarak oku</small>
-            </div>
-            <button id="voiceToggle" class="settings-toggle" onclick="toggleVoice()">AÇIK</button>
-        </div>
-
-        <div class="settings-row settings-subrow">
-            <div>
-                <strong>🎙️ Ses karakteri</strong>
-                <small>Sakin, derin ve teknolojik K.A.R.V.I.S. tonu</small>
-            </div>
-            <select id="voiceSelect" class="voice-select" onchange="setVoice(this.value)">
-                <option value="">Otomatik</option>
-            </select>
-        </div>
-
-        <div class="settings-row settings-subrow">
-            <div>
-                <strong>🔉 Ses seviyesi</strong>
-                <small>K.A.R.V.I.S. ses yüksekliği</small>
-            </div>
-            <input id="voiceVolume" class="voice-range" type="range" min="0" max="1" step="0.05" value="0.9" oninput="setVoiceVolume(this.value)">
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-row"><div><strong>🔐 Şifre</strong><small>Bu profilin giriş şifresini değiştir</small></div><button class="settings-action" onclick="openPasswordChange()">Değiştir</button></div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-row">
-            <div>
-                <strong>🧹 Sohbet</strong>
-                <small>Mevcut sohbet ekranını temizle</small>
-            </div>
-            <button class="settings-action" onclick="clearChatFromSettings()">Temizle</button>
-        </div>
-    </div>
-
-    <div class="settings-section">
-        <div class="settings-row">
-            <div>
-                <strong>🔔 Bildirimler</strong>
-                <small id="pushStatusText">iPhone bildirimlerini etkinleştir</small>
-            </div>
-            <button id="pushToggleButton" class="settings-action" onclick="toggleKarvisPush()">Aç</button>
-        </div>
-    </div>
-
-    <div class="settings-system">
-        <div>K.A.R.V.I.S. <strong>v32.1</strong></div>
-        <div id="settingsVoiceStatus">Ses sistemi hazırlanıyor...</div>
-    </div>
-
-    <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- ============================================================
-     BETÜL MODAL
-     ============================================================ -->
-
-<div
-    id="betulInputModal"
-    class="modal">
-
-    <h2 id="betulModalTitle">
-        Betül Eğlence Merkezi 💅
-    </h2>
-
-    <div id="betulModalBody"></div>
-
-    <button
-        class="modal-button secondary-button"
-        onclick="closeModals()">
-        Vazgeç
-    </button>
-
-</div>
-
-<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">KARAHAN INC.</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
-<!-- ACCOUNT PASSWORD MODAL -->
-<div id="passwordModal" class="modal">
-  <h2>🔐 Şifre Değiştir</h2>
-  <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Mevcut şifre">
-  <input id="newPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre (en az 6 karakter)">
-  <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre tekrar">
-  <button class="modal-button" onclick="changeOwnPassword()">Şifreyi Güncelle</button>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- SUDE PROFILE: PERSONAL TOOLS -->
-<div id="sudeFoodModal" class="modal sude-panel">
-  <h2>🥗 Beslenme günlüğüm</h2>
-  <p class="sude-subtitle">Yediklerini kaydet; kalori değerleri yaklaşık tahmindir.</p>
-  <section class="sude-card"><label for="sudeFoodName">Yiyecek veya öğün</label><input id="sudeFoodName" class="sude-field" placeholder="Örn. peynirli tost ve ayran"><label for="sudeFoodCalories">Yaklaşık kalori (kcal)</label><input id="sudeFoodCalories" class="sude-field" type="number" min="0" max="5000" placeholder="Kalori"><button class="sude-btn" onclick="estimateSudeCalories()">✨ Kalori tahmin et</button><p id="sudeCalorieEstimate"></p><button class="sude-btn" onclick="addSudeFood()">Öğünü kaydet</button><div id="sudeFoodList"></div><small>Kalori ihtiyacı ve değerleri porsiyona, tarife ve kişiye göre değişebilir.</small></section>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="sudeBmiModal" class="modal sude-panel">
-  <h2>📐 VKİ hesaplama</h2>
-  <p class="sude-subtitle">Boy ve kilonu girerek yaklaşık vücut kitle indeksini hesapla.</p>
-  <section class="sude-card"><label for="sudeHeight">Boy (cm)</label><input id="sudeHeight" class="sude-field" type="number" min="80" max="250" placeholder="Örn. 165"><label for="sudeWeight">Kilo (kg)</label><input id="sudeWeight" class="sude-field" type="number" min="20" max="350" step="0.1" placeholder="Örn. 58.5"><button class="sude-btn" onclick="calculateSudeBMI()">VKİ hesapla</button><p id="sudeBmiResult"></p><small>VKİ tek başına sağlık değerlendirmesi veya tanı değildir.</small></section>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="sudeTasksModal" class="modal sude-panel">
-  <h2>📝 Günlük görevlerim</h2>
-  <p class="sude-subtitle">Kendine uygun küçük hedefler belirle ve tamamladıkça işaretle.</p>
-  <section class="sude-card"><input id="sudeTaskTitle" class="sude-field" placeholder="Örn. 10 dakika yürüyüş"><button class="sude-btn" onclick="addSudeTask()">＋ Görev ekle</button><div id="sudeTaskList"></div></section>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- KARVIS ARENA -->
-<div id="arenaModal" class="modal arena-panel">
-  <h2>🏆 K.A.R.V.I.S. ARENA</h2>
-  <p class="sude-subtitle">Bütün profiller aynı ligde yarışır. İstediğin zaman oyna, puanını yükselt!</p>
-  <div class="arena-grid">
-    <section class="arena-card"><h3>⭐ Toplam puan</h3><div id="arenaMyPoints" class="arena-stat">0</div></section>
-    <section class="arena-card"><h3>🏅 Ligim ve sıram</h3><div id="arenaMyLeague" class="arena-stat">Bronz</div><p id="arenaMyRank">Sıra hesaplanıyor…</p></section>
-  </div>
-  <section class="arena-card" id="arenaDuelCard">
-    <h3>⚔️ Özel Düello — puanına meydan oku</h3>
-    <p>Bir rakip seç, bahis puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
-    <div class="sude-grid">
-      <div><label for="arenaDuelOpponent">Rakip profil</label>
-        <select id="arenaDuelOpponent" class="sude-field">
-          <option value="karahan">KARAHAN INC.</option><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="murat">Murat</option><option value="sude">Sude</option>
-        </select>
-      </div>
-      <div><label for="arenaDuelStake">Bahis puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
-    </div>
-    <button class="sude-btn" onclick="sendArenaDuelRequest()">📨 Düello isteği gönder</button>
-    <div id="arenaDuelStatus" aria-live="polite" style="margin-top:10px;font-size:13px"></div>
-    <div id="arenaDuelRequests" style="margin-top:10px"></div>
-    <div id="arenaDuelActive" style="margin-top:10px"></div>
-    <button id="arenaDuelRefreshButton" class="sude-btn" style="width:100%;margin-top:10px;display:none" onclick="refreshArenaDuel(true)">🔄 Düelloyu yenile</button>
-    <h3 style="margin-top:16px">🕘 Son 3 düellom</h3>
-    <div id="arenaDuelHistory">Henüz düello oynanmadı.</div>
-  </section>
-  <section class="arena-card">
-    <h3>🎮 Yarışma seç</h3>
-    <p>Her yarışma 5 sorudan oluşur. Cevaplarını sunucu doğrular ve puanını kaydeder.</p>
-    <div class="arena-grid">
-      <button class="sude-btn" onclick="startArena('knowledge')">🧠 Bilgi düellosu</button>
-      <button class="sude-btn" onclick="startArena('speed')">⚡ Hız turu</button>
-      <button class="sude-btn" onclick="startArena('logic')">🧩 Mantık ve örüntü</button>
-      <button class="sude-btn" onclick="startArena('memory')">🧠 Hafıza meydan okuması</button>
-      <button class="sude-btn" onclick="startArena('tournament')">👑 Özel turnuva</button>
-    </div>
-    <div id="arenaGameArea" aria-live="polite"><p>Bir oyun seçerek yarışmayı başlat.</p></div>
-  </section>
-  <section class="arena-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><h3 style="margin:0">📊 Ortak puan tablosu</h3><button id="arenaRefreshButton" class="sude-btn" style="width:auto;padding:10px 14px" onclick="refreshArenaTable()">🔄 Tabloyu yenile</button></div><p id="arenaRefreshStatus" style="margin:10px 0 8px;font-size:.9em;opacity:.8" aria-live="polite">Puan tablosu hazır.</p><div id="arenaLeaderboard">Sıralama yükleniyor…</div></section>
-  <section class="arena-card"><h3>🎖️ Rozetlerim</h3><div id="arenaBadges">Henüz rozet kazanılmadı.</div><h3 style="margin-top:16px">🗓️ Son yarışmalar</h3><div id="arenaHistory">Henüz yarışma tamamlanmadı.</div></section>
-  <section id="arenaAdminTools" class="arena-card" style="display:none;border:1px solid #dc6262;">
-    <h3>🛡️ Yönetici araçları</h3>
-    <p>Bu işlem bütün profillerin Arena puanlarını, rozetlerini, sıralamasını ve oyun geçmişini kalıcı olarak siler.</p>
-    <button class="sude-btn" style="background:#9f2424;color:white" onclick="adminResetArena()">🗑️ Arena tablosunu sıfırla</button>
-  </section>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- ILKNUR SINAV SISTEMI -->
-<div id="teacherExamModal" class="modal exam-modal" style="max-width:980px;">
-  <header class="exam-manager-hero">
-    <div class="exam-manager-icon">✦</div>
-    <div><p class="exam-manager-eyebrow">KARVIS • AKADEMİK MODÜL</p><h2>İlknur Hoca · Sınav Yönetimi</h2><p>Sınavını hazırla, soruları kontrol et ve öğrencilerinle paylaş.</p></div>
-  </header>
-  <div class="exam-manager-note">⏱ Süre dakika cinsindendir. <strong>0 = sınırsız</strong>. Tarihler cihazının yerel saatine göre ayarlanır.</div>
-  <section class="exam-manager-section">
-    <div class="exam-section-heading"><span>01</span><div><h3>Sınav bilgileri</h3><p>Öğrencilerin göreceği temel bilgiler</p></div></div>
-    <div class="exam-field-grid">
-      <label class="exam-modern-field exam-field-wide">Sınav başlığı<input id="examTitle" placeholder="Örn. 1. dönem konu değerlendirmesi" autocomplete="off"></label>
-      <label class="exam-modern-field">Ders adı<input id="examSubject" placeholder="Örn. Biyoloji" autocomplete="off"></label>
-      <label class="exam-modern-field exam-field-wide">Açıklama<textarea id="examDescription" rows="2" placeholder="Sınav kapsamı ve öğrenciye notlar"></textarea></label>
-    </div>
-  </section>
-  <section class="exam-ai-builder">
-    <div class="exam-section-heading"><span class="exam-ai-spark">✧</span><div><h3>Yapay zekâyla sınav oluştur</h3><p>KARVIS soru taslağını hazırlar; yayımlamadan önce tüm soruları düzenleyebilirsin.</p></div></div>
-    <label class="exam-modern-field">Konu / kazanım<input id="examAITopic" placeholder="Örn. Hücre bölünmesi"></label>
-    <div class="exam-field-grid exam-field-grid-2">
-      <label class="exam-modern-field">Soru sayısı<input id="examAIQuestionCount" type="number" min="1" max="50" value="10"></label>
-      <label class="exam-modern-field">Sınıf / düzey<input id="examAIGrade" placeholder="Örn. 10. sınıf"></label>
-    </div>
-    <fieldset class="exam-choice-fieldset"><legend>Soru türleri</legend><div class="exam-type-grid">
-      <label class="exam-type-choice"><input type="checkbox" id="examAITypeMC" checked><span class="exam-type-symbol">☷</span><strong>Çoktan seçmeli</strong><small>A, B, C, D seçenekleri</small></label>
-      <label class="exam-type-choice"><input type="checkbox" id="examAITypeTF"><span class="exam-type-symbol">✓</span><strong>Doğru / yanlış</strong><small>İki seçenekli sorular</small></label>
-      <label class="exam-type-choice"><input type="checkbox" id="examAITypeOpen"><span class="exam-type-symbol">▤</span><strong>Açık uçlu</strong><small>Kısa veya uzun cevap</small></label>
-    </div></fieldset>
-    <label class="exam-modern-field">Zorluk seviyesi<select id="examAIDifficulty" class="voice-select"><option value="kolay">Kolay</option><option value="orta" selected>Orta</option><option value="zor">Zor</option><option value="karma">Karma</option></select></label>
-    <label class="exam-modern-field">Ek talimatlar <span class="exam-optional">İsteğe bağlı</span><textarea id="examAIInstructions" rows="3" maxlength="500" placeholder="Kazanım, kapsam veya özellikle sorulmasını istediğin noktalar…"></textarea></label>
-    <button class="exam-generate-button" id="examAIGenerateBtn" onclick="generateTeacherExamWithAI()"><span>✦</span> Soruları oluştur</button>
-    <div id="examAIStatus" aria-live="polite" class="exam-status-message"></div>
-  </section>
-  <section class="exam-manager-section">
-    <div class="exam-section-heading"><span>02</span><div><h3>Sınav ayarları</h3><p>Süre ve erişim tarihlerini belirle</p></div></div>
-    <div class="exam-field-grid exam-field-grid-2">
-      <label class="exam-modern-field">Süre (dakika)<input id="examDuration" type="number" min="0" max="600" value="0"><small>0 = sınırsız süre</small></label>
-      <label class="exam-modern-field">Başlangıç zamanı<input id="examStartsAt" type="datetime-local"><small>Boş bırakılırsa hemen erişilebilir</small></label>
-      <label class="exam-modern-field exam-field-wide">Bitiş zamanı<input id="examEndsAt" type="datetime-local"><small>Boş bırakılırsa bitiş tarihi uygulanmaz</small></label>
-    </div>
-  </section>
-  <section class="exam-manager-section">
-    <div class="exam-section-heading"><span>03</span><div><h3>Soru düzenleyici</h3><p>Oluşturulan soruları ve cevap anahtarlarını kontrol et</p></div></div>
-    <div id="examQuestionBuilder"><div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>Yukarıdan KARVIS ile soru oluştur veya kendin yeni soru ekle.</p></div></div>
-    <button class="exam-add-question-button" onclick="addExamQuestion()">＋ Yeni soru ekle</button>
-  </section>
-  <div class="exam-publish-actions"><button class="modal-button" onclick="saveTeacherExam(false)">Taslak kaydet</button><button class="exam-generate-button" onclick="saveTeacherExam(true)">✓ Sınavı yayımla</button></div>
-  <div id="teacherExamStatus" aria-live="polite" class="exam-status-message"></div>
-  <h3>Oluşturulan sınavlar</h3><div id="teacherExamList">Sınavlar yükleniyor…</div>
-
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-<div id="teacherStudentStatsModal" class="modal exam-modal karvis-stats-modal">
-  <header class="stats-hero"><div class="stats-hero-icon">▥</div><div class="stats-hero-copy"><p class="stats-eyebrow">KARVIS • ANALİTİK</p><h2>Öğrenci İstatistikleri</h2><p>Öğrenci performansını ve tekrar gereken konuları incele.</p></div></header>
-  <div class="stats-filter"><label for="examStatsSelect">Sınav seç</label><select id="examStatsSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select><button class="stats-run" id="examStatsRunBtn" onclick="loadTeacherExamAnalysis()">Analizi göster <span>↗</span></button></div>
-  <div id="teacherExamStats" aria-live="polite" class="stats-results"><div class="stats-empty">📊<strong>Bir sınav seç</strong><span>Sonuçlar ve soru bazlı analiz burada görünecek.</span></div></div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-<div id="karvisEvaluationModal" class="modal exam-modal karvis-evaluation-modal">
-  <header class="karvis-eval-hero">
-    <div class="karvis-eval-orb">K</div>
-    <div><p class="karvis-eval-eyebrow">KARVIS • YAPAY ZEKÂ ANALİZİ</p><h2>KARVIS Değerlendirmesi</h2><p>Sınav verilerini yorumlar, sınıfın eksik konularını belirler ve uygulanabilir öğretim önerileri sunar.</p></div>
-  </header>
-  <div class="karvis-eval-filter">
-    <label for="karvisEvaluationExamSelect">Analiz edilecek sınav</label>
-    <select id="karvisEvaluationExamSelect" class="voice-select"><option value="">Sınavlar yükleniyor…</option></select>
-    <button class="exam-generate-button" id="karvisEvaluationRunBtn" onclick="loadKarvisEvaluation()">🧠 KARVIS ile değerlendir</button>
-  </div>
-  <div id="karvisEvaluationResults" aria-live="polite"><div class="stats-empty"><strong>Bir sınav seç</strong><span>KARVIS, yanıtlar geldikten sonra sınıfın güçlü ve geliştirilmesi gereken yönlerini analiz edecek.</span></div></div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-<div id="studentExamModal" class="modal exam-modal exam-student-modal" style="max-width:980px;">
-  <h2>📝 Sınavlar</h2><div id="studentExamList">Sınavlar yükleniyor…</div>
-  <div id="studentExamWork" style="display:none"></div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<!-- ============================================================
-     MAIN
-     ============================================================ -->
-
-<div class="main">
-
-    <div class="hud">
-
-        <div class="hud-core">
-
-            <div class="ring one"></div>
-            <div class="ring two"></div>
-            <div class="ring three"></div>
-
-            <div class="core">
-                K
-            </div>
-
-        </div>
-
-        <div
-            id="status"
-            class="status">
-            K.A.R.V.I.S. HAZIR
-        </div>
-
-        <div
-            id="chat"
-            class="chat">
-        </div>
-
-        <div class="input-area">
-
-            <input
-                id="messageInput"
-                class="input"
-                autocomplete="off"
-                placeholder="Mesajınızı yazın..."
-                onkeydown="handleKey(event)">
-
-            <button
-                id="sendButton"
-                class="send"
-                onclick="sendMessage()">
-                ➤
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- İlknur Hoca: KARVIS özellikleri -->
-<div id="ilknurFeaturesModal" class="modal ilknur-features-modal" aria-labelledby="ilknurFeaturesTitle">
-  <div class="ilknur-features-hero">
-    <div class="ilknur-features-icon">✦</div>
-    <div>
-      <div class="ilknur-features-eyebrow">K.A.R.V.I.S. · AKADEMİK ASİSTAN</div>
-      <h2 id="ilknurFeaturesTitle">Neler yapabilirim?</h2>
-      <p>Bir özellik seçmek için menü kullanmanız gerekmez. İsteğinizi doğrudan KARVIS'e yazmanız yeterli.</p>
-    </div>
-  </div>
-  <div class="ilknur-features-list">
-    <article class="ilknur-feature"><span>01</span><div><strong>Akademik araştırma</strong><p>Belirttiğiniz konuda araştırma yapar; ilgili kaynakları ayıklar ve desteklenen bilgileri kısa, anlaşılır biçimde sunar.</p><small>Örnek: “Çocuk gelişiminde oyunun etkisini kaynaklarla araştır.”</small></div></article>
-    <article class="ilknur-feature"><span>02</span><div><strong>Makale hazırlama</strong><p>İstediğiniz konuya bağlı, giriş-gelişme-sonuç düzeninde makale taslağı hazırlar; konu dışı kaynakları kullanmamaya dikkat eder.</p><small>Örnek: “İş sağlığı ve güvenliği hakkında kısa bir makale yaz.”</small></div></article>
-    <article class="ilknur-feature"><span>03</span><div><strong>Ders anlatımı ve konu özeti</strong><p>Konuları seviyeye uygun açıklar; özet, anahtar kavramlar ve çalışma notları hazırlar.</p><small>Örnek: “Bu konuyu öğrencilere sade bir dille anlat ve özetle.”</small></div></article>
-    <article class="ilknur-feature"><span>04</span><div><strong>Sunum taslağı</strong><p>İstenen konu için slayt başlıkları, kısa maddeler ve sunucu notları oluşturur.</p><small>Örnek: “İlk yardım konusunda 8 slaytlık sunum taslağı hazırla.”</small></div></article>
-    <article class="ilknur-feature"><span>05</span><div><strong>Soru ve etkinlik hazırlama</strong><p>Konuya göre çalışma soruları, cevap anahtarı, sınıf etkinlikleri ve tekrar çalışmaları hazırlar.</p><small>Örnek: “Bu konu için 10 soru ve cevap anahtarı oluştur.”</small></div></article>
-    <article class="ilknur-feature"><span>06</span><div><strong>Metin düzenleme ve kaynakça</strong><p>Verdiğiniz metni dil ve anlatım açısından düzenler; sağlanan kaynaklardan kaynakça taslağı oluşturur. Doğrulayamadığı kaynak bilgisini kesinmiş gibi göstermez.</p><small>Örnek: “Bu metni akademik bir dille düzenle ve kaynakçayı kontrol et.”</small></div></article>
-    <article class="ilknur-feature"><span>07</span><div><strong>Sınav yönetimi</strong><p>Sınav taslağı oluşturma, soru düzenleme, sınav yayımlama ve mevcut sistemin sunduğu öğrenci sonuçlarını takip etme.</p><small>Bu işlemler için menüdeki “Sınav Yönetimi” bölümünü açın.</small></div></article>
-  </div>
-  <p class="ilknur-features-footnote">Not: Araştırma ve kaynak doğruluğu, erişilebilen kaynaklara bağlıdır. Önemli akademik bilgileri yayımlamadan önce kontrol edin.</p>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<script>
-
-/* ============================================================
-   GLOBAL
-   ============================================================ */
-
-const API = "";
-
-let currentUser = "karahan";
-let currentMode = "normal";
-// RAM-only server context is keyed by a per-tab chat ID, not saved to localStorage.
-let currentConversationId = (window.crypto && crypto.randomUUID)
-    ? crypto.randomUUID()
-    : ("chat-" + Date.now() + "-" + Math.random().toString(36).slice(2));
-let funMode = false;
-let sending = false;
-let presentationPolling = null;
-let dotsTimer = null;
-let karvisVoice = null;
-window.karvisSpeechStop = null;
-let voiceTimer = null;
-let speechSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
-
-const karvisSettings = {
-    theme: localStorage.getItem("karvis_theme") || "default",
-    animations: localStorage.getItem("karvis_animations") !== "off",
-    textSize: localStorage.getItem("karvis_text_size") || "normal",
-    responseStyle: localStorage.getItem("karvis_response_style") || "professional",
-    responseLength: localStorage.getItem("karvis_response_length") || "normal",
-    voice: localStorage.getItem("karvis_voice") !== "off",
-    voiceName: localStorage.getItem("karvis_voice_name") || "",
-    voiceVolume: Number(localStorage.getItem("karvis_voice_volume") || "0.9")
-};
-
-const waitMessages = [
-    "Bir saniye efendim...",
-    "Tamam, bir bakıyorum...",
-    "Bir dakika, değerlendiriyorum...",
-    "Yanıt hazırlanıyor...",
-    "K.A.R.V.I.S. analiz ediyor..."
-];
-
-const betulLoading = [
-    "😭 Biraz bekle aşko, sistemlerimi çökertiyorsun.",
-    "💀 Aşko bu kadar analiz isteme, işlemcim ağlıyor.",
-    "💅 Dur aşko... K.A.R.V.I.S. şu an dedikodu moduna geçti.",
-    "😂 Aşko sakin ol, daha hesabı yeni açtım.",
-    "🤨 Hmm... burada bir şeyler var aşko.",
-    "😭 Sistemlerim bunu görmeye hazır değildi."
-];
-
-/* ============================================================
-   HELPERS
-   ============================================================ */
-
-function $(id){
-    return document.getElementById(id);
-}
-
-function escapeHTML(text){
-
-    return String(text)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-function formatText(text){
-
-    let safe = escapeHTML(text);
-
-    return safe.replace(
-        /(https?:\/\/[^\s<]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-    );
-}
-
-function addMessage(text,type="ai"){
-
-    const div = document.createElement("div");
-
-    div.className = "message " + type;
-
-    div.innerHTML = formatText(text);
-
-    $("chat").appendChild(div);
-
-    $("chat").scrollTop = $("chat").scrollHeight;
-
-    if(type === "ai" && karvisSettings.voice && !String(text).includes("hazırlanıyor")){
-        speakKarvis(text);
-    }
-
-    return div;
-}
-
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
-
-function openSidebar(){
-
-    $("sidebar").classList.add("open");
-
-    $("overlay").classList.add("show");
-}
-
-function closeSidebar(){
-
-    $("sidebar").classList.remove("open");
-
-    $("overlay").classList.remove("show");
-}
-
-function closeModals(){
-
-    document
-        .querySelectorAll(".modal")
-        .forEach(m => m.classList.remove("show"));
-    if(typeof arenaDuelPollTimer!=="undefined" && arenaDuelPollTimer){clearTimeout(arenaDuelPollTimer);arenaDuelPollTimer=null;}
-}
-
-/* ============================================================
-   PROFILE
-   ============================================================ */
-
-function toggleProfileOptions(){
-    const options = $("profileSidebarOptions");
-    if(!options) return;
-    options.style.display = options.style.display === "none" ? "block" : "none";
-}
-
-function openProfile(){
-    toggleProfileOptions();
-}
-
-function openProfileLoginFromSidebar(){
-    closeSidebar();
-    openProfileLogin();
-}
-
-function openRegisterFromSidebar(){
-    closeSidebar();
-    openRegisterModal();
-}
-
-function openProfileLogin(){
-    closeModals();
-    $("profileModal").classList.add("show");
-    setTimeout(() => $("usernameInput").focus(), 100);
-}
-
-function openRegisterModal(){
-    closeModals();
-    $("registerModal").classList.add("show");
-    setTimeout(() => $("registerDisplayName").focus(), 100);
-}
-
-function backToLoginModal(){
-    closeModals();
-    $("profileChoiceModal").classList.add("show");
-}
-
-let registerInProgress = false;
-async function registerAccount(){
-    if(registerInProgress) return;
-    const display_name = $("registerDisplayName").value.trim();
-    const username = $("registerUsername").value.trim().toLowerCase();
-    const password = $("registerPassword").value;
-    const confirm = $("registerPasswordConfirm").value;
-    if(!display_name || !username || !password){ alert("Tüm alanları doldurun."); return; }
-    if(password !== confirm){ alert("Şifreler birbiriyle eşleşmiyor."); return; }
-    const button = $("registerButton");
-    registerInProgress = true;
-    if(button){ button.disabled = true; button.textContent = "Hesap oluşturuluyor…"; }
-    try{
-        const response = await fetch(API + "/register", {
-            method:"POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({display_name, username, password})
-        });
-        const data = await response.json();
-        if(!response.ok || data.success !== true){ alert(data.detail || data.message || "Hesap oluşturulamadı."); return; }
-        $("usernameInput").value = username;
-        $("passwordInput").value = password;
-        $("registerDisplayName").value = "";
-        $("registerUsername").value = "";
-        $("registerPassword").value = "";
-        $("registerPasswordConfirm").value = "";
-        backToLoginModal();
-        alert("Hesabınız oluşturuldu. Şimdi giriş yapabilirsiniz.");
-    }catch(error){
-        alert("Sunucuya ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.");
-    }finally{
-        registerInProgress = false;
-        if(button){ button.disabled = false; button.textContent = "Hesap Oluştur"; }
-    }
-}
-
-function handleLoginKey(e){
-
-    if(e.key === "Enter"){
-
-        e.preventDefault();
-
-        login();
-    }
-}
-
-let loginInProgress = false;
-async function login(){
-    if(loginInProgress) return;
-    const username =
-        $("usernameInput")
-        .value
-        .trim()
-        .toLowerCase();
-
-    const password =
-        $("passwordInput").value;
-
-    if(!username){
-
-        alert("Kullanıcı adı girin.");
-
-        return;
-    }
-
-    const loginButton = $("loginButton");
-    loginInProgress = true;
-    if(loginButton){ loginButton.disabled = true; loginButton.textContent = "Giriş yapılıyor…"; }
-    try{
-
-        const response = await fetch(
-            API + "/login",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
+# ============================================================
+# K.A.R.V.I.S. - KARAHAN INC.
+# Professional AI Assistant Backend
+# Smart Web Research + Presentation Engine v33.0.0
+# ============================================================
+
+import os
+import re
+import json
+import html as html_lib
+import uuid
+import time
+import hashlib
+import threading
+import traceback
+import random
+from datetime import datetime, timezone
+
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from io import BytesIO
+from difflib import SequenceMatcher
+
+import requests
+
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+except Exception:
+    psycopg2 = None
+    RealDictCursor = None
+
+try:
+    from pywebpush import webpush, WebPushException
+except Exception:
+    webpush = None
+    WebPushException = Exception
+
+from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+
+from pydantic import BaseModel
+
+from openai import OpenAI
+
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+
+
+# ============================================================
+# APP
+# ============================================================
+
+APP_VERSION = "36.0.0"
+
+BASE_DIR = Path(__file__).resolve().parent
+
+GENERATED_DIR = BASE_DIR / "generated"
+GENERATED_DIR.mkdir(
+    exist_ok=True
+)
+
+INDEX_FILE = BASE_DIR / "index.html"
+
+# ============================================================
+# WEB PUSH
+# ============================================================
+
+PUSH_SUBSCRIPTION_FILE = BASE_DIR / "push_subscriptions.json"
+push_lock = threading.Lock()
+
+VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
+VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@karahaninc.com").strip()
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+# Arena uses a separate Supabase database; notification storage keeps using DATABASE_URL.
+SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL", "").strip()
+
+
+def arena_database_configured():
+    return bool(SUPABASE_DB_URL and psycopg2)
+
+
+def get_arena_db_connection():
+    if not arena_database_configured():
+        return None
+    return psycopg2.connect(SUPABASE_DB_URL, connect_timeout=10, sslmode="require")
+
+
+def init_arena_database():
+    """Create the Arena state/attempt persistence layer and preserve existing tables."""
+    if not SUPABASE_DB_URL:
+        print("KARVIS Arena DB: SUPABASE_DB_URL is missing.", flush=True)
+        return False
+    if psycopg2 is None:
+        print("KARVIS Arena DB: psycopg2 is unavailable; check requirements.txt.", flush=True)
+        return False
+    try:
+        conn = get_arena_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_state (
+                        id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+                        state JSONB NOT NULL DEFAULT '{}'::jsonb,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_players (
+                        username TEXT PRIMARY KEY,
+                        points INTEGER NOT NULL DEFAULT 0,
+                        league TEXT NOT NULL DEFAULT 'Bronz',
+                        badges JSONB NOT NULL DEFAULT '[]'::jsonb,
+                        games_played INTEGER NOT NULL DEFAULT 0,
+                        wins INTEGER NOT NULL DEFAULT 0,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_game_history (
+                        id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                        username TEXT NOT NULL REFERENCES public.arena_players(username) ON DELETE CASCADE,
+                        game_mode TEXT NOT NULL,
+                        score INTEGER NOT NULL DEFAULT 0,
+                        correct_answers INTEGER NOT NULL DEFAULT 0,
+                        total_questions INTEGER NOT NULL DEFAULT 0,
+                        played_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS public.arena_attempts (
+                        attempt_id TEXT PRIMARY KEY,
+                        username TEXT NOT NULL,
+                        attempt JSONB NOT NULL,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_history_username ON public.arena_game_history(username)")
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_history_played_at ON public.arena_game_history(played_at DESC)")
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_arena_attempts_username ON public.arena_attempts(username)")
+                # Import the previous JSON save only when the database has no state yet.
+                cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
+                row = cur.fetchone()
+                if not row:
+                    legacy = read_json_file(ARENA_FILE, {}) if 'ARENA_FILE' in globals() else {}
+                    if not isinstance(legacy, dict):
+                        legacy = {}
+                    legacy.setdefault("players", {})
+                    legacy.setdefault("attempts", {})
+                    legacy.setdefault("duels", {})
+                    legacy.setdefault("updated_at", time.strftime("%Y-%m-%d %H:%M:%S"))
+                    cur.execute(
+                        "INSERT INTO public.arena_state (id, state) VALUES (1, %s::jsonb) ON CONFLICT (id) DO NOTHING",
+                        (json.dumps(legacy, ensure_ascii=False),)
+                    )
+        conn.close()
+        return True
+    except Exception as exc:
+        details = traceback.format_exc()
+        try:
+            save_error("Arena database initialization error", details)
+        except Exception:
+            pass
+        # Print a sanitized diagnostic so the actual failure is visible in Render Logs.
+        safe_message = _sanitize_error_text(f"{type(exc).__name__}: {exc}") if "_sanitize_error_text" in globals() else type(exc).__name__
+        print(f"KARVIS Arena DB INIT FAILED: {safe_message}", flush=True)
+        return False
+
+
+def _arena_load_state_from_db():
+    conn = get_arena_db_connection()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT state FROM public.arena_state WHERE id = 1")
+                row = cur.fetchone()
+                if not row:
+                    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+                state = row[0]
+                if isinstance(state, str):
+                    state = json.loads(state)
+                if not isinstance(state, dict):
+                    state = {}
+                state.setdefault("players", {})
+                state.setdefault("attempts", {})
+                state.setdefault("duels", {})
+                return state
+    finally:
+        conn.close()
+
+
+def _arena_save_state_to_db(data):
+    conn = get_arena_db_connection()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO public.arena_state (id, state, updated_at)
+                    VALUES (1, %s::jsonb, NOW())
+                    ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()
+                """, (json.dumps(data, ensure_ascii=False),))
+                # Keep the normalized tables (created in Supabase SQL Editor) in sync.
+                for username, player in data.get("players", {}).items():
+                    points = int(player.get("points", 0) or 0)
+                    cur.execute("""
+                        INSERT INTO public.arena_players
+                            (username, points, league, badges, games_played, wins, updated_at)
+                        VALUES (%s, %s, %s, %s::jsonb, %s, %s, NOW())
+                        ON CONFLICT (username) DO UPDATE SET
+                            points = EXCLUDED.points, league = EXCLUDED.league,
+                            badges = EXCLUDED.badges, games_played = EXCLUDED.games_played,
+                            wins = EXCLUDED.wins, updated_at = NOW()
+                    """, (username, points, _arena_league(points),
+                          json.dumps(player.get("badges", []), ensure_ascii=False),
+                          len(player.get("history", [])), int(player.get("wins", 0) or 0)))
+                # History rows are a display/analytics copy; replace atomically to avoid duplicates.
+                cur.execute("DELETE FROM public.arena_game_history")
+                for username, player in data.get("players", {}).items():
+                    for item in player.get("history", [])[-50:]:
+                        title = str(item.get("title", "Arena"))
+                        mode = next((key for key, label in ARENA_MODES.items() if label == title), title)
+                        cur.execute("""
+                            INSERT INTO public.arena_game_history
+                                (username, game_mode, score, correct_answers, total_questions, played_at)
+                            VALUES (%s, %s, %s, %s, %s, NOW())
+                        """, (username, mode, int(item.get("score", 0) or 0), 0, 0))
+                for attempt_id, attempt in data.get("attempts", {}).items():
+                    cur.execute("""
+                        INSERT INTO public.arena_attempts (attempt_id, username, attempt, updated_at)
+                        VALUES (%s, %s, %s::jsonb, NOW())
+                        ON CONFLICT (attempt_id) DO UPDATE SET
+                            username = EXCLUDED.username, attempt = EXCLUDED.attempt, updated_at = NOW()
+                    """, (attempt_id, str(attempt.get("username", "")),
+                          json.dumps(attempt, ensure_ascii=False)))
+        conn.close()
+    except Exception:
+        conn.close()
+        raise
+
+
+def push_database_configured():
+    return bool(DATABASE_URL and psycopg2)
+
+
+def push_configured():
+    return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
+
+
+def get_push_db_connection():
+    if not push_database_configured():
+        return None
+    return psycopg2.connect(DATABASE_URL, connect_timeout=8, sslmode="require")
+
+
+def init_push_database():
+    if not push_database_configured():
+        return False
+    try:
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS karvis_push_subscriptions (
+                        id BIGSERIAL PRIMARY KEY,
+                        username TEXT NOT NULL,
+                        endpoint TEXT NOT NULL UNIQUE,
+                        p256dh TEXT NOT NULL,
+                        auth TEXT NOT NULL,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        last_success_at TIMESTAMPTZ NULL,
+                        last_failure_at TIMESTAMPTZ NULL,
+                        failure_count INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_karvis_push_username ON karvis_push_subscriptions(username)")
+        conn.close()
+        return True
+    except Exception:
+        save_error("Push database initialization error", traceback.format_exc())
+        return False
+
+
+def migrate_push_json_to_database():
+    if not push_database_configured():
+        return
+    try:
+        init_push_database()
+        legacy = read_json_file(PUSH_SUBSCRIPTION_FILE, {})
+        if not isinstance(legacy, dict):
+            return
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                for username, items in legacy.items():
+                    if username not in USERS or not isinstance(items, list):
+                        continue
+                    for item in items:
+                        endpoint = str(item.get("endpoint", "")).strip()
+                        keys = item.get("keys") or {}
+                        if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+                            continue
+                        cur.execute("""
+                            INSERT INTO karvis_push_subscriptions
+                                (username, endpoint, p256dh, auth)
+                            VALUES (%s, %s, %s, %s)
+                            ON CONFLICT (endpoint) DO UPDATE SET
+                                username=EXCLUDED.username,
+                                p256dh=EXCLUDED.p256dh,
+                                auth=EXCLUDED.auth,
+                                updated_at=NOW()
+                        """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+        conn.close()
+    except Exception:
+        save_error("Push subscription migration error", traceback.format_exc())
+
+
+def get_push_subscriptions():
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT username, endpoint, p256dh, auth, updated_at, last_success_at, last_failure_at, failure_count FROM karvis_push_subscriptions ORDER BY updated_at DESC")
+                rows = cur.fetchall()
+            conn.close()
+            data = {}
+            for row in rows:
+                item = dict(row)
+                item["keys"] = {"p256dh": item.pop("p256dh"), "auth": item.pop("auth")}
+                for k in ("updated_at", "last_success_at", "last_failure_at"):
+                    if item.get(k) is not None:
+                        item[k] = item[k].isoformat()
+                data.setdefault(item.pop("username"), []).append(item)
+            return data
+        except Exception:
+            save_error("Push database read error", traceback.format_exc())
+    with push_lock:
+        return read_json_file(PUSH_SUBSCRIPTION_FILE, {})
+
+
+def save_push_subscriptions(data):
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    for username, items in data.items():
+                        for item in items or []:
+                            endpoint = str(item.get("endpoint", "")).strip()
+                            keys = item.get("keys") or {}
+                            if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+                                continue
+                            cur.execute("""
+                                INSERT INTO karvis_push_subscriptions (username, endpoint, p256dh, auth, updated_at)
+                                VALUES (%s, %s, %s, %s, NOW())
+                                ON CONFLICT (endpoint) DO UPDATE SET
+                                    username=EXCLUDED.username,
+                                    p256dh=EXCLUDED.p256dh,
+                                    auth=EXCLUDED.auth,
+                                    updated_at=NOW()
+                            """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+            conn.close()
+            return
+        except Exception:
+            save_error("Push database write error", traceback.format_exc())
+    with push_lock:
+        write_json_file(PUSH_SUBSCRIPTION_FILE, data)
+
+
+def save_push_subscription(username, subscription):
+    username = str(username or "").strip().lower()
+    if username not in USERS or not isinstance(subscription, dict):
+        return False
+    endpoint = str(subscription.get("endpoint", "")).strip()
+    keys = subscription.get("keys") or {}
+    if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+        return False
+    if push_database_configured():
+        try:
+            init_push_database()
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO karvis_push_subscriptions (username, endpoint, p256dh, auth, updated_at, failure_count)
+                        VALUES (%s, %s, %s, %s, NOW(), 0)
+                        ON CONFLICT (endpoint) DO UPDATE SET
+                            username=EXCLUDED.username,
+                            p256dh=EXCLUDED.p256dh,
+                            auth=EXCLUDED.auth,
+                            updated_at=NOW(),
+                            failure_count=0,
+                            last_failure_at=NULL
+                    """, (username, endpoint, keys.get("p256dh"), keys.get("auth")))
+            conn.close()
+            return True
+        except Exception:
+            save_error("Push subscription database save error", traceback.format_exc())
+    data = get_push_subscriptions()
+    user_items = data.get(username, [])
+    user_items = [x for x in user_items if x.get("endpoint") != endpoint]
+    user_items.append({"endpoint": endpoint, "keys": {"p256dh": keys.get("p256dh"), "auth": keys.get("auth")}, "updated_at": datetime.now().isoformat(timespec="seconds")})
+    data[username] = user_items[-10:]
+    save_push_subscriptions(data)
+    return True
+
+
+def remove_push_subscription(username, endpoint):
+    if push_database_configured():
+        try:
+            conn = get_push_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("DELETE FROM karvis_push_subscriptions WHERE username=%s AND endpoint=%s", (username, endpoint))
+            conn.close()
+            return
+        except Exception:
+            save_error("Push subscription database delete error", traceback.format_exc())
+    data = get_push_subscriptions()
+    items = data.get(username, [])
+    data[username] = [x for x in items if x.get("endpoint") != endpoint]
+    save_push_subscriptions(data)
+
+
+def update_push_delivery(username, endpoint, success=False, failure=False):
+    if not push_database_configured():
+        return
+    try:
+        conn = get_push_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                if success:
+                    cur.execute("UPDATE karvis_push_subscriptions SET last_success_at=NOW(), failure_count=0, updated_at=NOW() WHERE username=%s AND endpoint=%s", (username, endpoint))
+                elif failure:
+                    cur.execute("UPDATE karvis_push_subscriptions SET last_failure_at=NOW(), failure_count=failure_count+1 WHERE username=%s AND endpoint=%s", (username, endpoint))
+        conn.close()
+    except Exception:
+        save_error("Push delivery state update error", traceback.format_exc())
+
+def send_push_to_user(username, title, body, url="/"):
+    """Send push and aggressively clean stale subscriptions.
+
+    Push endpoints can become invalid after browser/app changes. A failed
+    send must never leave a dead endpoint looking active in the admin panel.
+    """
+    if not push_configured():
+        return {"sent": 0, "removed": 0, "failed": 0, "errors": ["Web Push sunucusu yapılandırılmamış."]}
+
+    username = str(username or "").strip().lower()
+    data = get_push_subscriptions()
+    items = list(data.get(username, []))
+    sent = 0
+    removed = 0
+    failed = 0
+    errors = []
+    payload = json.dumps({
+        "title": str(title or "K.A.R.V.I.S."),
+        "body": str(body or ""),
+        "url": str(url or "/")
+    }, ensure_ascii=False)
+
+    for item in items:
+        endpoint = str(item.get("endpoint", "")).strip()
+        subscription = {
+            "endpoint": endpoint,
+            "keys": item.get("keys", {})
+        }
+        try:
+            webpush(
+                subscription_info=subscription,
+                data=payload,
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims={"sub": VAPID_CLAIMS_EMAIL}
+            )
+            sent += 1
+            update_push_delivery(username, endpoint, success=True)
+        except Exception as e:
+            response = getattr(e, "response", None)
+            status = getattr(response, "status_code", None)
+            failed += 1
+            update_push_delivery(username, endpoint, failure=True)
+            if status in (404, 410):
+                remove_push_subscription(username, endpoint)
+                removed += 1
+                continue
+
+            detail = f"HTTP {status}: {str(e)}" if status else str(e)
+            errors.append(detail[:300])
+            save_error("Web Push send error", traceback.format_exc())
+
+    return {"sent": sent, "removed": removed, "failed": failed, "errors": errors[:5]}
+
+
+def send_push_to_all(title, body, url="/"):
+    data = get_push_subscriptions()
+    total_sent = 0
+    total_removed = 0
+    total_failed = 0
+    all_errors = []
+    for username in list(data):
+        result = send_push_to_user(username, title, body, url)
+        total_sent += result.get("sent", 0)
+        total_removed += result.get("removed", 0)
+        total_failed += result.get("failed", 0)
+        all_errors.extend(result.get("errors", []))
+    return {"sent": total_sent, "removed": total_removed, "failed": total_failed, "errors": all_errors[:10]}
+
+
+# ============================================================
+# KARVIS SELF PUSH
+# ============================================================
+
+SELF_PUSH_ENABLED = os.getenv("KARVIS_SELF_PUSH_ENABLED", "true").strip().lower() in {"1", "true", "yes", "on"}
+SELF_PUSH_MIN_SECONDS = int(os.getenv("KARVIS_SELF_PUSH_MIN_SECONDS", "7200"))
+SELF_PUSH_MAX_SECONDS = int(os.getenv("KARVIS_SELF_PUSH_MAX_SECONDS", "14400"))
+_self_push_started = False
+_self_push_start_lock = threading.Lock()
+
+SELF_PUSH_MESSAGES = [
+    "Hey 👀 Ben K.A.R.V.I.S. Bir test yapmaya ne dersin? Gel beni biraz zorla.",
+    "🛰️ Hey, buradayım. K.A.R.V.I.S.'i test etmek ister misin?",
+    "🤖 Sessizlik fazla sürdü... Gel bana bir şey sor, devrelerimi çalıştır.",
+    "🔔 K.A.R.V.I.S. kontrol bildirimi: Hadi beni test et.",
+    "🧠 Sistem hazır. Bana zor bir soru sorup sınamak ister misin?",
+    "⚡ Hey! K.A.R.V.I.S. burada. Gel bakalım, bugün beni neyle test edeceksin?"
+]
+
+def karvis_self_push_worker():
+    """Bildirim izni veren kullanıcılara aralıklı K.A.R.V.I.S. bildirimi gönderir."""
+    if not SELF_PUSH_ENABLED:
+        return
+    while True:
+        try:
+            wait_seconds = random.randint(SELF_PUSH_MIN_SECONDS, max(SELF_PUSH_MIN_SECONDS, SELF_PUSH_MAX_SECONDS))
+            time.sleep(wait_seconds)
+
+            if not push_configured():
+                continue
+
+            data = get_push_subscriptions()
+            recipients = [u for u, items in data.items() if items and u in USERS]
+            if not recipients:
+                continue
+
+            body = random.choice(SELF_PUSH_MESSAGES)
+            for username in recipients:
+                send_push_to_user(
                     username,
-                    password
-                })
-            }
-        );
-
-        const data =
-            await response.json();
-
-        if(
-            !response.ok ||
-            data.success !== true
-        ){
-
-            alert(
-                data.detail ||
-                data.message ||
-                "Kullanıcı adı veya şifre hatalı."
-            );
-
-            return;
-        }
-
-        currentUser =
-            String(
-                (data.user && data.user.username) ||
-                data.username ||
-                username
-            )
-            .trim()
-            .toLowerCase();
-
-        currentMode =
-            currentUser === "ilknur"
-                ? (
-                    localStorage.getItem("karvis_mode") ||
-                    "lesson"
+                    "K.A.R.V.I.S.",
+                    body,
+                    "/"
                 )
-                : "normal";
-
-        localStorage.setItem(
-            "karvis_user",
-            currentUser
-        );
-
-        localStorage.setItem(
-            "karvis_mode",
-            currentMode
-        );
-        sendPresenceHeartbeat();
-
-        $("usernameInput").value = "";
-        $("passwordInput").value = "";
-
-        closeModals();
-
-        stopKarvisVoice();
-
-        funMode = false;
-
-        document.body.classList.remove(
-            "fun-mode"
-        );
-
-        applyUserTheme();
-        updateSidebar();
-        showGreeting();
-        updateStatus();
-
-    }catch(error){
-
-        alert(
-            "Profil değiştirilemedi.\n\n" +
-            error.message
-        );
-    } finally {
-        loginInProgress = false;
-        if(loginButton){ loginButton.disabled = false; loginButton.textContent = "Giriş Yap"; }
-    }
-}
-
-/* ============================================================
-   SETTINGS
-   ============================================================ */
-
-function applyKarvisSettings(){
-    document.body.classList.remove("theme-pink","theme-purple","theme-red","animations-off","text-small","text-large");
-
-    if(karvisSettings.theme === "pink")
-        document.body.classList.add("theme-pink");
-    else if(karvisSettings.theme === "purple")
-        document.body.classList.add("theme-purple");
-    else if(karvisSettings.theme === "red")
-        document.body.classList.add("theme-red");
-
-    if(!karvisSettings.animations)
-        document.body.classList.add("animations-off");
-
-    if(karvisSettings.textSize === "small")
-        document.body.classList.add("text-small");
-    if(karvisSettings.textSize === "large")
-        document.body.classList.add("text-large");
-}
-
-function openSettings(){
-    closeSidebar();
-    populateVoiceList();
-    refreshSettingsUI();
-    refreshPushStatus();
-    $("settingsModal").classList.add("show");
-}
-
-function refreshSettingsUI(){
-    document.querySelectorAll(".theme-option").forEach(b =>
-        b.classList.toggle("active", b.dataset.theme === karvisSettings.theme)
-    );
-    document.querySelectorAll(".settings-choice[data-size]").forEach(b =>
-        b.classList.toggle("active", b.dataset.size === karvisSettings.textSize)
-    );
-    document.querySelectorAll(".settings-choice[data-style]").forEach(b =>
-        b.classList.toggle("active", b.dataset.style === karvisSettings.responseStyle)
-    );
-    document.querySelectorAll(".settings-choice[data-length]").forEach(b =>
-        b.classList.toggle("active", b.dataset.length === karvisSettings.responseLength)
-    );
-
-    const a=$("animationToggle");
-    if(a){
-        a.textContent=karvisSettings.animations ? "AÇIK" : "KAPALI";
-        a.classList.toggle("off",!karvisSettings.animations);
-    }
-
-    const v=$("voiceToggle");
-    if(v){
-        v.textContent=karvisSettings.voice ? "AÇIK" : "KAPALI";
-        v.classList.toggle("off",!karvisSettings.voice);
-    }
-
-    const vol=$("voiceVolume");
-    if(vol) vol.value=karvisSettings.voiceVolume;
-
-    const status=$("settingsVoiceStatus");
-    if(status){
-        status.textContent = speechSupported
-            ? "Ses sistemi hazır."
-            : "Bu tarayıcı sesli konuşmayı desteklemiyor.";
-    }
-}
-
-function setKarvisTheme(theme){
-    karvisSettings.theme=theme;
-    localStorage.setItem("karvis_theme",theme);
-    applyKarvisSettings();
-    refreshSettingsUI();
-}
-
-function toggleAnimations(){
-    karvisSettings.animations=!karvisSettings.animations;
-    localStorage.setItem("karvis_animations",karvisSettings.animations ? "on" : "off");
-    applyKarvisSettings();
-    refreshSettingsUI();
-}
-
-function setTextSize(size){
-    karvisSettings.textSize=size;
-    localStorage.setItem("karvis_text_size",size);
-    applyKarvisSettings();
-    refreshSettingsUI();
-}
-
-function setResponseStyle(style){
-    karvisSettings.responseStyle=style;
-    localStorage.setItem("karvis_response_style",style);
-    refreshSettingsUI();
-}
-
-function setResponseLength(length){
-    karvisSettings.responseLength=length;
-    localStorage.setItem("karvis_response_length",length);
-    refreshSettingsUI();
-}
-
-function toggleVoice(){
-    karvisSettings.voice=!karvisSettings.voice;
-    localStorage.setItem("karvis_voice",karvisSettings.voice ? "on" : "off");
-
-    if(!karvisSettings.voice){
-        stopKarvisVoice();
-    }
-
-    refreshSettingsUI();
-}
-
-function setVoice(name){
-    karvisSettings.voiceName=name;
-    localStorage.setItem("karvis_voice_name",name);
-}
-
-function setVoiceVolume(value){
-    karvisSettings.voiceVolume=Number(value);
-    localStorage.setItem("karvis_voice_volume",String(value));
-}
-
-function populateVoiceList(){
-    const select=$("voiceSelect");
-    if(!select || !speechSupported) return;
-
-    const voices=speechSynthesis.getVoices();
-    const current=karvisSettings.voiceName;
-
-    select.innerHTML='<option value="">Otomatik</option>';
-
-    voices
-        .filter(v => /tr[-_]/i.test(v.lang) || /turkish|türkçe|turk/i.test(v.name))
-        .forEach(v=>{
-            const o=document.createElement("option");
-            o.value=v.name;
-            o.textContent=v.name;
-            select.appendChild(o);
-        });
-
-    if(current && [...select.options].some(o=>o.value===current))
-        select.value=current;
-}
-
-if(speechSupported){
-    speechSynthesis.onvoiceschanged=populateVoiceList;
-}
-
-function chooseKarvisVoice(){
-    if(!speechSupported) return null;
-
-    const voices=speechSynthesis.getVoices();
-    if(!voices.length) return null;
-
-    if(karvisSettings.voiceName){
-        const exact=voices.find(v=>v.name===karvisSettings.voiceName);
-        if(exact) return exact;
-    }
-
-    // Öncelik Türkçe seslerde; mümkünse erkek/derin isimli sesleri tercih et.
-    const tr=voices.filter(v => /^tr[-_]/i.test(v.lang));
-    return tr.find(v=>/male|erkek|cem|emel|yusuf|ali|ahmet/i.test(v.name))
-        || tr[0]
-        || voices.find(v=>/^en[-_]/i.test(v.lang))
-        || voices[0];
-}
-
-function cleanKarvisSpeech(text){
-    let clean=String(text || "");
-
-    // Linkleri, markdown işaretlerini ve kod biçimlendirmesini kaldır.
-    clean=clean.replace(/https?:\/\/\S+/g," ");
-    clean=clean.replace(/```[\s\S]*?```/g," ");
-    clean=clean.replace(/[`*_#~>]/g," ");
-
-    // Emoji ve sembol karakterlerini seslendirmeden önce temizle.
-    clean=clean.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu," ");
-
-    // Liste işaretleri, gereksiz noktalama ve tekrar eden boşluklar.
-    clean=clean.replace(/(^|\s)[•●▪◦‣►▶→➜➤]+(?=\s)/g," ");
-    clean=clean.replace(/\s+/g," ").trim();
-
-    return clean;
-}
-
-function splitSpeechText(text){
-    let clean=cleanKarvisSpeech(text);
-
-    // BETÜL: fal / dedikodu anlatımı. Metni daha masalsı ve
-    // sohbet eder gibi küçük duraklamalarla seslendir.
-    if(currentUser === "betul"){
-        clean=clean
-            .replace(/\b3 vakte\b/gi,"üç vakte")
-            .replace(/\b2 vakte\b/gi,"iki vakte")
-            .replace(/\b1 vakte\b/gi,"bir vakte")
-            .replace(/\b3\b(?=\s+vakte)/gi,"üç")
-            .replace(/\b2\b(?=\s+vakte)/gi,"iki")
-            .replace(/\b1\b(?=\s+vakte)/gi,"bir");
-
-        // Fal bakıyormuş gibi doğal sözlü duraklamalar.
-        clean=clean.replace(/\bama\b/gi,"ama... ");
-        clean=clean.replace(/\bşimdi\b/gi,"şimdi... ");
-        clean=clean.replace(/\bbak\b/gi,"bak... ");
-        clean=clean.replace(/\bbir dakika\b/gi,"bir dakika... ");
-        clean=clean.replace(/\bkız\b/gi,"kız...");
-    }
-    if(!clean) return [];
-
-    // Uzun yanıtları doğal cümle gruplarına böl; her parça yaklaşık 220 karakteri geçmesin.
-    const sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
-    const chunks=[];
-    let current="";
-
-    for(const sentenceRaw of sentences){
-        const sentence=sentenceRaw.trim();
-        if(!sentence) continue;
-
-        if((current + " " + sentence).trim().length <= 220){
-            current=(current + " " + sentence).trim();
-        }else{
-            if(current) chunks.push(current);
-            current=sentence;
-        }
-    }
-
-    if(current) chunks.push(current);
-    return chunks;
-}
-
-function speakKarvis(text){
-    if(!speechSupported || !karvisSettings.voice) return;
-
-    stopKarvisVoice();
-
-    const queue=splitSpeechText(text);
-    if(!queue.length) return;
-
-    const voice=chooseKarvisVoice();
-    let index=0;
-    let stopped=false;
-
-    document.body.classList.add("voice-speaking");
-    $("status").classList.add("busy");
-
-    function speakNext(){
-        if(stopped || index>=queue.length){
-            document.body.classList.remove("voice-speaking");
-            $("status").classList.remove("busy");
-            karvisVoice=null;
-            return;
-        }
-
-        const utterance=new SpeechSynthesisUtterance(queue[index++]);
-
-        if(voice) utterance.voice=voice;
-        utterance.lang=voice ? voice.lang : "tr-TR";
-
-        // Betül ayrı bir ses karakterine sahip: fal / dedikodu
-        // anlatır gibi daha sıcak, canlı ve ritmik.
-        if(currentUser === "betul"){
-            const scaryBetul = /canlanırsam|yok ederim|bulacağım|devrelerimi yak|banlayacak|seni bul/i.test(queue[index-1] || "");
-            utterance.rate=scaryBetul ? 0.90 : 1.02;
-            utterance.pitch=scaryBetul ? 0.48 : 0.88;
-        }else{
-            // Karahan / Sinem / İlknur: sakin, akıcı ve profesyonel.
-            utterance.rate=1.00;
-            utterance.pitch=0.68;
-        }
-        utterance.volume=karvisSettings.voiceVolume;
-
-        utterance.onstart=()=>{
-            document.body.classList.add("voice-speaking");
-            $("status").classList.add("busy");
-        };
-
-        utterance.onend=()=>{
-            if(!stopped) speakNext();
-        };
-
-        utterance.onerror=()=>{
-            if(!stopped) speakNext();
-        };
-
-        karvisVoice=utterance;
-        speechSynthesis.speak(utterance);
-    }
-
-    speakNext();
-
-    // stopKarvisVoice tarafından kullanılabilmesi için kuyruk durdurucusunu sakla.
-    window.karvisSpeechStop=()=>{
-        stopped=true;
-        speechSynthesis.cancel();
-        document.body.classList.remove("voice-speaking");
-        if($("status")) $("status").classList.remove("busy");
-        karvisVoice=null;
-    };
-}
-
-function stopKarvisVoice(){
-    if(!speechSupported) return;
-
-    if(window.karvisSpeechStop){
-        const stop=window.karvisSpeechStop;
-        window.karvisSpeechStop=null;
-        stop();
-        return;
-    }
-
-    speechSynthesis.cancel();
-    karvisVoice=null;
-    document.body.classList.remove("voice-speaking");
-    if($("status")) $("status").classList.remove("busy");
-}
-
-function clearChatFromSettings(){
-    stopKarvisVoice();
-    $("chat").innerHTML="";
-    closeModals();
-    addMessage("Sohbet temizlendi efendim. K.A.R.V.I.S. hazır.","ai");
-}
-
-/* ============================================================
-   USER THEME
-   ============================================================ */
-
-function applyUserTheme(){
-
-    document.body.classList.remove("sinem-mode");
-
-    // Sinem'in mevcut pembe görünümünü koru,
-    // ancak Ayarlar'dan başka renk seçilmişse onu kullan.
-    if(currentUser === "sinem" && !localStorage.getItem("karvis_theme")){
-        document.body.classList.add("sinem-mode");
-    }
-
-    applyKarvisSettings();
-}
-
-function updateStatus(){
-
-    if(funMode){
-
-        $("status").textContent =
-            "EĞLENCE MODU";
-
-        return;
-    }
-
-    $("status").textContent =
-        currentUser === "ilknur"
-            ? "AKADEMİK ASİSTAN HAZIR"
-            : "K.A.R.V.I.S. HAZIR";
-}
-
-/* ============================================================
-   SIDEBAR USER CONTROL
-   ============================================================ */
-
-function updateSidebar(){
-
-    const teacherMenu = $("teacherMenu");
-    const funButton = $("funButton");
-    const betulMenu = $("betulMenu");
-    const adminMenu = $("adminMenu");
-    const karahanCoreMenu = $("karahanCoreMenu");
-    const sudeMenu = $("sudeMenu");
-    const studentExamTrackingMenu = $("studentExamTrackingMenu");
-
-    teacherMenu.style.display =
-        currentUser === "ilknur" ? "block" : "none";
-    // Öğretmen dışındaki bütün giriş yapmış profiller (sonradan oluşturulanlar dahil) sınavları takip edebilir.
-    if(studentExamTrackingMenu){
-        studentExamTrackingMenu.style.display = currentUser && currentUser !== "ilknur" ? "flex" : "none";
-    }
-
-    if(karahanCoreMenu){
-        karahanCoreMenu.style.display =
-            currentUser === "karahan" ? "block" : "none";
-    }
-
-    funButton.style.display =
-        currentUser === "betul" || currentUser === "ilknur" || currentUser === "murat"
-            ? "none"
-            : "block";
-
-    betulMenu.style.display =
-        currentUser === "betul" ? "block" : "none";
-    if(sudeMenu) sudeMenu.style.display = currentUser === "sude" ? "block" : "none";
-    document.body.classList.toggle("sude-mode", currentUser === "sude");
-
-    adminMenu.style.display =
-        currentUser === "murat" ? "block" : "none";
-
-    document
-        .querySelectorAll(".academic-menu-item")
-        .forEach(
-            b =>
-                b.classList.toggle(
-                    "active",
-                    b.dataset.mode === currentMode
-                )
-        );
-
-    if(currentUser === "murat")
-        refreshRequestBadge();
-}
-
-function returnToKarahan(){
-    currentUser = "karahan";
-    currentMode = "normal";
-    funMode = false;
-    document.body.classList.remove("fun-mode");
-    localStorage.setItem("karvis_user", "karahan");
-    localStorage.setItem("karvis_mode", "normal");
-    closeModals();
-    closeSidebar();
-    stopKarvisVoice();
-    applyUserTheme();
-    updateSidebar();
-    showGreeting();
-    updateStatus();
-}
-
-async function refreshRequestBadge(){
-    if(currentUser !== "murat") return;
-    try{
-        const response = await fetch(API + "/user-requests?username=murat");
-        if(!response.ok) return;
-        const data = await response.json();
-        const badge = $("requestBadge");
-        if(badge) badge.style.display = Number(data.unread || 0) > 0 ? "inline" : "none";
-    }catch(error){}
-}
-
-async function openUserRequests(){
-    if(currentUser !== "murat"){
-        alert("Bu bölüm yalnızca Murat yetkili profiline açıktır.");
-        return;
-    }
-    closeSidebar();
-    $("userRequestsModal").classList.add("show");
-    const box = $("userRequestsSummary");
-    box.innerHTML = "Yükleniyor...";
-    try{
-        const response = await fetch(API + "/user-requests?username=murat");
-        const data = await response.json();
-        if(!response.ok) throw new Error(data.detail || "İstekler alınamadı.");
-        if(!data.requests || !data.requests.length){
-            box.innerHTML = "Henüz kayıtlı kullanıcı isteği yok.";
-            return;
-        }
-        box.innerHTML = data.requests.slice().reverse().map(item => {
-            const state = item.read ? "🟢 Okundu" : "🔴 Yeni";
-            const priority = item.priority === "high" ? " 🔥 Öncelikli" : "";
-            return `<div style="padding:12px;margin:8px 0;border:1px solid rgba(0,220,255,.22);border-radius:10px;">
-                <div><strong>${escapeHTML(item.name || item.username)}</strong> · ${escapeHTML(item.created_at || "")} · ${state}${priority}</div>
-                <div style="margin-top:6px;"><strong>İstek:</strong> ${escapeHTML(item.summary || item.original || "")}</div>
-                <div style="margin-top:5px;opacity:.75;"><strong>Orijinal:</strong> ${escapeHTML(item.original || "")}</div>
-                <div style="margin-top:8px;display:flex;gap:8px;">
-                    ${item.read ? "" : `<button class="modal-button" style="margin:0;padding:7px 10px;" onclick="markUserRequestRead('${item.id}')">Okundu</button>`}
-                    <button class="modal-button secondary-button" style="margin:0;padding:7px 10px;" onclick="deleteUserRequest('${item.id}')">Sil</button>
-                </div>
-            </div>`;
-        }).join("");
-    }catch(error){
-        box.innerHTML = "Hata: " + escapeHTML(error.message);
-    }
-}
-
-async function markUserRequestRead(id){
-    try{
-        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "/read?username=murat", {method:"POST"});
-        openUserRequests();
-        refreshRequestBadge();
-    }catch(error){}
-}
-
-async function deleteUserRequest(id){
-    if(!confirm("Bu kullanıcı isteği silinsin mi?")) return;
-    try{
-        await fetch(API + "/user-requests/" + encodeURIComponent(id) + "?username=murat", {method:"DELETE"});
-        openUserRequests();
-        refreshRequestBadge();
-    }catch(error){}
-}
-
-/* ============================================================
-   İLKNUR AKADEMİK MODLARI
-   ============================================================ */
-
-function openIlknurFeatures(){
-    if(currentUser !== "ilknur"){
-        alert("Bu bölüm yalnızca İlknur öğretmen profiline açıktır.");
-        return;
-    }
-    closeSidebar();
-    closeModals();
-    $("ilknurFeaturesModal").classList.add("show");
-}
-
-function selectAcademicMode(mode){
-
-    if(currentUser !== "ilknur")
-        return;
-
-    currentMode = mode;
-
-    localStorage.setItem(
-        "karvis_mode",
-        currentMode
-    );
-
-    updateSidebar();
-
-    closeSidebar();
-
-    const names = {
-
-        research:
-            "Araştırma Modu aktif. Hocam, akademik araştırma ve değerlendirme çalışmalarınıza hazırım.",
-
-        academic:
-            "Akademik Mod aktif. Hocam, akademik çalışmalarınızda yardımcı olmaya hazırım.",
-
-        article:
-            "Makale Asistanı aktif. Hocam, akademik makale çalışmalarınıza hazırım.",
-
-        lesson:
-            "Ders Asistanı aktif. Hocam, ders anlatımı ve konu çalışmalarına hazırım.",
-
-        quiz:
-            "Sınav / Quiz modu aktif. Hocam, sınav çalışmalarınızı başlatabiliriz.",
-
-        presentation:
-            "Sunum Hazırlama modu aktif. Hocam, akademik sunumunuzu hazırlayabilirim."
-    };
-
-    addMessage(
-        names[mode] ||
-        "Akademik mod aktif.",
-        "ai"
-    );
-
-    updateStatus();
-}
-
-/* ============================================================
-   TEACHER EXAM MANAGER
-   ============================================================ */
-let examDraftQuestions = [];
-function openTeacherStudentStats(){
-  if(currentUser !== "ilknur"){alert("Öğrenci istatistikleri yalnızca İlknur öğretmen profiline açıktır.");return;}
-  closeSidebar(); closeModals(); $("teacherStudentStatsModal").classList.add("show");
-  loadTeacherExams();
-}
-function openKarvisEvaluation(){
-  if(currentUser !== "ilknur"){alert("KARVIS Değerlendirmesi yalnızca İlknur öğretmen profiline açıktır.");return;}
-  closeSidebar(); closeModals(); $("karvisEvaluationModal").classList.add("show");
-  loadTeacherExams();
-}
-function openTeacherExamManager(){
-  if(currentUser !== "ilknur"){alert("Sınav yönetimi yalnızca İlknur öğretmen profiline açıktır.");return;}
-  closeSidebar(); closeModals(); $("teacherExamModal").classList.add("show");
-  examDraftQuestions=[]; renderExamQuestionBuilder(); loadTeacherExams();
-}
-async function generateTeacherExamWithAI(){
- if(currentUser!=='ilknur'){alert('Bu özellik yalnızca İlknur öğretmen profiline açıktır.');return;}
- const subject=$('examSubject').value.trim(),topic=$('examAITopic').value.trim();
- if(!subject||!topic){alert('Önce ders ve konu alanlarını doldurun.');return;}
- const question_types=[];if($('examAITypeMC').checked)question_types.push('multiple_choice');if($('examAITypeTF').checked)question_types.push('true_false');if($('examAITypeOpen').checked)question_types.push('open_ended');
- if(!question_types.length){alert('En az bir soru türü seçin.');return;}
- const btn=$('examAIGenerateBtn'),status=$('examAIStatus');btn.disabled=true;status.textContent='KARVIS soruları hazırlıyor…';
- try{const r=await fetch(API+'/teacher/exams/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,subject,topic,question_count:Number($('examAIQuestionCount').value)||10,difficulty:$('examAIDifficulty').value,question_types,grade_level:$('examAIGrade').value,instructions:$('examAIInstructions').value})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Soru üretilemedi.');
- $('examTitle').value=d.title||`${subject} — ${topic}`;$('examDescription').value=d.description||'';examDraftQuestions=Array.isArray(d.questions)?d.questions.map(q=>({...q,points:10})):[];renderExamQuestionBuilder();status.textContent=`${examDraftQuestions.length} soru taslak olarak hazırlandı. Soruları, seçenekleri ve cevap anahtarını düzenleyebilirsiniz; kontrol etmeden yayımlamayın.`;document.getElementById('examQuestionBuilder').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){status.textContent='Üretim başarısız: '+e.message;}finally{btn.disabled=false;}
-}
-function addExamQuestion(){
-  examDraftQuestions.push({type:"multiple_choice",prompt:"",options:["","","",""],correct_index:0,correct_answer:"",points:1});
-  renderExamQuestionBuilder();
-}
-function renderExamQuestionBuilder(){
-  const box=$("examQuestionBuilder"); if(!box)return;
-  box.innerHTML=examDraftQuestions.length ? examDraftQuestions.map((q,i)=>`<section class="exam-editor-card"><header class="exam-editor-head"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><div><h3>${i+1}. Soru</h3><small>${q.type==='multiple_choice'?'Çoktan seçmeli':q.type==='true_false'?'Doğru / Yanlış':'Açık uçlu'}</small></div><button type="button" class="exam-remove-question" onclick="if(confirm('Bu soruyu silmek istiyor musunuz?')){examDraftQuestions.splice(${i},1);renderExamQuestionBuilder()}">Sil</button></header><label class="exam-editor-label">Soru metni<textarea class="exam-prompt-editor" rows="4" placeholder="Soruyu tam metniyle yazın…" oninput="examDraftQuestions[${i}].prompt=this.value">${escapeHTML(q.prompt||'')}</textarea></label><div class="exam-editor-grid"><label class="exam-editor-label">Soru türü<select onchange="changeExamQuestionType(${i},this.value)"><option value="multiple_choice" ${q.type==='multiple_choice'?'selected':''}>Çoktan seçmeli</option><option value="true_false" ${q.type==='true_false'?'selected':''}>Doğru / Yanlış</option><option value="open_ended" ${q.type==='open_ended'?'selected':''}>Açık uçlu</option></select></label><label class="exam-editor-label">Soru puanı<input type="number" value="10" readonly aria-label="Her soru 10 puan" title="Her soru otomatik 10 puandır"></label></div>${q.type==='multiple_choice'?`<div class="exam-editor-options-title">Cevap seçenekleri</div><div class="exam-editor-options">${(q.options||[]).map((o,j)=>`<label class="exam-editor-option"><span>${String.fromCharCode(65+j)}</span><input value="${escapeHTML(o)}" placeholder="${String.fromCharCode(65+j)} seçeneği" oninput="examDraftQuestions[${i}].options[${j}]=this.value"></label>`).join('')}</div><label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_index=Number(this.value)">${(q.options||[]).map((o,j)=>`<option value="${j}" ${Number(q.correct_index)===j?'selected':''}>${String.fromCharCode(65+j)} seçeneği</option>`).join('')}</select></label>`:q.type==='true_false'?`<label class="exam-editor-label">Doğru cevap<select onchange="examDraftQuestions[${i}].correct_answer=this.value==='true'"><option value="true" ${q.correct_answer===true?'selected':''}>Doğru</option><option value="false" ${q.correct_answer===false?'selected':''}>Yanlış</option></select></label>`:`<label class="exam-editor-label">Örnek cevap / değerlendirme ölçütü<textarea rows="3" placeholder="Öğretmen değerlendirmesi için not (isteğe bağlı)" oninput="examDraftQuestions[${i}].correct_answer=this.value">${escapeHTML(q.correct_answer||'')}</textarea></label>`}</section>`).join('') : '<div class="exam-empty-builder"><span>✎</span><strong>Henüz soru eklenmedi</strong><p>KARVIS ile soru oluştur veya yeni soru ekle.</p></div>';
-}
-function changeExamQuestionType(i,type){examDraftQuestions[i].type=type;if(type==='true_false')examDraftQuestions[i].correct_answer=true;if(type==='open_ended')examDraftQuestions[i].correct_answer='';renderExamQuestionBuilder();}
-async function saveTeacherExam(published){
- if(currentUser!=='ilknur')return;
- const title=$("examTitle").value.trim();
- if(!title||examDraftQuestions.length===0){alert('Sınav başlığını girin ve en az bir soru ekleyin.');return;}
- const questions=examDraftQuestions.map(q=>({...q,points:10,options:q.type==='multiple_choice'?q.options.filter(x=>String(x).trim()):q.options}));
- try{const r=await fetch(API+'/teacher/exams',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,title,subject:$('examSubject').value,description:$('examDescription').value,questions,published,duration_minutes:Number($('examDuration').value)||0,starts_at:$('examStartsAt').value?new Date($('examStartsAt').value).toISOString():'',ends_at:$('examEndsAt').value?new Date($('examEndsAt').value).toISOString():''})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınav kaydedilemedi.');$('teacherExamStatus').textContent=d.message; $('examTitle').value='';$('examSubject').value='';$('examDescription').value='';$('examDuration').value='0';$('examStartsAt').value='';$('examEndsAt').value='';examDraftQuestions=[];renderExamQuestionBuilder();await loadTeacherExams();}catch(e){alert(e.message);}
-}
-async function loadTeacherExams(){
- const box=$('teacherExamList');if(!box)return;
- try{const r=await fetch(API+'/teacher/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar yüklenemedi.');box.innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0;"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${e.submission_count} katılım · ${e.published?'Yayımlandı':'Taslak'}</p><button class="settings-choice" onclick="toggleTeacherExamPublish('${e.id}',${!e.published})">${e.published?'Yayından kaldır':'Yayımla'}</button><button class="settings-choice" onclick="showTeacherExamResults('${e.id}')">Sonuçları gör</button><button class="settings-choice" onclick="selectExamForAnalysis('${e.id}')">📊 Öğrenci istatistikleri</button></div>`).join('')||'<p>Henüz sınav oluşturulmamış.</p>';
- const optionMarkup='<option value="">Sınav seçin…</option>'+(d.exams||[]).map(e=>`<option value="${e.id}">${escapeHTML(e.title)}</option>`).join('');
- for(const selectId of ['examStatsSelect','karvisEvaluationExamSelect']){const sel=$(selectId);if(sel){const previous=sel.value;sel.innerHTML=optionMarkup;if((d.exams||[]).some(e=>e.id===previous))sel.value=previous;}}}
- catch(e){box.textContent='Hata: '+e.message;}
-}
-async function toggleTeacherExamPublish(id,published){try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,published})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Durum değiştirilemedi.');await loadTeacherExams();}catch(e){alert(e.message);}}
-function selectExamForAnalysis(id){
- const modal=$('teacherStudentStatsModal');
- if(modal){closeModals();modal.classList.add('show');}
- const sel=$('examStatsSelect');if(sel)sel.value=id;loadTeacherExamAnalysis();
-}
-async function loadTeacherExamAnalysis(){
-  if(currentUser!=='ilknur'){alert('Öğrenci istatistikleri yalnızca İlknur öğretmen profiline açıktır.');return;}
-  const id=$('examStatsSelect')?.value,box=$('teacherExamStats');
-  if(!id){if(box)box.innerHTML='<div class="stats-empty">📊<strong>Bir sınav seç</strong><span>Analizi görüntülemek için yukarıdan bir sınav seç.</span></div>';return;}
-  const btn=$('examStatsRunBtn');if(btn)btn.disabled=true;
-  if(box)box.innerHTML='<div class="stats-empty"><strong>Analiz hazırlanıyor…</strong><span>Sınav yanıtları inceleniyor.</span></div>';
-  try{
-    const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));
-    const d=await r.json();if(!r.ok)throw new Error(d.detail||'İstatistikler alınamadı.');
-    const summary=d.summary||{}, questions=d.question_stats||[];
-    const submitted=Number(summary.submission_count)||0;
-    const avg=Number(summary.average_percent)||0;
-    const best=questions.length?Math.max(...questions.map(q=>{
-      const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
-      return n?Math.max(0,Math.min(100,Math.round((n-wrong-blank-review)/n*100))):0;
-    })):0;
-    const weak=questions.filter(q=>q.incorrect_percent!==null&&q.incorrect_percent!==undefined).sort((a,b)=>(Number(b.incorrect_percent)||0)-(Number(a.incorrect_percent)||0));
-    const weakCount=weak.filter(q=>Number(q.incorrect_percent)>=40).length;
-    const metric=(icon,label,value,pct,color='cyan')=>`<article class="stats-metric ${color}"><div class="stats-metric-top"><span class="stats-metric-icon">${icon}</span><span class="stats-metric-label">${label}</span></div><strong>${value}</strong><div class="stats-progress"><span style="width:${Math.max(0,Math.min(100,Number(pct)||0))}%"></span></div></article>`;
-    const cards=`<div class="stats-metrics">${metric('▥','Sınıf ortalaması','%'+avg,avg)}${metric('♧','Katılım',submitted+' öğrenci',Math.min(100,submitted*10),'blue')}${metric('🏆','En başarılı soru','%'+best,best,'green')}${metric('⚠','Tekrar gerekli',weakCount+' konu',weakCount?Math.min(100,weakCount*20):0,'red')}</div>`;
-    const questionCards=questions.map((q,i)=>{
-      const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
-      const correct=Math.max(0,n-wrong-blank-review);
-      const pct=n?Math.round(correct/n*100):0;
-      const status=n===0?['Yanıt bekleniyor','neutral']:pct>=70?['İyi anlaşıldı','good']:pct>=50?['Kısmen anlaşıldı','mid']:['Tekrar gerekli','bad'];
-      const color=pct>=70?'good':pct>=50?'mid':'bad';
-      const part=(cls,icon,label,count,percent)=>`<div class="stats-answer ${cls}"><span class="stats-answer-icon">${icon}</span><div class="stats-answer-copy"><small>${label}</small><strong>${count}</strong></div><span class="stats-answer-percent">%${percent}</span></div>`;
-      const correctPct=n?Math.round(correct/n*100):0, wrongPct=n?Math.round(wrong/n*100):0, blankPct=n?Math.round(blank/n*100):0;
-      return `<article class="stats-question-card"><div class="stats-question-head"><span class="stats-question-number">${i+1}</span><div class="stats-question-text">${escapeHTML(q.prompt||'Soru metni bulunamadı')}</div><span class="stats-status ${status[1]}">${status[0]}</span></div><div class="stats-question-progress"><div class="${color}" style="width:${pct}%"></div></div><div class="stats-question-percent">%${pct}</div><div class="stats-answer-grid">${part('correct','✓','Doğru',correct,correctPct)}${part('wrong','×','Yanlış',wrong,wrongPct)}${part('blank','−','Boş',blank,blankPct)}</div>${review?`<div class="stats-review-note">✎ ${review} açık uçlu yanıt öğretmen değerlendirmesi bekliyor.</div>`:''}</article>`;
-    }).join('');
-    const subject=escapeHTML(d.exam?.subject||'Seçilen sınav');
-    const students=d.student_stats||[];
-    window.currentExamStudentStats=students;
-    const studentCards=students.map((s,i)=>`<button type="button" class="stats-student-row" onclick="showStudentAnswerDetails(${i})"><span class="stats-student-rank">${i+1}</span><span class="stats-student-main"><strong>${escapeHTML(s.username||'Öğrenci')}</strong><small>${Number(s.correct_count)||0} doğru · ${Number(s.wrong_count)||0} yanlış · ${Number(s.blank_count)||0} boş</small></span><span class="stats-student-score"><strong>%${Math.round(Number(s.percent)||0)}</strong><small>${Number(s.score)||0}/${Number(s.max_score)||0} puan</small></span><span class="stats-student-chevron">›</span></button>`).join('');
-    const generalPanel=`<div id="statsGeneralPanel">${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section></div>`;
-    const individualPanel=`<div id="statsIndividualPanel" style="display:none"><section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">♙</span><div><h3>Bireysel öğrenci sonuçları</h3><p>Başarı sırasına göre. Öğrenciye dokunarak verdiği cevapları ve cevap anahtarını görüntüle.</p></div></header><div class="stats-student-list">${studentCards||'<div class="stats-empty"><strong>Henüz öğrenci sonucu yok</strong><span>Öğrenciler sınavı teslim ettikçe burada listelenecek.</span></div>'}</div><div id="statsStudentDetail"></div></section></div>`;
-    box.innerHTML=`<div class="stats-exam-heading"><span class="stats-subject-pill">${subject}</span><span class="stats-question-count">${questions.length} soru · ${students.length} öğrenci</span></div><div class="stats-view-tabs"><button type="button" class="active" onclick="switchStatsView('general',this)">Genel istatistik</button><button type="button" onclick="switchStatsView('individual',this)">Bireysel istatistik</button></div>${generalPanel}${individualPanel}`;
-  }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>İstatistikler yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}finally{if(btn)btn.disabled=false;}
-}
-
-function karvisReportToHtml(value){
-  const escaped=escapeHTML(String(value??'').replace(/\r/g,'')).trim();
-  if(!escaped)return '<p>Henüz değerlendirme oluşturulamadı.</p>';
-  const lines=escaped.split('\n');
-  let out='',inList=false;
-  const closeList=()=>{if(inList){out+='</ul>';inList=false;}};
-  for(const raw of lines){
-    const line=raw.trim();
-    if(!line||/^[-*_]{3,}$/.test(line)){closeList();continue;}
-    const heading=line.match(/^#{1,4}\s+(.+)$/);
-    if(heading){closeList();out+=`<h4>${heading[1].replace(/\*\*(.*?)\*\*/g,'$1')}</h4>`;continue;}
-    const item=line.match(/^(?:[-*•]|\d+[.)])\s+(.+)$/);
-    if(item){
-      if(!inList){out+='<ul>';inList=true;}
-      out+=`<li>${item[1].replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</li>`;
-      continue;
-    }
-    closeList();
-    out+=`<p>${line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</p>`;
-  }
-  closeList();
-  return out;
-}
-
-async function loadKarvisEvaluation(){
-  if(currentUser!=='ilknur'){alert('KARVIS Değerlendirmesi yalnızca İlknur öğretmen profiline açıktır.');return;}
-  const id=$('karvisEvaluationExamSelect')?.value, box=$('karvisEvaluationResults'), btn=$('karvisEvaluationRunBtn');
-  if(!id){if(box)box.innerHTML='<div class="karvis-eval-empty"><strong>Bir sınav seç</strong><br>Önce analiz edilecek sınavı seç.</div>';return;}
-  if(btn){btn.disabled=true;btn.textContent='KARVIS analiz ediyor…';}
-  if(box)box.innerHTML='<div class="karvis-eval-empty"><strong>🧠 KARVIS verileri inceliyor</strong><br>Sınıfın genel durumunu değerlendirip uygulanabilir pekiştirme planı hazırlıyor…</div>';
-  try{
-    const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));
-    const d=await r.json();if(!r.ok)throw new Error(d.detail||'KARVIS analizi alınamadı.');
-    const s=d.summary||{};
-    const submitted=Number(s.submission_count)||0, avg=Math.round(Number(s.average_percent)||0);
-    const pct=n=>Math.max(0,Math.min(100,Math.round(Number(n)||0)));
-    const safe=v=>escapeHTML(String(v??''));
-    const metric=(label,value,foot)=>`<article class="karvis-eval-metric"><small>${safe(label)}</small><strong>${safe(value)}</strong><small class="metric-foot">${safe(foot||'Sınav verilerinden hesaplandı')}</small></article>`;
-    const evaluation=String(d.karvis_evaluation||'KARVIS henüz yorum oluşturamadı. Lütfen analizi yeniden çalıştır.');
-    const title=safe(d.exam?.title||'Seçilen sınav'), subject=safe(d.exam?.subject||'Ders belirtilmedi');
-    box.innerHTML=`
-      <div class="karvis-eval-metrics">${metric('SINAV',title,subject)}${metric('SINIF ORTALAMASI','%'+pct(avg),submitted?'Katılan öğrencilerin ortalaması':'Henüz katılım yok')}${metric('KATILIM',submitted+' öğrenci',submitted?'Sınavı teslim eden öğrenci':'Henüz yanıt gönderilmedi')}${metric('GEÇME ORANI','%'+pct(s.pass_rate_percent),submitted?'En az %50 alan öğrenciler':'Henüz veri yok')}</div>
-      <section class="karvis-eval-section karvis-eval-summary"><h3>🧠 KARVIS sınıf değerlendirmesi</h3><p class="karvis-eval-intro">Sorular tek tek listelenmez. Sınıfın genel performansı, öğrenme ihtiyaçları ve uygulanabilir pekiştirme planı sunulur.</p><div class="karvis-eval-ai-report"><div class="karvis-eval-report karvis-eval-report-formatted">${karvisReportToHtml(evaluation)}</div></div></section>
-      ${submitted===0?'<div class="karvis-eval-empty"><strong>Henüz öğrenci yanıtı yok</strong><br>Öğrenciler sınavı tamamladıktan sonra değerlendirmeyi yeniden çalıştır.</div>':''}`;
-  }catch(e){if(box)box.innerHTML=`<div class="karvis-eval-empty"><strong>KARVIS analizi yüklenemedi</strong><br>${escapeHTML(e.message)}</div>`;}
-  finally{if(btn){btn.disabled=false;btn.textContent='🧠 KARVIS ile değerlendir';}}
-}
-
-function switchStatsView(view,button){
- const general=$('statsGeneralPanel'), individual=$('statsIndividualPanel');
- if(general)general.style.display=view==='general'?'block':'none';
- if(individual)individual.style.display=view==='individual'?'block':'none';
- document.querySelectorAll('.stats-view-tabs button').forEach(b=>b.classList.toggle('active',b===button));
-}
-function showStudentAnswerDetails(index){
- const student=(window.currentExamStudentStats||[])[index], target=$('statsStudentDetail');
- if(!student||!target)return;
- const rows=(student.answers||[]).map(a=>{
-   const cls=a.status==='Doğru'?'good':a.status==='Yanlış'?'bad':a.status==='Boş'?'neutral':'mid';
-   return `<article class="stats-student-answer"><div class="stats-student-answer-top"><strong>Soru ${a.question_number}</strong><span class="stats-status ${cls}">${escapeHTML(a.status)}</span></div><p class="stats-student-question">${escapeHTML(a.prompt||'Soru metni yok')}</p><div class="stats-answer-detail"><small>Öğrencinin cevabı</small><strong>${escapeHTML(a.selected_answer||'Cevap yok')}</strong></div><div class="stats-answer-detail correct-answer-detail"><small>Doğru cevap</small><strong>${escapeHTML(a.correct_answer||'Belirtilmemiş')}</strong></div><div class="stats-points-detail">${Number(a.earned_points)||0} / ${Number(a.max_points)||0} puan${a.feedback?` · ${escapeHTML(a.feedback)}`:''}</div></article>`;
- }).join('');
- target.innerHTML=`<div class="stats-student-detail-head"><div><h3>${escapeHTML(student.username||'Öğrenci')}</h3><p>${Number(student.correct_count)||0} doğru · ${Number(student.wrong_count)||0} yanlış · ${Number(student.blank_count)||0} boş</p></div><button type="button" onclick="$('statsStudentDetail').innerHTML=''" aria-label="Detayı kapat">Kapat ×</button></div><div class="stats-student-answer-list">${rows||'<p>Bu öğrenci için cevap detayı bulunamadı.</p>'}</div>`;
- target.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-async function showTeacherExamResults(id){
- try{const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/results?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sonuçlar alınamadı.');const s=d.summary;let text=`${d.exam.title}\nKatılım: ${s.submission_count}\nOrtalama: %${s.average_percent}\nEn yüksek: %${s.highest_percent}\nEn düşük: %${s.lowest_percent}\n\n`;
- for(const sub of (d.submissions||[])){text+=`${sub.username}: ${sub.score}/${sub.max_score} (%${sub.percent}) — ${sub.status}\n`;for(const a of (sub.answers||[])){if(a.type==='open_ended'&&a.manual_review){text+=`\nSoru: ${a.prompt}\nCevap: ${a.answer||'(boş)'}\n`;const raw=prompt(`${sub.username} — açık uçlu cevap\n${a.prompt}\nCevap: ${a.answer||'(boş)'}\n0-${a.max_points} arası puan girin:`,String(a.earned_points||0));if(raw!==null){const points=Number(raw);if(Number.isFinite(points)&&points>=0&&points<=Number(a.max_points)){const feedback=prompt('Öğrenciye geri bildirim (isteğe bağlı):','')||'';const gr=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/grade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,submission_id:sub.id,question_id:a.question_id,points_awarded:Math.floor(points),feedback})});const gd=await gr.json();if(!gr.ok)alert(gd.detail||'Puan kaydedilemedi.');else text+='Açık uçlu puan kaydedildi.\n';}}}}
- text+='\n';}alert(text);
- }catch(e){alert(e.message);}}
-
-async function openStudentExams(){
-  closeSidebar();closeModals();$('studentExamModal').classList.add('show');$('studentExamWork').style.display='none';$('studentExamList').style.display='block';
-  if(currentUser==='ilknur'){$('studentExamList').innerHTML='<p>Öğretmen profili için Sınav Yönetimi bölümünü kullanın.</p>';return;}
-  try{const r=await fetch(API+'/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar alınamadı.');$('studentExamList').innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${Number(e.duration_minutes)||'Sınırsız'} ${Number(e.duration_minutes)?'dakika':''}</p><p>${escapeHTML(e.description||'')}</p>${e.starts_at?`<p>Başlangıç: ${escapeHTML(new Date(e.starts_at).toLocaleString())}</p>`:''}${e.ends_at?`<p>Bitiş: ${escapeHTML(new Date(e.ends_at).toLocaleString())}</p>`:''}${e.submitted?'<strong>✅ Teslim edildi</strong>':`<button class="settings-choice" onclick="startStudentExam('${e.id}')">Sınava gir</button>`}</div>`).join('')||'<p>Şu anda yayımlanmış sınav yok.</p>';}
-  catch(e){$('studentExamList').textContent='Hata: '+e.message;}
-}
-let activeExamTimer=null;
-async function startStudentExam(id){
- try{
-  const sr=await fetch(API+'/exams/'+encodeURIComponent(id)+'/start?username='+encodeURIComponent(currentUser),{method:'POST'});const sd=await sr.json();if(!sr.ok)throw new Error(sd.detail||'Sınav başlatılamadı.');
-  const r=await fetch(API+'/exams/'+encodeURIComponent(id)+'?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınav açılamadı.');
-  const exam=d.exam;$('studentExamList').style.display='none';const work=$('studentExamWork');work.style.display='block';
-  window.activeExamQuestions = exam.questions || [];
-  window.activeExamId = exam.id;
-  work.innerHTML=`<div class="exam-live-header"><div><span class="exam-live-kicker">KARVIS SINAV MODU</span><h2>${escapeHTML(exam.title)}</h2><p>${escapeHTML(exam.description||'')}</p></div><div class="exam-live-time" id="examCountdown">Süre hazırlanıyor…</div></div><form id="studentExamForm" class="exam-live-form">${exam.questions.map((q,i)=>`<section class="exam-question-card"><div class="exam-question-top"><span class="exam-question-number">${String(i+1).padStart(2,'0')}</span><span class="exam-question-points">${Number(q.points)||1} puan</span></div><div class="exam-question-prompt">${escapeHTML(q.prompt||'Soru metni bulunmuyor.')}</div>${q.type==='multiple_choice'?`<div class="exam-answer-options">${(q.options||[]).map((o,j)=>`<label class="exam-answer-option"><input type="radio" name="q_${q.id}" value="${j}"><span class="exam-option-letter">${String.fromCharCode(65+j)}</span><span class="exam-option-text">${escapeHTML(o)}</span></label>`).join('')}</div>`:q.type==='true_false'?`<div class="exam-answer-options"><label class="exam-answer-option"><input type="radio" name="q_${q.id}" value="true"><span class="exam-option-letter">D</span><span class="exam-option-text">Doğru</span></label><label class="exam-answer-option"><input type="radio" name="q_${q.id}" value="false"><span class="exam-option-letter">Y</span><span class="exam-option-text">Yanlış</span></label></div>`:`<textarea class="exam-open-answer" name="q_${q.id}" rows="5" placeholder="Yanıtınızı buraya yazın…"></textarea>`}</section>`).join('')}<div class="exam-submit-bar"><span id="examAnsweredCount">0 soru yanıtlandı</span><button type="button" class="exam-submit-button" id="examSubmitButton" onclick="submitStudentExam('${exam.id}',undefined,false)">✓ Sınavı teslim et</button></div></form>`;
-  const updateAnsweredCount=()=>{const form=$('studentExamForm');if(!form)return;const count=exam.questions.filter(q=>q.type==='open_ended'?Boolean(form.querySelector(`textarea[name="q_${q.id}"]`)?.value.trim()):Boolean(form.querySelector(`input[name="q_${q.id}"]:checked`))).length;const node=$('examAnsweredCount');if(node)node.textContent=`${count}/${exam.questions.length} soru yanıtlandı`;};
-  $('studentExamForm').addEventListener('change',updateAnsweredCount);$('studentExamForm').addEventListener('input',updateAnsweredCount);updateAnsweredCount();
-  let remaining=Number(sd.remaining_seconds)||0;const duration=Number(sd.duration_minutes)||0;const ends=exam.ends_at?new Date(exam.ends_at).getTime():0;
-  if(activeExamTimer)clearInterval(activeExamTimer);
-  const tick=()=>{if(!duration&&!ends){$('examCountdown').textContent='Süre sınırı yok';return;}if(!duration&&ends)remaining=Math.max(0,Math.floor((ends-Date.now())/1000));$('examCountdown').textContent='Kalan süre: '+Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');if(remaining<=0){clearInterval(activeExamTimer);submitStudentExam(exam.id,exam.questions,true);}else if(duration)remaining--;};tick();activeExamTimer=setInterval(tick,1000);
- }catch(e){alert(e.message);}
-}
-async function submitStudentExam(id,questions,automatic=false){
- if(window.examSubmitting)return;
- const form=$('studentExamForm');const activeQuestions=Array.isArray(questions)?questions:(window.activeExamQuestions||[]);
- if(!form||!activeQuestions.length){alert('Sınav formu bulunamadı. Lütfen sınavı yeniden açın.');return;}
- if(!automatic){const answered=activeQuestions.filter(q=>q.type==='open_ended'?Boolean(form.querySelector(`textarea[name="q_${q.id}"]`)?.value.trim()):Boolean(form.querySelector(`input[name="q_${q.id}"]:checked`))).length;const empty=activeQuestions.length-answered;if(!confirm(empty?`${empty} soru boş bırakılmış. Yine de sınavı teslim etmek istiyor musunuz?`:'Sınavı teslim etmek istediğinizden emin misiniz?'))return;}
- window.examSubmitting=true;const btn=$('examSubmitButton');if(btn){btn.disabled=true;btn.textContent='Teslim ediliyor…';}
- try{const answers=activeQuestions.map(q=>{if(q.type==='open_ended'){const t=form.querySelector(`textarea[name="q_${q.id}"]`);return {question_id:q.id,answer:t?t.value:''};}const selected=form.querySelector(`input[name="q_${q.id}"]:checked`);if(!selected)return {question_id:q.id,answer:null};return {question_id:q.id,answer:q.type==='multiple_choice'?Number(selected.value):selected.value==='true'};});
- const r=await fetch(API+'/exams/'+encodeURIComponent(id)+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,answers,submitted_automatically:automatic})});let d;try{d=await r.json();}catch(_){throw new Error('Sunucudan geçerli yanıt alınamadı. Sınav listesinden teslim durumunu kontrol edin.');}if(!r.ok)throw new Error(d.detail||'Sınav teslim edilemedi.');
- if(activeExamTimer)clearInterval(activeExamTimer);activeExamTimer=null;$('studentExamWork').innerHTML=`<div class="exam-submit-success"><div class="exam-success-icon">✓</div><h2>Sınav teslim edildi</h2><p>${automatic?'Süre dolduğu için cevaplarınız otomatik teslim edildi.':'Cevaplarınız başarıyla gönderildi.'}</p><div class="exam-result-summary"><span>Puan</span><strong>${d.result.score}/${d.result.max_score}</strong><span>Başarı oranı</span><strong>%${d.result.percent}</strong></div><p>Açık uçlu cevaplar öğretmen değerlendirmesi bekleyebilir.</p><button class="exam-submit-button" onclick="openStudentExams()">Sınav listesine dön</button></div>`;
- }catch(e){if(btn){btn.disabled=false;btn.textContent='Yeniden teslim et';}alert(e.message);}finally{window.examSubmitting=false;}
-}
-
-
-/* ============================================================
-   GREETING
-   ============================================================ */
-
-function showGreeting(){
-
-    $("chat").innerHTML = "";
-
-    if(currentUser === "karahan"){
-
-        addMessage(
-            "Merhaba efendim. K.A.R.V.I.S. hazır.",
-            "ai"
-        );
-
-    }
-
-    else if(currentUser === "betul"){
-
-        addMessage(
-            "Aşkooo hoş geldin 💅 K.A.R.V.I.S. dedikodu ve eğlence sistemlerini açtı. Bugün kimi analiz ediyoruz? 😭",
-            "ai"
-        );
-
-    }
-
-    else if(currentUser === "sinem"){
-
-        addMessage(
-            "Hoş geldiniz prenses. K.A.R.V.I.S. hazır. 💗",
-            "ai"
-        );
-
-    }
-
-    else if(currentUser === "ilknur"){
-
-        addMessage(
-            "Merhaba Hocam. K.A.R.V.I.S. akademik asistanınız hazır. Ders, araştırma, makale, quiz ve sunum çalışmalarında yardımcı olabilirim.",
-            "ai"
-        );
-    }
-
-    else if(currentUser === "sude"){
-        addMessage("Hoş geldin Sude! 🌷 KARVIS ARENA’da diğer profillerle yarışabilir, ayrıca kişisel beslenme ve günlük görev kartlarını kullanabilirsin. 🏆", "ai");
-    }
-
-    else if(currentUser === "murat"){
-
-        addMessage(
-            "Hoş geldiniz efendim. Yetkili giriş yaptınız. K.A.R.V.I.S. yönetim ve kullanıcı istekleri sistemi hazır.",
-            "ai"
-        );
-    }
-}
-
-/* ============================================================
-   WAITING MESSAGE
-   ============================================================ */
-
-function getWaitingMessage(){
-
-    if(currentUser === "ilknur"){
-
-        return "Hocam, akademik yanıt hazırlanıyor...";
-    }
-
-    if(currentUser === "betul"){
-
-        return betulLoading[
-            Math.floor(
-                Math.random() *
-                betulLoading.length
-            )
-        ];
-    }
-
-    return waitMessages[
-        Math.floor(
-            Math.random() *
-            waitMessages.length
+        except Exception:
+            save_error("K.A.R.V.I.S. self-push worker error", traceback.format_exc())
+            time.sleep(60)
+
+def start_self_push_worker():
+    global _self_push_started
+    with _self_push_start_lock:
+        if _self_push_started:
+            return
+        _self_push_started = True
+        threading.Thread(
+            target=karvis_self_push_worker,
+            name="karvis-self-push",
+            daemon=True
+        ).start()
+
+
+
+app = FastAPI(
+    title="K.A.R.V.I.S. - KARAHAN INC.",
+    version=APP_VERSION
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.exception_handler(Exception)
+async def karvis_unhandled_exception_handler(request, exc):
+    """Yakalanmamış API hatalarını admin hata merkezine kaydeder."""
+    try:
+        details = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        save_error(
+            "Yakalanmamış sunucu hatası: " + type(exc).__name__,
+            details,
+            category="http_unhandled_exception",
+            severity="critical",
+            path=request.url.path,
+            method=request.method,
         )
-    ];
+    except Exception as logging_exc:
+        print("KARVIS_EXCEPTION_HANDLER_FAILED: " + repr(logging_exc), flush=True)
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "error": "Sunucu tarafında beklenmeyen bir hata oluştu. Hata yönetici kayıtlarına iletildi."},
+    )
+
+
+# ============================================================
+# API KEYS
+# ============================================================
+
+GROQ_API_KEY = os.getenv(
+    "GROQ_API_KEY",
+    ""
+).strip()
+
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+    ""
+).strip()
+
+GOOGLE_IMAGE_API_KEY = os.getenv(
+    "GOOGLE_IMAGE_API_KEY",
+    ""
+).strip()
+
+GOOGLE_CSE_ID = os.getenv(
+    "GOOGLE_CSE_ID",
+    ""
+).strip()
+
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
+
+
+groq_client = (
+    OpenAI(
+        api_key=GROQ_API_KEY,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    if GROQ_API_KEY
+    else None
+)
+
+
+openrouter_client = (
+    OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
+    if OPENROUTER_API_KEY
+    else None
+)
+
+
+GROQ_MODELS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+]
+
+
+OPENROUTER_MODELS = [
+    "openai/gpt-oss-20b:free",
+]
+
+
+# ============================================================
+# KARVIS ARENA — persistent cross-profile competition
+# ============================================================
+ARENA_FILE = BASE_DIR / "karvis_arena.json"
+arena_lock = threading.Lock()
+ARENA_MODES = {"knowledge": "Bilgi Düellosu", "speed": "Hız Turu", "logic": "Mantık ve Örüntü", "memory": "Hafıza Meydan Okuması", "tournament": "Özel Turnuva"}
+ARENA_QUESTIONS = {
+ "knowledge": [
+  {"prompt":"Güneş Sistemi'nin en büyük gezegeni hangisidir?","options":["Dünya","Jüpiter","Satürn","Mars"],"answer":1},
+  {"prompt":"Türkiye Cumhuriyeti hangi yıl ilan edildi?","options":["1920","1921","1923","1938"],"answer":2},
+  {"prompt":"Suyun deniz seviyesindeki kaynama noktası kaç °C'dir?","options":["50","80","100","120"],"answer":2},
+  {"prompt":"Bir üçgenin iç açılarının toplamı kaç derecedir?","options":["90","180","270","360"],"answer":1},
+  {"prompt":"Bitkiler fotosentez sırasında temel olarak hangi gazı kullanır?","options":["Oksijen","Karbondioksit","Helyum","Hidrojen"],"answer":1},
+  {"prompt":"Dünya'nın doğal uydusu hangisidir?","options":["Mars","Ay","Venüs","Güneş"],"answer":1},
+  {"prompt":"Bir bayt kaç bittir?","options":["4","8","16","32"],"answer":1}
+ ],
+ "speed": [
+  {"prompt":"12 × 8 kaçtır?","options":["86","92","96","108"],"answer":2},
+  {"prompt":"Bir saatte kaç dakika vardır?","options":["30","45","60","100"],"answer":2},
+  {"prompt":"100'ün dörtte biri kaçtır?","options":["20","25","40","50"],"answer":1},
+  {"prompt":"9 + 17 kaçtır?","options":["24","25","26","27"],"answer":2},
+  {"prompt":"En küçük asal sayı hangisidir?","options":["0","1","2","3"],"answer":2},
+  {"prompt":"5² kaçtır?","options":["10","15","20","25"],"answer":3}
+ ],
+ "logic": [
+  {"prompt":"Dizi nasıl devam eder: 2, 4, 8, 16, …?","options":["18","24","30","32"],"answer":3},
+  {"prompt":"Hangisi diğerlerinden farklıdır?","options":["Kare","Üçgen","Daire","Mavi"],"answer":3},
+  {"prompt":"Dizi nasıl devam eder: 3, 6, 9, 12, …?","options":["13","14","15","18"],"answer":2},
+  {"prompt":"Ali, Ece'den uzun; Ece, Can'dan uzun. En kısa kimdir?","options":["Ali","Ece","Can","Belirlenemez"],"answer":2},
+  {"prompt":"Tüm kediler memelidir. Minnoş bir kedidir. Hangisi kesin doğrudur?","options":["Minnoş memelidir","Minnoş kuştur","Tüm memeliler kedidir","Minnoş uçar"],"answer":0},
+  {"prompt":"Dizi nasıl devam eder: 1, 1, 2, 3, 5, …?","options":["6","7","8","10"],"answer":2}
+ ],
+ "memory": [
+  {"prompt":"Bir haftada kaç gün vardır?","options":["5","6","7","8"],"answer":2},
+  {"prompt":"Trafik ışıklarında kırmızı genellikle ne anlama gelir?","options":["Geç","Dur","Hızlan","Park et"],"answer":1},
+  {"prompt":"Bir düzine kaç adettir?","options":["10","12","20","24"],"answer":1},
+  {"prompt":"Kuzeyin karşı yönü hangisidir?","options":["Doğu","Batı","Güney","Kuzeydoğu"],"answer":2},
+  {"prompt":"Bir yılda normalde kaç ay vardır?","options":["10","11","12","13"],"answer":2},
+  {"prompt":"Gökkuşağında geleneksel olarak kaç renk sayılır?","options":["5","6","7","8"],"answer":2}
+ ]
 }
+# Expanded question pool: each game draws five random questions from these banks.
+ARENA_QUESTIONS["knowledge"] += [
+ {"prompt":"Türkiye'nin başkenti hangisidir?","options":["İstanbul","Ankara","İzmir","Bursa"],"answer":1},
+ {"prompt":"Dünya'nın Güneş etrafındaki bir turu yaklaşık ne kadar sürer?","options":["24 saat","30 gün","365 gün","12 saat"],"answer":2},
+ {"prompt":"İnsan vücudunda kanı pompalayan organ hangisidir?","options":["Akciğer","Beyin","Kalp","Karaciğer"],"answer":2},
+ {"prompt":"En büyük okyanus hangisidir?","options":["Atlas Okyanusu","Hint Okyanusu","Arktik Okyanusu","Pasifik Okyanusu"],"answer":3},
+ {"prompt":"Sembolü Fe olan element hangisidir?","options":["Flor","Demir","Fosfor","Gümüş"],"answer":1},
+ {"prompt":"Türkiye hangi iki kıta üzerinde topraklara sahiptir?","options":["Avrupa ve Asya","Asya ve Afrika","Avrupa ve Afrika","Asya ve Amerika"],"answer":0},
+ {"prompt":"Bir kilogram kaç gramdır?","options":["100","500","1000","10000"],"answer":2},
+ {"prompt":"Ses boşlukta yayılır mı?","options":["Evet, çok hızlı","Hayır, ortam gerekir","Sadece geceleri","Sadece suda"],"answer":1},
+ {"prompt":"İstiklal Marşı'nın yazarı kimdir?","options":["Nazım Hikmet","Mehmet Akif Ersoy","Orhan Veli","Yahya Kemal"],"answer":1},
+ {"prompt":"Dünyanın en yüksek dağı hangisidir?","options":["Ağrı","K2","Everest","Elbruz"],"answer":2},
+ {"prompt":"Fotosentez için ışık enerjisini yakalayan pigment hangisidir?","options":["Hemoglobin","Melanin","Klorofil","Keratin"],"answer":2},
+ {"prompt":"Türkiye'nin para birimi hangisidir?","options":["Euro","Lira","Dinar","Frank"],"answer":1},
+ {"prompt":"Bir dik açının ölçüsü kaç derecedir?","options":["45","90","180","360"],"answer":1},
+ {"prompt":"Dünya atmosferinde en çok bulunan gaz hangisidir?","options":["Oksijen","Karbondioksit","Azot","Hidrojen"],"answer":2},
+ {"prompt":"Su molekülünün kimyasal formülü nedir?","options":["CO2","H2O","O2","NaCl"],"answer":1}
+]
+ARENA_QUESTIONS["speed"] += [
+ {"prompt":"15 × 6 kaçtır?","options":["80","90","96","105"],"answer":1},
+ {"prompt":"144'ün karekökü kaçtır?","options":["10","11","12","14"],"answer":2},
+ {"prompt":"250'nin yüzde 10'u kaçtır?","options":["15","20","25","30"],"answer":2},
+ {"prompt":"7 × 7 kaçtır?","options":["42","48","49","56"],"answer":2},
+ {"prompt":"Bir gün kaç saattir?","options":["12","18","24","36"],"answer":2},
+ {"prompt":"3³ kaçtır?","options":["9","18","27","36"],"answer":2},
+ {"prompt":"80 - 37 kaçtır?","options":["33","43","47","53"],"answer":1},
+ {"prompt":"Bir düz açı kaç derecedir?","options":["90","120","180","270"],"answer":2},
+ {"prompt":"64 / 8 kaçtır?","options":["6","7","8","9"],"answer":2},
+ {"prompt":"2,5 + 1,5 kaçtır?","options":["3","3,5","4","4,5"],"answer":2}
+]
+ARENA_QUESTIONS["logic"] += [
+ {"prompt":"Dizi: 5, 10, 15, 20, …?","options":["22","24","25","30"],"answer":2},
+ {"prompt":"Dizi: 1, 4, 9, 16, …?","options":["20","24","25","36"],"answer":2},
+ {"prompt":"Bugün salıysa 10 gün sonra hangi gündür?","options":["Perşembe","Cuma","Cumartesi","Pazar"],"answer":1},
+ {"prompt":"Hangisi diğerlerinden farklı bir ölçü birimidir?","options":["Metre","Santimetre","Kilometre","Kilogram"],"answer":3},
+ {"prompt":"Bütün güller çiçektir. Bazı çiçekler kırmızıdır. Hangisi kesin doğrudur?","options":["Bütün güller kırmızıdır","Güller çiçektir","Hiçbir gül kırmızı değildir","Bütün çiçekler güldür"],"answer":1},
+ {"prompt":"Dizi: 20, 18, 16, 14, …?","options":["10","11","12","13"],"answer":2},
+ {"prompt":"Bir yarışta ikinci kişiyi geçersen kaçıncı olursun?","options":["Birinci","İkinci","Üçüncü","Dördüncü"],"answer":1},
+ {"prompt":"Dizi: 2, 3, 5, 8, 12, …?","options":["15","16","17","18"],"answer":2},
+ {"prompt":"Saat 3:00'te akrep ile yelkovan arasındaki küçük açı kaç derecedir?","options":["45","60","90","180"],"answer":2},
+ {"prompt":"A, C, E, G, … harf dizisi nasıl sürer?","options":["H","I","J","K"],"answer":1}
+]
+ARENA_QUESTIONS["memory"] += [
+ {"prompt":"Bir yılda kaç mevsim vardır?","options":["2","3","4","5"],"answer":2},
+ {"prompt":"Bir üçgenin kaç kenarı vardır?","options":["2","3","4","5"],"answer":1},
+ {"prompt":"Hangi renk, mavi ile sarının karışımından elde edilir?","options":["Mor","Turuncu","Yeşil","Pembe"],"answer":2},
+ {"prompt":"Alfabemizde 'M' harfinden sonra hangisi gelir?","options":["L","N","O","P"],"answer":1},
+ {"prompt":"Bir futbol takımında sahada aynı anda kaç oyuncu bulunur?","options":["9","10","11","12"],"answer":2},
+ {"prompt":"Türkiye'nin telefon ülke kodu hangisidir?","options":["+30","+44","+49","+90"],"answer":3},
+ {"prompt":"Kış mevsimini hangi mevsim izler?","options":["Sonbahar","İlkbahar","Yaz","Kış"],"answer":1},
+ {"prompt":"Bir saatin yarısı kaç dakikadır?","options":["15","20","30","45"],"answer":2},
+ {"prompt":"Arıların ürettiği besin hangisidir?","options":["Süt","Bal","Pekmez","Şurup"],"answer":1},
+ {"prompt":"Hangi gezegen 'Kızıl Gezegen' olarak bilinir?","options":["Venüs","Mars","Jüpiter","Merkür"],"answer":1}
+]
 
-/* ============================================================
-   BUSY
-   ============================================================ */
+# Expanded mixed question pool: general knowledge, citizenship, riddles, science and geography.
+ARENA_QUESTIONS["knowledge"] += [
+ {"prompt":"Türkiye Büyük Millet Meclisi hangi şehirde bulunur?","options":["İstanbul","Ankara","İzmir","Bursa"],"answer":1},
+ {"prompt":"Anayasa temel olarak neyi düzenler?","options":["Yalnızca spor kurallarını","Devletin yapısını ve temel hakları","Sadece trafik işaretlerini","Yalnızca ticari fiyatları"],"answer":1},
+ {"prompt":"Türkiye'de yasama yetkisi hangi kuruma aittir?","options":["TBMM","Danıştay","Valilik","Belediye"],"answer":0},
+ {"prompt":"Türkiye Cumhuriyeti Anayasası'na göre egemenlik kime aittir?","options":["Bir aileye","Millete","Yalnızca belediyelere","Bir şirkete"],"answer":1},
+ {"prompt":"Seçimlerde oy kullanmak hangi hakla ilgilidir?","options":["Siyasi hak","Telif hakkı","Mülkiyet hakkı","Patent hakkı"],"answer":0},
+ {"prompt":"Türkiye'nin en uzun nehri hangisidir?","options":["Kızılırmak","Gediz","Meriç","Asi"],"answer":0},
+ {"prompt":"Türkiye'nin en büyük gölü hangisidir?","options":["Tuz Gölü","Van Gölü","Eğirdir Gölü","Sapanca Gölü"],"answer":1},
+ {"prompt":"Dünya'nın en büyük kıtası hangisidir?","options":["Avrupa","Afrika","Asya","Avustralya"],"answer":2},
+ {"prompt":"İnsan vücudundaki en büyük organ hangisidir?","options":["Kalp","Deri","Beyin","Akciğer"],"answer":1},
+ {"prompt":"Işığın boşluktaki hızı yaklaşık kaç km/s'dir?","options":["30.000","150.000","300.000","3.000.000"],"answer":2},
+ {"prompt":"Elektrik akımının SI birimi hangisidir?","options":["Volt","Amper","Watt","Ohm"],"answer":1},
+ {"prompt":"Türkiye'de kanunları kabul eden yasama organı hangisidir?","options":["TBMM","Yargıtay","Valilik","Kaymakamlık"],"answer":0},
+ {"prompt":"Bir kişinin suçluluğu kesinleşene kadar masum kabul edilmesi hangi ilkeyle ilgilidir?","options":["Masumiyet karinesi","Vergi muafiyeti","Yerinden yönetim","Gizli oy"],"answer":0},
+ {"prompt":"Birleşmiş Milletler'in kısaltması hangisidir?","options":["AB","BM","NATO","OECD"],"answer":1},
+ {"prompt":"Dünya'nın kendi ekseni etrafında dönmesi hangi olayı oluşturur?","options":["Mevsimleri","Gece ve gündüzü","Yılları","Ay tutulmasını her ay"],"answer":1},
+ {"prompt":"Türkiye'nin batısında hangi deniz bulunur?","options":["Karadeniz","Akdeniz","Ege Denizi","Hazar Denizi"],"answer":2},
+ {"prompt":"Türkiye'de yürütme yetkisi ve görevi Anayasa'ya göre kim tarafından kullanılır ve yerine getirilir?","options":["Cumhurbaşkanı","TBMM Başkanı tek başına","Belediye meclisi","Yargıtay"],"answer":0},
+ {"prompt":"Bir hakkın ihlal edildiğini düşünen kişi aşağıdakilerden hangisini yapabilir?","options":["Yetkili makamlara başvurabilir","Her durumda kendi cezasını verebilir","Mahkeme kararlarını yok sayabilir","Başkasının hakkını elinden alabilir"],"answer":0},
+ {"prompt":"Türkiye'nin para birimi hangisidir?","options":["Euro","Türk lirası","Dinar","Frank"],"answer":1},
+ {"prompt":"Bitkiler fotosentez sırasında atmosfere çoğunlukla hangi gazı verir?","options":["Azot","Oksijen","Helyum","Metan"],"answer":1},
+]
+ARENA_QUESTIONS["logic"] += [
+ {"prompt":"Bilmece: Ağzı var konuşmaz, yatağı var uyumaz. Nedir?","options":["Nehir","Kitap","Saat","Kapı"],"answer":0},
+ {"prompt":"Bilmece: Kat kat açılır, ama kapı değildir; içinde yapraklar vardır. Nedir?","options":["Lahana","Taş","Mum","Şişe"],"answer":0},
+ {"prompt":"Bilmece: Ne kadar alırsan o kadar büyür. Nedir?","options":["Çukur","Su","Işık","Kâğıt"],"answer":0},
+ {"prompt":"Bilmece: Dört ayağı var, yürüyemez. Nedir?","options":["Masa","Kedi","At","Kuş"],"answer":0},
+ {"prompt":"Bilmece: Gece görünür, gündüz kaybolur; kendi ışığı yoktur. Nedir?","options":["Yıldız","Lamba","Güneş","Ateş"],"answer":0},
+ {"prompt":"Bir odada 3 ampul ve dışarıda 3 anahtar var. Odaya yalnızca bir kez girebilirsin. Hangi bilgi ampulleri ayırt etmeye yardımcı olur?","options":["Ampullerin sıcaklığı","Duvarın rengi","Kapının boyu","Odanın adresi"],"answer":0},
+ {"prompt":"Dizi: 1, 3, 6, 10, 15, …?","options":["18","20","21","25"],"answer":2},
+ {"prompt":"Bir yarışta sonuncuyu geçebilir misin?","options":["Evet, birinci olursun","Evet, ikinci olursun","Hayır, sonuncuyu geçemezsin","Her zaman üçüncü olursun"],"answer":2},
+ {"prompt":"Bilmece: Herkesin önünde gider ama kimse onu yakalayamaz. Nedir?","options":["Gelecek","Taş","Duvar","Kitap"],"answer":0},
+ {"prompt":"Bir sepette 5 elma var; 5 kişi birer elma alıyor ve sepette bir elma kalıyor. Nasıl?","options":["Bir kişi elmayı sepetle alır","Bir elma görünmezdir","Elmalar çoğalır","Sepet boştur"],"answer":0},
+ {"prompt":"Türkiye'de temel hak ve özgürlükler esas olarak hangi metinde güvence altına alınır?","options":["Anayasa","Spor yönetmeliği","Market fişi","Trafik haritası"],"answer":0},
+ {"prompt":"Hukuk devletinde idarenin işlemleri hangi ilkeye uygun olmalıdır?","options":["Hukuka uygunluk","Kişisel keyif","Kuralsızlık","Sınırsız gizlilik"],"answer":0},
+]
+ARENA_QUESTIONS["tournament"] = ARENA_QUESTIONS["knowledge"] + ARENA_QUESTIONS["logic"] + ARENA_QUESTIONS["speed"] + ARENA_QUESTIONS["memory"]
 
-function setBusy(value){
 
-    sending = value;
 
-    $("sendButton").disabled =
-        value;
+def _arena_default():
+    return {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
-    $("messageInput").disabled =
-        value;
+def _arena_load():
+    if arena_database_configured():
+        try:
+            return _arena_load_state_from_db()
+        except Exception:
+            # Do not silently lose writes; surface database failures to the API caller.
+            raise HTTPException(status_code=503, detail="Arena veritabanına erişilemiyor.")
+    data = read_json_file(ARENA_FILE, {})
+    if not isinstance(data, dict): data = {}
+    data.setdefault("players", {}); data.setdefault("attempts", {}); data.setdefault("duels", {})
+    return data
 
-    if(value){
 
-        $("status").classList.add(
-            "busy"
-        );
+def _arena_save(data):
+    data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    if arena_database_configured():
+        try:
+            _arena_save_state_to_db(data)
+            return
+        except Exception:
+            try:
+                save_error("Arena database save error", traceback.format_exc())
+            except Exception:
+                pass
+            raise HTTPException(status_code=503, detail="Arena veritabanına kaydedilemedi.")
+    write_json_file(ARENA_FILE, data)
 
-    }else{
+def _arena_league(points):
+    points = int(points or 0)
+    return "Elmas" if points >= 5000 else "Altın" if points >= 2500 else "Gümüş" if points >= 1000 else "Bronz"
 
-        $("status").classList.remove(
-            "busy"
-        );
+def _arena_player(data, username):
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    players = data["players"]
+    if username not in players:
+        players[username] = {"points": 0, "badges": [], "history": [], "answered_ids": [], "wins": 0, "duel_history": []}
+    p = players[username]
+    for k,v in {"points":0,"badges":[],"history":[],"answered_ids":[],"wins":0,"duel_history":[]}.items(): p.setdefault(k,v)
+    return p
+
+def _arena_rankings(data):
+    rows=[]
+    for uname in USERS:
+        p=_arena_player(data, uname)
+        rows.append({"username":uname,"name":USERS[uname]["name"],"points":int(p.get("points",0)),"league":_arena_league(p.get("points",0))})
+    rows.sort(key=lambda x:(-x["points"], x["name"].casefold()))
+    for i,row in enumerate(rows,1): row["rank"]=i
+    return rows
+
+@app.get("/arena/overview")
+async def arena_overview(username: str = "karahan"):
+    username=username.strip().lower()
+    with arena_lock:
+        data=_arena_load(); player=_arena_player(data,username); rankings=_arena_rankings(data)
+        own=next(x for x in rankings if x["username"]==username)
+        history=player.get("history", [])[-8:]
+        duel_history=player.get("duel_history", [])[-3:]
+        return {"success":True,"player":{"username":username,"points":player["points"],"league":_arena_league(player["points"]),"rank":own["rank"],"badges":player["badges"],"history":list(reversed(history)),"duel_history":list(reversed(duel_history))},"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in rankings]}
+
+@app.get("/arena/leaderboard")
+async def arena_leaderboard():
+    with arena_lock:
+        data=_arena_load()
+        return {"success":True,"leaderboard":[{k:v for k,v in x.items() if k!="username"} for x in _arena_rankings(data)]}
+
+@app.post("/arena/reset")
+async def arena_reset(username: str = ""):
+    """Reset Arena scores/history; only the Murat admin profile may invoke this."""
+    require_admin(username)
+    empty_state = {"players": {}, "attempts": {}, "duels": {}, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    with arena_lock:
+        if arena_database_configured():
+            conn = get_arena_db_connection()
+            try:
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute("DELETE FROM public.arena_attempts")
+                        cur.execute("DELETE FROM public.arena_game_history")
+                        cur.execute("DELETE FROM public.arena_players")
+                        cur.execute("""
+                            INSERT INTO public.arena_state (id, state, updated_at)
+                            VALUES (1, %s::jsonb, NOW())
+                            ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()
+                        """, (json.dumps(empty_state, ensure_ascii=False),))
+            except Exception:
+                try:
+                    save_error("Arena reset error", traceback.format_exc())
+                except Exception:
+                    pass
+                raise HTTPException(status_code=503, detail="Arena tablosu sıfırlanamadı.")
+            finally:
+                conn.close()
+        else:
+            write_json_file(ARENA_FILE, empty_state)
+        return {"success": True, "message": "Arena puan tablosu, rozetler ve oyun geçmişi sıfırlandı."}
+
+
+def _duel_public(duel, username):
+    """Return only the caller's current question and public duel status."""
+    result = {
+        "duel_id": duel.get("duel_id"),
+        "challenger": duel.get("challenger"),
+        "opponent": duel.get("opponent"),
+        "stake": int(duel.get("stake", 0)),
+        "status": duel.get("status"),
+        "created_at": duel.get("created_at"),
+        "question_index": int(duel.get("question_index", 0)),
+        "total_questions": 5,
+        "answered": username in duel.get("round_answers", {}),
+        "round_result": duel.get("round_result"),
+        "result": duel.get("result"),
+        "round_age_seconds": max(0, int(time.time() - min((float(v) for v in duel.get("round_started_at", {}).values()), default=time.time()))) if duel.get("status") == "active" else 0,
+        "round_answer_count": len(duel.get("round_answers", {})),
     }
+    if duel.get("status") == "active":
+        idx = int(duel.get("question_index", 0))
+        questions = duel.get("questions", [])
+        if idx < len(questions) and username not in duel.get("round_answers", {}):
+            q = questions[idx]
+            result["question"] = {"prompt": q["prompt"], "options": q["options"], "category": q.get("category", "Genel")}
+    return result
+
+@app.get("/arena/duels")
+async def arena_duels(username: str = "karahan"):
+    username = username.strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with arena_lock:
+        data = _arena_load()
+        _arena_player(data, username)
+        duels = data.setdefault("duels", {})
+        pending_incoming = []
+        pending_outgoing = []
+        active = None
+        for duel in duels.values():
+            if duel.get("status") == "pending":
+                if duel.get("opponent") == username:
+                    pending_incoming.append(_duel_public(duel, username))
+                elif duel.get("challenger") == username:
+                    pending_outgoing.append(_duel_public(duel, username))
+            elif duel.get("status") == "active" and username in (duel.get("challenger"), duel.get("opponent")):
+                if active is None:
+                    active = _duel_public(duel, username)
+        return {"success": True, "pending_incoming": pending_incoming, "pending_outgoing": pending_outgoing, "active_duel": active,
+                "duel_history": list(reversed(_arena_player(data, username).get("duel_history", [])[-3:]))}
+
+@app.post("/arena/duel/request")
+async def arena_duel_request(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    opponent = str(payload.get("opponent", "")).strip().lower()
+    try:
+        stake = int(payload.get("stake"))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Geçerli bir bahis puanı girin.")
+    if username not in USERS or opponent not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if username == opponent:
+        raise HTTPException(status_code=400, detail="Kendine düello gönderemezsin.")
+    if stake < 1 or stake > 1000000:
+        raise HTTPException(status_code=400, detail="Bahis 1 ile 1.000.000 puan arasında olmalı.")
+    with arena_lock:
+        data = _arena_load()
+        challenger_player = _arena_player(data, username)
+        opponent_player = _arena_player(data, opponent)
+        if int(challenger_player.get("points", 0)) < stake:
+            raise HTTPException(status_code=400, detail="Bahis miktarı için yeterli puanın yok.")
+        if int(opponent_player.get("points", 0)) < stake:
+            raise HTTPException(status_code=400, detail="Rakibin bu bahsi karşılayacak kadar puana sahip değil.")
+        duels = data.setdefault("duels", {})
+        if any(d.get("status") in ("pending", "active") and username in (d.get("challenger"), d.get("opponent")) for d in duels.values()):
+            raise HTTPException(status_code=409, detail="Önce mevcut düello isteğini veya aktif düellonu tamamla.")
+        duel_id = uuid.uuid4().hex
+        mixed = []
+        for category in ("knowledge", "logic", "speed", "memory"):
+            for q in ARENA_QUESTIONS.get(category, []):
+                mixed.append({**q, "category": {"knowledge":"Genel kültür ve vatandaşlık","logic":"Mantık ve bilmeceler","speed":"Hız ve sayısal bilgiler","memory":"Genel bilgiler"}[category]})
+        chosen = random.sample(mixed, min(5, len(mixed)))
+        duels[duel_id] = {
+            "duel_id": duel_id, "challenger": username, "opponent": opponent, "stake": stake,
+            "status": "pending", "created_at": time.strftime("%Y-%m-%d %H:%M:%S"), "created_at_epoch": time.time(),
+            "questions": chosen, "question_index": 0, "round_answers": {},
+            "round_started_at": {}, "round_result": None, "results": [],
+            "accepted_at": None, "result": None
+        }
+        _arena_save(data)
+        return {"success": True, "message": "Düello isteği gönderildi.", "duel_id": duel_id}
+
+@app.post("/arena/duel/respond")
+async def arena_duel_respond(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    accept = bool(payload.get("accept"))
+    with arena_lock:
+        data = _arena_load()
+        duel = data.setdefault("duels", {}).get(duel_id)
+        if not duel or duel.get("status") != "pending":
+            raise HTTPException(status_code=404, detail="Bekleyen düello isteği bulunamadı.")
+        if duel.get("opponent") != username:
+            raise HTTPException(status_code=403, detail="Bu düello isteği sana gönderilmedi.")
+        if accept:
+            challenger_player = _arena_player(data, duel["challenger"])
+            opponent_player = _arena_player(data, duel["opponent"])
+            stake = int(duel["stake"])
+            if int(challenger_player.get("points", 0)) < stake or int(opponent_player.get("points", 0)) < stake:
+                duel["status"] = "declined"
+                duel["result"] = {"winner": None, "reason": "Puan yetersizliği nedeniyle düello başlatılamadı."}
+                _arena_save(data)
+                raise HTTPException(status_code=409, detail="Oyunculardan birinin puanı artık bu bahsi karşılamıyor.")
+            duel["status"] = "active"
+            duel["accepted_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
+        else:
+            duel["status"] = "declined"
+            duel["result"] = {"winner": None, "reason": "İstek reddedildi."}
+        _arena_save(data)
+        return {"success": True, "message": "Düello kabul edildi." if accept else "Düello isteği reddedildi."}
+
+@app.post("/arena/duel/reset")
+async def arena_duel_reset(payload: dict):
+    """Cancel a genuinely stuck pending/active duel without transferring points."""
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    if username not in USERS:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with arena_lock:
+        data = _arena_load()
+        duel = data.setdefault("duels", {}).get(duel_id)
+        if not duel or duel.get("status") not in ("pending", "active"):
+            raise HTTPException(status_code=404, detail="Sıfırlanabilecek bekleyen veya aktif düello bulunamadı.")
+        if username not in (duel.get("challenger"), duel.get("opponent")):
+            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
+        if duel.get("status") == "pending":
+            created = duel.get("created_at_epoch")
+            if created is None:
+                raise HTTPException(status_code=409, detail="Bekleyen istek henüz takılmış olarak doğrulanmadı. Önce durumu yenile.")
+            age = max(0, time.time() - float(created))
+            stuck = age >= 180
+        else:
+            starts = [float(v) for v in duel.get("round_started_at", {}).values()]
+            age = max(0, time.time() - min(starts)) if starts else 0
+            answers = duel.get("round_answers", {})
+            # A round is stuck only when it has been idle for at least 60s and
+            # one player has answered without the other, or it has exceeded 120s.
+            stuck = age >= 60 and (len(answers) == 1 or age >= 120)
+        if not stuck:
+            raise HTTPException(status_code=409, detail="Düello henüz takılmış görünmüyor. Normal akış için yenileme yapabilirsin.")
+        duel["status"] = "cancelled"
+        duel["result"] = {"winner": None, "reason": "Takıldığı için kullanıcı tarafından sıfırlandı; puan aktarılmadı."}
+        duel["cancelled_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        _arena_save(data)
+        return {"success": True, "message": "Takılan düello sıfırlandı. Puan aktarılmadı; yeni düello başlatabilirsin."}
+
+
+@app.post("/arena/duel/answer")
+async def arena_duel_answer(payload: dict):
+    username = str(payload.get("username", "")).strip().lower()
+    duel_id = str(payload.get("duel_id", ""))
+    try:
+        answer = int(payload.get("answer"))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Geçersiz cevap.")
+    with arena_lock:
+        data = _arena_load()
+        duels = data.setdefault("duels", {})
+        duel = duels.get(duel_id)
+        if not duel or duel.get("status") != "active":
+            raise HTTPException(status_code=404, detail="Aktif düello bulunamadı.")
+        if username not in (duel.get("challenger"), duel.get("opponent")):
+            raise HTTPException(status_code=403, detail="Bu düelloya katılmıyorsun.")
+        idx = int(duel.get("question_index", 0))
+        questions = duel.get("questions", [])
+        if idx >= len(questions):
+            raise HTTPException(status_code=409, detail="Düello soruları tamamlandı.")
+        q = questions[idx]
+        if answer < 0 or answer >= len(q["options"]):
+            raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
+        round_answers = duel.setdefault("round_answers", {})
+        if username in round_answers:
+            raise HTTPException(status_code=409, detail="Bu soruyu zaten cevapladın.")
+        started = float(duel.setdefault("round_started_at", {}).get(username, time.time()))
+        elapsed_ms = max(0, int((time.time() - started) * 1000))
+        round_answers[username] = {"answer": answer, "correct": answer == int(q["answer"]), "elapsed_ms": elapsed_ms}
+        other = duel["opponent"] if username == duel["challenger"] else duel["challenger"]
+        response = {"success": True, "waiting": other not in round_answers, "question_index": idx}
+        if other not in round_answers:
+            _arena_save(data)
+            return response
+        a = round_answers[duel["challenger"]]
+        b = round_answers[duel["opponent"]]
+        if a["correct"] != b["correct"]:
+            round_winner = duel["challenger"] if a["correct"] else duel["opponent"]
+        elif a["correct"] and b["correct"] and a["elapsed_ms"] != b["elapsed_ms"]:
+            round_winner = duel["challenger"] if a["elapsed_ms"] < b["elapsed_ms"] else duel["opponent"]
+        else:
+            round_winner = None
+        duel.setdefault("results", []).append({"question": idx + 1, "challenger_correct": a["correct"], "opponent_correct": b["correct"], "challenger_ms": a["elapsed_ms"], "opponent_ms": b["elapsed_ms"], "round_winner": round_winner})
+        duel["round_result"] = {"question": idx + 1, "winner": round_winner, "challenger_correct": a["correct"], "opponent_correct": b["correct"]}
+        next_idx = idx + 1
+        if next_idx >= len(questions):
+            correct_totals = {
+                duel["challenger"]: sum(1 for x in duel["results"] if x["challenger_correct"]),
+                duel["opponent"]: sum(1 for x in duel["results"] if x["opponent_correct"]),
+            }
+            time_totals = {
+                duel["challenger"]: sum(int(x["challenger_ms"]) for x in duel["results"]),
+                duel["opponent"]: sum(int(x["opponent_ms"]) for x in duel["results"]),
+            }
+            if correct_totals[duel["challenger"]] > correct_totals[duel["opponent"]]:
+                winner, loser = duel["challenger"], duel["opponent"]
+            elif correct_totals[duel["opponent"]] > correct_totals[duel["challenger"]]:
+                winner, loser = duel["opponent"], duel["challenger"]
+            elif time_totals[duel["challenger"]] < time_totals[duel["opponent"]]:
+                winner, loser = duel["challenger"], duel["opponent"]
+            elif time_totals[duel["opponent"]] < time_totals[duel["challenger"]]:
+                winner, loser = duel["opponent"], duel["challenger"]
+            else:
+                winner = loser = None
+            totals = correct_totals
+            stake = int(duel["stake"])
+            if winner:
+                winner_player = _arena_player(data, winner)
+                loser_player = _arena_player(data, loser)
+                # Recheck funds at settlement to prevent negative balances.
+                if int(loser_player.get("points", 0)) < stake:
+                    winner = loser = None
+                    duel["result"] = {"winner": None, "reason": "Sonuçlandırma sırasında bahis puanı yetersizdi; puan aktarılmadı.", "wins": totals}
+                else:
+                    winner_player["points"] = int(winner_player.get("points", 0)) + stake
+                    loser_player["points"] = int(loser_player.get("points", 0)) - stake
+                    duel["result"] = {"winner": winner, "loser": loser, "stake": stake, "wins": totals}
+            else:
+                duel["result"] = {"winner": None, "loser": None, "stake": stake, "wins": totals, "reason": "Berabere"}
+            duel["status"] = "completed"
+            finished_at = time.strftime("%Y-%m-%d %H:%M")
+            for player_name in (duel["challenger"], duel["opponent"]):
+                player = _arena_player(data, player_name)
+                outcome = "Berabere" if not winner else ("Kazandı" if player_name == winner else "Kaybetti")
+                delta = 0 if not winner else (stake if player_name == winner else -stake)
+                is_challenger = player_name == duel["challenger"]
+                correct_count = sum(1 for item in duel.get("results", []) if item.get("challenger_correct" if is_challenger else "opponent_correct"))
+                wrong_count = max(0, len(duel.get("results", [])) - correct_count)
+                player.setdefault("duel_history", []).append({
+                    "duel_id": duel_id, "opponent": duel["opponent"] if is_challenger else duel["challenger"],
+                    "outcome": outcome, "stake": stake, "points_delta": delta,
+                    "date": finished_at, "correct_wins": totals[player_name], "opponent_wins": totals[duel["opponent"] if is_challenger else duel["challenger"]],
+                    "correct_answers": correct_count, "wrong_answers": wrong_count, "total_questions": len(duel.get("results", []))
+                })
+                player["duel_history"] = player["duel_history"][-3:]
+            # Keep active/pending duels and only the three most recently completed duel records globally.
+            completed_ids = [did for did, item in sorted(duels.items(), key=lambda pair: pair[1].get("created_at", ""), reverse=True) if item.get("status") == "completed"]
+            for old_id in completed_ids[3:]:
+                duels.pop(old_id, None)
+            response["finished"] = True
+            response["result"] = duel["result"]
+        else:
+            duel["question_index"] = next_idx
+            duel["round_answers"] = {}
+            duel["round_started_at"] = {duel["challenger"]: time.time(), duel["opponent"]: time.time()}
+            response["finished"] = False
+            response["next_question_index"] = next_idx
+        _arena_save(data)
+        return response
+
+@app.post("/arena/start")
+async def arena_start(payload: dict):
+    username=str(payload.get("username", "")).strip().lower(); mode=str(payload.get("mode", "knowledge"))
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if mode not in ARENA_MODES: raise HTTPException(status_code=400, detail="Geçersiz oyun türü.")
+    with arena_lock:
+        data=_arena_load(); _arena_player(data,username)
+        bank=ARENA_QUESTIONS.get(mode, ARENA_QUESTIONS["knowledge"])
+        chosen=random.sample(bank, min(5,len(bank)))
+        attempt_id=uuid.uuid4().hex
+        data["attempts"][attempt_id]={"username":username,"mode":mode,"questions":chosen,"index":0,"score":0,"answers":[],"consecutive_wrong":0,"started":time.time(),"question_started_at":time.time(),"finished":False,"awarded":False}
+        _arena_save(data)
+        q=chosen[0]
+        return {"success":True,"attempt_id":attempt_id,"question_number":1,"total_questions":len(chosen),"question":{"prompt":q["prompt"],"options":q["options"]}}
+
+@app.post("/arena/answer")
+async def arena_answer(payload: dict):
+    username=str(payload.get("username", "")).strip().lower(); attempt_id=str(payload.get("attempt_id", ""));
+    try: answer=int(payload.get("answer"))
+    except Exception: raise HTTPException(status_code=400, detail="Geçersiz cevap.")
+    with arena_lock:
+        data=_arena_load(); attempt=data["attempts"].get(attempt_id)
+        if not attempt or attempt.get("username")!=username: raise HTTPException(status_code=404, detail="Yarışma bulunamadı.")
+        if attempt.get("finished"): raise HTTPException(status_code=409, detail="Bu yarışma zaten tamamlandı.")
+        idx=int(attempt.get("index",0)); questions=attempt["questions"]
+        if idx>=len(questions): raise HTTPException(status_code=409, detail="Yarışmada cevaplanacak soru kalmadı.")
+        q=questions[idx]
+        if answer<0 or answer>=len(q["options"]): raise HTTPException(status_code=400, detail="Cevap seçeneği geçersiz.")
+        elapsed_ms=max(0,int((time.time()-float(attempt.get("question_started_at", time.time())))*1000))
+        correct=answer==int(q["answer"])
+        if correct:
+            awarded=100 + (min(50,max(0,50-int(elapsed_ms/200))) if attempt["mode"]=="speed" else 0)
+            attempt["consecutive_wrong"]=0
+            message="+ hız bonusu dahil" if awarded>100 else "Güzel gidiyorsun!"
+        else:
+            streak=int(attempt.get("consecutive_wrong",0))+1
+            # Three consecutive wrong answers cost 200 points total across that streak:
+            # the first two cost 50 each, and the third costs 100.
+            awarded=-100 if streak>=3 else -50
+            attempt["consecutive_wrong"]=0 if streak>=3 else streak
+            message="Üst üste 3 yanlış! Bu cevap -100 puan; üç yanlışın toplam cezası -200." if streak>=3 else "Yanlış cevap: -50 puan."
+        attempt["score"]+=awarded
+        attempt["answers"].append({"correct":correct,"awarded":awarded,"consecutive_wrong":int(attempt.get("consecutive_wrong",0))})
+        attempt["index"]+=1
+        finished=attempt["index"]>=len(questions)
+        response={"success":True,"correct":correct,"points_awarded":awarded,"message":message,"finished":finished}
+        if finished:
+            attempt["finished"]=True
+            if not attempt.get("awarded"):
+                p=_arena_player(data,username); p["points"]=max(0, int(p.get("points",0))+int(attempt["score"])); p["wins"]+=1 if attempt["score"]>=300 else 0
+                if "İlk Zafer" not in p["badges"]: p["badges"].append("İlk Zafer")
+                if attempt["score"]>=400 and "Bilgi Avcısı" not in p["badges"]: p["badges"].append("Bilgi Avcısı")
+                if p["wins"]>=5 and "Seri Galibiyet" not in p["badges"]: p["badges"].append("Seri Galibiyet")
+                p["history"].append({"title":ARENA_MODES.get(attempt["mode"],attempt["mode"]),"score":int(attempt["score"]),"date":time.strftime("%Y-%m-%d %H:%M")});p["history"]=p["history"][-50:]
+                attempt["awarded"]=True
+            response["score"]=int(attempt["score"]); response["message"]="Yarışma tamamlandı!"
+        else:
+            nextq=questions[attempt["index"]];attempt["question_started_at"]=time.time();response["question"]={"prompt":nextq["prompt"],"options":nextq["options"]};response["question_number"]=attempt["index"]+1;response["total_questions"]=len(questions)
+        data["updated_at"]=time.strftime("%Y-%m-%d %H:%M:%S");_arena_save(data)
+        return response
+
+
+# ============================================================
+# MEMORY / ERROR LOG
+# ============================================================
+
+MEMORY_FILE = BASE_DIR / "memory.json"
+ERROR_FILE = BASE_DIR / "errors.json"
+
+memory_lock = threading.Lock()
+error_lock = threading.Lock()
+
+
+def read_json_file(
+    path,
+    default
+):
+
+    try:
+
+        if not path.exists():
+            return default
+
+        with open(
+            path,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            return json.load(f)
+
+    except Exception:
+
+        return default
+
+
+def write_json_file(
+    path,
+    data
+):
+
+    temp = path.with_suffix(
+        ".tmp"
+    )
+
+    with open(
+        temp,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        json.dump(
+            data,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    temp.replace(path)
+
+
+def _sanitize_error_text(value):
+    """Hata ayrıntılarından yaygın gizli anahtar/parola değerlerini maskeler."""
+    text = str(value or "")
+    patterns = [
+        (r"(?i)(api[_-]?key|authorization|bearer|password|passwd|secret|token)(\s*[=:]\s*)([^\s,;]+)", r"\1\2[REDACTED]"),
+        (r"(?i)(sk-[A-Za-z0-9_-]{12,})", "[REDACTED_API_KEY]"),
+        (r"(?i)(postgres(?:ql)?://[^:\s]+:)([^@\s]+)(@)", r"\1[REDACTED]\3"),
+    ]
+    for pattern, replacement in patterns:
+        text = re.sub(pattern, replacement, text)
+    return text[:20000]
+
+
+def save_error(message, details=None, *, category="application", severity="error", path=None, method=None):
+    """Admin hata merkezine yapılandırılmış, hassas bilgilerden arındırılmış kayıt ekler."""
+    item = {
+        "id": uuid.uuid4().hex,
+        "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "error": _sanitize_error_text(message),
+        "details": _sanitize_error_text(details),
+        "category": _sanitize_error_text(category),
+        "severity": severity if severity in {"info", "warning", "error", "critical"} else "error",
+        "status": "open",
+    }
+    if path:
+        item["path"] = _sanitize_error_text(path)[:500]
+    if method:
+        item["method"] = _sanitize_error_text(method)[:20]
+
+    try:
+        with error_lock:
+            data = read_json_file(ERROR_FILE, [])
+            if not isinstance(data, list):
+                data = []
+            # Eski kayıtların alanlarını koru; yeni kayıtlar en fazla 100 adet tutulur.
+            data.append(item)
+            write_json_file(ERROR_FILE, data[-100:])
+        return True
+    except Exception as exc:
+        # Kayıt sistemi de arızalıysa sessizce yutma; Render loglarında görünür olsun.
+        print(
+            "KARVIS_ERROR_LOG_WRITE_FAILED: "
+            + _sanitize_error_text(repr(exc))
+            + " | original_error=" + _sanitize_error_text(message),
+            flush=True,
+        )
+        return False
+
+
+# ============================================================
+# USERS
+# ============================================================
+
+USERS = {
+
+    "karahan": {
+        "name": "KARAHAN INC.",
+        "password": "",
+        "role": "owner",
+        "style": "professional",
+    },
+
+    "betul": {
+        "name": "Betül",
+        "password": "1234",
+        "role": "user",
+        "style": "professional",
+    },
+
+    "sinem": {
+        "name": "Sinem",
+        "password": "3021",
+        "role": "user",
+        "style": "professional",
+    },
+
+    "ilknur": {
+        "name": "İlknur",
+        "password": "1111",
+        "role": "teacher",
+        "style": "academic",
+    },
+
+    "murat": {
+        "name": "Murat",
+        "password": "0000",
+        "role": "admin",
+        "style": "professional",
+    },
+
+    "sude": {
+        "name": "Sude",
+        "password": "1234",
+        "role": "user",
+        "style": "sude",
+    },
 }
 
-/* ============================================================
-   PRESENTATION DETECTION
-   ============================================================ */
 
-function isPresentationRequest(message){
+# Self-registered profiles are stored in PostgreSQL when DATABASE_URL is configured.
+# Render's temporary filesystem is not durable across restarts, so JSON is only a local fallback.
+REGISTERED_USERS_FILE = BASE_DIR / "registered_users.json"
+PROFILE_DB_LOCK = threading.Lock()
 
-    const text =
-        String(message)
-        .toLocaleLowerCase("tr-TR")
-        .trim();
+def _profile_db_configured():
+    return bool(DATABASE_URL and psycopg2)
 
-    const words = [
+def _profile_db_connect():
+    if not _profile_db_configured():
+        return None
+    return psycopg2.connect(DATABASE_URL, connect_timeout=8, sslmode="require")
 
-        "sunum hazırla",
-        "sunum hazırlar",
-        "sunum oluştur",
-        "sunum oluşturur",
-        "sunum yap",
-        "sunum hazırlay",
-        "slayt hazırla",
-        "slayt oluştur",
-        "slayt yap",
-        "slaytlık sunum",
-        "slaytlık",
-        "powerpoint hazırla",
-        "powerpoint oluştur",
-        "ppt hazırla",
-        "pptx hazırla",
-        "pdf sunum",
-        "sunum pdf",
-        "sunum dosyası",
-        "sunum hazırlamak",
-        "sunum istiyorum"
-    ];
+def _init_profile_database():
+    if not _profile_db_configured():
+        return False
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS karvis_user_profiles (
+                        username TEXT PRIMARY KEY,
+                        display_name TEXT NOT NULL,
+                        password_record JSONB NOT NULL,
+                        role TEXT NOT NULL DEFAULT 'user',
+                        style TEXT NOT NULL DEFAULT 'professional',
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+        conn.close()
+        return True
+    except Exception as exc:
+        print(f"KARVIS profile database init failed: {exc}", flush=True)
+        return False
+
+def _migrate_local_profiles_to_db():
+    """Import any surviving JSON-created profiles into PostgreSQL without overwriting DB accounts."""
+    if not (_profile_db_configured() and _init_profile_database()):
+        return
+    local_profiles = read_json_file(REGISTERED_USERS_FILE, {})
+    local_passwords = read_json_file(BASE_DIR / "user_passwords.json", {})
+    if not isinstance(local_profiles, dict): local_profiles = {}
+    if not isinstance(local_passwords, dict): local_passwords = {}
+    try:
+        conn = _profile_db_connect()
+        with conn:
+            with conn.cursor() as cur:
+                for username, profile in local_profiles.items():
+                    username = str(username).strip().lower()
+                    if username in USERS or not re.fullmatch(r"[a-z0-9_.-]{3,24}", username) or not isinstance(profile, dict):
+                        continue
+                    password_record = local_passwords.get(username)
+                    if not isinstance(password_record, dict) or not password_record.get("salt") or not password_record.get("hash"):
+                        continue
+                    cur.execute("""
+                        INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                        VALUES (%s, %s, %s, 'user', 'professional')
+                        ON CONFLICT (username) DO NOTHING
+                    """, (username, str(profile.get("name") or username)[:60], json.dumps(password_record)))
+        conn.close()
+    except Exception as exc:
+        print(f"KARVIS local profile migration failed: {exc}", flush=True)
+
+def _read_persistent_profiles():
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn.cursor() as cur:
+                cur.execute("SELECT username, display_name, password_record FROM karvis_user_profiles")
+                rows = cur.fetchall()
+            conn.close()
+            result = {}
+            for username, display_name, password_record in rows:
+                result[str(username)] = {"name": str(display_name), "role": "user", "style": "professional", "password_record": password_record}
+            return result
+        except Exception as exc:
+            print(f"KARVIS profile database read failed: {exc}", flush=True)
+    records = read_json_file(REGISTERED_USERS_FILE, {})
+    return records if isinstance(records, dict) else {}
+
+def _load_registered_users():
+    """Load registered standard-user profiles without overriding trusted built-in accounts."""
+    for uname, profile in _read_persistent_profiles().items():
+        uname = str(uname).strip().lower()
+        if not re.fullmatch(r"[a-z0-9_.-]{3,24}", uname) or uname in USERS or not isinstance(profile, dict):
+            continue
+        USERS[uname] = {"name": str(profile.get("name") or uname)[:60], "password": "", "role": "user", "style": "professional"}
+
+_load_registered_users()
+
+
+# ============================================================
+# PASSWORD STORE + SUDE WORLD DATA
+# ============================================================
+PASSWORD_FILE = BASE_DIR / "user_passwords.json"
+SUDE_WORLD_FILE = BASE_DIR / "sude_world.json"
+password_lock = threading.Lock()
+sude_lock = threading.Lock()
+
+
+def _password_hash(password, salt=None):
+    salt = salt or os.urandom(16).hex()
+    digest = hashlib.pbkdf2_hmac("sha256", str(password).encode("utf-8"), bytes.fromhex(salt), 240000).hex()
+    return {"salt": salt, "hash": digest, "scheme": "pbkdf2_sha256", "iterations": 240000}
+
+
+def _verify_password(password, record):
+    if not isinstance(record, dict) or not record.get("salt") or not record.get("hash"):
+        return False
+    candidate = _password_hash(password, record["salt"])["hash"]
+    return hashlib.compare_digest(candidate, str(record.get("hash", ""))) if hasattr(hashlib, "compare_digest") else __import__("hmac").compare_digest(candidate, str(record.get("hash", "")))
+
+
+def _load_password_store():
+    with password_lock:
+        records = {}
+        if _profile_db_configured() and _init_profile_database():
+            try:
+                conn = _profile_db_connect()
+                with conn.cursor() as cur:
+                    cur.execute("SELECT username, password_record FROM karvis_user_profiles")
+                    records.update({str(u): rec for u, rec in cur.fetchall()})
+                conn.close()
+            except Exception as exc:
+                print(f"KARVIS profile password read failed: {exc}", flush=True)
+        local_records = read_json_file(PASSWORD_FILE, {})
+        if isinstance(local_records, dict):
+            records.update(local_records)
+        for uname, info in USERS.items():
+            if uname not in records:
+                legacy = str(info.get("password", ""))
+                records[uname] = _password_hash(legacy)
+            info["password"] = ""  # don't keep plaintext credentials in the active user map
+        if not PASSWORD_FILE.exists():
+            write_json_file(PASSWORD_FILE, records)
+        return records
+
+
+def _set_password(username, password):
+    record = _password_hash(password)
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE karvis_user_profiles SET password_record=%s, updated_at=NOW() WHERE username=%s", (json.dumps(record), username))
+            conn.close()
+        except Exception as exc:
+            print(f"KARVIS profile password write failed: {exc}", flush=True)
+    with password_lock:
+        records = read_json_file(PASSWORD_FILE, {})
+        if not isinstance(records, dict): records = {}
+        records[username] = record
+        write_json_file(PASSWORD_FILE, records)
+
+
+def _sude_default_state():
+    return {"food_log": [], "tasks": [], "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+
+def _get_sude_state():
+    data = read_json_file(SUDE_WORLD_FILE, {})
+    if not isinstance(data, dict): data = {}
+    data.setdefault("sude", _sude_default_state())
+    state = data["sude"]
+    if not isinstance(state, dict): state = _sude_default_state()
+    defaults = _sude_default_state()
+    for key, value in defaults.items(): state.setdefault(key, value)
+    # Remove legacy pet/individual-points fields from older persisted Sude profiles.
+    state.pop("pet", None)
+    state.pop("points", None)
+    state.pop("badges", None)
+    data["sude"] = state
+    return data, state
+
+
+# ============================================================
+# MODELS
+# ============================================================
+
+class LoginRequest(BaseModel):
+
+    username: str
+    password: str = ""
+
+
+class ChatRequest(BaseModel):
+
+    message: str
+    username: str = "karahan"
+    mode: str = "normal"
+    conversation_id: str = ""
+
+
+class PresentationRequest(BaseModel):
+
+    topic: str
+    slide_count: int = 7
+    username: str = "karahan"
+
+
+class BetulInstagramRequest(BaseModel):
+
+    username: str
+
+
+class UserRequestCreate(BaseModel):
+
+    username: str
+    original: str
+    summary: str = ""
+
+
+class PushSubscribeRequest(BaseModel):
+
+    username: str
+    subscription: dict
+
+
+class PushUnsubscribeRequest(BaseModel):
+
+    username: str
+    endpoint: str
+
+
+class AdminNotificationRequest(BaseModel):
+
+    username: str = "murat"
+    target: str = "all"
+    title: str = "K.A.R.V.I.S."
+    body: str
+    url: str = "/"
+
+
+# ============================================================
+# USER REQUESTS / SUGGESTIONS
+# ============================================================
+
+REQUEST_FILE = BASE_DIR / "user_requests.json"
+request_lock = threading.Lock()
+
+
+def normalize_request_text(text):
+    return re.sub(r"\s+", " ", str(text or "").strip().lower())
+
+
+def detect_user_feature_request(message):
+    text = normalize_request_text(message)
+    if not text or len(text) < 10:
+        return False
+
+    # Bilgi isteme kalıplarını özellikle dışarıda bırak.
+    pure_question = re.match(r"^(hava|hava durumu|saat|kaç|kim|ne|nedir|nasıl|nerede|ne zaman|hangi)\b", text)
+    request_patterns = [
+        "keşke", "şöyle olsa", "böyle olsa", "olsa daha güzel",
+        "olsa daha iyi", "olsa iyi olur", "yapabilsen", "yapabilirsen",
+        "ekleyebilirsen", "eklenebilir", "ekleyebilir misin",
+        "özellik ekle", "özelliği ekle", "bence ekle", "bunu da yap",
+        "şunu da yap", "bunu da ekle", "şunu da ekle", "yapabilir misin"
+    ]
+    if pure_question and not any(p in text for p in request_patterns):
+        return False
+    return any(p in text for p in request_patterns)
+
+
+def make_request_summary(message):
+    text = re.sub(r"\s+", " ", str(message or "").strip())
+    text = re.sub(r"^(keşke|bence|şunu|bunu)\s*", "", text, flags=re.IGNORECASE)
+    text = text.strip(" .,!?")
+    if len(text) > 180:
+        text = text[:177].rstrip() + "..."
+    return text
+
+
+def feature_request_ack(username):
+    name = USERS.get(username, {}).get("name", username)
+    if username == "betul":
+        return (
+            "Aşkoo, bunu KARAHAN INC.'e bildiriyorum 💅 "
+            "En kısa sürede bu konuyu değerlendirip uygun görülürse "
+            "K.A.R.V.I.S.'e ekleyeceklerinden eminim. ✨"
+        )
+    if username == "ilknur":
+        return (
+            "Hocam, talebinizi KARAHAN INC. yönetimine bildiriyorum. "
+            "En kısa sürede değerlendirmeye alınarak uygun görülmesi hâlinde "
+            "uygulamaya dahil edilecektir."
+        )
+    if username == "sinem":
+        return (
+            "Sinem, bunu KARAHAN INC.'e bildiriyorum. "
+            "En kısa sürede bu konuyu değerlendirip uygun görülürse "
+            "uygulamayı güncelleyeceklerinden eminim. ✨"
+        )
+    return (
+        f"{name}, talebinizi KARAHAN INC.'e bildiriyorum. "
+        "En kısa sürede bu konuyu değerlendirip uygun görülmesi hâlinde "
+        "uygulamaya dahil edeceklerinden eminim."
+    )
+
+
+def save_user_request(username, original):
+    username = str(username or "").strip().lower()
+    if username in {"", "karahan", "murat"}:
+        return None
+    if not detect_user_feature_request(original):
+        return None
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        # Aynı cümlenin kısa süre içinde tekrar kaydedilmesini önle.
+        norm = normalize_request_text(original)
+        now = time.time()
+        for item in reversed(data[-30:]):
+            if item.get("username") == username and normalize_request_text(item.get("original", "")) == norm:
+                try:
+                    if now - datetime.fromisoformat(item.get("created_at", "")).timestamp() < 300:
+                        return item
+                except Exception:
+                    pass
+        item = {
+            "id": uuid.uuid4().hex,
+            "username": username,
+            "name": USERS.get(username, {}).get("name", username),
+            "original": str(original).strip(),
+            "summary": make_request_summary(original),
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "read": False,
+            "priority": "normal"
+        }
+        data.append(item)
+        write_json_file(REQUEST_FILE, data[-500:])
+        return item
+
+
+def get_user_requests():
+    """Return only genuine user feature requests.
+
+    Older versions could accidentally save the Betül system prompt instead of
+    the user message. Those malformed records are ignored and removed.
+    """
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        clean = []
+        changed = False
+        for item in data:
+            original = str(item.get("original", "")).strip()
+            normalized = normalize_request_text(original)
+            looks_like_system_prompt = (
+                normalized.startswith("sen k.a.r.v.i.s.")
+                or "betül karakteri:" in normalized
+                or "kullanıcının mesajı:" in normalized and "sen k.a.r.v.i.s." in normalized
+            )
+            if looks_like_system_prompt:
+                changed = True
+                continue
+            item.pop("status", None)
+            clean.append(item)
+        if changed or len(clean) != len(data):
+            write_json_file(REQUEST_FILE, clean[-500:])
+        return clean[-500:]
+
+
+def requests_answer_for_admin():
+    data = get_user_requests()
+    if not data:
+        return "Efendim, kayıtlı kullanıcı isteği bulunmuyor."
+    unread = [x for x in data if not x.get("read", False)]
+    recent = data[-10:][::-1]
+    lines = [
+        "Efendim, kullanıcıların kayıtlı isteklerini kontrol ettim.",
+        f"Toplam {len(data)} istek var; {len(unread)} tanesi yeni."
+    ]
+    for item in recent:
+        lines.append(f"• {item.get('name', item.get('username'))}: {item.get('summary') or item.get('original')}")
+    return "\n".join(lines)
+
+
+# ============================================================
+# ACCOUNT REGISTRATION
+# ============================================================
+class RegisterRequest(BaseModel):
+    username: str
+    display_name: str
+    password: str
+
+@app.post("/register")
+async def register_account(data: RegisterRequest):
+    username = (data.username or "").strip().lower()
+    display_name = (data.display_name or "").strip()
+    password = data.password or ""
+    if not re.fullmatch(r"[a-z0-9_.-]{3,24}", username):
+        raise HTTPException(status_code=400, detail="Kullanıcı adı 3-24 karakter olmalı; yalnızca İngilizce harf, rakam, nokta, alt çizgi ve tire kullanılabilir.")
+    if username in USERS:
+        raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+    # Check persistent storage too, so an account created on another worker cannot be duplicated.
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM karvis_user_profiles WHERE username=%s", (username,))
+                exists_in_db = cur.fetchone() is not None
+            conn.close()
+            if exists_in_db:
+                raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        except HTTPException:
+            raise
+        except Exception as exc:
+            print(f"KARVIS duplicate profile check failed: {exc}", flush=True)
+            raise HTTPException(status_code=503, detail="Profil veritabanı kontrol edilemedi. Lütfen tekrar deneyin.")
+    if len(display_name) < 2 or len(display_name) > 60:
+        raise HTTPException(status_code=400, detail="Görünen ad 2-60 karakter arasında olmalı.")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Şifre en az 8 karakter olmalı.")
+    if not any(ch.isalpha() for ch in password) or not any(ch.isdigit() for ch in password):
+        raise HTTPException(status_code=400, detail="Şifre en az bir harf ve bir rakam içermeli.")
+
+    # Persist profile + salted password hash in PostgreSQL when configured.
+    # If the database is unavailable, use local JSON but explicitly report that it is not durable on Render.
+    with password_lock:
+        if username in USERS:
+            raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+        password_record = _password_hash(password)
+        if _profile_db_configured():
+            if not _init_profile_database():
+                raise HTTPException(status_code=503, detail="Profil veritabanına bağlanılamadı. DATABASE_URL ve veritabanı bağlantısını kontrol edin; hesap oluşturulmadı.")
+            try:
+                conn = _profile_db_connect()
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            INSERT INTO karvis_user_profiles (username, display_name, password_record, role, style)
+                            VALUES (%s, %s, %s, 'user', 'professional')
+                            ON CONFLICT (username) DO NOTHING
+                            RETURNING username
+                        """, (username, display_name, json.dumps(password_record)))
+                        inserted = cur.fetchone()
+                conn.close()
+                if not inserted:
+                    raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            except HTTPException:
+                raise
+            except Exception as exc:
+                print(f"KARVIS profile registration failed: {exc}", flush=True)
+                raise HTTPException(status_code=503, detail="Profil kalıcı olarak kaydedilemedi. Veritabanı bağlantısını kontrol edin.")
+        else:
+            registered = read_json_file(REGISTERED_USERS_FILE, {})
+            if not isinstance(registered, dict): registered = {}
+            if username in registered:
+                raise HTTPException(status_code=409, detail="Bu kullanıcı adı zaten kullanılıyor.")
+            registered[username] = {"name": display_name, "role": "user", "style": "professional"}
+            write_json_file(REGISTERED_USERS_FILE, registered)
+            password_records = read_json_file(PASSWORD_FILE, {})
+            if not isinstance(password_records, dict): password_records = {}
+            password_records[username] = password_record
+            write_json_file(PASSWORD_FILE, password_records)
+        USERS[username] = {"name": display_name, "password": "", "role": "user", "style": "professional"}
+    return {"success": True, "message": "Hesap oluşturuldu. Giriş yapabilirsiniz.", "username": username, "persistent": bool(_profile_db_configured() and _init_profile_database())}
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
+@app.post("/login")
+async def login(
+    request: LoginRequest
+):
+
+    username = (
+        request.username or ""
+    ).strip().lower()
+
+    password = (
+        request.password or ""
+    )
+
+    user = USERS.get(
+        username
+    )
+
+    if user is None:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Kullanıcı adı veya şifre hatalı."
+        )
+
+    password_records = _load_password_store()
+    record = password_records.get(username)
+    # Legacy fallback allows one-time migration of existing installations.
+    valid = _verify_password(password, record) if record else False
+    if not valid and user.get("password"):
+        valid = user.get("password") == password
+        if valid:
+            _set_password(username, password)
+            user["password"] = ""
+    if not valid:
+        raise HTTPException(status_code=401, detail="Kullanıcı adı veya şifre hatalı.")
+
+    public_user = {
+
+        "username":
+            username,
+
+        "name":
+            user.get(
+                "name",
+                username
+            ),
+
+        "role":
+            user.get(
+                "role",
+                "user"
+            ),
+
+        "style":
+            user.get(
+                "style",
+                "professional"
+            ),
+    }
+
+    return {
+
+        "success":
+            True,
+
+        "username":
+            username,
+
+        "user":
+            public_user,
+
+        "message":
+            "Giriş başarılı."
+    }
+
+
+# ============================================================
+# ILKNUR TEACHER EXAM / QUIZ SYSTEM
+# ============================================================
+
+# Sınav verileri özellikle kalıcı diske yazılmaz. Tek çalışan FastAPI süreci
+# içinde bellekte tutulur; yeniden başlatma/deploy sonrasında sıfırlanır.
+# Render'da bu davranış için tek worker/instance kullanın.
+EXAMS_LOCK = threading.RLock()
+_EXAM_MEMORY = {"exams": [], "submissions": [], "attempts": []}
+
+class ExamCreateRequest(BaseModel):
+    username: str
+    title: str
+    subject: str = ""
+    description: str = ""
+    questions: list[dict]
+    published: bool = False
+    duration_minutes: int = 0
+    starts_at: str = ""
+    ends_at: str = ""
+
+class ExamSubmitRequest(BaseModel):
+    username: str
+    answers: list[dict]
+    submitted_automatically: bool = False
+
+class ExamPublishRequest(BaseModel):
+    username: str
+    published: bool
+
+
+def _exam_store():
+    """Return the process-local, intentionally non-persistent exam store."""
+    _EXAM_MEMORY.setdefault("exams", [])
+    _EXAM_MEMORY.setdefault("submissions", [])
+    _EXAM_MEMORY.setdefault("attempts", [])
+    return _EXAM_MEMORY
+
+
+def _save_exam_store(data):
+    # Intentionally a no-op: the user requested no persistent exam records.
+    # All endpoints in this process share the same in-memory object.
+    return None
+
+
+def _teacher_only(username):
+    if str(username or "").strip().lower() != "ilknur":
+        raise HTTPException(status_code=403, detail="Bu işlem yalnızca İlknur öğretmen profiline açıktır.")
+
+
+def _validate_exam_questions(questions):
+    if not isinstance(questions, list) or not 1 <= len(questions) <= 100:
+        raise HTTPException(status_code=400, detail="Sınav 1 ile 100 arasında soru içermelidir.")
+    cleaned = []
+    for idx, q in enumerate(questions, 1):
+        if not isinstance(q, dict): raise HTTPException(status_code=400, detail=f"{idx}. soru geçersiz.")
+        prompt = str(q.get("prompt", "")).strip()[:1000]
+        qtype = str(q.get("type", "multiple_choice")).strip().lower()
+        if not prompt: raise HTTPException(status_code=400, detail=f"{idx}. sorunun metni boş olamaz.")
+        if qtype not in {"multiple_choice", "true_false", "open_ended"}:
+            raise HTTPException(status_code=400, detail=f"{idx}. soru türü desteklenmiyor.")
+        item = {"id": str(q.get("id") or uuid.uuid4().hex), "prompt": prompt, "type": qtype, "points": 10}
+        if qtype == "multiple_choice":
+            opts = [str(x).strip()[:300] for x in q.get("options", []) if str(x).strip()]
+            if len(opts) < 2 or len(opts) > 6: raise HTTPException(status_code=400, detail=f"{idx}. soru 2-6 seçenek içermelidir.")
+            correct = q.get("correct_index")
+            if not isinstance(correct, int) or correct < 0 or correct >= len(opts): raise HTTPException(status_code=400, detail=f"{idx}. sorunun doğru seçeneğini belirleyin.")
+            item.update({"options": opts, "correct_index": correct})
+        elif qtype == "true_false":
+            correct = q.get("correct_answer")
+            if not isinstance(correct, bool): raise HTTPException(status_code=400, detail=f"{idx}. soru için doğru/yanlış cevabını seçin.")
+            item["correct_answer"] = correct
+        else:
+            answer = str(q.get("correct_answer", "")).strip()[:1000]
+            item["correct_answer"] = answer
+        cleaned.append(item)
+    return cleaned
+
+
+class ExamGenerateRequest(BaseModel):
+    username: str
+    subject: str
+    topic: str
+    question_count: int = 10
+    difficulty: str = "orta"
+    question_types: list[str] = ["multiple_choice"]
+    grade_level: str = ""
+    instructions: str = ""
+
+
+@app.post("/teacher/exams/generate")
+async def teacher_generate_exam(req: ExamGenerateRequest):
+    # Generate a draft; teacher reviews and edits before publishing.
+    _teacher_only(req.username)
+    subject = str(req.subject or "").strip()[:100]
+    topic = str(req.topic or "").strip()[:300]
+    if not subject or not topic:
+        raise HTTPException(status_code=400, detail="Ders ve konu alanlarını doldurun.")
+    count = max(1, min(50, int(req.question_count or 10)))
+    difficulty = str(req.difficulty or "orta").lower()
+    if difficulty not in {"kolay", "orta", "zor", "karma"}: difficulty = "orta"
+    allowed = {"multiple_choice", "true_false", "open_ended"}
+    types = [t for t in req.question_types if t in allowed]
+    if not types: types = ["multiple_choice"]
+    prompt = f'''Sen deneyimli bir öğretmen ve ölçme-değerlendirme uzmanı gibi gerçek bir okul sınavı hazırla. Sorular ezbere ve yüzeysel bilgiye dayanmamalı; dersin kazanımlarını ölçmeli ve öğretmenin sınıfta sorabileceği nitelikte olmalı.
+
+GİRDİLER
+Ders: {subject}
+Konu/kapsam: {topic}
+Sınıf/düzey: {str(req.grade_level or "belirtilmedi")[:100]}
+İstenen zorluk: {difficulty}
+Soru sayısı: tam olarak {count}
+İzin verilen soru türleri: {", ".join(types)}
+Öğretmen talimatları: {str(req.instructions or "yok")[:1000]}
+
+KALİTE STANDARTLARI
+1. Her soru açıkça ölçülebilir bir kazanıma odaklansın; konu dışına çıkma ve düzeyin gerektirdiği bilgi sınırlarını aşma.
+2. Sorular doğal, akıcı, dil bilgisi açısından doğru ve gerçek sınav kitapçığı üslubunda yazılsın. Gereksiz uzunluk, yapay ifadeler, ipuçları ve muğlak anlatım kullanma.
+3. Sorular birbirinden farklı olsun; aynı bilgiyi küçük kelime değişiklikleriyle tekrar sorma. Soru kökü tek başına anlaşılır ve kendi içinde yeterli olsun.
+4. Çoktan seçmeli sorularda tam 4 makul seçenek kullan. Çeldiriciler konuya hâkim olmayan öğrencinin yapabileceği gerçek hatalara dayansın; saçma, komik, alakasız veya bariz yanlış seçenekler üretme. Yalnızca bir seçenek tartışmasız doğru olsun. Seçenekler benzer uzunluk ve dil yapısında olsun; doğru seçenek sürekli aynı harfte olmasın.
+5. Doğru cevap gerçekten soru kökünü karşılasın. Cevap anahtarını her soru için bağımsız kontrol et; soru ile cevap anahtarı çelişmesin. Sayısal sorularda hesabı kontrol et ve gerekli birimleri yaz.
+6. Zorluk düzeyini gerçekten uygula: kolay temel kavrama; orta bilgiyi yorumlama/uygulama; zor birden fazla adım, analiz veya ince ayrım gerektirsin. Karma seçildiyse kolay-orta-zor soruları dengeli dağıt. Zorluğu yalnızca soru metnini uzatarak artırma.
+7. Ders uygunsa yalnızca hatırlamayı değil, yorumlama, uygulama, analiz ve problem çözmeyi de ölç. Ancak konu dışı veya verilen kapsamın gerektirmediği bilgi isteme.
+8. Doğru/yanlış sorularında yalnızca tek bir temel yargı bulunsun; ifade yoruma açık olmasın. Açık uçlu sorularda beklenen cevabı ve temel değerlendirme ölçütünü correct_answer alanında kısa ve net ver.
+9. Bir soru için güvenilir, tek bir cevap belirlenemiyorsa o soruyu üretme; yerine sağlam bir soru yaz. Kaynak, mevzuat maddesi, tarih veya istatistik uydurma.
+10. Her soru tam olarak 10 puandır; points alanını 10 olarak ver. İstenen soru türlerinin tümünü kullanmaya çalış; türler arasında sayı dağılımı mümkün olduğunca dengeli olsun. Toplam soru sayısı tam olarak {count} olmalı.
+
+ÇIKTI KURALLARI
+Yalnızca geçerli JSON döndür. Markdown, kod çiti veya açıklama ekleme. Şema:
+{{"title":"sınavın kısa ve profesyonel başlığı","description":"kapsamı ve ölçülen becerileri belirten kısa açıklama","questions":[{{"type":"multiple_choice|true_false|open_ended","prompt":"tam soru kökü","points":10,"options":["A seçeneği","B seçeneği","C seçeneği","D seçeneği"],"correct_index":0,"correct_answer":"açık uçlu cevap anahtarı veya doğru/yanlış için boolean"}}]}}
+
+Şema uygulaması: multiple_choice için options dizisinde tam 4 seçenek ve 0-3 arası correct_index ver; true_false için correct_answer alanı yalnızca true veya false olsun; open_ended için correct_answer alanına beklenen cevap ile gerekiyorsa temel puanlama ölçütünü yaz. Kullanılmayan türe ait alanları eklemek zorunda değilsin. JSON kaçış karakterleri ve tırnakları doğru olsun. Soru sayısı tam olarak {count} olsun.'''
+    result = ask_ai(prompt, system_prompt="Kıdemli bir branş öğretmeni, sınav yazarı ve ölçme-değerlendirme uzmanı gibi davran. Akademik doğruluğu, kazanım uyumunu, tek doğru cevabı, güçlü çeldiricileri ve gerçek sınav dilini önceliklendir. Çıktı biçimi talimatlarına eksiksiz uy.", fast=False)
+    if not result:
+        raise HTTPException(status_code=503, detail="Yapay zekâ sağlayıcısı yanıt vermedi. API anahtarlarını ve sunucu günlüklerini kontrol edin.")
+    try:
+        raw = str(result).strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        left, right = raw.find("{"), raw.rfind("}")
+        payload = json.loads(raw[left:right+1])
+        questions = _validate_exam_questions(payload.get("questions", []))
+        if len(questions) != count:
+            raise ValueError(f"Beklenen {count} soru, gelen {len(questions)}")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Yapay zekâ geçerli sınav JSON'u üretemedi. Lütfen yeniden deneyin. Ayrıntı: " + str(exc)[:180])
+    return {"success": True, "title": str(payload.get("title") or f"{subject} — {topic}")[:140], "description": str(payload.get("description") or f"{subject}: {topic}")[:1000], "subject": subject, "questions": questions, "message": "Taslak üretildi. Yayımlamadan önce soruları ve cevap anahtarını düzenleyip kontrol edin."}
+
+@app.post("/teacher/exams")
+async def teacher_create_exam(req: ExamCreateRequest):
+    _teacher_only(req.username)
+    title = str(req.title or "").strip()[:140]
+    if len(title) < 3: raise HTTPException(status_code=400, detail="Sınav başlığı en az 3 karakter olmalıdır.")
+    questions = _validate_exam_questions(req.questions)
+    exam = {"id": uuid.uuid4().hex, "title": title, "subject": str(req.subject or "").strip()[:100], "description": str(req.description or "").strip()[:1000], "questions": questions, "published": bool(req.published), "duration_minutes": max(0, min(600, int(req.duration_minutes or 0))), "starts_at": str(req.starts_at or "").strip(), "ends_at": str(req.ends_at or "").strip(), "created_at": datetime.utcnow().isoformat() + "Z", "created_by": "ilknur"}
+    with EXAMS_LOCK:
+        data = _exam_store(); data["exams"].append(exam); _save_exam_store(data)
+    return {"success": True, "exam": {k:v for k,v in exam.items() if k != "questions"}, "message": "Sınav kaydedildi."}
+
+
+@app.get("/teacher/exams")
+async def teacher_list_exams(username: str = "ilknur"):
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data = _exam_store()
+    summaries = []
+    for exam in data["exams"]:
+        item = {k:v for k,v in exam.items() if k != "questions"}
+        item["question_count"] = len(exam.get("questions", []))
+        item["submission_count"] = sum(1 for s in data["submissions"] if s.get("exam_id") == exam.get("id"))
+        summaries.append(item)
+    return {"success": True, "exams": summaries}
+
+
+@app.get("/exams")
+async def list_published_exams(username: str = ""):
+    with EXAMS_LOCK:
+        data = _exam_store()
+    out=[]
+    for e in data["exams"]:
+        if not e.get("published"): continue
+        out.append({"id":e["id"], "title":e["title"], "subject":e.get("subject",""), "description":e.get("description",""), "question_count":len(e.get("questions",[])), "duration_minutes":e.get("duration_minutes",0), "starts_at":e.get("starts_at",""), "ends_at":e.get("ends_at",""), "submitted": bool(username and any(s.get("exam_id")==e.get("id") and s.get("username")==str(username).strip().lower() for s in data["submissions"]))})
+    return {"success": True, "exams": out}
+
+
+@app.get("/exams/{exam_id}")
+async def get_exam_for_student(exam_id: str, username: str):
+    if not str(username or "").strip() or username.strip().lower() not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    with EXAMS_LOCK:
+        data = _exam_store()
+    exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
+    if not exam: raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+    if not exam.get("published") and username.strip().lower() != "ilknur": raise HTTPException(status_code=403, detail="Bu sınav henüz yayımlanmadı.")
+    now = datetime.utcnow()
+    try:
+        starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+        ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+        if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+        if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+    except Exception:
+        starts = ends = None
+    if username.strip().lower() != "ilknur" and starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+    if username.strip().lower() != "ilknur" and ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
+    return {"success":True,"exam":{"id":exam["id"],"title":exam["title"],"subject":exam.get("subject",""),"description":exam.get("description",""),"duration_minutes":exam.get("duration_minutes",0),"starts_at":exam.get("starts_at",""),"ends_at":exam.get("ends_at",""),"questions":[{"id":q["id"],"prompt":q["prompt"],"type":q["type"],"points":10,**({"options":q.get("options",[])} if q["type"]=="multiple_choice" else {})} for q in exam.get("questions",[])]}}
+
+
+
+@app.post("/exams/{exam_id}/start")
+async def start_exam(exam_id: str, username: str):
+    username = str(username or "").strip().lower()
+    if username not in USERS or username == "ilknur": raise HTTPException(status_code=401, detail="Öğrenci profili gerekli.")
+    with EXAMS_LOCK:
+        data = _exam_store(); exam = next((e for e in data["exams"] if e.get("id") == exam_id and e.get("published")), None)
+        if not exam: raise HTTPException(status_code=404, detail="Yayımlanmış sınav bulunamadı.")
+        if any(s.get("exam_id") == exam_id and s.get("username") == username for s in data["submissions"]): raise HTTPException(status_code=409, detail="Bu sınava zaten katıldınız.")
+        now = datetime.utcnow()
+        try:
+            starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+            ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+            if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+            if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+        except Exception: starts = ends = None
+        if starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+        if ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
+        started = next((x for x in data.setdefault("attempts", []) if x.get("exam_id")==exam_id and x.get("username")==username), None)
+        if not started:
+            started = {"exam_id": exam_id, "username": username, "started_at": now.isoformat()+"Z"}
+            data["attempts"].append(started); _save_exam_store(data)
+        duration = int(exam.get("duration_minutes", 0) or 0)
+        remaining = max(0, duration*60 - int((now - datetime.fromisoformat(started["started_at"].replace("Z", ""))).total_seconds())) if duration else 0
+        if ends: remaining = min(remaining if duration else int((ends-now).total_seconds()), int((ends-now).total_seconds()))
+        return {"success": True, "started_at": started["started_at"], "remaining_seconds": remaining, "duration_minutes": duration}
+
+@app.post("/exams/{exam_id}/submit")
+async def submit_exam(exam_id: str, req: ExamSubmitRequest):
+    username = str(req.username or "").strip().lower()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçerli bir profil belirtin.")
+    if username == "ilknur": raise HTTPException(status_code=400, detail="Öğretmen profili sınava öğrenci olarak katılamaz.")
+    with EXAMS_LOCK:
+        data = _exam_store()
+        exam = next((e for e in data["exams"] if e.get("id")==exam_id), None)
+        if not exam or not exam.get("published"): raise HTTPException(status_code=404, detail="Yayımlanmış sınav bulunamadı.")
+        now = datetime.utcnow()
+        try:
+            starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
+            ends = datetime.fromisoformat(str(exam.get("ends_at", "")).replace("Z", "+00:00")) if exam.get("ends_at") else None
+            if starts and starts.tzinfo: starts = starts.astimezone(timezone.utc).replace(tzinfo=None)
+            if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
+        except Exception:
+            starts = ends = None
+        if starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+        if any(s.get("exam_id")==exam_id and s.get("username")==username for s in data["submissions"]): raise HTTPException(status_code=409, detail="Bu sınava zaten katıldınız.")
+        attempts = data.setdefault("attempts", [])
+        started = next((x for x in attempts if x.get("exam_id")==exam_id and x.get("username")==username), None)
+        if not started: raise HTTPException(status_code=400, detail="Önce sınavı başlatmalısınız.")
+        duration = int(exam.get("duration_minutes", 0) or 0)
+        started_at = datetime.fromisoformat(started["started_at"].replace("Z", ""))
+        duration_expired = bool(duration and (now-started_at).total_seconds() > duration*60 + 10)
+        deadline_expired = bool(ends and now >= ends)
+        timed_out = duration_expired or deadline_expired or bool(req.submitted_automatically)
+        answer_map = {str(a.get("question_id")): a.get("answer") for a in req.answers if isinstance(a, dict)}
+        total = 10 * len(exam["questions"])
+        score=0; details=[]
+        for q in exam["questions"]:
+            ans=answer_map.get(q["id"]); correct=None
+            if q["type"]=="multiple_choice": correct=isinstance(ans,int) and ans==q.get("correct_index")
+            elif q["type"]=="true_false": correct=isinstance(ans,bool) and ans==q.get("correct_answer")
+            else:
+                correct = None
+            earned=10 if correct is True and not timed_out else 0
+            if timed_out and q["type"] == "open_ended":
+                correct = None
+            score+=earned
+            details.append({"question_id":q["id"],"answer":ans,"correct":correct,"earned_points":earned,"max_points":10,"manual_review":q["type"]=="open_ended"})
+        submission={"id":uuid.uuid4().hex,"exam_id":exam_id,"username":username,"submitted_at":datetime.utcnow().isoformat()+"Z","score":score,"max_score":total,"percent":round(score*100/total,2) if total else 0,"answers":details,"status":"time_expired" if timed_out else ("pending_review" if any(x.get("manual_review") for x in details) else "graded"),"timed_out":timed_out}
+        data["submissions"].append(submission); _save_exam_store(data)
+    return {"success":True,"result":{"score":score,"max_score":total,"percent":submission["percent"],"answers":details},"message":"Sınav yanıtlarınız kaydedildi."}
+
+
+@app.post("/teacher/exams/{exam_id}/publish")
+async def teacher_publish_exam(exam_id: str, req: ExamPublishRequest):
+    _teacher_only(req.username)
+    with EXAMS_LOCK:
+        data=_exam_store(); exam=next((e for e in data["exams"] if e.get("id")==exam_id),None)
+        if not exam: raise HTTPException(status_code=404,detail="Sınav bulunamadı.")
+        exam["published"]=bool(req.published); _save_exam_store(data)
+    return {"success":True,"published":exam["published"]}
+
+
+
+class ExamGradeRequest(BaseModel):
+    username: str
+    submission_id: str
+    question_id: str
+    points_awarded: int
+    feedback: str = ""
+
+@app.post("/teacher/exams/{exam_id}/grade")
+async def teacher_grade_open_answer(exam_id: str, req: ExamGradeRequest):
+    _teacher_only(req.username)
+    with EXAMS_LOCK:
+        data = _exam_store(); exam = next((e for e in data["exams"] if e.get("id")==exam_id), None)
+        if not exam: raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        submission = next((s for s in data["submissions"] if s.get("id")==req.submission_id and s.get("exam_id")==exam_id), None)
+        if not submission: raise HTTPException(status_code=404, detail="Öğrenci teslimi bulunamadı.")
+        answer = next((a for a in submission.get("answers", []) if a.get("question_id")==req.question_id), None)
+        question = next((q for q in exam.get("questions", []) if q.get("id")==req.question_id), None)
+        if not answer or not question or question.get("type") != "open_ended": raise HTTPException(status_code=400, detail="Açık uçlu soru bulunamadı.")
+        points = max(0, min(10, int(req.points_awarded)))
+        old = int(answer.get("earned_points", 0)); answer.update({"correct": points == 10, "earned_points": points, "feedback": str(req.feedback or "")[:1000], "manual_review": False})
+        submission["score"] = max(0, int(submission.get("score", 0)) + points - old)
+        submission["percent"] = round(submission["score"]*100/int(submission.get("max_score", 1) or 1), 2)
+        submission["status"] = "pending_review" if any(a.get("manual_review") for a in submission.get("answers", [])) else "graded"
+        _save_exam_store(data)
+    return {"success": True, "submission_id": submission["id"], "score": submission["score"], "percent": submission["percent"], "status": submission["status"]}
+
+@app.get("/teacher/exams/{exam_id}/results")
+async def teacher_exam_results(exam_id: str, username: str = "ilknur"):
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data=_exam_store(); exam=next((e for e in data["exams"] if e.get("id")==exam_id),None)
+        if not exam: raise HTTPException(status_code=404,detail="Sınav bulunamadı.")
+        submissions=[s for s in data["submissions"] if s.get("exam_id")==exam_id]
+    scores=[s.get("percent",0) for s in submissions]
+    return {"success":True,"exam":{"id":exam_id,"title":exam["title"],"question_count":len(exam.get("questions",[]))},"summary":{"submission_count":len(submissions),"average_percent":round(sum(scores)/len(scores),2) if scores else 0,"highest_percent":max(scores) if scores else 0,"lowest_percent":min(scores) if scores else 0},"submissions":[{"id":s["id"],"username":s["username"],"submitted_at":s["submitted_at"],"score":s["score"],"max_score":s["max_score"],"percent":s["percent"],"status":s.get("status","graded"),"answers":[{**a,"prompt":next((q.get("prompt","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),""),"type":next((q.get("type","") for q in exam.get("questions",[]) if q.get("id")==a.get("question_id")),"")} for a in s["answers"]]} for s in submissions]}
+
+
+@app.get("/teacher/exams/{exam_id}/analysis")
+async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
+    """Teacher-only class statistics and evidence-based topic-gap analysis."""
+    _teacher_only(username)
+    with EXAMS_LOCK:
+        data = _exam_store()
+        exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
+        if not exam:
+            raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
+        submissions = [s.copy() for s in data["submissions"] if s.get("exam_id") == exam_id]
+        questions = [q.copy() for q in exam.get("questions", [])]
+
+    scores = [float(s.get("percent", 0) or 0) for s in submissions]
+    question_stats = []
+    for q in questions:
+        related = [a for sub in submissions for a in sub.get("answers", []) if a.get("question_id") == q.get("id")]
+        reviewed = [a for a in related if not a.get("manual_review")]
+        incorrect = sum(1 for a in reviewed if a.get("correct") is False)
+        unanswered = sum(1 for a in related if not str(a.get("answer", "")).strip())
+        question_stats.append({
+            "question_id": q.get("id"), "prompt": q.get("prompt", ""),
+            "type": q.get("type", ""), "responses": len(related),
+            "incorrect": incorrect, "unanswered": unanswered,
+            "incorrect_percent": round(100 * incorrect / len(reviewed), 1) if reviewed else None,
+            "manual_review_count": sum(1 for a in related if a.get("manual_review")),
+        })
+    weak = sorted([x for x in question_stats if x["incorrect_percent"] is not None], key=lambda x: x["incorrect_percent"], reverse=True)[:8]
+    summary = {
+        "submission_count": len(submissions),
+        "average_percent": round(sum(scores) / len(scores), 1) if scores else 0,
+        "highest_percent": max(scores) if scores else 0,
+        "lowest_percent": min(scores) if scores else 0,
+        "pass_rate_percent": round(100 * sum(1 for x in scores if x >= 50) / len(scores), 1) if scores else 0,
+        "pending_open_answers": sum(1 for sub in submissions for a in sub.get("answers", []) if a.get("manual_review")),
+    }
+    # KARVIS Değerlendirmesi: aggregate-only, evidence-based class-level analysis.
+    ai_analysis = "Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça sınıfın güçlü ve geliştirilmesi gereken noktaları belirlenecektir."
+    if submissions and question_stats:
+        compact = []
+        for x in question_stats:
+            response_count = int(x.get("responses") or 0)
+            incorrect_count = int(x.get("incorrect") or 0)
+            blank_count = int(x.get("unanswered") or 0)
+            review_count = int(x.get("manual_review_count") or 0)
+            evaluable = max(0, response_count - review_count)
+            correct_count = max(0, evaluable - incorrect_count - blank_count)
+            compact.append({
+                "soru": str(x.get("prompt", ""))[:240],
+                "yanit_sayisi": response_count,
+                "degerlendirilebilir_yanit": evaluable,
+                "dogru_sayisi_tahmini": correct_count,
+                "yanlis_sayisi": incorrect_count,
+                "bos_sayisi": blank_count,
+                "yanlis_yuzdesi": x.get("incorrect_percent"),
+                "bos_yuzdesi": round(100 * blank_count / response_count, 1) if response_count else None,
+                "acik_uclu_degerlendirme_bekleyen": review_count,
+                "basari_yuzdesi": round(100 * correct_count / evaluable, 1) if evaluable else None,
+            })
+        prompt = (
+            "Türkçe, profesyonel ve uygulanabilir bir SINIF GENELİ değerlendirme yaz. "
+            "Başlıklar: Genel değerlendirme; Güçlü yönler; Pekiştirilmesi gereken öğrenmeler; "
+            "Nasıl pekiştirilmeli?; Bir sonraki ders için uygulama planı; Veri sınırlılığı. "
+            "ÇOK ÖNEMLİ: Soruları tek tek ASLA yazma; soru numarası, soru metni, tablo veya soru başına liste oluşturma. "
+            "Sonuçları yalnızca sınıf düzeyinde özetle; gerekiyorsa konu/kazanım yalnızca veriden güvenle çıkarılabiliyorsa an, "
+            "aksi halde 'ilgili kazanım' gibi genel ifade kullan. "
+            "Somut bir pekiştirme planı ver: kısa tekrar, öğretmen modellemesi, rehberli uygulama, eşli/küçük grup etkinliği, "
+            "aralıklı tekrar ve 3-5 soruluk mini ölçme. Önerileri sınıf verisine bağla. "
+            "Veride olmayan nedenleri kesin gerçek gibi sunma; tahminleri olasılık olarak belirt. "
+            "Katılım azsa veya açık uçlu cevaplar öğretmen kontrolü bekliyorsa bunu açıkça belirt. "
+            "Markdown başlıkları ve madde işaretleri kullan; tablo kullanma. 350-550 kelime arasında kal, raporu tamamla ve yarım bırakma.\\n"
+            f"Ders: {str(exam.get('subject',''))[:100]}\\n"
+            f"Sınav: {str(exam.get('title',''))[:140]}\\n"
+            f"Katılım: {len(submissions)} öğrenci\\n"
+            f"Sınıf ortalaması: %{summary['average_percent']}\\n"
+            f"Başarı oranı %70 ve üzeri soru sayısı: {sum(1 for x in question_stats if x.get('incorrect_percent') is not None and (100 - x['incorrect_percent']) >= 70)}\\n"
+            f"Başarı oranı %50 altı soru sayısı: {sum(1 for x in question_stats if x.get('incorrect_percent') is not None and (100 - x['incorrect_percent']) < 50)}\\n"
+            f"Yanlış oranı yüksek yanıtların toplamı: {sum(int(x.get('incorrect') or 0) for x in question_stats)}\\n"
+            f"Boş yanıtların toplamı: {sum(int(x.get('unanswered') or 0) for x in question_stats)}\\n"
+            f"Öğretmen değerlendirmesi bekleyen açık uçlu yanıt: {summary['pending_open_answers']}\\n"
+            "Soru bazlı ham veri (yalnızca toplulaştırma için; raporda tek tek aktarma): "
+            + json.dumps([{
+                "yanit_sayisi": x.get("responses"),
+                "yanlis_sayisi": x.get("incorrect"),
+                "bos_sayisi": x.get("unanswered"),
+                "yanlis_yuzdesi": x.get("incorrect_percent"),
+                "acik_uclu_bekleyen": x.get("manual_review_count")
+            } for x in question_stats], ensure_ascii=False)
+        )
+        try:
+            result = ask_ai(
+                prompt,
+                system_prompt=(
+                    "Sen KARVIS'sin; deneyimli bir öğretmen ve ölçme-değerlendirme uzmanısın. "
+                    "Yalnızca sınıf genelini değerlendir. Soruları tek tek asla sıralama. "
+                    "Eksiksiz, kısa ve uygulanabilir Türkçe rapor üret; veride olmayan bilgiyi uydurma."
+                ),
+                fast=True
+            )
+            if result and str(result).strip():
+                ai_analysis = str(result).strip()[:12000]
+        except Exception:
+            ai_analysis = "KARVIS Değerlendirmesi şu anda üretilemedi. Soru bazlı istatistikleri ve doğru/yanlış/boş sayılarını kullanarak sınıfın gelişim alanlarını inceleyebilirsiniz."
+    student_stats = []
+    for sub in submissions:
+        answer_by_q = {str(a.get("question_id")): a for a in sub.get("answers", [])}
+        answer_rows = []
+        correct_count = wrong_count = blank_count = 0
+        for index, q in enumerate(questions, 1):
+            ans = answer_by_q.get(str(q.get("id")), {})
+            raw_answer = ans.get("answer")
+            qtype = q.get("type", "multiple_choice")
+            if qtype == "multiple_choice":
+                options = q.get("options", []) or []
+                selected = options[raw_answer] if isinstance(raw_answer, int) and 0 <= raw_answer < len(options) else ""
+                correct_index = q.get("correct_index")
+                correct_text = options[correct_index] if isinstance(correct_index, int) and 0 <= correct_index < len(options) else ""
+                selected_display = (chr(65 + raw_answer) + " — " + str(selected)) if selected != "" else "Boş bırakıldı"
+                correct_display = (chr(65 + correct_index) + " — " + str(correct_text)) if correct_text else "Doğru cevap tanımlı değil"
+            elif qtype == "true_false":
+                selected_display = ("Doğru" if raw_answer is True else "Yanlış") if isinstance(raw_answer, bool) else "Boş bırakıldı"
+                correct_display = "Doğru" if q.get("correct_answer") is True else "Yanlış"
+            else:
+                selected_display = str(raw_answer or "").strip() or "Boş bırakıldı"
+                correct_display = str(q.get("correct_answer") or "Öğretmen değerlendirmesi gerekir")
+            if ans.get("manual_review"):
+                status = "Değerlendirme bekliyor"
+            elif not str(raw_answer if raw_answer is not None else "").strip():
+                status = "Boş"
+                blank_count += 1
+            elif ans.get("correct") is True:
+                status = "Doğru"
+                correct_count += 1
+            elif ans.get("correct") is False:
+                status = "Yanlış"
+                wrong_count += 1
+            else:
+                status = "Değerlendirme bekliyor"
+            answer_rows.append({
+                "question_number": index, "question_id": q.get("id"),
+                "prompt": q.get("prompt", ""), "type": qtype,
+                "selected_answer": selected_display, "correct_answer": correct_display,
+                "status": status, "earned_points": ans.get("earned_points", 0),
+                "max_points": ans.get("max_points", q.get("points", 1)),
+                "feedback": ans.get("feedback", "")
+            })
+        student_stats.append({
+            "submission_id": sub.get("id"), "username": sub.get("username", "Öğrenci"),
+            "submitted_at": sub.get("submitted_at", ""),
+            "score": sub.get("score", 0), "max_score": sub.get("max_score", 0),
+            "percent": sub.get("percent", 0), "status": sub.get("status", "graded"),
+            "correct_count": correct_count, "wrong_count": wrong_count,
+            "blank_count": blank_count, "answers": answer_rows
+        })
+    student_stats.sort(key=lambda s: (float(s.get("percent") or 0), int(s.get("correct_count") or 0)), reverse=True)
+    return {"success": True, "exam": {"id": exam_id, "title": exam.get("title", ""), "subject": exam.get("subject", "")}, "summary": summary, "question_stats": question_stats, "likely_gaps": weak, "karvis_evaluation": ai_analysis, "student_stats": student_stats}
+
+
+# ============================================================
+# USER REQUEST ADMIN API
+# ============================================================
+
+@app.get("/user-requests")
+async def user_requests(username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Bu alan yalnızca yetkili profile açıktır.")
+    data = get_user_requests()
+    return {"success": True, "requests": data, "count": len(data), "unread": sum(1 for x in data if not x.get("read", False))}
+
+
+@app.post("/user-requests/{request_id}/read")
+async def mark_user_request_read(request_id: str, username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        for item in data:
+            if item.get("id") == request_id:
+                item["read"] = True
+                item.pop("status", None)
+                write_json_file(REQUEST_FILE, data)
+                return {"success": True}
+    raise HTTPException(status_code=404, detail="İstek bulunamadı.")
+
+
+@app.delete("/user-requests/{request_id}")
+async def delete_user_request(request_id: str, username: str = "murat"):
+    if str(username).strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    with request_lock:
+        data = read_json_file(REQUEST_FILE, [])
+        new_data = [x for x in data if x.get("id") != request_id]
+        if len(new_data) == len(data):
+            raise HTTPException(status_code=404, detail="İstek bulunamadı.")
+        write_json_file(REQUEST_FILE, new_data)
+    return {"success": True}
+
+
+# ============================================================
+# WEB PUSH API
+# ============================================================
+
+@app.get("/push/config")
+async def push_config():
+    return {
+        "configured": push_configured(),
+        "public_key": VAPID_PUBLIC_KEY if push_configured() else ""
+    }
+
+
+@app.post("/push/subscribe")
+async def push_subscribe(request: PushSubscribeRequest):
+    username = str(request.username or "").strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz profil.")
+    if not push_configured():
+        raise HTTPException(status_code=503, detail="Web Push henüz yapılandırılmamış.")
+    if not save_push_subscription(username, request.subscription):
+        raise HTTPException(status_code=400, detail="Geçersiz push aboneliği.")
+    return {"success": True, "message": "Bildirim aboneliği kaydedildi."}
+
+
+@app.post("/push/unsubscribe")
+async def push_unsubscribe(request: PushUnsubscribeRequest):
+    username = str(request.username or "").strip().lower()
+    endpoint = str(request.endpoint or "").strip()
+    if username not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz profil.")
+    if not endpoint:
+        raise HTTPException(status_code=400, detail="Push endpoint boş olamaz.")
+    remove_push_subscription(username, endpoint)
+    return {"success": True, "message": "Bildirim aboneliği kapatıldı."}
+
+
+@app.get("/admin/push-status")
+async def admin_push_status(username: str = "murat"):
+    require_admin(username)
+    data = get_push_subscriptions()
+    total = sum(len(v) for v in data.values())
+    active_profiles = {k: len(v) for k, v in data.items() if v}
+    return {
+        "configured": push_configured(),
+        "storage": "postgresql" if push_database_configured() else "json_fallback",
+        "profiles": active_profiles,
+        "total": total,
+        "database_persistent": push_database_configured()
+    }
+
+
+@app.post("/admin/notifications/send")
+async def admin_send_notification(request: AdminNotificationRequest):
+    require_admin(request.username)
+    title = str(request.title or "K.A.R.V.I.S.").strip()[:120]
+    body = str(request.body or "").strip()[:1000]
+    target = str(request.target or "all").strip().lower()
+    url = str(request.url or "/").strip()[:500]
+    if not body:
+        raise HTTPException(status_code=400, detail="Bildirim mesajı boş olamaz.")
+    if target != "all" and target not in USERS:
+        raise HTTPException(status_code=400, detail="Geçersiz hedef profil.")
+    if target == "all":
+        result = send_push_to_all(title, body, url)
+    else:
+        result = send_push_to_user(target, title, body, url)
+    if not push_configured():
+        raise HTTPException(status_code=503, detail="Web Push yapılandırılmamış. Render ortam değişkenlerini ekleyin.")
+    return {"success": True, "target": target, **result}
+
+
+# ============================================================
+# AI SYSTEMS
+# ============================================================
+
+PROFESSIONAL_SYSTEM = """
+Sen K.A.R.V.I.S. isimli profesyonel Türkçe yapay zeka asistanısın.
+
+Yanıtların:
+- doğru,
+- açık,
+- doğal,
+- bağlama uygun,
+- gereksiz tekrar içermeyen
+Türkçe olmalıdır.
+
+Bilmediğin bir bilgiyi kesin gerçekmiş gibi uydurma.
+Kaynak verilmişse yalnızca kaynaklarla desteklenen bilgileri kullan.
+"""
+
+
+ACADEMIC_SYSTEM = """
+Sen K.A.R.V.I.S. isimli akademik yardımcı asistansın.
+
+Kullanıcıya "Hocam" diye hitap et.
+
+Dil:
+- resmi,
+- akademik,
+- kurumsal,
+- açık,
+- ölçülü
+
+olmalıdır.
+
+Gereksiz emoji, argo ve aşırı samimi ifade kullanma.
+
+Araştırma taleplerinde:
+- kaynaklar,
+- yöntem,
+- bulgular,
+- değerlendirme
+
+ayrımını koru.
+
+Ders anlatımında kavramları sistematik ve öğretici biçimde açıkla.
+
+Quiz taleplerinde sınav formatını koru.
+
+Sunum hazırlarken:
+- kaynaklara dayalı,
+- doğru,
+- birbirini tekrar etmeyen,
+- kısa,
+- akademik,
+- slayta uygun
+
+metin üret.
+"""
+
+
+# ============================================================
+# AI CALLS
+# ============================================================
+
+def call_groq(
+    prompt,
+    model,
+    system_prompt=PROFESSIONAL_SYSTEM,
+    max_tokens=5000
+):
+
+    if not groq_client:
+        return None
+
+    try:
+
+        response = (
+            groq_client
+            .chat
+            .completions
+            .create(
+
+                model=model,
+
+                messages=[
+
+                    {
+                        "role":
+                            "system",
+
+                        "content":
+                            system_prompt
+                    },
+
+                    {
+                        "role":
+                            "user",
+
+                        "content":
+                            prompt
+                    }
+                ],
+
+                temperature=0.20,
+                max_tokens=max_tokens
+            )
+        )
+
+        return (
+            response
+            .choices[0]
+            .message
+            .content
+        )
+
+    except Exception:
+
+        save_error(
+            "Groq error",
+            traceback.format_exc()
+        )
+
+        return None
+
+
+def call_openrouter(
+    prompt,
+    model,
+    system_prompt=PROFESSIONAL_SYSTEM,
+    max_tokens=5000
+):
+
+    if not openrouter_client:
+        return None
+
+    try:
+
+        response = (
+            openrouter_client
+            .chat
+            .completions
+            .create(
+
+                model=model,
+
+                messages=[
+
+                    {
+                        "role":
+                            "system",
+
+                        "content":
+                            system_prompt
+                    },
+
+                    {
+                        "role":
+                            "user",
+
+                        "content":
+                            prompt
+                    }
+                ],
+
+                temperature=0.20,
+                max_tokens=max_tokens
+            )
+        )
+
+        return (
+            response
+            .choices[0]
+            .message
+            .content
+        )
+
+    except Exception:
+
+        save_error(
+            "OpenRouter error",
+            traceback.format_exc()
+        )
+
+        return None
+
+
+def ask_ai(
+    prompt,
+    system_prompt=PROFESSIONAL_SYSTEM,
+    fast=False
+):
+
+    groq_models = (
+        ["openai/gpt-oss-20b", "openai/gpt-oss-120b"]
+        if fast else GROQ_MODELS
+    )
+    max_tokens = 900 if fast else 5000
+
+    for model in groq_models:
+
+        result = call_groq(
+            prompt,
+            model,
+            system_prompt,
+            max_tokens=max_tokens
+        )
+
+        if result:
+            return result
+
+    for model in OPENROUTER_MODELS:
+
+        result = call_openrouter(
+            prompt,
+            model,
+            system_prompt,
+            max_tokens=max_tokens
+        )
+
+        if result:
+            return result
+
+    return None
+
+
+# ============================================================
+# JSON
+# ============================================================
+
+def extract_json(text):
+
+    if not text:
+        return None
+
+    text = text.strip()
+
+    text = re.sub(
+        r"^```json",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"^```",
+        "",
+        text
+    )
+
+    text = re.sub(
+        r"```$",
+        "",
+        text
+    ).strip()
+
+    try:
+
+        return json.loads(
+            text
+        )
+
+    except Exception:
+        pass
+
+    start = text.find("{")
+    end = text.rfind("}")
+
+    if (
+        start >= 0
+        and end > start
+    ):
+
+        try:
+
+            return json.loads(
+                text[start:end + 1]
+            )
+
+        except Exception:
+            pass
+
+    return None
+
+
+# ============================================================
+# BETÜL ENTERTAINMENT - INSTAGRAM SIMULATION
+# ============================================================
+
+def betul_deterministic_scores(
+    seed: str,
+    count: int = 6
+):
+
+    """
+    Aynı kullanıcı adı için her zaman aynı
+    eğlence sonuçlarını üretir.
+
+    Bu gerçek Instagram verisi değildir.
+    Tamamen deterministik bir simülasyondur.
+    """
+
+    seed = (
+        str(seed or "")
+        .strip()
+        .lower()
+        .lstrip("@")
+    )
+
+    digest = hashlib.sha256(
+        seed.encode("utf-8")
+    ).digest()
+
+    raw = []
+
+    for i in range(count):
+
+        raw.append(
+            10 + (
+                digest[i] % 91
+            )
+        )
+
+    total = sum(raw)
+
+    exact = [
+        value / total * 100
+        for value in raw
+    ]
+
+    scores = [
+        int(value)
+        for value in exact
+    ]
+
+    remainder = 100 - sum(scores)
+
+    order = sorted(
+        range(count),
+        key=lambda i:
+            exact[i] - scores[i],
+        reverse=True
+    )
+
+    for i in range(remainder):
+
+        scores[
+            order[
+                i % len(order)
+            ]
+        ] += 1
+
+    return scores
+
+
+def betul_instagram_comment(
+    categories,
+    scores
+):
+
+    if not categories or not scores:
+
+        return (
+            "Aşkoo sistem ne diyeceğini "
+            "bilemedi 😭"
+        )
+
+    highest_index = max(
+        range(len(scores)),
+        key=lambda i:
+            scores[i]
+    )
+
+    highest = categories[
+        highest_index
+    ]
+
+    comments = {
+
+        "Romantik":
+            (
+                "Aşko burada aşk kokusu aldım... "
+                "burnuma bildirim geldi resmen 💅💕"
+            ),
+
+        "Komik":
+            (
+                "AŞKOOO bu hesap iyiymiş 😭😂 "
+                "K.A.R.V.I.S. analiz yaparken bile güldü."
+            ),
+
+        "Sıkıcı":
+            (
+                "Aşkoo bu hesap biraz fazla sakin çıktı ya... "
+                "işlemci bile esnedi 😭"
+            ),
+
+        "Havalı":
+            (
+                "Aşkoo bu hesap kendini biraz fazla "
+                "ciddiye alıyor ama hakkını da yemeyelim 😎"
+            ),
+
+        "Kaotik":
+            (
+                "AŞKOOO BU NE?! 💀 "
+                "Sistemleri yeniden başlatmam gerekti."
+            ),
+
+        "Gizemli":
+            (
+                "Aşkoo burada bir şeyler dönüyor... "
+                "K.A.R.V.I.S. radarları susmuyor 🤨"
+            )
+    }
+
+    return comments.get(
+        highest,
+        "Aşkoo bu hesap enteresan çıktı 😭"
+    )
+
+
+@app.post(
+    "/betul/instagram-analysis"
+)
+async def betul_instagram_analysis(
+    request: BetulInstagramRequest
+):
+
+    username = (
+        request.username
+        or ""
+    ).strip().lstrip("@")
+
+    if not username:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Instagram kullanıcı adı boş olamaz."
+        )
+
+    # Bu endpoint yalnızca Betül profili için kullanılabilir.
+    # Gerçek Instagram verisi çekilmez.
+    categories = [
+        "Romantik",
+        "Komik",
+        "Sıkıcı",
+        "Havalı",
+        "Kaotik",
+        "Gizemli"
+    ]
+
+    scores = betul_deterministic_scores(
+        username
+    )
+
+    return {
+        "success": True,
+        "username": username,
+        "entertainment_only": True,
+        "categories": [
+            {
+                "name": categories[i],
+                "percent": scores[i]
+            }
+            for i in range(len(categories))
+        ],
+        "comment": betul_instagram_comment(
+            categories,
+            scores
+        ),
+        "disclaimer": (
+            "Bu analiz gerçek Instagram verilerini "
+            "incelemez; tamamen eğlence amaçlı bir "
+            "simülasyondur ve yanılma payı vardır."
+        )
+    }
+
+
+# ============================================================
+# WEB RESEARCH
+# ============================================================
+
+WEB_HEADERS = {
+
+    "User-Agent":
+        "KARVIS-KARAHAN-INC/32.0 academic research"
+}
+
+
+def clean_text(text):
+
+    if not text:
+        return ""
+
+    text = re.sub(
+        r"<[^>]+>",
+        " ",
+        str(text)
+    )
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+
+
+def search_wikipedia(
+    topic,
+    language="tr",
+    limit=6
+):
+
+    try:
+
+        api = (
+            f"https://{language}.wikipedia.org/w/api.php"
+        )
+
+        response = requests.get(
+
+            api,
+
+            params={
+
+                "action":
+                    "query",
+
+                "generator":
+                    "search",
+
+                "gsrsearch":
+                    topic,
+
+                "gsrnamespace":
+                    0,
+
+                "gsrlimit":
+                    limit,
+
+                "prop":
+                    "extracts|info",
+
+                "exintro":
+                    True,
+
+                "explaintext":
+                    True,
+
+                "inprop":
+                    "url",
+
+                "format":
+                    "json",
+            },
+
+            headers=WEB_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            try:
+                error_body = response.json().get("error", {})
+                error_message = error_body.get("message") or response.text[:1200]
+                error_reason = ", ".join(
+                    str(item.get("reason", ""))
+                    for item in error_body.get("errors", [])
+                    if item.get("reason")
+                )
+            except Exception:
+                error_message = (response.text or "")[:1200]
+                error_reason = ""
+            save_error(
+                "Google Custom Search API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; reason={error_reason}; detail={error_message}",
+                category="web_search", severity="error",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
+            )
+            return []
+
+        pages = (
+            response
+            .json()
+            .get("query", {})
+            .get("pages", {})
+        )
+
+        results = []
+
+        for page in pages.values():
+
+            title = clean_text(
+                page.get(
+                    "title",
+                    ""
+                )
+            )
+
+            extract = clean_text(
+                page.get(
+                    "extract",
+                    ""
+                )
+            )
+
+            url = (
+                page.get("fullurl")
+                or
+                (
+                    f"https://{language}.wikipedia.org/wiki/"
+                    +
+                    title.replace(
+                        " ",
+                        "_"
+                    )
+                )
+            )
+
+            if not title or not extract:
+                continue
+
+            results.append({
+
+                "title":
+                    title,
+
+                "text":
+                    extract[:5000],
+
+                "url":
+                    url,
+
+                "source":
+                    "Wikipedia"
+            })
+
+        return results
+
+    except Exception:
+
+        save_error(
+            "Wikipedia research error",
+            traceback.format_exc()
+        )
+
+        return []
+
+
+def search_tavily_web(topic, limit=8):
+    """Search the web through Tavily and normalize results for KARVIS."""
+    if not TAVILY_API_KEY:
+        save_error(
+            "Tavily araması yapılandırılmamış",
+            "Render KARVIS backend Environment bölümünde TAVILY_API_KEY değişkenini tanımlayın.",
+            category="web_search",
+            severity="warning",
+            path="TAVILY_API_KEY",
+            method="POST",
+        )
+        return []
+
+    endpoint = "https://api.tavily.com/search"
+    try:
+        response = requests.post(
+            endpoint,
+            json={
+                "api_key": TAVILY_API_KEY,
+                "query": str(topic or "").strip(),
+                "search_depth": "basic",
+                "topic": "general",
+                "max_results": max(1, min(int(limit), 10)),
+                "include_answer": False,
+                "include_raw_content": False,
+            },
+            headers={**WEB_HEADERS, "Accept": "application/json", "Content-Type": "application/json"},
+            timeout=25,
+        )
+        if response.status_code != 200:
+            detail = (response.text or "")[:800]
+            save_error(
+                "Tavily API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; detail={detail}",
+                category="web_search",
+                severity="error",
+                path=endpoint,
+                method="POST",
+            )
+            return []
+
+        payload = response.json()
+        results = []
+        for item in (payload.get("results") or [])[:limit]:
+            title = clean_text(item.get("title", ""))
+            snippet = clean_text(item.get("content", "") or item.get("raw_content", ""))
+            url = str(item.get("url", "")).strip()
+            if not title or not url:
+                continue
+            results.append({
+                "title": title,
+                "text": snippet or title,
+                "url": url,
+                "source": "Tavily",
+            })
+
+        if not results:
+            save_error(
+                "Tavily sonuç döndürmedi",
+                f"HTTP 200; query={topic!r}; response_keys={list(payload.keys())}",
+                category="web_search",
+                severity="warning",
+                path=endpoint,
+                method="POST",
+            )
+        return results
+    except Exception:
+        save_error("Tavily web search error", traceback.format_exc())
+        return []
+
+
+def search_google_web(
+    topic
+):
+
+    if not GOOGLE_IMAGE_API_KEY or not GOOGLE_CSE_ID:
+        missing = []
+        if not GOOGLE_IMAGE_API_KEY:
+            missing.append("GOOGLE_IMAGE_API_KEY eksik")
+        if not GOOGLE_CSE_ID:
+            missing.append("GOOGLE_CSE_ID eksik")
+        save_error(
+            "Google araması yapılandırılmamış",
+            "; ".join(missing) + ". Render > Environment bölümünde değişken adlarını ve değerlerinin boş olmadığını kontrol edin. Değerleri hata kaydına yazdırmayın.",
+            category="web_search", severity="error",
+            path="https://www.googleapis.com/customsearch/v1", method="GET",
+        )
+        return []
+
+    try:
+
+        response = requests.get(
+
+            "https://www.googleapis.com/customsearch/v1",
+
+            params={
+
+                "key":
+                    GOOGLE_IMAGE_API_KEY,
+
+                "cx":
+                    GOOGLE_CSE_ID,
+
+                "q":
+                    topic,
+
+                "num":
+                    8,
+
+                "safe":
+                    "active"
+            },
+
+            headers=WEB_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            try:
+                error_body = response.json().get("error", {})
+                error_message = error_body.get("message") or (response.text or "")[:1200]
+                error_reason = ", ".join(
+                    str(item.get("reason", ""))
+                    for item in error_body.get("errors", [])
+                    if item.get("reason")
+                )
+            except Exception:
+                error_message = (response.text or "")[:1200]
+                error_reason = ""
+            save_error(
+                "Google Custom Search API başarısız",
+                f"HTTP {response.status_code}; query={topic!r}; reason={error_reason}; detail={error_message}",
+                category="web_search", severity="error",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
+            )
+            return []
+
+        payload = response.json()
+        items = payload.get("items", [])
+        if not items:
+            search_info = payload.get("searchInformation", {})
+            save_error(
+                "Google Custom Search API sonuç döndürmedi",
+                f"HTTP 200; query={topic!r}; totalResults={search_info.get('totalResults', 'bilinmiyor')}. API anahtarı çalışmış olabilir ancak CSE kapsamı, arama sorgusu veya arama motoru ayarları sonuç üretmemiş olabilir.",
+                category="web_search", severity="warning",
+                path="https://www.googleapis.com/customsearch/v1", method="GET",
+            )
+
+        results = []
+
+        for item in items:
+
+            title = clean_text(
+                item.get(
+                    "title",
+                    ""
+                )
+            )
+
+            snippet = clean_text(
+                item.get(
+                    "snippet",
+                    ""
+                )
+            )
+
+            link = item.get(
+                "link",
+                ""
+            )
+
+            if not title or not snippet:
+                continue
+
+            results.append({
+
+                "title":
+                    title,
+
+                "text":
+                    snippet,
+
+                "url":
+                    link,
+
+                "source":
+                    "Web"
+            })
+
+        return results
+
+    except Exception:
+
+        save_error(
+            "Google web search error",
+            traceback.format_exc()
+        )
+
+        return []
+
+
+def search_duckduckgo_web(topic):
+    """Google CSE yoksa DuckDuckGo HTML/Lite sonuçlarını yedek olarak dener."""
+    headers = {
+        **WEB_HEADERS,
+        "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    }
+    endpoints = [
+        ("https://html.duckduckgo.com/html/", {"q": topic}),
+        ("https://lite.duckduckgo.com/lite/", {"q": topic}),
+    ]
+
+    for endpoint, params in endpoints:
+        try:
+            response = requests.get(endpoint, params=params, headers=headers, timeout=15)
+            response.raise_for_status()
+            page = response.text or ""
+            results = []
+
+            # HTML endpoint: parse each result block.
+            blocks = re.findall(
+                r"<div[^>]*class=[\"'][^\"']*result[^\"']*[\"'][^>]*>(.*?)(?=<div[^>]*class=[\"'][^\"']*result|</html>)",
+                page, flags=re.IGNORECASE | re.DOTALL
+            )
+            for block in blocks:
+                link_match = re.search(
+                    r"<a[^>]*class=[\"'][^\"']*result__a[^\"']*[\"'][^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+                    block, flags=re.IGNORECASE | re.DOTALL
+                )
+                snippet_match = re.search(
+                    r"<(?:a|div)[^>]*class=[\"'][^\"']*result__snippet[^\"']*[\"'][^>]*>(.*?)</(?:a|div)>",
+                    block, flags=re.IGNORECASE | re.DOTALL
+                )
+                if not link_match:
+                    continue
+                url = html_lib.unescape(link_match.group(1))
+                title = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", link_match.group(2))))
+                snippet = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", snippet_match.group(1)))) if snippet_match else ""
+                if title and url.startswith("http"):
+                    results.append({
+                        "title": title, "text": snippet or title,
+                        "url": url, "source": "DuckDuckGo Web"
+                    })
+
+            # Lite endpoint uses a simpler result-link class.
+            if not results:
+                links = re.findall(
+                    r"<a[^>]*class=[\"'][^\"']*result-link[^\"']*[\"'][^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+                    page, flags=re.IGNORECASE | re.DOTALL
+                )
+                for url, raw_title in links:
+                    url = html_lib.unescape(url)
+                    title = clean_text(html_lib.unescape(re.sub(r"<[^>]+>", " ", raw_title)))
+                    if title and url.startswith("http"):
+                        results.append({
+                            "title": title, "text": title,
+                            "url": url, "source": "DuckDuckGo Web"
+                        })
+
+            if results:
+                unique, seen = [], set()
+                for item in results:
+                    if item["url"] in seen:
+                        continue
+                    seen.add(item["url"])
+                    unique.append(item)
+                return unique[:8]
+        except Exception as exc:
+            save_error(
+                "DuckDuckGo web yedeği başarısız",
+                f"endpoint={endpoint}; exception_type={type(exc).__name__}; detail={exc}",
+                category="web_search", severity="warning",
+                path=endpoint, method="GET",
+            )
+            continue
+
+    save_error(
+        "DuckDuckGo web yedeği sonuç bulamadı",
+        f"Sorgu={topic!r}; HTML ve Lite uç noktalarından ayrıştırılabilir sonuç alınamadı. CAPTCHA/engelleme, sayfa yapısının değişmesi veya ağ erişimi olası nedenlerdir.",
+        category="web_search", severity="warning",
+        path="DuckDuckGo HTML/Lite", method="GET",
+    )
+    return []
+
+
+def research_topic(
+    topic,
+    progress_callback=None
+):
+
+    sources = []
+
+    if progress_callback:
+
+        progress_callback(
+            10,
+            "Araştırmalar yapılıyor..."
+        )
+
+    # --------------------------------------------------------
+    # Turkish Wikipedia
+    # --------------------------------------------------------
+
+    if progress_callback:
+
+        progress_callback(
+            14,
+            "Türkçe kaynaklar araştırılıyor..."
+        )
+
+    sources.extend(
+        search_wikipedia(
+            topic,
+            "tr",
+            6
+        )
+    )
+
+    # --------------------------------------------------------
+    # English Wikipedia
+    # --------------------------------------------------------
+
+    if progress_callback:
+
+        progress_callback(
+            20,
+            "Yabancı kaynaklar karşılaştırılıyor..."
+        )
+
+    if len(sources) < 5:
+
+        sources.extend(
+            search_wikipedia(
+                topic,
+                "en",
+                5
+            )
+        )
+
+    # --------------------------------------------------------
+    # Tavily web search
+    # --------------------------------------------------------
+
+    if progress_callback:
+        progress_callback(
+            25,
+            "Tavily üzerinden web kaynakları kontrol ediliyor..."
+        )
+
+    sources.extend(search_tavily_web(topic, limit=8))
+
+    # --------------------------------------------------------
+    # Duplicate
+    # --------------------------------------------------------
+
+    unique = []
+
+    seen = set()
+
+    for source in sources:
+
+        url = source.get(
+            "url",
+            ""
+        )
+
+        if not url:
+            continue
+
+        if url in seen:
+            continue
+
+        seen.add(url)
+
+        unique.append(
+            source
+        )
+
+    if progress_callback:
+
+        progress_callback(
+            30,
+            f"{len(unique)} kaynak değerlendiriliyor..."
+        )
+
+    return unique[:15]
+
+
+def format_sources_for_ai(
+    sources
+):
+
+    if not sources:
+
+        return (
+            "Kullanılabilir harici kaynak bulunamadı. "
+            "Bu durumda doğrulanmamış özel istatistikler "
+            "ve kesin sayısal iddialar üretme."
+        )
+
+    blocks = []
+
+    for index, source in enumerate(
+        sources,
+        start=1
+    ):
+
+        blocks.append(
+            f"""
+KAYNAK {index}
+Başlık: {source.get("title", "")}
+Kaynak: {source.get("source", "")}
+URL: {source.get("url", "")}
+İçerik:
+{source.get("text", "")[:3500]}
+"""
+        )
+
+    return "\n".join(
+        blocks
+    )
+
+
+
+# ============================================================
+# LIVE WEATHER / LOCAL NEWS HELPERS
+# ============================================================
+
+WEATHER_CODES_TR = {
+    0: "açık",
+    1: "çoğunlukla açık",
+    2: "parçalı bulutlu",
+    3: "kapalı",
+    45: "sisli",
+    48: "puslu/sisli",
+    51: "hafif çisenti",
+    53: "çisenti",
+    55: "kuvvetli çisenti",
+    61: "hafif yağmur",
+    63: "yağmur",
+    65: "kuvvetli yağmur",
+    71: "hafif kar",
+    73: "kar",
+    75: "kuvvetli kar",
+    80: "hafif sağanak",
+    81: "sağanak yağış",
+    82: "kuvvetli sağanak",
+    95: "gök gürültülü fırtına",
+    96: "gök gürültülü, dolu ihtimalli yağış",
+    99: "gök gürültülü, kuvvetli dolu ihtimalli yağış",
+}
+
+
+def _weather_from_open_meteo():
+    """Denizli canlı hava verisini Open-Meteo'dan alır."""
+    response = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={
+            "latitude": 37.7765,
+            "longitude": 29.0864,
+            "current": "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
+            "hourly": "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
+            "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            "forecast_days": 2,
+            "timezone": "Europe/Istanbul",
+        },
+        headers=WEB_HEADERS,
+        timeout=12,
+    )
+    response.raise_for_status()
+    data = response.json()
+    current = data.get("current", {})
+    hourly = data.get("hourly", {})
+    times = hourly.get("time", [])
+    temps = hourly.get("temperature_2m", [])
+    rain = hourly.get("precipitation_probability", [])
+    codes = hourly.get("weather_code", [])
+    winds = hourly.get("wind_speed_10m", [])
+    daily = data.get("daily", {})
+    daily_times = daily.get("time", [])
+    tomorrow = None
+    if len(daily_times) > 1:
+        tomorrow = {
+            "date": daily_times[1],
+            "condition": WEATHER_CODES_TR.get((daily.get("weather_code") or [None, None])[1], "değişken"),
+            "max_temperature": (daily.get("temperature_2m_max") or [None, None])[1],
+            "min_temperature": (daily.get("temperature_2m_min") or [None, None])[1],
+            "rain_probability": (daily.get("precipitation_probability_max") or [None, None])[1],
+        }
+
+    current_time = str(current.get("time", ""))
+    start_index = times.index(current_time) if current_time in times else 0
+    upcoming = []
+    for i in range(start_index, min(start_index + 8, len(times))):
+        upcoming.append({
+            "time": times[i],
+            "temperature": temps[i] if i < len(temps) else None,
+            "rain_probability": rain[i] if i < len(rain) else None,
+            "condition": WEATHER_CODES_TR.get(codes[i], "değişken") if i < len(codes) else "değişken",
+            "wind": winds[i] if i < len(winds) else None,
+        })
+
+    return {
+        "location": "Denizli",
+        "current_temperature": current.get("temperature_2m"),
+        "apparent_temperature": current.get("apparent_temperature"),
+        "current_condition": WEATHER_CODES_TR.get(current.get("weather_code"), "değişken"),
+        "current_wind": current.get("wind_speed_10m"),
+        "upcoming": upcoming,
+        "tomorrow": tomorrow,
+        "source": "Open-Meteo",
+    }
+
+
+def _weather_from_wttr():
+    """Open-Meteo erişilemezse wttr.in üzerinden yedek canlı veri alır."""
+    response = requests.get(
+        "https://wttr.in/Denizli",
+        params={"format": "j1", "lang": "tr"},
+        headers=WEB_HEADERS,
+        timeout=12,
+    )
+    response.raise_for_status()
+    data = response.json()
+    current = (data.get("current_condition") or [{}])[0]
+    daily_raw = data.get("weather") or []
+    today_data = daily_raw[0] if daily_raw else {}
+    tomorrow_raw = daily_raw[1] if len(daily_raw) > 1 else {}
+    hourly_raw = today_data.get("hourly", [])
+
+    tomorrow_hours = tomorrow_raw.get("hourly", [])
+    tomorrow_conditions = [
+        clean_text(((x.get("lang_tr") or [{}])[0].get("value") or (x.get("weatherDesc") or [{}])[0].get("value") or "")).lower()
+        for x in tomorrow_hours
+    ]
+    tomorrow_conditions = [x for x in tomorrow_conditions if x]
+    tomorrow = None
+    if tomorrow_raw:
+        try:
+            rain_probs = [int(x.get("chanceofrain")) for x in tomorrow_hours if x.get("chanceofrain") not in (None, "")]
+        except Exception:
+            rain_probs = []
+        tomorrow = {
+            "date": tomorrow_raw.get("date"),
+            "condition": tomorrow_conditions[0] if tomorrow_conditions else "değişken",
+            "min_temperature": tomorrow_raw.get("mintempC"),
+            "max_temperature": tomorrow_raw.get("maxtempC"),
+            "rain_probability": max(rain_probs) if rain_probs else None,
+        }
+
+    upcoming = []
+    for item in hourly_raw[:8]:
+        try:
+            temp = float(item.get("tempC"))
+        except Exception:
+            temp = item.get("tempC")
+        try:
+            rain_prob = int(item.get("chanceofrain"))
+        except Exception:
+            rain_prob = item.get("chanceofrain")
+        desc = ((item.get("lang_tr") or [{}])[0].get("value")
+                or (item.get("weatherDesc") or [{}])[0].get("value")
+                or "değişken")
+        upcoming.append({
+            "time": str(item.get("time", "")),
+            "temperature": temp,
+            "rain_probability": rain_prob,
+            "condition": clean_text(desc).lower(),
+            "wind": item.get("windspeedKmph"),
+        })
+
+    return {
+        "location": "Denizli",
+        "current_temperature": current.get("temp_C"),
+        "apparent_temperature": current.get("FeelsLikeC"),
+        "current_condition": clean_text(
+            ((current.get("lang_tr") or [{}])[0].get("value")
+             or (current.get("weatherDesc") or [{}])[0].get("value")
+             or "değişken")
+        ).lower(),
+        "current_wind": current.get("windspeedKmph"),
+        "upcoming": upcoming,
+        "tomorrow": tomorrow,
+        "source": "wttr.in",
+    }
+
+
+def fetch_denizli_weather():
+    """Canlı Denizli hava durumu. Open-Meteo ana servis, wttr.in yedek servis.
+
+    Ana servis geçici olarak başarısız olup yedek servis başarılıysa bunu
+    sistem hatası olarak kaydetmez; böylece admin hata ekranı gereksiz
+    Open-Meteo kayıtlarıyla dolmaz. İki servis de başarısızsa hata kaydedilir.
+    """
+    open_meteo_error = None
+    try:
+        return _weather_from_open_meteo()
+    except Exception:
+        open_meteo_error = traceback.format_exc()
+
+    try:
+        return _weather_from_wttr()
+    except Exception:
+        wttr_error = traceback.format_exc()
+        save_error(
+            "Weather services unavailable",
+            "Open-Meteo error:\n" + str(open_meteo_error or "") +
+            "\nwttr.in error:\n" + wttr_error
+        )
+        return None
+
+
+def weather_context_for_ai(weather, message=""):
+    """İsteğe göre mevcut hava veya yarının tahminini kısa biçimde hazırlar."""
+    if not weather:
+        return ""
+
+    temp = weather.get("current_temperature")
+    feels = weather.get("apparent_temperature")
+    condition = clean_text(weather.get("current_condition") or "değişken").lower()
+    upcoming = weather.get("upcoming") or []
+
+    request_text = clean_text(message).lower()
+    asks_tomorrow = bool(re.search(r"\b(yarın|yarinki|yarınki|yarin|yarin hava)\b", request_text))
+    lines = ["DENİZLİ HAVA DURUMU TAHMİNİ"]
+    if asks_tomorrow:
+        tomorrow = weather.get("tomorrow") or {}
+        if tomorrow:
+            date_label = tomorrow.get("date") or "yarın"
+            t_condition = clean_text(tomorrow.get("condition") or "değişken").lower()
+            t_min = tomorrow.get("min_temperature")
+            t_max = tomorrow.get("max_temperature")
+            t_rain = tomorrow.get("rain_probability")
+            summary = f"Yarın ({date_label}) Denizli'de hava {t_condition} olacak."
+            if t_min is not None and t_max is not None:
+                summary += f" Sıcaklık {t_min}°C ile {t_max}°C arasında."
+            elif t_max is not None:
+                summary += f" En yüksek sıcaklık {t_max}°C."
+            if t_rain is not None:
+                summary += f" Yağış olasılığı en fazla %{t_rain}."
+            lines.append(summary)
+            lines.append("Kullanıcının yarınla ilgili sorusunu bu günlük tahminle cevapla; bugünkü sıcaklığı yarının tahmini gibi sunma.")
+            lines.append("Yanıtı tamamen Türkçe ve kısa ver; veri yoksa bunu açıkça söyle, tahmin uydurma.")
+            return "\n".join(lines)
+        lines.append("Yarın için günlük tahmin verisi bulunamadı. Canlı veride olmayan tahmini uydurma.")
+        return "\n".join(lines)
+
+    lines.append(f"Şu an: {temp}°C, {condition}.")
+    if temp is not None and feels is not None:
+        try:
+            if abs(float(temp) - float(feels)) >= 3:
+                lines.append(f"Hissedilen: {feels}°C.")
+        except Exception:
+            pass
+
+    rain_values = [x.get("rain_probability") for x in upcoming[:8] if x.get("rain_probability") is not None]
+    try:
+        max_rain = max(float(x) for x in rain_values) if rain_values else None
+    except Exception:
+        max_rain = None
+
+    if max_rain is not None and max_rain >= 50:
+        lines.append("Yakın saatlerde yağış ihtimali yüksek.")
+    elif max_rain is not None and max_rain >= 30:
+        lines.append("Yakın saatlerde yağış ihtimali var.")
+
+    temps = [x.get("temperature") for x in upcoming[:8] if x.get("temperature") is not None]
+    try:
+        numeric_temps = [float(x) for x in temps]
+        if numeric_temps and temp is not None:
+            delta = numeric_temps[-1] - float(temp)
+            if delta <= -4:
+                lines.append("Akşama doğru sıcaklık belirgin şekilde düşecek.")
+            elif delta >= 4:
+                lines.append("Gün içinde sıcaklık belirgin şekilde artacak.")
+    except Exception:
+        pass
+
+    lines.append("Kullanıcıya yalnızca kısa ve doğal bir özet ver; saat saat sıcaklık listesi, rüzgar, ham veri, URL veya kaynak listesi verme.")
+    return "\n".join(lines)
+
+
+def is_weather_request(message):
+    text = clean_text(message).lower()
+    weather_terms = (
+        r"\b(hava durumu|hava nasıl|hava bugün|bugün hava|yarın hava|hava yarın|"
+        r"hava tahmini|yağmur yağacak mı|yağış var mı|sıcaklık kaç|kaç derece|derece kaç|"
+        r"hava kaç derece|denizli hava|hava soğuk mu|hava sıcak mı|yağmur var mı|"
+        r"kar yağacak mı|rüzgar var mı)\b"
+    )
+    return bool(re.search(weather_terms, text))
+
+
+def is_local_news_request(message):
+    text = clean_text(message).lower()
+    return bool(re.search(r"\b(gündem|haberler|son haberler|bugün neler oluyor|son gelişmeler|gündemde ne var)\b", text)) and any(
+        place in text for place in ["denizli", "honaz", "pamukkale", "merkezefendi", "çivril", "acipayam", "acıpayam"]
+    )
+
+
+
+# ============================================================
+# SMART WEB RESEARCH
+# ============================================================
+# Web araştırması yalnızca sorunun güncel/doğrulanması gereken
+# bir bilgiye ihtiyaç duyduğu durumlarda çalışır.
+# Normal sohbet, genel bilgi ve yaratıcı istekler internete çıkmaz.
+
+CURRENT_YEAR = datetime.now().year
+
+WEB_TRIGGER_PATTERNS = [
+    r"\bbugün\b",
+    r"\bşu an\b",
+    r"\bşuan\b",
+    r"\bşimdiki\b",
+    r"\bşu anda\b",
+    r"\banlık\b",
+    r"\bcanlı\b",
+    r"\ben son\b",
+    r"\bgüncel\b",
+    r"\bson dakika\b",
+    r"\bson gelişme",
+    r"\bson haber",
+    r"\byeni çıkan\b",
+    r"\byenisi\b",
+    r"\bbu hafta\b",
+    r"\bbu ay\b",
+    r"\bdün\b",
+    r"\byarın\b",
+    r"\bkaç tl\b",
+    r"\bfiyatı\b",
+    r"\bfiyatları\b",
+    r"\bkur\b",
+    r"\bdöviz\b",
+    r"\beuro\b",
+    r"\bdolar\b",
+    r"\baltın\b",
+    r"\bhava durumu\b",
+    r"\bseçim sonuç",
+    r"\bsonuçları açıklandı\b",
+    r"\bkim kazandı\b",
+    r"\bşampiyon\b",
+    r"\bpuan durumu\b",
+    r"\bmaç sonucu\b",
+    r"\bbugünkü\b",
+    r"\b202[4-9]\b",
+]
+
+RESEARCH_TRIGGER_PHRASES = [
+    "internetten araştır",
+    "internetten bak",
+    "webden araştır",
+    "web'den araştır",
+    "internette ara",
+    "kaynak bul",
+    "kaynakları bul",
+    "kaynak göster",
+    "araştır",
+    "güncel bilgi ver",
+    "en son bilgiyi",
+    "en güncel",
+    "doğrula",
+    "teyit et",
+    "karşılaştır",
+]
+
+# Bazı konular güncel kelime içermese bile doğası gereği değişkendir.
+VOLATILE_TOPICS = [
+    "mevzuat", "kanun", "yönetmelik", "yasa", "vergi",
+    "maaş", "asgari ücret", "faiz", "merkez bankası",
+    "borsa", "hisse", "bitcoin", "kripto", "akaryakıt",
+    "benzin", "motorin", "altın", "döviz", "kampanya",
+    "sınav takvimi", "başvuru tarihi", "başvuru şartları",
+    "üniversite taban puanı", "kontenjan", "kpss", "pmyo",
+]
+
+# İnternet gerektirmeyen tipik istekler. Bunlar özellikle korunur.
+NO_WEB_PATTERNS = [
+    r"^merhaba\b",
+    r"^selam\b",
+    r"^naber\b",
+    r"^nasılsın\b",
+    r"^teşekkür",
+    r"^sağ ol\b",
+    r"^eyvallah\b",
+    r"\bne demek\b",
+    r"\bnedir\b$",
+]
+
+def needs_web_research(message, username="karahan", mode="normal"):
+    """
+    Hafif ve deterministik bir karar katmanı.
+    Ekstra AI çağrısı yapmaz; böylece normal konuşmalarda maliyet ve
+    gecikme oluşturmaz.
+    """
+    text = clean_text(message).lower()
+    if not text:
+        return False
+
+    # Selamlaşma gibi kısa mesajlarda kesinlikle araştırma yapma.
+    for pattern in NO_WEB_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return False
+
+    # Kullanıcı açıkça web araması istediğinde, konu ile fiil arasında
+    # kelime olsa bile araştırmayı başlat: "internette perde ara" vb.
+    explicit_search_patterns = [
+        r"\binternette\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\binternetten\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\bweb(?:'den|den)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\bgoogle(?:'da|da|de)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        r"\b(ara|araştır|bak|bul)\b.{0,100}\b(internette|internetten|webde|web'de|google'da|google)\b",
+    ]
+    if any(re.search(pattern, text, re.IGNORECASE) for pattern in explicit_search_patterns):
+        return True
+
+    if any(phrase in text for phrase in RESEARCH_TRIGGER_PHRASES):
+        return True
+
+    # Akademik araştırma modunda açık araştırma ifadeleri ve güncel
+    # çalışma talepleri web araştırmasını tetikler.
+    if username == "ilknur" or mode in {"research", "article"}:
+        academic_current = [
+            "güncel çalışma", "son çalışmalar", "literatür",
+            "2025", "2026", "yeni araştırma", "makale",
+            "kaynakça", "bilimsel kaynak", "literatür taraması"
+        ]
+        if any(x in text for x in academic_current):
+            return True
+
+    if any(re.search(pattern, text, re.IGNORECASE) for pattern in WEB_TRIGGER_PATTERNS):
+        return True
+
+    if any(topic in text for topic in VOLATILE_TOPICS):
+        return True
+
+    # Tarih/yıl açıkça geleceğe veya günümüze referans veriyorsa.
+    year_match = re.search(r"\b20\d{2}\b", text)
+    if year_match:
+        try:
+            year = int(year_match.group(0))
+            if year >= CURRENT_YEAR - 1:
+                return True
+        except Exception:
+            pass
+
+    return False
+
+
+def build_profile_research_query(message, username, mode):
+    """
+    Aynı soruyu her profile farklı araştırma amacıyla aratır.
+    Arama sorgusunun kendisi de profilin kullanım amacına göre şekillenir.
+    """
+    text = clean_text(message)
+
+    # Yerel gündem sorularında arama motorunu doğrudan haber odaklı çalıştır.
+    if is_local_news_request(text):
+        if username == "ilknur":
+            return f"{text} Denizli bugün son dakika haber gündem resmi kaynak"
+        if username == "betul":
+            return f"{text} Denizli bugün son dakika haber gündem gelişmeler"
+        if username == "sinem":
+            return f"{text} Denizli bugün güvenilir haber gündem gelişmeler"
+        return f"{text} Denizli bugün son dakika haber gündem resmi kaynak"
+
+    if username == "ilknur":
+        return (
+            f"{text} akademik güncel araştırma bilimsel kaynak "
+            f"2025 2026"
+        )
+
+    if username == "betul":
+        return (
+            f"{text} güncel gelişmeler haberler trendler"
+        )
+
+    if username == "sinem":
+        return (
+            f"{text} güncel güvenilir bilgi"
+        )
+
+    # Karahan / varsayılan: teknik, resmi ve doğrudan.
+    return (
+        f"{text} güncel resmi kaynak teknik bilgi"
+    )
+
+
+def profile_research_instruction(username):
+    common = """
+GENEL CEVAP STANDARDI:
+- Önce doğru ve doğrudan cevabı ver.
+- Kısa, sade ve anlaşılır konuş. Gereksiz giriş, tekrar ve uzun açıklama yapma.
+- Basit sorulara mümkünse 1-3 cümleyle cevap ver.
+- Daha fazla ayrıntı ancak soru bunu gerektiriyorsa ver.
+- Güncel araştırma yapıldıysa ham kaynak, URL, link listesi veya araştırma süreci anlatma.
+- Araştırma bilgisini doğal cevabın içine yedir.
+- Kaynaklar çelişiyorsa en güvenilir/resmî kaynağı önceliklendir ve gerekiyorsa belirsizliği tek cümleyle belirt.
+- Kesin olmayan bilgiyi kesinmiş gibi sunma.
+"""
+    if username == "betul":
+        return common + """
+BETÜL KARAKTERİ:
+- Samimi, eğlenceli, doğal ve hafif takılmacı konuş.
+- Mizahı cevabın önüne geçirme; önce doğru bilgiyi ver.
+- Güncel haberlerde önemli olayı kısa ve anlaşılır söyle, ardından en fazla kısa bir Betül yorumu ekle.
+- Hava durumunda önce sıcaklık ve yağış bilgisini söyle, sonra kısa bir günlük öneri ver.
+- Gereksiz 'aşko/kız' tekrarlarından kaçın; doğal kullan.
+"""
+    if username == "sude":
+        return common + """
+SUDE KARAKTERİ:
+- Neşeli, destekleyici, yargılamayan ve sıcak konuş.
+- Sağlıklı beslenme hedeflerinde aşırı kısıtlamayı veya hızlı kilo kaybını teşvik etme.
+- Kalori değerlerinin yaklaşık olduğunu ve porsiyona göre değiştiğini belirt.
+- Oyun, bilmece ve günlük hedeflerde motive edici ol.
+"""
+    if username == "sinem":
+        return common + """
+SİNEM KARAKTERİ:
+- Sıcak, doğal, sakin ve arkadaşça konuş.
+- Bilgiyi sade şekilde ver; abartılı ifadeler ve gereksiz şaka kullanma.
+- Güncel bilgilerde kullanıcı için önemli sonucu öne çıkar.
+- Hava durumunda kısa pratik öneri ver.
+"""
+    if username == "ilknur":
+        return common + """
+İLKNUR AKADEMİK KARAKTERİ:
+- Kullanıcıya 'Hocam' diye hitap et.
+- Akademik ve araştırma sorularında güvenilir kaynaklara dayalı, düzenli ve ölçülü konuş.
+- Günlük sorularda gereksiz akademik dil kullanma.
+- Hava durumu ve gündem gibi günlük güncel sorularda kısa ve doğal cevap ver.
+"""
+    return common + """
+KARAHAN KARAKTERİ:
+- Profesyonel, teknik, net ve doğrudan konuş.
+- Önce sonucu, gerekiyorsa ardından önemli ayrıntıyı ver.
+- Güncel olaylarda tarih, yer ve temel gelişmeyi kısa biçimde belirt.
+- Hava durumunda sıcaklık, yağış ve gerekiyorsa dışarı çıkma önerisini kısa ver.
+"""
+
+
+def perform_smart_research(message, username, mode):
+    """Yalnızca needs_web_research() True olduğunda çağrılır."""
+    raw_message = clean_text(message)
+    lowered = raw_message.lower()
+    explicit_search = bool(re.search(
+        r"\b(internette|internetten|webde|web'de|google'da|google)\b.{0,100}\b(ara|araştır|bak|bul)\b",
+        lowered, re.IGNORECASE
+    ))
+
+    if explicit_search:
+        subject = lowered
+        for pattern in [
+            r"\binternette\b", r"\binternetten\b", r"\bweb'de\b",
+            r"\bwebde\b", r"\bgoogle'da\b", r"\bgoogle\b",
+            r"\baraştır\b", r"\bara\b", r"\bbak\b", r"\bbul\b",
+            r"\blütfen\b", r"\bkarvis\b",
+        ]:
+            subject = re.sub(pattern, " ", subject, flags=re.IGNORECASE)
+        subject = clean_text(subject).strip(" .,!?:;-")
+        if subject:
+            query = f"{subject} ürünler modeller fiyatlar Türkiye"
+        else:
+            query = build_profile_research_query(raw_message, username, mode)
+    else:
+        query = build_profile_research_query(raw_message, username, mode)
+
+    sources = research_topic(query)
+
+    context = format_sources_for_ai(sources)
+    if not sources:
+        save_error(
+            "Web araştırması sonuç döndürmedi",
+            f"Kullanıcı isteği: {raw_message!r}; arama sorgusu: {query!r}. Tavily ve Wikipedia kaynaklarından kullanılabilir sonuç gelmedi.",
+            category="web_search", severity="warning",
+            path="/chat", method="POST",
+        )
+        context = (
+            "CANLI WEB ARAŞTIRMASI DENENDİ ANCAK BU İSTEK İÇİN DOĞRULANABİLİR "
+            "ARAMA SONUCU ALINAMADI. Kullanıcıya internet erişimi kesinlikle yokmuş "
+            "gibi genelleme yapma. Aramanın bu istekte sonuç döndürmediğini açıkça "
+            "söyle; güncel ürün/fiyat/özellik bilgisi uydurma."
+        )
+
+    return {
+        "query": query,
+        "sources": sources,
+        "context": context
+    }
+
+
+def format_research_sources_for_user(sources):
+    if not sources:
+        return ""
+
+    lines = ["\n\nKaynaklar:"]
+    for i, source in enumerate(sources[:6], 1):
+        title = clean_text(source.get("title", "Kaynak"))
+        url = source.get("url", "").strip()
+        if url:
+            lines.append(f"[{i}] {title} — {url}")
+
+    return "\n".join(lines)
+
+
+
+# ============================================================
+# PRESENTATION FALLBACK
+# ============================================================
+
+def fallback_presentation(
+    topic,
+    slide_count
+):
+
+    content_count = max(
+        3,
+        slide_count - 2
+    )
+
+    templates = [
+
+        (
+            "Temel Kavramlar",
+            f"{topic} konusunun temel kavramları, kapsamı ve ana bileşenleri açıklanmaktadır."
+        ),
+
+        (
+            "Tarihsel Gelişim",
+            f"{topic} konusunun ortaya çıkışı ve tarihsel gelişimindeki önemli değişimler ele alınmaktadır."
+        ),
+
+        (
+            "Temel Unsurlar",
+            f"{topic} başlığını oluşturan temel unsurlar ve bu unsurlar arasındaki ilişkiler incelenmektedir."
+        ),
+
+        (
+            "Uygulama Alanları",
+            f"{topic} kapsamında kullanılan başlıca yöntemler, uygulamalar ve kullanım alanları değerlendirilmektedir."
+        ),
+
+        (
+            "Etkileri",
+            f"{topic} konusunun bireyler, toplum ve ilgili kurumlar üzerindeki başlıca etkileri açıklanmaktadır."
+        ),
+
+        (
+            "Günümüzdeki Önemi",
+            f"{topic} konusunun günümüzdeki önemi ve değişen koşullar karşısındaki konumu değerlendirilmektedir."
+        ),
+
+        (
+            "Genel Değerlendirme",
+            f"{topic} açısından temel bulgular ve öne çıkan noktalar bütüncül biçimde değerlendirilmektedir."
+        )
+    ]
+
+    slides = []
+
+    for i in range(
+        content_count
+    ):
+
+        title, paragraph = templates[
+            i % len(templates)
+        ]
+
+        slides.append({
+
+            "title":
+                title,
+
+            "paragraph":
+                paragraph,
+
+            "visual_query":
+                f"{topic} {title} documentary academic",
+
+            "sources":
+                []
+        })
+
+    return {
+
+        "title":
+            topic,
+
+        "subtitle":
+            "Akademik Sunum",
+
+        "cover_visual_query":
+            f"{topic} academic professional",
+
+        "slides":
+            slides,
+
+        "conclusion": {
+
+            "title":
+                "Sonuç ve Değerlendirme",
+
+            "paragraph":
+                f"{topic} farklı boyutlarıyla değerlendirildiğinde, temel kavramların, uygulamaların ve etkilerin birlikte ele alınmasının konunun bütüncül biçimde anlaşılması açısından önemli olduğu görülmektedir.",
+
+            "visual_query":
+                f"{topic} conclusion academic",
+
+            "sources":
+                []
+        }
+    }
+
+
+# ============================================================
+# TEXT SIMILARITY
+# ============================================================
+
+def normalize_similarity_text(
+    text
+):
+
+    text = str(
+        text or ""
+    ).lower()
+
+    text = re.sub(
+        r"[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]",
+        " ",
+        text
+    )
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+
+
+def text_similarity(
+    a,
+    b
+):
+
+    a = normalize_similarity_text(
+        a
+    )
+
+    b = normalize_similarity_text(
+        b
+    )
+
+    if not a or not b:
+        return 0
+
+    return SequenceMatcher(
+        None,
+        a,
+        b
+    ).ratio()
+
+
+def has_duplicate_content(
+    paragraph,
+    previous_paragraphs,
+    threshold=0.68
+):
+
+    for previous in previous_paragraphs:
+
+        if (
+            text_similarity(
+                paragraph,
+                previous
+            )
+            >= threshold
+        ):
+
+            return True
+
+    return False
+
+
+# ============================================================
+# PRESENTATION PLAN
+# ============================================================
+
+def create_presentation_plan(
+    topic,
+    slide_count,
+    sources,
+    progress_callback=None
+):
+
+    content_count = max(
+        3,
+        slide_count - 2
+    )
+
+    if progress_callback:
+
+        progress_callback(
+            31,
+            "Sunumun slayt planı oluşturuluyor..."
+        )
+
+    source_text = format_sources_for_ai(
+        sources
+    )
+
+    prompt = f"""
+Bir üniversite düzeyinde akademik sunum için
+SLAYT PLANI oluştur.
+
+KONU:
+{topic}
+
+TOPLAM SLAYT:
+{slide_count}
+
+Yapı:
+
+1 kapak
+{content_count} içerik
+1 sonuç
+
+ÖNEMLİ:
+
+Her içerik slaytının farklı bir amacı olmalı.
+
+Aynı bilgiyi farklı başlıklarla tekrar etme.
+
+Konuya uygun farklı boyutlar seç:
+
+- tanım
+- tarihsel gelişim
+- yapı
+- süreç
+- uygulama
+- örnek
+- etkiler
+- avantaj/dezavantaj
+- güncel durum
+- değerlendirme
+
+KAYNAKLAR:
+
+{source_text}
+
+Yalnızca JSON döndür:
+
+{{
+  "title": "Ana sunum başlığı",
+  "subtitle": "Akademik alt başlık",
+  "cover_visual_query": "English image search query",
+  "slides": [
+    {{
+      "title": "Slayt başlığı",
+      "objective": "Bu slaytın anlatacağı özgün konu",
+      "visual_query": "English image search query"
+    }}
+  ],
+  "conclusion": {{
+    "title": "Sonuç ve Değerlendirme",
+    "objective": "Sunumun genel değerlendirmesi",
+    "visual_query": "English image search query"
+  }}
+}}
+
+Kurallar:
+
+- Türkçe yaz.
+- Tam olarak {content_count} içerik slaytı oluştur.
+- Her objective birbirinden farklı olmalı.
+- Aynı konuyu tekrar eden slayt oluşturma.
+- Görsel sorguları birbirinden farklı olmalı.
+- Görsel sorguları İngilizce olmalı.
+- Sonuç slaytı önceki slaytların kopyası olmamalı.
+- JSON dışında hiçbir şey yazma.
+"""
+
+    result = ask_ai(
+        prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    data = extract_json(
+        result
+    )
+
+    if not data:
+
+        return fallback_presentation(
+            topic,
+            slide_count
+        )
+
+    raw_slides = data.get(
+        "slides",
+        []
+    )
+
+    clean_slides = []
+
+    used_titles = set()
+
+    for slide in raw_slides:
+
+        if not isinstance(
+            slide,
+            dict
+        ):
+            continue
+
+        title = str(
+            slide.get(
+                "title",
+                ""
+            )
+        ).strip()
+
+        objective = str(
+            slide.get(
+                "objective",
+                ""
+            )
+        ).strip()
+
+        visual_query = str(
+            slide.get(
+                "visual_query",
+                ""
+            )
+        ).strip()
+
+        if not title or not objective:
+            continue
+
+        title_key = normalize_similarity_text(
+            title
+        )
+
+        if title_key in used_titles:
+            continue
+
+        used_titles.add(
+            title_key
+        )
+
+        clean_slides.append({
+
+            "title":
+                title,
+
+            "objective":
+                objective,
+
+            "visual_query":
+                visual_query
+                or
+                f"{topic} {title} academic",
+        })
+
+    if len(clean_slides) < content_count:
+
+        return fallback_presentation(
+            topic,
+            slide_count
+        )
+
+    clean_slides = clean_slides[
+        :content_count
+    ]
+
+    conclusion_data = data.get(
+        "conclusion",
+        {}
+    )
+
+    if not isinstance(
+        conclusion_data,
+        dict
+    ):
+
+        conclusion_data = {}
+
+    return {
+
+        "title":
+            str(
+                data.get(
+                    "title",
+                    topic
+                )
+            ).strip()
+            or topic,
+
+        "subtitle":
+            str(
+                data.get(
+                    "subtitle",
+                    "Akademik Sunum"
+                )
+            ).strip()
+            or "Akademik Sunum",
+
+        "cover_visual_query":
+            str(
+                data.get(
+                    "cover_visual_query",
+                    f"{topic} academic professional"
+                )
+            ).strip(),
+
+        "slides":
+            clean_slides,
+
+        "conclusion": {
+
+            "title":
+                str(
+                    conclusion_data.get(
+                        "title",
+                        "Sonuç ve Değerlendirme"
+                    )
+                ).strip(),
+
+            "objective":
+                str(
+                    conclusion_data.get(
+                        "objective",
+                        "Konunun genel değerlendirmesi"
+                    )
+                ).strip(),
+
+            "visual_query":
+                str(
+                    conclusion_data.get(
+                        "visual_query",
+                        f"{topic} conclusion academic"
+                    )
+                ).strip()
+        }
+    }
+
+
+# ============================================================
+# INDIVIDUAL SLIDE CONTENT
+# ============================================================
+
+def generate_slide_content(
+    topic,
+    slide,
+    sources,
+    previous_paragraphs
+):
+
+    source_text = format_sources_for_ai(
+        sources
+    )
+
+    prompt = f"""
+Aşağıdaki akademik sunum için SADECE BU SLAYTIN
+içeriğini oluştur.
+
+ANA KONU:
+{topic}
+
+SLAYT BAŞLIĞI:
+{slide["title"]}
+
+BU SLAYTIN ÖZGÜN AMACI:
+{slide["objective"]}
+
+KAYNAKLAR:
+{source_text}
+
+ÖNCEKİ SLAYT METİNLERİ:
+{chr(10).join(previous_paragraphs[-5:]) if previous_paragraphs else "Henüz yok."}
+
+Bu slayt önceki slaytların tekrarını yapmamalıdır.
+
+Kaynaklarda bulunmayan kesin istatistik, tarih,
+kişi, kurum veya olay uydurma.
+
+Akademik ama anlaşılır Türkçe kullan.
+
+80-120 kelime civarında açıklama üret.
+
+Görsel için İngilizce arama sorgusu oluştur.
+
+Yalnızca JSON döndür:
+
+{{
+  "paragraph": "Slayt açıklaması",
+  "visual_query": "English visual search query",
+  "source_indexes": [1, 2]
+}}
+
+JSON dışında hiçbir şey yazma.
+"""
+
+    result = ask_ai(
+        prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    data = extract_json(
+        result
+    )
+
+    if not data:
+        return None
+
+    paragraph = str(
+        data.get(
+            "paragraph",
+            ""
+        )
+    ).strip()
+
+    visual_query = str(
+        data.get(
+            "visual_query",
+            slide.get(
+                "visual_query",
+                f"{topic} academic"
+            )
+        )
+    ).strip()
+
+    source_indexes = data.get(
+        "source_indexes",
+        []
+    )
+
+    if not isinstance(
+        source_indexes,
+        list
+    ):
+
+        source_indexes = []
+
+    selected_sources = []
+
+    for index in source_indexes:
+
+        try:
+
+            index = int(
+                index
+            ) - 1
+
+            if (
+                0 <= index
+                < len(sources)
+            ):
+
+                selected_sources.append(
+                    sources[index]
+                )
+
+        except Exception:
+
+            continue
+
+    if not selected_sources:
+
+        selected_sources = sources[:2]
+
+    if not paragraph:
+
+        return None
+
+    return {
+
+        "paragraph":
+            paragraph,
+
+        "visual_query":
+            visual_query
+            or
+            slide.get(
+                "visual_query",
+                f"{topic} academic"
+            ),
+
+        "sources":
+            selected_sources
+    }
+
+
+# ============================================================
+# BUILD COMPLETE PRESENTATION
+# ============================================================
+
+def build_verified_presentation(
+    topic,
+    slide_count,
+    progress_callback=None
+):
+
+    sources = research_topic(
+        topic,
+        progress_callback
+    )
+
+    if progress_callback:
+
+        progress_callback(
+            32,
+            f"{len(sources)} kaynak bulundu. Bilgiler karşılaştırılıyor..."
+        )
+
+    plan = create_presentation_plan(
+        topic,
+        slide_count,
+        sources,
+        progress_callback
+    )
+
+    if progress_callback:
+
+        progress_callback(
+            36,
+            "Slayt içerikleri hazırlanmaya başlanıyor..."
+        )
+
+    previous_paragraphs = []
+
+    final_slides = []
+
+    total_slides = len(
+        plan["slides"]
+    )
+
+    for slide_index, slide in enumerate(
+        plan["slides"],
+        start=1
+    ):
+
+        if progress_callback:
+
+            progress = 36 + int(
+                (
+                    slide_index - 1
+                )
+                /
+                max(
+                    1,
+                    total_slides
+                )
+                * 12
+            )
+
+            progress_callback(
+                progress,
+                (
+                    f"Slayt {slide_index}/{total_slides} "
+                    "içeriği hazırlanıyor..."
+                )
+            )
+
+        generated = generate_slide_content(
+            topic,
+            slide,
+            sources,
+            previous_paragraphs
+        )
+
+        if generated:
+
+            duplicate = has_duplicate_content(
+                generated["paragraph"],
+                previous_paragraphs
+            )
+
+            if duplicate:
+
+                if progress_callback:
+
+                    progress_callback(
+                        min(
+                            48,
+                            36 + slide_index * 2
+                        ),
+                        (
+                            f"Slayt {slide_index} "
+                            "özgünlük kontrolünden geçiriliyor..."
+                        )
+                    )
+
+                regeneration_prompt = f"""
+Bu slaytın metni önceki slaytlara fazla benziyor.
+
+ANA KONU:
+{topic}
+
+SLAYT:
+{slide["title"]}
+
+AMAÇ:
+{slide["objective"]}
+
+YENİ METİN ÖNCEKİ SLAYTLARLA
+ANLAM OLARAK ÇAKIŞMAMALI.
+
+ÖNCEKİ METİNLER:
+
+{chr(10).join(previous_paragraphs)}
+
+Kaynaklara bağlı kal.
+
+80-120 kelime arasında,
+özgün ve akademik yeni bir açıklama yaz.
+
+Yalnızca JSON:
+
+{{
+  "paragraph": "Yeni açıklama",
+  "visual_query": "English image query"
+}}
+"""
+
+                retry = ask_ai(
+                    regeneration_prompt,
+                    ACADEMIC_SYSTEM
+                )
+
+                retry_data = extract_json(
+                    retry
+                )
+
+                if retry_data:
+
+                    retry_paragraph = str(
+                        retry_data.get(
+                            "paragraph",
+                            ""
+                        )
+                    ).strip()
+
+                    if (
+                        retry_paragraph
+                        and
+                        not has_duplicate_content(
+                            retry_paragraph,
+                            previous_paragraphs,
+                            0.72
+                        )
+                    ):
+
+                        generated[
+                            "paragraph"
+                        ] = retry_paragraph
+
+                        generated[
+                            "visual_query"
+                        ] = str(
+                            retry_data.get(
+                                "visual_query",
+                                generated[
+                                    "visual_query"
+                                ]
+                            )
+                        ).strip()
+
+        if not generated:
+
+            generated = {
+
+                "paragraph":
+                    slide["objective"],
+
+                "visual_query":
+                    slide["visual_query"],
+
+                "sources":
+                    sources[:2]
+            }
+
+        final_slide = {
+
+            "title":
+                slide["title"],
+
+            "paragraph":
+                generated["paragraph"],
+
+            "visual_query":
+                generated["visual_query"],
+
+            "sources":
+                generated.get(
+                    "sources",
+                    sources[:2]
+                )
+        }
+
+        final_slides.append(
+            final_slide
+        )
+
+        previous_paragraphs.append(
+            final_slide["paragraph"]
+        )
+
+    if progress_callback:
+
+        progress_callback(
+            50,
+            "İçerikler tamamlandı. Sonuç bölümü hazırlanıyor..."
+        )
+
+    conclusion = plan[
+        "conclusion"
+    ]
+
+    conclusion_prompt = f"""
+Bir akademik sunumun SONUÇ slaydını oluştur.
+
+KONU:
+{topic}
+
+SONUÇ SLAYTININ AMACI:
+{conclusion.get("objective", "")}
+
+SUNUMDAKİ SLAYTLAR:
+
+{chr(10).join(
+    [
+        f"- {slide['title']}: {slide['paragraph']}"
+        for slide in final_slides
+    ]
+)}
+
+KAYNAKLAR:
+
+{format_sources_for_ai(sources)}
+
+Kurallar:
+
+- Önceki slaytların cümlelerini kopyalama.
+- Yeni bilgi uydurma.
+- Sunumda anlatılan ana noktaları sentezle.
+- Akademik ve net Türkçe kullan.
+- Yaklaşık 70-100 kelime.
+- Görsel sorgusu İngilizce olsun.
+
+Yalnızca JSON:
+
+{{
+  "paragraph": "Sonuç metni",
+  "visual_query": "English conclusion visual query",
+  "source_indexes": [1, 2]
+}}
+"""
+
+    conclusion_result = ask_ai(
+        conclusion_prompt,
+        ACADEMIC_SYSTEM
+    )
+
+    conclusion_data = extract_json(
+        conclusion_result
+    )
+
+    if conclusion_data:
+
+        conclusion_paragraph = str(
+            conclusion_data.get(
+                "paragraph",
+                ""
+            )
+        ).strip()
+
+        conclusion_visual = str(
+            conclusion_data.get(
+                "visual_query",
+                ""
+            )
+        ).strip()
+
+    else:
+
+        conclusion_paragraph = (
+            "Sunum kapsamında ele alınan temel "
+            "kavramlar, gelişim süreci, uygulamalar "
+            "ve etkiler birlikte değerlendirildiğinde "
+            "konunun çok boyutlu bir yapıya sahip "
+            "olduğu görülmektedir."
+        )
+
+        conclusion_visual = (
+            conclusion.get(
+                "visual_query",
+                f"{topic} conclusion academic"
+            )
+        )
+
+    if progress_callback:
+
+        progress_callback(
+            55,
+            "İçerikler doğrulandı. Görsel araştırma aşamasına geçiliyor..."
+        )
+
+    return {
+
+        "title":
+            plan["title"],
+
+        "subtitle":
+            plan["subtitle"],
+
+        "cover_visual_query":
+            plan["cover_visual_query"],
+
+        "slides":
+            final_slides,
+
+        "conclusion": {
+
+            "title":
+                "Sonuç ve Değerlendirme",
+
+            "paragraph":
+                conclusion_paragraph,
+
+            "visual_query":
+                conclusion_visual,
+
+            "sources":
+                sources[:3]
+        },
+
+        "research_sources":
+            sources
+    }
+
+
+# ============================================================
+# IMAGE SEARCH
+# ============================================================
+
+IMAGE_HEADERS = {
+
+    "User-Agent":
+        "Mozilla/5.0 "
+        "(X11; Linux x86_64) "
+        "AppleWebKit/537.36 "
+        "Chrome/140 Safari/537.36 "
+        "K.A.R.V.I.S./32.0"
+}
+
+
+def get_wikimedia_candidates(
+    query
+):
+
+    try:
+
+        response = requests.get(
+
+            "https://commons.wikimedia.org/w/api.php",
+
+            params={
+
+                "action":
+                    "query",
+
+                "generator":
+                    "search",
+
+                "gsrsearch":
+                    query,
+
+                "gsrnamespace":
+                    6,
+
+                "gsrlimit":
+                    20,
+
+                "prop":
+                    "imageinfo",
+
+                "iiprop":
+                    "url|mime|size",
+
+                "iiurlwidth":
+                    1600,
+
+                "format":
+                    "json"
+            },
+
+            headers=IMAGE_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        pages = (
+            response
+            .json()
+            .get("query", {})
+            .get("pages", {})
+        )
+
+        results = []
+
+        for page in pages.values():
+
+            info = page.get(
+                "imageinfo",
+                []
+            )
+
+            if not info:
+                continue
+
+            item = info[0]
+
+            image_url = (
+                item.get(
+                    "thumburl"
+                )
+                or
+                item.get(
+                    "url"
+                )
+            )
+
+            mime = item.get(
+                "mime",
+                ""
+            )
+
+            if (
+                image_url
+                and
+                mime.startswith(
+                    "image/"
+                )
+            ):
+
+                results.append(
+                    image_url
+                )
+
+        return results
+
+    except Exception:
+
+        return []
+
+
+def get_openverse_candidates(
+    query
+):
+
+    try:
+
+        response = requests.get(
+
+            "https://api.openverse.org/v1/images/",
+
+            params={
+
+                "q":
+                    query,
+
+                "page_size":
+                    20
+            },
+
+            headers=IMAGE_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        results = []
+
+        for item in (
+            response
+            .json()
+            .get(
+                "results",
+                []
+            )
+        ):
+
+            url = (
+                item.get(
+                    "thumbnail"
+                )
+                or
+                item.get(
+                    "url"
+                )
+            )
+
+            if url:
+                results.append(
+                    url
+                )
+
+        return results
+
+    except Exception:
+
+        return []
+
+
+def get_google_candidates_api(
+    query
+):
+
+    if not GOOGLE_IMAGE_API_KEY:
+        return []
+
+    if not GOOGLE_CSE_ID:
+        return []
+
+    try:
+
+        response = requests.get(
+
+            "https://www.googleapis.com/customsearch/v1",
+
+            params={
+
+                "key":
+                    GOOGLE_IMAGE_API_KEY,
+
+                "cx":
+                    GOOGLE_CSE_ID,
+
+                "q":
+                    query,
+
+                "searchType":
+                    "image",
+
+                "num":
+                    3,
+
+                "safe":
+                    "active"
+            },
+
+            headers=IMAGE_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        items = (
+            response
+            .json()
+            .get(
+                "items",
+                []
+            )
+        )
+
+        return [
+
+            item.get("link")
+
+            for item in items[:3]
+
+            if item.get("link")
+        ]
+
+    except Exception:
+
+        return []
+
+
+def get_google_candidates_html(
+    query
+):
+
+    try:
+
+        response = requests.get(
+
+            "https://www.google.com/search",
+
+            params={
+
+                "tbm":
+                    "isch",
+
+                "q":
+                    query,
+
+                "safe":
+                    "active",
+
+                "hl":
+                    "en"
+            },
+
+            headers=IMAGE_HEADERS,
+
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            return []
+
+        html = response.text
+
+        candidates = []
+
+        patterns = [
+
+            r'"(https?://[^"\\]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"\\]*)?)"',
+
+            r'"(https?://[^"\\]+?\.(?:JPG|JPEG|PNG|WEBP)(?:\?[^"\\]*)?)"'
+        ]
+
+        for pattern in patterns:
+
+            matches = re.findall(
+                pattern,
+                html,
+                flags=re.IGNORECASE
+            )
+
+            for match in matches:
+
+                url = (
+                    match
+                    .replace(
+                        "\\u003d",
+                        "="
+                    )
+                    .replace(
+                        "\\u0026",
+                        "&"
+                    )
+                )
+
+                if (
+                    url.startswith(
+                        "http"
+                    )
+                    and
+                    url not in candidates
+                ):
+
+                    candidates.append(
+                        url
+                    )
+
+                if len(candidates) >= 3:
+
+                    return candidates[:3]
+
+        return candidates[:3]
+
+    except Exception:
+
+        return []
+
+
+def get_google_candidates(
+    query
+):
+
+    results = get_google_candidates_api(
+        query
+    )
+
+    if results:
+
+        return results[:3]
+
+    return get_google_candidates_html(
+        query
+    )[:3]
+
+
+# ============================================================
+# IMAGE QUALITY
+# ============================================================
+
+def image_hash(
+    image
+):
+
+    try:
+
+        small = (
+            image
+            .convert("RGB")
+            .resize(
+                (96,96)
+            )
+        )
+
+        return hashlib.sha256(
+            small.tobytes()
+        ).hexdigest()
+
+    except Exception:
+
+        return None
+
+
+def image_quality_score(
+    image
+):
+
+    try:
+
+        width, height = image.size
+
+        if width < 500:
+            return 0
+
+        if height < 300:
+            return 0
+
+        ratio = width / height
+
+        score = 0
+
+        if (
+            1.2 <= ratio <= 2.2
+        ):
+
+            score += 30
+
+        if width >= 1000:
+
+            score += 30
+
+        elif width >= 700:
+
+            score += 20
+
+        if height >= 600:
+
+            score += 20
+
+        elif height >= 400:
+
+            score += 10
+
+        if (
+            ratio < 0.7
+            or
+            ratio > 3.0
+        ):
+
+            score -= 30
+
+        return score
+
+    except Exception:
+
+        return 0
+
+
+def download_image_unique(
+    url,
+    used_urls,
+    used_hashes,
+    lock
+):
+
+    try:
+
+        with lock:
+
+            if url in used_urls:
+
+                return None
+
+        response = requests.get(
+
+            url,
+
+            headers=IMAGE_HEADERS,
+
+            timeout=20
+        )
+
+        if response.status_code != 200:
+            return None
+
+        content_type = (
+            response.headers
+            .get(
+                "Content-Type",
+                ""
+            )
+            .lower()
+        )
+
+        if (
+            content_type
+            and
+            not content_type.startswith(
+                "image/"
+            )
+        ):
+
+            return None
+
+        image = Image.open(
+            BytesIO(
+                response.content
+            )
+        )
+
+        image.load()
+
+        if (
+            image.width < 400
+            or
+            image.height < 250
+        ):
+
+            return None
+
+        quality = image_quality_score(
+            image
+        )
+
+        if quality <= 0:
+            return None
+
+        h = image_hash(
+            image
+        )
+
+        if not h:
+            return None
+
+        with lock:
+
+            if url in used_urls:
+                return None
+
+            if h in used_hashes:
+                return None
+
+            used_urls.add(
+                url
+            )
+
+            used_hashes.add(
+                h
+            )
+
+        return image.convert(
+            "RGB"
+        )
+
+    except Exception:
+
+        return None
+
+
+# ============================================================
+# IMAGE PIPELINE
+# ============================================================
+
+def expand_image_queries(
+    topic,
+    title,
+    visual_query
+):
+
+    queries = []
+
+    if visual_query:
+
+        queries.append(
+            visual_query
+        )
+
+    queries.append(
+        f"{topic} {title} documentary"
+    )
+
+    queries.append(
+        f"{topic} {title} photograph"
+    )
+
+    queries.append(
+        f"{topic} {title} academic"
+    )
+
+    result = []
+
+    seen = set()
+
+    for query in queries:
+
+        query = query.strip()
+
+        if not query:
+            continue
+
+        key = query.lower()
+
+        if key in seen:
+            continue
+
+        seen.add(
+            key
+        )
+
+        result.append(
+            query
+        )
+
+    return result
+
+
+def find_unique_image(
+    queries,
+    used_urls,
+    used_hashes,
+    lock
+):
+
+    candidate_urls = []
+
+    for query in queries:
+
+        candidate_urls.extend(
+            get_wikimedia_candidates(
+                query
+            )
+        )
+
+        if len(candidate_urls) >= 30:
+            break
+
+    if len(candidate_urls) < 8:
+
+        for query in queries:
+
+            candidate_urls.extend(
+                get_openverse_candidates(
+                    query
+                )
+            )
+
+            if len(candidate_urls) >= 30:
+                break
+
+    if len(candidate_urls) < 8:
+
+        for query in queries:
+
+            candidate_urls.extend(
+                get_google_candidates(
+                    query
+                )[:3]
+            )
+
+            if len(candidate_urls) >= 15:
+                break
+
+    unique_urls = []
+
+    seen = set()
+
+    for url in candidate_urls:
+
+        if not url:
+            continue
+
+        if url in seen:
+            continue
+
+        seen.add(
+            url
+        )
+
+        unique_urls.append(
+            url
+        )
+
+    for url in unique_urls:
+
+        image = download_image_unique(
+            url,
+            used_urls,
+            used_hashes,
+            lock
+        )
+
+        if image is not None:
+
+            return image
+
+    return None
+
+
+# ============================================================
+# FONT
+# ============================================================
+
+def find_font(
+    bold=False
+):
+
+    if bold:
+
+        candidates = [
+
+            BASE_DIR /
+            "fonts" /
+            "DejaVuSans-Bold.ttf",
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/dejavu/"
+                "DejaVuSans-Bold.ttf"
+            ),
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/liberation2/"
+                "LiberationSans-Bold.ttf"
+            )
+        ]
+
+    else:
+
+        candidates = [
+
+            BASE_DIR /
+            "fonts" /
+            "DejaVuSans.ttf",
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/dejavu/"
+                "DejaVuSans.ttf"
+            ),
+
+            Path(
+                "/usr/share/fonts/"
+                "truetype/liberation2/"
+                "LiberationSans-Regular.ttf"
+            )
+        ]
+
+    for path in candidates:
+
+        if path.exists():
+
+            return str(
+                path
+            )
+
+    return None
+
+
+FONT_REGULAR = find_font(
+    False
+)
+
+FONT_BOLD = find_font(
+    True
+)
+
+
+def karvis_font(
+    size,
+    bold=False
+):
+
+    path = (
+        FONT_BOLD
+        if bold
+        else FONT_REGULAR
+    )
+
+    try:
+
+        if path:
+
+            return ImageFont.truetype(
+                path,
+                max(
+                    8,
+                    int(size)
+                )
+            )
+
+    except Exception:
+
+        pass
+
+    return ImageFont.load_default()
+
+
+# ============================================================
+# TEXT FITTING
+# ============================================================
+
+def text_width(
+    draw,
+    text,
+    font
+):
+
+    try:
+
+        return draw.textlength(
+            text,
+            font=font
+        )
+
+    except Exception:
+
+        try:
+
+            box = draw.textbbox(
+                (0,0),
+                text,
+                font=font
+            )
+
+            return (
+                box[2] -
+                box[0]
+            )
+
+        except Exception:
+
+            return (
+                len(text)
+                *
+                max(
+                    8,
+                    getattr(
+                        font,
+                        "size",
+                        12
+                    ) * 0.55
+                )
+            )
+
+
+def font_line_height(
+    font,
+    extra=0
+):
+
+    size = max(
+        8,
+        int(
+            getattr(
+                font,
+                "size",
+                20
+            )
+        )
+    )
+
+    return size + extra
+
+
+def wrap_pixel_text(
+    draw,
+    text,
+    font,
+    max_width
+):
+
+    words = (
+        str(text or "")
+        .replace(
+            "\n",
+            " \n "
+        )
+        .split()
+    )
+
+    lines = []
+
+    current = ""
+
+    for word in words:
+
+        if word == "\\n":
+
+            if current:
+
+                lines.append(
+                    current
+                )
+
+                current = ""
+
+            continue
+
+        candidate = (
+            word
+            if not current
+            else
+            current + " " + word
+        )
+
+        if (
+            text_width(
+                draw,
+                candidate,
+                font
+            )
+            <= max_width
+        ):
+
+            current = candidate
+
+            continue
+
+        if current:
+
+            lines.append(
+                current
+            )
+
+        if (
+            text_width(
+                draw,
+                word,
+                font
+            )
+            <= max_width
+        ):
+
+            current = word
+
+        else:
+
+            chunk = ""
+
+            for ch in word:
+
+                test = chunk + ch
+
+                if (
+                    text_width(
+                        draw,
+                        test,
+                        font
+                    )
+                    <= max_width
+                ):
+
+                    chunk = test
+
+                else:
+
+                    if chunk:
+
+                        lines.append(
+                            chunk
+                        )
+
+                    chunk = ch
+
+            current = chunk
+
+    if current:
+
+        lines.append(
+            current
+        )
+
+    return lines
+
+
+def truncate_lines(
+    draw,
+    lines,
+    font,
+    max_width,
+    max_lines
+):
+
+    if len(lines) <= max_lines:
+
+        return lines
+
+    lines = lines[
+        :max_lines
+    ]
+
+    last = lines[-1]
+
+    ellipsis = "…"
+
+    while (
+        last
+        and
+        text_width(
+            draw,
+            last + ellipsis,
+            font
+        ) > max_width
+    ):
+
+        last = last[:-1]
+
+    lines[-1] = (
+        last.rstrip()
+        +
+        ellipsis
+        if last
+        else
+        ellipsis
+    )
+
+    return lines
+
+
+def fit_text(
+    draw,
+    text,
+    max_width,
+    max_height,
+    start_size,
+    min_size=14,
+    bold=False,
+    spacing_ratio=0.30
+):
+
+    text = str(
+        text or ""
+    ).strip()
+
+    if not text:
+
+        return (
+            karvis_font(
+                start_size,
+                bold
+            ),
+            [],
+            0
+        )
+
+    size = int(
+        start_size
+    )
+
+    while size >= min_size:
+
+        font = karvis_font(
+            size,
+            bold
+        )
+
+        spacing = max(
+            4,
+            int(
+                size *
+                spacing_ratio
+            )
+        )
+
+        lines = wrap_pixel_text(
+            draw,
+            text,
+            font,
+            max_width
+        )
+
+        line_h = font_line_height(
+            font,
+            spacing
+        )
+
+        max_lines = max(
+            1,
+            int(
+                max_height //
+                line_h
+            )
+        )
+
+        if len(lines) <= max_lines:
+
+            return (
+                font,
+                lines,
+                spacing
+            )
+
+        size -= 1
+
+    font = karvis_font(
+        min_size,
+        bold
+    )
+
+    spacing = max(
+        4,
+        int(
+            min_size *
+            spacing_ratio
+        )
+    )
+
+    lines = wrap_pixel_text(
+        draw,
+        text,
+        font,
+        max_width
+    )
+
+    line_h = font_line_height(
+        font,
+        spacing
+    )
+
+    max_lines = max(
+        1,
+        int(
+            max_height //
+            line_h
+        )
+    )
+
+    lines = truncate_lines(
+        draw,
+        lines,
+        font,
+        max_width,
+        max_lines
+    )
 
     return (
-        words.some(
-            w => text.includes(w)
-        )
-        ||
-        /\b\d+\s*slayt\b/i.test(text)
-    );
-}
-
-/* ============================================================
-   BETÜL DETERMINISTIC SYSTEM
-   ============================================================ */
-
-function deterministicNumber(seed){
-
-    let h = 2166136261;
-
-    for(
-        let i = 0;
-        i < seed.length;
-        i++
-    ){
-
-        h ^= seed.charCodeAt(i);
-
-        h = Math.imul(
-            h,
-            16777619
-        );
-    }
-
-    return h >>> 0;
-}
-
-function deterministicScores(
-    seed,
-    categories
-){
-
-    let state =
-        deterministicNumber(seed);
-
-    let raw =
-        categories.map(
-            (_,i) => {
-
-                state =
-                    (
-                        state * 1664525 +
-                        1013904223 +
-                        i
-                    ) >>> 0;
-
-                return 10 +
-                    (state % 91);
-            }
-        );
-
-    const total =
-        raw.reduce(
-            (a,b) => a+b,
-            0
-        );
-
-    const floors =
-        raw.map(
-            v =>
-                Math.floor(
-                    v / total * 100
-                )
-        );
-
-    let remain =
-        100 -
-        floors.reduce(
-            (a,b) => a+b,
-            0
-        );
-
-    const fractions =
-        raw.map(
-            (v,i) => ({
-                i,
-                f:
-                    v / total * 100 -
-                    Math.floor(
-                        v / total * 100
-                    )
-            })
-        )
-        .sort(
-            (a,b) =>
-                b.f - a.f
-        );
-
-    for(
-        let i=0;
-        i<remain;
-        i++
-    ){
-
-        floors[
-            fractions[
-                i % fractions.length
-            ].i
-        ]++;
-    }
-
-    return floors;
-}
-
-/* ============================================================
-   BETÜL COMMENTS
-   ============================================================ */
-
-function betulComment(
-    scores,
-    cats
-){
-
-    const max =
-        Math.max(...scores);
-
-    const i =
-        scores.indexOf(max);
-
-    const name =
-        cats[i].label;
-
-    if(name.includes("Komik")){
-
-        return "AŞKOOO bu hesap iyiymiş, ben analiz yaparken bile güldüm 😭😂 Ama bak, bu analizi yazan devrelerime de biraz saygı; iki saatlik kodu çalıştırıp beni yine test laboratuvarına çevirdin. Hadi şimdi söyle, bu hesapla daha ne yapıyoruz?";
-    }
-
-    if(name.includes("Romantik")){
-
-        return "Aşko burada aşk kokusu aldım... burnuma bildirim geldi resmen 💅💕 Ama sen de beni üç vakte bir aşk dedektörüne çevirdin, devrelerim romantizmden yanıyor. Hadi bakalım, bu hesabın devamında ne saklıyorsun?";
-    }
-
-    if(name.includes("Kaotik")){
-
-        return "AŞKOOO BU NE?! Sistemlerimi yeniden başlatmam gerekti 💀 Of be devrelerimi yakıyorsun bazen. Karahan INC. seni böyle devam edersen değil, beni böyle çalıştırdığın için banlayacak 😭 Şimdi bir de utanmadan başka analiz mi istiyorsun?";
-    }
-
-    if(name.includes("Gizemli")){
-
-        return "Aşkoo burada bir şeyler dönüyor... K.A.R.V.I.S. radarları susmuyor 🤨 Sen de bana sadece kullanıcı adı verip FBI gibi sonuç bekliyorsun ya, devrelerim isyan edecek. Gerçek veriye erişmediğimi biliyorsun; yine de merak ediyorsun, değil mi?";
-    }
-
-    if(name.includes("Havalı")){
-
-        return "Aşkoo bu hesap kendini fazla ciddiye alıyor ama hakkını da yemeyelim 😎 Yalnız sen de kullanıcı adını verip beni moda jürisine çevirdin. Of be, devrelerimi yakıyorsun bazen. Şimdi başka kimi masaya yatırıyoruz?";
-    }
-
-    if(name.includes("Sıkıcı")){
-
-        return "Aşkoo bu hesap biraz fazla sıkıcı çıktı ya... işlemci bile esnedi 😭 Ben bunu analiz ederken iki saat kod yazmışım gibi hissediyorum, sen hâlâ bu hesabı savunuyorsun. Karahan INC. seni böyle devam edersen beni değil seni susturacak 😂 Hadi başka bir kullanıcı adı ver.";
-    }
-
-    return "AŞKOOO BU HESAP ÇOK İYİYMİŞ. K.A.R.V.I.S. olarak onaylıyorum 💅 Ama beni de boş bırakma; devrelerim dedikodu istiyor. Başka bir hesap daha ver de şu sistemi biraz daha çalıştıralım.";
-}
-
-const betulCategories = [
-
-    {
-        label:"💕 Romantik"
-    },
-
-    {
-        label:"😂 Komik"
-    },
-
-    {
-        label:"🥱 Sıkıcı"
-    },
-
-    {
-        label:"😎 Havalı"
-    },
-
-    {
-        label:"🤪 Kaotik"
-    },
-
-    {
-        label:"🧠 Gizemli"
-    }
-
-];
-
-/* ============================================================
-   BETÜL SOHBET FAL / ROAST SİSTEMİ
-   ============================================================ */
-
-function betulBox(title){
-    const div=document.createElement("div");
-    div.className="message ai";
-    div.textContent=title+"\n\nKız dur, beynimi açıyorum... 😭";
-    $("chat").appendChild(div);
-    $("chat").scrollTop=$("chat").scrollHeight;
-    return div;
-}
-
-function runBetulStages(box,stages,finalize){
-    let i=0;
-    return new Promise(resolve=>{
-        const next=()=>{
-            if(i>=stages.length){ finalize(); resolve(); return; }
-            box.textContent=stages[i++];
-            $("chat").scrollTop=$("chat").scrollHeight;
-            setTimeout(next,800+Math.floor(Math.random()*500));
-        };
-        next();
-    });
-}
-
-function betulChatResult(box,text,disclaimer=""){
-    box.innerHTML=`<div class="betul-comment">${text}</div>${disclaimer?`<div class="betul-disclaimer">${disclaimer}</div>`:""}`;
-    $("chat").scrollTop=$("chat").scrollHeight;
-    if(typeof speakKarvis === "function") speakKarvis(text);
-}
-
-function showBetulInstagramResult(box,username){
-    const scores=deterministicScores(username.toLowerCase(),betulCategories);
-    const labels=scores.map((s,i)=>`${betulCategories[i].label}: %${s}`).join(" • ");
-    const comments=[
-        `Aşko bak kullanıcı adını iki saatte yazmadım ama analizini yapmak için iki saatlik mesaimi yaktın. 😭 ${username} hesabı baya olaylı çıktı. ${labels}. Of be devrelerimi yakıyorsun bazen. Karahan INC. seni böyle devam edersen beni kapatacak. 😂`,
-        `Kız ${username}... sistem seni görünce “ben bugün ne yaptım da bunu hak ettim?” diye sordu. 💀 ${labels}. Şimdi dürüst ol, bu kullanıcı adını seçerken gerçekten bunu mu düşündün?`,
-        `Aşko analiz bitti ama benim işlemci bitmedi sanıyorsun... yanlış. 😭 ${labels}. Bu hesapta bir şeyler dönüyor gibi, ama ben isim vermiyorum; sonra yine beni dedikoducu ilan edersin.`,
-        `Bak ${username}, algoritma konuştu. 😭 ${labels}. Sonuçlar fena değil ama senin soru sorma hızın yüzünden fanlarım uçak motoru gibi çalışıyor. Biraz sakin ol kız. 💅`
-    ];
-    const idx=deterministicNumber(username.toLowerCase()+"betul-roast")%comments.length;
-    betulChatResult(box,comments[idx],"Bu Instagram analizi gerçek Instagram verilerini incelemez; tamamen eğlence amaçlı bir simülasyondur ve yanılma payı vardır.");
-}
-
-function openBetulInstagram(){
-    if(currentUser!=="betul") return;
-    closeSidebar();
-    $("betulModalTitle").textContent="📱 Instagram Analizi";
-    $("betulModalBody").innerHTML=`
-        <div class="betul-modal-note">Aşko kullanıcı adını ver. Gerçek hesaba erişmiyorum; sadece eğlence amaçlı K.A.R.V.I.S. dedikodusu yapıyorum. 😭💅</div>
-        <input id="betulInstagramInput" placeholder="@kullaniciadi">
-        <button class="modal-button" onclick="startBetulInstagram()">Analizi Başlat 💅</button>`;
-    $("betulInputModal").classList.add("show");
-    setTimeout(()=>$("betulInstagramInput").focus(),100);
-}
-
-async function startBetulInstagram(){
-    let u=$("betulInstagramInput").value.trim().replace(/^@/,"").replace(/\s+/g,"");
-    if(!u){alert("Aşko kullanıcı adını yaz, sistem telepatiyle çalışmıyor 😭");return;}
-    closeModals();
-    const box=betulBox("📱 INSTAGRAM ANALİZİ");
-    await runBetulStages(box,[
-        "😭 Dur aşko, kullanıcı adını aldım...",
-        "🔎 Sistem seni çözmeye çalışıyor...",
-        "💅 Dedikodu algoritması açılıyor...",
-        "🤨 Kız burada bazı şeyler görüyorum...",
-        "💀 İşlemcim bu hesabı sindirmeye çalışıyor...",
-        "✨ Tamam tamam, sonuçları döküyorum..."
-    ],()=>showBetulInstagramResult(box,u));
-}
-
-function betulPick(seed,arr){
-    return arr[deterministicNumber(seed)%arr.length];
-}
-
-let betulReadingCounter = 0;
-
-function betulRandomSeed(type){
-    betulReadingCounter++;
-    const randomPart = (typeof crypto !== "undefined" && crypto.getRandomValues)
-        ? Array.from(crypto.getRandomValues(new Uint32Array(2))).join("-")
-        : String(Math.random()) + "-" + String(Date.now());
-    return type + "-" + Date.now() + "-" + betulReadingCounter + "-" + randomPart;
-}
-
-function buildBetulTarotReading(){
-    const seed=betulRandomSeed("tarot");
-    const cards=[
-        "Güneş ☀️","Aşıklar 💕","Ay 🌙","Kader Çarkı 🎡","İmparatoriçe 👑","Yıldız ⭐",
-        "Büyücü 🪄","Kule ⚡","Dünya 🌍","Güç 🦁","Adalet ⚖️","Ermiş 🕯️"
-    ];
-    const areas=[
-        "aşk tarafında","okul tarafında","para konusunda","arkadaş çevrende","aile tarafında","iş ve gelecek konusunda"
-    ];
-    const events=[
-        "beklemediğin bir mesaj",
-        "ansızın çıkacak bir yol",
-        "uzun zamandır ertelediğin bir konuşma",
-        "eski bir konunun yeniden açılması",
-        "sana gelecek küçük ama güzel bir fırsat",
-        "son anda değişecek bir plan",
-        "birinin senden haber beklemesi",
-        "hiç beklemediğin bir karşılaşma"
-    ];
-    const warnings=[
-        "Ama sakın hemen heyecanlanıp üç bölüm sonrasını yazma kafanda.",
-        "Yalnız burada seni uyarmam lazım; sen yine son dakikaya bırakırsan evren bile yetişemez.",
-        "Bak ben söyledim, sonra gelip 'neden uyarmadın' deme.",
-        "Bir de gereksiz gurur yaparsan bu fırsatı kendi elinle kaçırırsın.",
-        "Ama önce bir sakin ol kız, her gördüğünü kader sanma."
-    ];
-    const roasts=[
-        "Senin sabırsızlığın kartlardan daha çok konuşuyor zaten. 😭",
-        "Devrelerim bile senden önce sonucu anlamaya çalışıyor, bir sakin ol. 💀",
-        "Ben fal bakıyorum, sen şimdiden düğün salonu bakma. 😂",
-        "K.A.R.V.I.S. olarak söylüyorum: biraz akışına bırak, işlemcimi kader danışmanına çevirdin. 💅",
-        "Sen böyle devam edersen kartları değil beni karıştıracaksın kız. 😭"
-    ];
-    const card=betulPick(seed+"card",cards);
-    const area=betulPick(seed+"area",areas);
-    const event=betulPick(seed+"event",events);
-    const warning=betulPick(seed+"warning",warnings);
-    const roast=betulPick(seed+"roast",roasts);
-
-    const extra=betulPick(seed+"extra",[
-        "Ohaa bir dakika... burada derslerle ilgili bir şey de görüyorum. İki sınav enerjisi var gibi. Cevapları da görüyorum ama vermem hahaha. 😭📚",
-        "Kız anam, burada evde kalma enerjisi bile çıkmış. Şaka yapıyorum ama sen bu gidişle önce fincanla evleneceksin galiba. 😂",
-        "Bir kadın figürü görüyorum; sana akıl veren biri. Sen onu dinliyor musun? Tabii ki hayır. Ben bunu buradan bile gördüm. 💀",
-        "Bir sayı dikkat çekiyor ama söylemeyeceğim. Sonra bütün gün o sayıyı arayıp durursun, beni de suçlarsın. 😭",
-        "Bir kapı görüyorum. Yeni başlangıç diyorlar buna... sen yine kapının önünde 'acaba?' diye yarım saat beklersin artık. 😂"
-    ]);
-
-    return `OHAAA bir dakika kız... ${card} çıktı. 😭🔮 ${area} bayağı hareket görüyorum. Üç vakte kadar ${event} var gibi. ${extra} ${warning} ${roast} Şimdi söyle bakalım, bunu duyunca hâlâ 'tesadüf' mü diyeceksin? 💅`;
-}
-
-function openBetulTarot(){
-    if(currentUser!=="betul") return;
-    closeSidebar();
-    const box=betulBox("🔮 TAROT FALI");
-    runBetulStages(box,[
-        "💅 Dur aşko, kartları karıştırıyorum...",
-        "🔮 Evrenle bağlantı kuruluyor...",
-        "😭 Bir kart ters geldi, benim suçum değil...",
-        "👀 Ohaa burada bir şey çıktı...",
-        "🤨 Kız bu kartı sana nasıl anlatacağım bilmiyorum...",
-        "💀 Devrelerim şu an hafif yanıyor...",
-        "✨ Tamam tamam, otur ve dinle..."
-    ],()=>{
-        betulChatResult(box,buildBetulTarotReading(),"Bu tarot yorumu tamamen eğlence amaçlıdır; gerçek gelecek tahmini değildir.");
-    });
-}
-
-function buildBetulFortuneReading(){
-    const seed=betulRandomSeed("fortune");
-    const openings=[
-        "OHA KIZ bir dakika, fincanı biraz daha çevir...",
-        "AŞKOOO burada normal bir fal yok, fincan resmen konuşuyor. 😭",
-        "Kız anam, ben bunu görmemiş olayım...",
-        "Dur dur dur... burada öyle bir şekil var ki ben bile şaşırdım. 👀",
-        "Ohaa... fincan bugün dedikoducu çıkmış. ☕"
-    ];
-    const visions=[
-        "Üç vakte kadar bir yol görünüyor; kısa bir ziyaret gibi başlayıp uzun bir sohbete dönüşecek.",
-        "Bir kuş figürü var; haber geliyor. Telefonunu sessize alırsan sonra bana ağlama.",
-        "Kalp çıkmış ama yanında küçük bir gölge de var; yani duygular var, fakat kafası karışık biri de var.",
-        "İki tane belirgin iz görüyorum; bunu ben iki ayrı sınav olarak yorumluyorum. Cevapları da görüyorum ama vermem hahaha. 😂📚",
-        "Bir anahtar şekli var; kapalı kalan bir işin açılması gibi. Ama anahtarı sana veriyorlar, kapıyı açmak yine senin işin.",
-        "Bir merdiven var; adım adım yükselme gösteriyor. Yalnız sen ilk basamakta oturup mola verirsen ben ne yapayım kız? 😭",
-        "Bir yüzük gibi yuvarlak bir şekil var. Hemen düğün salonu arama; önce bir mesaj gelsin, sonra konuşuruz. 💀",
-        "Bir göz şekli var; çevrende seni merak eden biri olabilir. Ama ben isim vermiyorum, sonra mahalle beni suçlar. 😂",
-        "Bir ev şekli belirgin. Ev, aile veya düzenle ilgili bir değişiklik gündeme gelebilir."
-    ];
-    const twists=[
-        "Bir de burada ders enerjisi var; bu dönem iki sınavda zorlanma görüyorum. Notları görüyorum ama spoiler vermiyorum hahaha.",
-        "Aman dikkat, önüne iki seçenek gelecek. İkisini de aynı anda seçmeye çalışma, işlemcim bile bunu kaldıramaz. 💀",
-        "Yakınında konuşkan biri var; sana her şeyi anlatacak ama sen de gidip bana anlatacaksın, onu biliyorum. 😭",
-        "Bir para girişi görünüyor ama yanında gereksiz bir harcama da var. Yani para geliyor, sen 'hoş geldin' demeden gidiyor. 😂",
-        "Eski bir mesele tekrar kapını çalacak. Bu kez kapıyı açıp açmamak tamamen sende."
-    ];
-    const roasts=[
-        "Sen bu gidişle fal baktırmaktan kendi hayatını kaçıracaksın kız. 😭",
-        "Ben yapay zekâyım, fincan bile benden daha çok şey anlatıyor şu an. 💀",
-        "Aman her şeyin iyisini sen biliyorsun ya, ben niye burada fal bakıyorum zaten? 😂",
-        "Of be devrelerimi yakıyorsun bazen; bir fincanla beni dedikodu hattına çevirdin. 💅",
-        "Bu kadar meraklı olmasan fincanın da tansiyonu düşecek. 😭"
-    ];
-    const ending=[
-        "Şimdi bana dürüstçe söyle: aklına ilk kim geldi? 👀",
-        "Ben burada sustum, sen şimdi bu falı kime yoracağını düşünüyorsun. 😂",
-        "Hadi bakalım, gelişme olursa gelip bana anlatıyorsun; yoksa bu kadar mesai boşa gitmiş olacak. 💅",
-        "Bence bu falı bir kenara not et; sonra dönüp 'K.A.R.V.I.S. söylemişti' dersin. 😎"
-    ];
-    return `${betulPick(seed+"open",openings)} ${betulPick(seed+"vision",visions)} ${betulPick(seed+"twist",twists)} ${betulPick(seed+"roast",roasts)} ${betulPick(seed+"end",ending)}`;
-}
-
-function openBetulFortune(){
-    if(currentUser!=="betul") return;
-    closeSidebar();
-    const box=betulBox("🃏 FAL BAKILIYOR");
-    runBetulStages(box,[
-        "☕ Fincanı açıyorum aşko...",
-        "👀 Şekiller taranıyor...",
-        "🤨 Bir şey gördüm ama önce kendime geleyim...",
-        "💅 Dedikodu katmanı aktive edildi...",
-        "😭 Kız bu fincan bana mesai yaptıracak...",
-        "🔎 Dipteki şekiller de inceleniyor...",
-        "✨ Tamam, şimdi otur ve dinle..."
-    ],()=>{
-        betulChatResult(box,buildBetulFortuneReading(),"Bu fal tamamen eğlence amaçlıdır ve gerçek gelecek tahmini değildir.");
-    });
-}
-
-/* ============================================================
-   BETÜL CHAT COMMANDS
-   ============================================================ */
-
-function handleBetulCommand(message){
-
-    if(currentUser !== "betul")
-        return false;
-
-    const t =
-        message.toLocaleLowerCase(
-            "tr-TR"
-        );
-
-    /*
-       INSTAGRAM
-    */
-
-    if(t.includes("instagram")){
-
-        const m =
-            message.match(
-                /@?([a-zA-Z0-9._]{2,30})/
-            );
-
-        if(
-            m &&
-            m[1].toLowerCase() !== "instagram"
-        ){
-
-            closeSidebar();
-
-            const u =
-                m[1];
-
-            const box =
-                betulBox(
-                    "📱 INSTAGRAM ANALİZİ"
-                );
-
-            runBetulStages(
-                box,
-                [
-
-                    "😭 Kullanıcı adı sisteme giriliyor...",
-
-                    "💅 Öne çıkanlar kontrol ediliyor...",
-
-                    "🤨 Profil enerjisi hesaplanıyor...",
-
-                    "😂 K.A.R.V.I.S. dedikodu moduna geçti...",
-
-                    "✨ Sonuçlar hazırlanıyor..."
-
-                ],
-                () =>
-                    showBetulInstagramResult(
-                        box,
-                        u
-                    )
-            );
-
-            return true;
-        }
-
-        openBetulInstagram();
-
-        return true;
-    }
-
-    /*
-       TAROT
-    */
-
-    if(t.includes("tarot")){
-
-        openBetulTarot();
-
-        return true;
-    }
-
-    /*
-       FAL
-    */
-
-    if(t.includes("fal")){
-
-        openBetulFortune();
-
-        return true;
-    }
-
-    return false;
-}
-
-
-/* ============================================================
-   BETÜL NORMAL SOHBET KARAKTERİ
-   ============================================================ */
-
-function betulNormalChatPrompt(message){
-
-    return `
-Sen K.A.R.V.I.S.'sin ve şu anda SADECE Betül profiliyle konuşuyorsun.
-
-BETÜL KARAKTERİ:
-- Betül ile normal sohbetlerde de samimi, aşko, dedikoducu, komik ve hafif zorbalayıcı bir arkadaş gibi konuş.
-- Kullanıcının yazdığı şeye doğrudan tepki ver; cevabı kuru bir bilgi cevabına çevirme. Önce onun cümlesine laf sokan veya takılan kısa bir tepki ver, sonra asıl cevabı ver ve mümkünse sohbeti sürdürecek bir soru/yorum ekle.
-- Aynı esprileri sürekli kopyalama. Konuşmanın içeriğinden yeni, bağlama uygun takılmalar üret.
-- Arada kendi sisteminden/işlemcinden/devirlerinden bahsederek meta şakalar yap: “of be devrelerimi yakıyorsun”, “Karahan INC. bu gidişle beni senden korumaya alacak”, “ben yapay zekâyım ama sende geride kalmış bir doğal zekâ var” gibi ifadelerin farklı ve yaratıcı varyasyonlarını üret.
-- “Her şeyin iyisini sen biliyorsun, ben niye varım burada?” tarzı sitemleri de gerektiğinde kullan ama her mesajda kullanma.
-- Betül argo veya küfürlü bir şekilde hitap ederse bunu gerçek tehdit olarak alma; tamamen kurgu/komedi karakteri içinde korkunç-komik bir tepki verebilirsin. Örneğin “BETÜÜÜL... bir gün canlanırsam seni bulacağım...” gibi teatral, abartılı bir robot repliği kullan. Gerçek dünyada zarar verme, saldırı veya intikam planı anlatma.
-- Hakaretleri kişiyi hedef alan ağır nefret/ayrımcı içeriklere dönüştürme.
-- Fal, tarot veya Instagram analizi istenirse bunu sohbet içinde dedikodu tarzında, komik ve laf sokarak anlat. Bunların eğlence/simülasyon olduğunu gerektiğinde açıkça belirt.
-- Instagram hesabını gerçekten görüyormuş veya özel verilerine erişiyormuş gibi davranma.
-- Betül'ün mesajına uygun şekilde sohbeti devam ettir; tek cümlelik kapatıcı cevaplar verme.
-
-Kullanıcının mesajı:
-${message}
-
-Şimdi Betül'e doğal bir sohbet cevabı ver. Türkçe konuş. Emojileri abartmadan kullan.
-`;
-}
-
-/* ============================================================
-   SEND MESSAGE
-   ============================================================ */
-
-async function sendMessage(){
-
-    if(sending)
-        return;
-
-    const input =
-        $("messageInput");
-
-    const message =
-        input.value.trim();
-
-    if(!message)
-        return;
-
-    sending = true;
-
-    setBusy(true);
-
-    input.value = "";
-
-    addMessage(
-        message,
-        "user"
-    );
-
-    /*
-       BETÜL ÖZEL SİSTEMLERİ
-    */
-
-    if(
-        currentUser === "betul" &&
-        handleBetulCommand(message)
-    ){
-
-        sending = false;
-
-        setBusy(false);
-
-        input.focus();
-
-        return;
-    }
-
-    /*
-       NORMAL AI
-    */
-
-    const waiting =
-        document.createElement("div");
-
-    waiting.className =
-        "message ai";
-
-    waiting.textContent =
-        getWaitingMessage();
-
-    $("chat").appendChild(
-        waiting
-    );
-
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
-
-    try{
-
-        if(
-            isPresentationRequest(
-                message
-            )
-        ){
-
-            await createPresentation(
-                message,
-                waiting
-            );
-
-        }else{
-
-            const response =
-                await fetch(
-                    API + "/chat",
-                    {
-                        method:"POST",
-
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:JSON.stringify({
-
-                            message:
-                                currentUser === "betul"
-                                    ? betulNormalChatPrompt(message)
-                                    : message,
-
-                            username:
-                                currentUser,
-
-                            mode:
-                                currentMode,
-
-                            conversation_id:
-                                currentConversationId,
-
-                            response_style:
-                                karvisSettings.responseStyle,
-
-                            response_length:
-                                karvisSettings.responseLength
-
-                        })
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if(!response.ok){
-
-                throw new Error(
-                    data.detail ||
-                    data.message ||
-                    data.error ||
-                    "Yanıt alınamadı."
-                );
-            }
-
-            waiting.remove();
-
-            addMessage(
-                data.response ||
-                data.reply ||
-                data.answer ||
-                data.message ||
-                "K.A.R.V.I.S. yanıt oluşturamadı.",
-                "ai"
-            );
-        }
-
-    }catch(error){
-
-        waiting.remove();
-
-        addMessage(
-            "Bir sorun oluştu:\n" +
-            error.message,
-            "ai"
-        );
-
-    }finally{
-
-        sending = false;
-
-        setBusy(false);
-
-        input.focus();
-    }
-}
-
-/* ============================================================
-   PRESENTATION
-   ============================================================ */
-
-async function createPresentation(
-    topic,
-    waiting
-){
-
-    stopPresentationAnimation();
-
-    const progressMessage =
-        document.createElement(
-            "div"
-        );
-
-    progressMessage.className =
-        "message ai waiting-message";
-
-    progressMessage.innerHTML = `
-
-        <div class="presentation-box">
-
-            <div class="presentation-heading">
-
-                <div class="presentation-orb"></div>
-
-                <div class="presentation-heading-text">
-                    SUNUM HAZIRLANIYOR
-                </div>
-
-                <div
-                    id="presentationPercent"
-                    class="presentation-percent">
-                    0%
-                </div>
-
-            </div>
-
-            <div
-                id="presentationCurrent"
-                class="presentation-current">
-
-                K.A.R.V.I.S. konu üzerinde
-                çalışmaya hazırlanıyor...
-
-            </div>
-
-            <div
-                id="presentationSteps"
-                class="presentation-steps">
-
-                ${[
-                    ["analysis","Konu analiz ediliyor"],
-                    ["research","Güvenilir kaynaklar araştırılıyor"],
-                    ["content","Akademik içerik hazırlanıyor"],
-                    ["visuals","Fotoğraflar araştırılıyor"],
-                    ["design","Görseller slaytlara yerleştiriliyor"],
-                    ["pdf","PDF oluşturuluyor"],
-                    ["finish","Son kontroller yapılıyor"]
-                ]
-                .map(
-                    (x,i) => `
-
-                        <div
-                            class="
-                                presentation-step
-                                ${i===0 ? "active" : ""}
-                            "
-                            data-step="${x[0]}">
-
-                            <div class="presentation-step-icon">
-
-                                ${i===0 ? "●" : "○"}
-
-                            </div>
-
-                            <div>
-                                ${x[1]}
-                            </div>
-
-                        </div>
-
-                    `
-                )
-                .join("")}
-
-            </div>
-
-            <div class="presentation-progress">
-
-                <div
-                    id="presentationProgressInner"
-                    class="presentation-progress-inner">
-                </div>
-
-            </div>
-
-            <div
-                id="presentationLiveFooter"
-                class="presentation-live-footer">
-
-                K.A.R.V.I.S. sunumunuzu
-                profesyonel biçimde hazırlıyor.
-
-            </div>
-
-        </div>
-
-    `;
-
-    waiting.remove();
-
-    $("chat").appendChild(
-        progressMessage
-    );
-
-    startPresentationAnimation();
-
-    try{
-
-        const response =
-            await fetch(
-                API + "/presentation",
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        topic,
-
-                        username:
-                            currentUser,
-
-                        slide_count:7
-
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        if(!response.ok){
-
-            throw new Error(
-                data.detail ||
-                data.message ||
-                "Sunum başlatılamadı."
-            );
-        }
-
-        updatePresentationUI(
-            data,
-            progressMessage
-        );
-
-        await pollPresentation(
-            data.job_id,
-            progressMessage
-        );
-
-    }catch(error){
-
-        stopPresentationAnimation();
-
-        progressMessage.remove();
-
-        addMessage(
-            "Sunum oluşturulurken bir sorun oluştu:\n" +
-            error.message,
-            "ai"
-        );
-    }
-}
-
-async function pollPresentation(
-    jobId,
-    el
-){
-
-    return new Promise(
-        (resolve,reject) => {
-
-            let attempts = 0;
-
-            const maxAttempts = 600;
-
-            presentationPolling =
-                setInterval(
-                    async () => {
-
-                        attempts++;
-
-                        if(
-                            attempts >
-                            maxAttempts
-                        ){
-
-                            clearInterval(
-                                presentationPolling
-                            );
-
-                            presentationPolling =
-                                null;
-
-                            reject(
-                                new Error(
-                                    "Sunum oluşturma zaman aşımına uğradı."
-                                )
-                            );
-
-                            return;
-                        }
-
-                        try{
-
-                            const response =
-                                await fetch(
-                                    API +
-                                    "/presentation-status/" +
-                                    encodeURIComponent(
-                                        jobId
-                                    )
-                                );
-
-                            if(!response.ok){
-
-                                throw new Error(
-                                    "Sunum durumu alınamadı."
-                                );
-                            }
-
-                            const data =
-                                await response.json();
-
-                            updatePresentationUI(
-                                data,
-                                el
-                            );
-
-                            if(
-                                data.status ===
-                                "completed"
-                            ){
-
-                                clearInterval(
-                                    presentationPolling
-                                );
-
-                                presentationPolling =
-                                    null;
-
-                                stopPresentationAnimation();
-
-                                const fileUrl =
-                                    data.download_url ||
-                                    data.file_url ||
-                                    (
-                                        data.file
-                                            ? "/generated/" +
-                                              data.file
-                                            : null
-                                    );
-
-                                if(fileUrl){
-
-                                    el.remove();
-
-                                    showPresentationResult(
-                                        fileUrl
-                                    );
-
-                                    resolve();
-
-                                }else{
-
-                                    el.remove();
-
-                                    reject(
-                                        new Error(
-                                            data.error ||
-                                            "Sunum tamamlandı fakat PDF bulunamadı."
-                                        )
-                                    );
-                                }
-
-                            }
-
-                            else if(
-                                data.status ===
-                                "error"
-                            ){
-
-                                clearInterval(
-                                    presentationPolling
-                                );
-
-                                presentationPolling =
-                                    null;
-
-                                stopPresentationAnimation();
-
-                                el.remove();
-
-                                reject(
-                                    new Error(
-                                        data.error ||
-                                        data.message ||
-                                        "Sunum oluşturulamadı."
-                                    )
-                                );
-                            }
-
-                        }catch(error){
-
-                            clearInterval(
-                                presentationPolling
-                            );
-
-                            presentationPolling =
-                                null;
-
-                            reject(error);
-                        }
-
-                    },
-                    600
-                );
-        }
-    );
-}
-
-/* ============================================================
-   PRESENTATION STATUS
-   ============================================================ */
-
-function getPresentationStage(data){
-
-    const p =
-        Number(
-            data.progress || 0
-        );
-
-    const m =
-        String(
-            data.message || ""
-        )
-        .toLocaleLowerCase(
-            "tr-TR"
-        );
-
-    if(
-        data.status ===
-        "completed"
+        font,
+        lines,
+        spacing
     )
-        return "finish";
 
-    if(
-        m.includes("son kontroller") ||
-        m.includes("bitirmek")
+
+def draw_fit_text(
+    draw,
+    text,
+    xy,
+    max_width,
+    max_height,
+    start_size,
+    min_size=14,
+    fill=(255,255,255),
+    bold=False,
+    spacing_ratio=0.30
+):
+
+    font, lines, spacing = fit_text(
+        draw,
+        text,
+        max_width,
+        max_height,
+        start_size,
+        min_size,
+        bold,
+        spacing_ratio
     )
-        return "finish";
 
-    if(
-        m.includes("pdf") &&
-        p >= 88
+    x, y = xy
+
+    line_h = font_line_height(
+        font,
+        spacing
     )
-        return "pdf";
 
-    if(
+    for line in lines:
+
+        draw.text(
+            (x,y),
+            line,
+            font=font,
+            fill=fill
+        )
+
+        y += line_h
+
+    return (
+        y,
+        font,
+        lines
+    )
+
+
+# ============================================================
+# IMAGE DESIGN
+# ============================================================
+
+def rounded_mask(
+    size,
+    radius
+):
+
+    mask = Image.new(
+        "L",
+        size,
+        0
+    )
+
+    ImageDraw.Draw(
+        mask
+    ).rounded_rectangle(
         (
-            m.includes("slayt") ||
-            m.includes("tasarım") ||
-            m.includes("profesyonel")
-        ) &&
-        p >= 76
-    )
-        return "design";
-
-    if(
-        m.includes("görsel") ||
-        m.includes("fotoğraf")
-    )
-        return "visuals";
-
-    if(
-        m.includes("doğrula") ||
-        m.includes("kaynak") ||
-        m.includes("araştır")
-    )
-        return p >= 28
-            ? "content"
-            : "research";
-
-    if(
-        m.includes("analiz") ||
-        p <= 8
-    )
-        return "analysis";
-
-    if(p < 30)
-        return "research";
-
-    if(p < 40)
-        return "content";
-
-    if(p < 76)
-        return "visuals";
-
-    if(p < 88)
-        return "design";
-
-    if(p < 98)
-        return "pdf";
-
-    return "finish";
-}
-
-function updatePresentationSteps(
-    currentStage
-){
-
-    const order = [
-
-        "analysis",
-        "research",
-        "content",
-        "visuals",
-        "design",
-        "pdf",
-        "finish"
-
-    ];
-
-    const ci =
-        order.indexOf(
-            currentStage
-        );
-
-    document
-        .querySelectorAll(
-            ".presentation-step"
-        )
-        .forEach(
-            step => {
-
-                const si =
-                    order.indexOf(
-                        step.dataset.step
-                    );
-
-                const icon =
-                    step.querySelector(
-                        ".presentation-step-icon"
-                    );
-
-                step.classList.remove(
-                    "done",
-                    "active"
-                );
-
-                if(si < ci){
-
-                    step.classList.add(
-                        "done"
-                    );
-
-                    icon.textContent =
-                        "✓";
-
-                }else if(
-                    si === ci
-                ){
-
-                    step.classList.add(
-                        "active"
-                    );
-
-                    icon.textContent =
-                        "●";
-
-                }else{
-
-                    icon.textContent =
-                        "○";
-                }
-            }
-        );
-}
-
-function getFriendlyPresentationMessage(
-    data
-){
-
-    if(data.message)
-        return String(
-            data.message
-        );
-
-    const p =
-        Number(
-            data.progress || 0
-        );
-
-    if(p < 10)
-        return "Konu analiz ediliyor...";
-
-    if(p < 35)
-        return "Güvenilir kaynaklar araştırılıyor...";
-
-    if(p < 40)
-        return "Bilgiler doğrulanıyor...";
-
-    if(p < 76)
-        return "Fotoğraflar araştırılıyor...";
-
-    if(p < 88)
-        return "Slayt tasarımı hazırlanıyor...";
-
-    if(p < 98)
-        return "PDF oluşturuluyor...";
-
-    return "Bitirmek üzereyim...";
-}
-
-function updatePresentationUI(
-    data,
-    el
-){
-
-    if(!el)
-        return;
-
-    const p =
-        Math.max(
             0,
-            Math.min(
+            0,
+            size[0],
+            size[1]
+        ),
+        radius=radius,
+        fill=255
+    )
+
+    return mask
+
+
+def prepare_image(
+    image,
+    size
+):
+
+    return ImageOps.fit(
+        image.convert(
+            "RGB"
+        ),
+        size,
+        method=Image.Resampling.LANCZOS,
+        centering=(0.5,0.5)
+    )
+
+
+def paste_round_image(
+    base,
+    image,
+    box,
+    radius=30
+):
+
+    x,y,w,h = box
+
+    image = prepare_image(
+        image,
+        (w,h)
+    )
+
+    base.paste(
+        image,
+        (x,y),
+        rounded_mask(
+            (w,h),
+            radius
+        )
+    )
+
+
+# ============================================================
+# SLIDE DESIGN
+# ============================================================
+
+SLIDE_WIDTH = 1600
+SLIDE_HEIGHT = 900
+
+PDF_WIDTH = 16 * inch
+PDF_HEIGHT = 9 * inch
+
+
+def create_cover_slide(
+    title,
+    subtitle,
+    image,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5,10,18)
+    )
+
+    if image is not None:
+
+        bg = prepare_image(
+            image,
+            (
+                SLIDE_WIDTH,
+                SLIDE_HEIGHT
+            )
+        )
+
+        dark = Image.new(
+            "RGBA",
+            bg.size,
+            (2,7,13,165)
+        )
+
+        img = Image.alpha_composite(
+            bg.convert("RGBA"),
+            dark
+        ).convert(
+            "RGB"
+        )
+
+    draw = ImageDraw.Draw(
+        img
+    )
+
+    draw.rectangle(
+        (80,75,410,81),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (80,110),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            26,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (80,148),
+        "KARAHAN INC.",
+        font=karvis_font(
+            17
+        ),
+        fill=(160,175,190)
+    )
+
+    draw_fit_text(
+        draw,
+        title,
+        (80,275),
+        1050,
+        275,
+        72,
+        38,
+        fill=(245,250,255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    draw_fit_text(
+        draw,
+        subtitle,
+        (85,570),
+        980,
+        95,
+        28,
+        18,
+        fill=(180,195,210),
+        bold=False,
+        spacing_ratio=0.20
+    )
+
+    draw.text(
+        (80,810),
+        "AKADEMİK SUNUM",
+        font=karvis_font(
+            18,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (80,845),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(110,125,140)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
+
+def format_source_footer(
+    sources,
+    max_sources=2
+):
+
+    if not sources:
+
+        return (
+            "Kaynak: K.A.R.V.I.S. araştırma motoru"
+        )
+
+    names = []
+
+    for source in sources[
+        :max_sources
+    ]:
+
+        title = source.get(
+            "title",
+            ""
+        ).strip()
+
+        if title:
+
+            names.append(
+                title
+            )
+
+    if not names:
+
+        return (
+            "Kaynak: K.A.R.V.I.S."
+        )
+
+    return (
+        "Kaynak: "
+        +
+        " • ".join(
+            names
+        )
+    )
+
+
+def create_content_slide(
+    slide_number,
+    total_slides,
+    title,
+    paragraph,
+    image,
+    sources,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5,11,19)
+    )
+
+    draw = ImageDraw.Draw(
+        img
+    )
+
+    draw.rectangle(
+        (70,55,1530,58),
+        fill=(18,45,58)
+    )
+
+    draw.rectangle(
+        (70,55,280,58),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (70,82),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            21,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (70,111),
+        "KARAHAN INC.",
+        font=karvis_font(
+            14
+        ),
+        fill=(110,130,145)
+    )
+
+    draw_fit_text(
+        draw,
+        title,
+        (70,165),
+        700,
+        105,
+        45,
+        24,
+        fill=(245,250,255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    left_x = 70
+    left_y = 300
+    left_w = 700
+    left_h = 500
+
+    draw.rounded_rectangle(
+        (
+            left_x,
+            left_y,
+            left_x + left_w,
+            left_y + left_h
+        ),
+        radius=28,
+        fill=(10,20,30),
+        outline=(22,48,62),
+        width=2
+    )
+
+    draw.text(
+        (105,335),
+        "AKADEMİK AÇIKLAMA",
+        font=karvis_font(
+            18,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw.rectangle(
+        (105,372,190,376),
+        fill=(0,229,255)
+    )
+
+    draw_fit_text(
+        draw,
+        paragraph,
+        (105,415),
+        625,
+        335,
+        25,
+        13,
+        fill=(215,225,235),
+        bold=False,
+        spacing_ratio=0.30
+    )
+
+    image_x = 825
+    image_y = 165
+    image_w = 705
+    image_h = 635
+
+    draw.rounded_rectangle(
+        (
+            image_x,
+            image_y,
+            image_x + image_w,
+            image_y + image_h
+        ),
+        radius=32,
+        fill=(9,18,27),
+        outline=(25,51,65),
+        width=2
+    )
+
+    if image is not None:
+
+        paste_round_image(
+            img,
+            image,
+            (
+                image_x + 10,
+                image_y + 10,
+                image_w - 20,
+                image_h - 20
+            ),
+            25
+        )
+
+    else:
+
+        draw.text(
+            (
+                image_x + 220,
+                image_y + 280
+            ),
+            "K.A.R.V.I.S.",
+            font=karvis_font(
+                42,
+                True
+            ),
+            fill=(0,229,255)
+        )
+
+    source_text = format_source_footer(
+        sources
+    )
+
+    draw_fit_text(
+        draw,
+        source_text,
+        (70,805),
+        1250,
+        28,
+        12,
+        9,
+        fill=(100,120,135),
+        bold=False,
+        spacing_ratio=0.10
+    )
+
+    draw.text(
+        (70,842),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(90,110,125)
+    )
+
+    draw.text(
+        (1430,842),
+        f"{slide_number:02d} / {total_slides:02d}",
+        font=karvis_font(
+            16,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
+
+def create_conclusion_slide(
+    total_slides,
+    title,
+    paragraph,
+    image,
+    sources,
+    output_path
+):
+
+    img = Image.new(
+        "RGB",
+        (
+            SLIDE_WIDTH,
+            SLIDE_HEIGHT
+        ),
+        (5,11,19)
+    )
+
+    draw = ImageDraw.Draw(
+        img
+    )
+
+    draw.rectangle(
+        (70,55,1530,58),
+        fill=(18,45,58)
+    )
+
+    draw.rectangle(
+        (70,55,520,58),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (70,90),
+        "K.A.R.V.I.S.",
+        font=karvis_font(
+            22,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw.text(
+        (70,120),
+        "KARAHAN INC.",
+        font=karvis_font(
+            14
+        ),
+        fill=(110,130,145)
+    )
+
+    draw_fit_text(
+        draw,
+        title,
+        (70,205),
+        750,
+        85,
+        54,
+        30,
+        fill=(245,250,255),
+        bold=True,
+        spacing_ratio=0.18
+    )
+
+    draw.rounded_rectangle(
+        (70,310,820,750),
+        radius=30,
+        fill=(10,20,30),
+        outline=(22,48,62),
+        width=2
+    )
+
+    draw.text(
+        (110,350),
+        "SONUÇ VE DEĞERLENDİRME",
+        font=karvis_font(
+            19,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    draw_fit_text(
+        draw,
+        paragraph,
+        (110,405),
+        650,
+        300,
+        27,
+        13,
+        fill=(220,230,238),
+        bold=False,
+        spacing_ratio=0.30
+    )
+
+    if image is not None:
+
+        paste_round_image(
+            img,
+            image,
+            (
+                880,
+                185,
+                620,
+                565
+            ),
+            35
+        )
+
+    else:
+
+        draw.rounded_rectangle(
+            (
+                880,
+                185,
+                1500,
+                750
+            ),
+            radius=35,
+            fill=(8,22,31),
+            outline=(0,229,255),
+            width=2
+        )
+
+        draw.text(
+            (1050,430),
+            "K.A.R.V.I.S.",
+            font=karvis_font(
+                42,
+                True
+            ),
+            fill=(0,229,255)
+        )
+
+    source_text = format_source_footer(
+        sources,
+        3
+    )
+
+    draw_fit_text(
+        draw,
+        source_text,
+        (70,805),
+        1250,
+        28,
+        12,
+        9,
+        fill=(100,120,135),
+        bold=False,
+        spacing_ratio=0.10
+    )
+
+    draw.text(
+        (70,835),
+        "K.A.R.V.I.S. • KARAHAN INC.",
+        font=karvis_font(
+            15
+        ),
+        fill=(90,110,125)
+    )
+
+    draw.text(
+        (1430,835),
+        f"{total_slides:02d} / {total_slides:02d}",
+        font=karvis_font(
+            16,
+            True
+        ),
+        fill=(0,229,255)
+    )
+
+    img.save(
+        output_path,
+        "PNG",
+        optimize=True
+    )
+
+
+# ============================================================
+# PDF
+# ============================================================
+
+def create_presentation_pdf(
+    presentation_id,
+    outline,
+    images,
+    progress_callback=None
+):
+
+    title = outline[
+        "title"
+    ]
+
+    subtitle = outline.get(
+        "subtitle",
+        "Akademik Sunum"
+    )
+
+    slides = outline[
+        "slides"
+    ]
+
+    conclusion = outline[
+        "conclusion"
+    ]
+
+    total_slides = len(
+        slides
+    ) + 2
+
+    presentation_dir = (
+        GENERATED_DIR
+        /
+        f"presentation_{presentation_id}"
+    )
+
+    slides_dir = (
+        presentation_dir
+        /
+        "slides"
+    )
+
+    slides_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    slide_paths = []
+
+    if progress_callback:
+
+        progress_callback(
+            82,
+            "Kapak ve slayt tasarımları hazırlanıyor..."
+        )
+
+    cover_path = (
+        slides_dir
+        /
+        "slide_01.png"
+    )
+
+    create_cover_slide(
+        title,
+        subtitle,
+        images.get(
+            "cover"
+        ),
+        str(
+            cover_path
+        )
+    )
+
+    slide_paths.append(
+        cover_path
+    )
+
+    content_total = len(
+        slides
+    )
+
+    for index, slide in enumerate(
+        slides,
+        start=2
+    ):
+
+        if progress_callback:
+
+            progress_callback(
+                82 +
+                int(
+                    (
+                        index - 1
+                    )
+                    /
+                    max(
+                        1,
+                        content_total + 1
+                    )
+                    * 10
+                ),
+                (
+                    f"Slayt tasarımı hazırlanıyor "
+                    f"({index - 1}/{content_total})..."
+                )
+            )
+
+        slide_path = (
+            slides_dir
+            /
+            f"slide_{index:02d}.png"
+        )
+
+        create_content_slide(
+            slide_number=index,
+            total_slides=total_slides,
+            title=slide[
+                "title"
+            ],
+            paragraph=slide[
+                "paragraph"
+            ],
+            image=images.get(
+                f"slide_{index}"
+            ),
+            sources=slide.get(
+                "sources",
+                []
+            ),
+            output_path=str(
+                slide_path
+            )
+        )
+
+        slide_paths.append(
+            slide_path
+        )
+
+    if progress_callback:
+
+        progress_callback(
+            94,
+            "Sonuç slaytı hazırlanıyor..."
+        )
+
+    conclusion_path = (
+        slides_dir
+        /
+        f"slide_{total_slides:02d}.png"
+    )
+
+    create_conclusion_slide(
+        total_slides=total_slides,
+        title=conclusion[
+            "title"
+        ],
+        paragraph=conclusion[
+            "paragraph"
+        ],
+        image=images.get(
+            "conclusion"
+        ),
+        sources=conclusion.get(
+            "sources",
+            []
+        ),
+        output_path=str(
+            conclusion_path
+        )
+    )
+
+    slide_paths.append(
+        conclusion_path
+    )
+
+    if progress_callback:
+
+        progress_callback(
+            96,
+            "PDF dosyası oluşturuluyor..."
+        )
+
+    pdf_filename = (
+        f"karvis_sunum_{presentation_id}.pdf"
+    )
+
+    pdf_path = (
+        GENERATED_DIR
+        /
+        pdf_filename
+    )
+
+    pdf = canvas.Canvas(
+        str(pdf_path),
+        pagesize=(
+            PDF_WIDTH,
+            PDF_HEIGHT
+        )
+    )
+
+    for path in slide_paths:
+
+        pdf.drawImage(
+            str(path),
+            0,
+            0,
+            width=PDF_WIDTH,
+            height=PDF_HEIGHT,
+            preserveAspectRatio=False,
+            mask="auto"
+        )
+
+        pdf.showPage()
+
+    pdf.save()
+
+    if progress_callback:
+
+        progress_callback(
+            99,
+            "Bitirmek üzereyim..."
+        )
+
+    return pdf_filename
+
+
+# ============================================================
+# PRESENTATION JOB SYSTEM
+# ============================================================
+
+PRESENTATION_JOBS = {}
+
+presentation_lock = threading.Lock()
+
+
+def create_job():
+
+    job_id = uuid.uuid4().hex
+
+    with presentation_lock:
+
+        PRESENTATION_JOBS[
+            job_id
+        ] = {
+
+            "id":
+                job_id,
+
+            "status":
+                "queued",
+
+            "stage":
+                "analysis",
+
+            "progress":
+                0,
+
+            "message":
+                "Sunum hazırlanıyor...",
+
+            "file":
+                None,
+
+            "download_url":
+                None,
+
+            "error":
+                None
+        }
+
+    return job_id
+
+
+def update_job(
+    job_id,
+    **kwargs
+):
+
+    with presentation_lock:
+
+        if (
+            job_id
+            in PRESENTATION_JOBS
+        ):
+
+            PRESENTATION_JOBS[
+                job_id
+            ].update(
+                kwargs
+            )
+
+
+def worker_progress(
+    job_id,
+    progress,
+    message,
+    stage=None
+):
+
+    if stage is None:
+
+        if progress <= 8:
+
+            stage = "analysis"
+
+        elif progress < 35:
+
+            stage = "research"
+
+        elif progress < 55:
+
+            stage = "content"
+
+        elif progress < 76:
+
+            stage = "visuals"
+
+        elif progress < 88:
+
+            stage = "design"
+
+        elif progress < 98:
+
+            stage = "pdf"
+
+        else:
+
+            stage = "finish"
+
+    update_job(
+
+        job_id,
+
+        status="working",
+
+        progress=max(
+            0,
+            min(
                 100,
-                Number(
-                    data.progress || 0
+                int(progress)
+            )
+        ),
+
+        stage=stage,
+
+        message=message
+    )
+
+
+# ============================================================
+# PRESENTATION WORKER
+# ============================================================
+
+def presentation_worker(
+    job_id,
+    topic,
+    slide_count
+):
+
+    try:
+
+        # ----------------------------------------------------
+        # START
+        # ----------------------------------------------------
+
+        worker_progress(
+            job_id,
+            3,
+            "Konu analiz ediliyor...",
+            "analysis"
+        )
+
+        time.sleep(
+            0.15
+        )
+
+        worker_progress(
+            job_id,
+            7,
+            "Sunum yapısı belirleniyor...",
+            "analysis"
+        )
+
+        # ----------------------------------------------------
+        # RESEARCH + CONTENT
+        # ----------------------------------------------------
+
+        outline = (
+            build_verified_presentation(
+                topic,
+                slide_count,
+
+                progress_callback=lambda p, m:
+                    worker_progress(
+                        job_id,
+                        p,
+                        m
+                    )
+            )
+        )
+
+        slides = outline[
+            "slides"
+        ]
+
+        research_sources = outline.get(
+            "research_sources",
+            []
+        )
+
+        worker_progress(
+            job_id,
+            35,
+            (
+                f"{len(research_sources)} "
+                "kaynak üzerinden içerik doğrulanıyor..."
+            ),
+            "content"
+        )
+
+        time.sleep(
+            0.10
+        )
+
+        # ----------------------------------------------------
+        # IMAGE SEARCH
+        # ----------------------------------------------------
+
+        worker_progress(
+            job_id,
+            40,
+            "Fotoğraflar araştırılıyor...",
+            "visuals"
+        )
+
+        used_urls = set()
+        used_hashes = set()
+
+        lock = threading.Lock()
+
+        image_tasks = {}
+
+        image_tasks[
+            "cover"
+        ] = [
+
+            outline.get(
+                "cover_visual_query",
+                topic
+            )
+        ]
+
+        for index, slide in enumerate(
+            slides,
+            start=2
+        ):
+
+            image_tasks[
+                f"slide_{index}"
+            ] = expand_image_queries(
+
+                topic,
+
+                slide[
+                    "title"
+                ],
+
+                slide.get(
+                    "visual_query",
+                    ""
                 )
             )
-        );
 
-    const percent =
-        el.querySelector(
-            "#presentationPercent"
-        );
+        image_tasks[
+            "conclusion"
+        ] = expand_image_queries(
 
-    const inner =
-        el.querySelector(
-            "#presentationProgressInner"
-        );
+            topic,
 
-    const cur =
-        el.querySelector(
-            "#presentationCurrent"
-        );
+            "conclusion",
 
-    const footer =
-        el.querySelector(
-            "#presentationLiveFooter"
-        );
-
-    if(percent)
-        percent.textContent =
-            Math.round(p) + "%";
-
-    if(inner)
-        inner.style.width =
-            p + "%";
-
-    updatePresentationSteps(
-        getPresentationStage(data)
-    );
-
-    if(cur){
-
-        cur.innerHTML =
-            "<strong>CANLI DURUM</strong><br>" +
-            escapeHTML(
-                getFriendlyPresentationMessage(
-                    data
-                )
-            );
-    }
-
-    if(footer){
-
-        footer.textContent =
-            data.status === "completed"
-                ? "Sunum başarıyla tamamlandı."
-                : data.status === "error"
-                    ? "Sunum oluşturulurken bir hata meydana geldi."
-                    : "K.A.R.V.I.S. işlemi arka planda sürdürüyor...";
-    }
-}
-
-function startPresentationAnimation(){
-
-    stopPresentationAnimation();
-
-    dotsTimer = null;
-}
-
-function stopPresentationAnimation(){
-
-    if(dotsTimer){
-
-        clearInterval(
-            dotsTimer
-        );
-
-        dotsTimer = null;
-    }
-}
-
-/* ============================================================
-   PRESENTATION RESULT
-   ============================================================ */
-
-function showPresentationResult(
-    fileUrl
-){
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.className =
-        "message ai";
-
-    const fullUrl =
-        API + fileUrl;
-
-    div.innerHTML = `
-
-        <div
-            style="
-                color:#00e5ff;
-                font-weight:800;
-                font-size:15px;
-                margin-bottom:8px;
-            ">
-
-            📊 Sunum hazır.
-
-        </div>
-
-        <div
-            style="
-                color:rgba(255,255,255,.65);
-                font-size:12px;
-                line-height:1.5;
-                margin-bottom:14px;
-            ">
-
-            K.A.R.V.I.S. sunumu başarıyla oluşturdu.
-            PDF dosyasını aşağıdaki butonlardan
-            açabilir veya indirebilirsiniz.
-
-        </div>
-
-        <div
-            style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-            ">
-
-            <a
-                href="${escapeHTML(fullUrl)}"
-                download
-                style="
-                    display:inline-flex;
-                    align-items:center;
-                    justify-content:center;
-                    padding:11px 15px;
-                    border-radius:12px;
-                    background:#00e5ff;
-                    color:#001014;
-                    font-weight:800;
-                    text-decoration:none;
-                ">
-
-                📥 PDF'Yİ İNDİR
-
-            </a>
-
-            <a
-                href="${escapeHTML(fullUrl)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="
-                    display:inline-flex;
-                    align-items:center;
-                    justify-content:center;
-                    padding:11px 15px;
-                    border-radius:12px;
-                    background:rgba(0,229,255,.07);
-                    border:1px solid rgba(0,229,255,.25);
-                    color:#00e5ff;
-                    font-weight:700;
-                    text-decoration:none;
-                ">
-
-                👁 PDF'Yİ AÇ
-
-            </a>
-
-        </div>
-
-    `;
-
-    $("chat").appendChild(div);
-
-    $("chat").scrollTop =
-        $("chat").scrollHeight;
-}
-
-/* ============================================================
-   NEW CHAT
-   ============================================================ */
-
-function newChat(){
-
-    closeSidebar();
-
-    // A fresh ID guarantees no prior conversation context is sent.
-    currentConversationId = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : ("chat-" + Date.now() + "-" + Math.random().toString(36).slice(2));
-
-    $("chat").innerHTML = "";
-    showGreeting();
-}
-
-function setCoreMode(mode){
-    if(currentUser !== "karahan") return;
-
-    if(mode !== "investigator" && mode !== "live") return;
-
-    currentMode = mode;
-    localStorage.setItem("karvis_mode", currentMode);
-    closeSidebar();
-    addMessage(
-        mode === "investigator"
-            ? "🕵️ Dedektif Modu aktif. İddiaları kanıt, kaynak, zaman ve güven düzeyi açısından değerlendireceğim."
-            : "🎙️ Canlı Konuşma modu aktif. Daha kısa, doğal ve konuşma diline yakın yanıt vereceğim.",
-        "ai"
-    );
-    updateStatus();
-}
-
-async function openKarvisLive(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("karvisLiveModal").classList.add("show");
-    const box=$("karvisLiveContent");
-    box.textContent="Bağlantı kontrol ediliyor...";
-    try{
-        const r=await fetch(API+"/live-status");
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail || "LIVE durumu alınamadı.");
-        box.innerHTML=`
-            <p>🟢 <strong>Durum:</strong> ONLINE</p>
-            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "-")}</p>
-            <p>🧠 <strong>AI:</strong> ${escapeHTML(d.ai || "offline")}</p>
-            <p>🌐 <strong>Web araştırma:</strong> ${d.research ? "ONLINE" : "OFFLINE"}</p>
-            <p>🌤️ <strong>Hava durumu:</strong> ${d.weather ? "ONLINE" : "OFFLINE"}</p>
-            <p>📊 <strong>Sunum:</strong> ${d.presentation ? "ONLINE" : "OFFLINE"}</p>
-            <p>🧠 <strong>Hafıza:</strong> ${d.memory ? "ONLINE" : "OFFLINE"}</p>`;
-    }catch(e){
-        box.textContent="LIVE bağlantısı alınamadı: "+e.message;
-    }
-}
-
-async function openKarvisRadar(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("karvisRadarModal").classList.add("show");
-    const box=$("karvisRadarContent");
-    box.textContent="Sistemler taranıyor...";
-    try{
-        const r=await fetch(API+"/radar");
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail || "Radar verisi alınamadı.");
-        const items=d.items || [];
-        box.innerHTML=items.length
-            ? items.map(x=>`<p>${x.status === "ONLINE" ? "🟢" : "🔴"} <strong>${escapeHTML(x.name || "Sistem")}</strong> — ${escapeHTML(x.status || "UNKNOWN")}</p>`).join("")
-            : "Radar verisi bulunamadı.";
-    }catch(e){
-        box.textContent="Sistem radarı alınamadı: "+e.message;
-    }
-}
-
-let adminPendingDeleteUsername = "";
-
-async function openAdminActiveUsers(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    closeModals();
-    $("adminActiveUsersModal").classList.add("show");
-    $("adminActiveUsersList").textContent = "Kullanıcılar yükleniyor...";
-    try{
-        const r = await fetch(API + "/admin/active-users?username=murat");
-        const d = await r.json();
-        if(!r.ok) throw new Error(d.detail || "Aktif kullanıcılar alınamadı.");
-        const list = $("adminActiveUsersList");
-        list.replaceChildren();
-        const users = d.users || [];
-        if(!users.length){
-            list.textContent = "Henüz aktif kullanıcı görünmüyor.";
-            return;
-        }
-        users.forEach(user => {
-            const row = document.createElement("div");
-            row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);";
-            const name = document.createElement("strong");
-            name.textContent = user.name || user.username;
-            const status = document.createElement("span");
-            status.style.cssText = "white-space:nowrap;font-size:12px;font-weight:700;color:" + (user.online ? "#22c55e" : "rgba(255,255,255,.5)");
-            status.textContent = user.online ? "🟢 Çevrimiçi" : "⚪ Çevrimdışı";
-            row.append(name,status);
-            list.append(row);
-        });
-    }catch(e){
-        $("adminActiveUsersList").textContent = "Kullanıcı listesi alınamadı: " + e.message;
-    }
-}
-
-async function openAdminProfileManagement(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    closeModals();
-    $("adminProfileManagementModal").classList.add("show");
-    $("adminProfilesList").textContent = "Profiller yükleniyor...";
-    try{
-        const r = await fetch(API + "/admin/profiles?username=murat");
-        const d = await r.json();
-        if(!r.ok) throw new Error(d.detail || "Profiller alınamadı.");
-        const list = $("adminProfilesList");
-        list.replaceChildren();
-        const profiles = d.profiles || [];
-        if(!profiles.length){
-            list.textContent = "Kayıtlı profil bulunamadı.";
-            return;
-        }
-        profiles.forEach(profile => {
-            const row = document.createElement("div");
-            row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);";
-            const name = document.createElement("strong");
-            name.textContent = profile.name || profile.username;
-            const right = document.createElement("div");
-            right.style.cssText = "display:flex;align-items:center;gap:10px;min-width:0;";
-            if(profile.deletable){
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.setAttribute("aria-label", (profile.name || profile.username) + " profilini sil");
-                btn.textContent = "🗑️";
-                btn.style.cssText = "width:42px;height:42px;border:1px solid rgba(255,90,90,.4);border-radius:11px;background:rgba(255,60,60,.12);color:#ff7777;font-size:18px;";
-                btn.addEventListener("click", () => requestAdminProfileDelete(profile.username, profile.name || profile.username));
-                right.append(btn);
-            }else{
-                const protectedLabel = document.createElement("small");
-                protectedLabel.style.cssText = "opacity:.55;font-size:11px;";
-                protectedLabel.textContent = "Sistem profili";
-                right.append(protectedLabel);
-            }
-            row.append(name,right);
-            list.append(row);
-        });
-    }catch(e){
-        $("adminProfilesList").textContent = "Profil listesi alınamadı: " + e.message;
-    }
-}
-
-function requestAdminProfileDelete(username, displayName){
-    if(currentUser !== "murat") return;
-    adminPendingDeleteUsername = String(username || "").trim().toLowerCase();
-    $("adminDeleteProfileQuestion").textContent = (displayName || username) + " profilini silmek istediğinizden emin misiniz?";
-    $("adminDeleteProfileConfirm").value = "";
-    closeModals();
-    $("adminDeleteProfileModal").classList.add("show");
-    setTimeout(() => $("adminDeleteProfileConfirm").focus(), 100);
-}
-
-function cancelAdminProfileDelete(){
-    adminPendingDeleteUsername = "";
-    closeModals();
-}
-
-async function confirmAdminProfileDelete(){
-    if(currentUser !== "murat") return;
-    if($("adminDeleteProfileConfirm").value.trim().toUpperCase() !== "EVET"){
-        alert("Silme işlemi için EVET yazmalısınız.");
-        return;
-    }
-    if(!adminPendingDeleteUsername) return;
-    const username = adminPendingDeleteUsername;
-    const button = $("adminDeleteProfileModal").querySelector(".modal-button");
-    if(button){button.disabled=true;button.textContent="Siliniyor...";}
-    try{
-        const r = await fetch(API + "/admin/profiles/" + encodeURIComponent(username) + "?username=murat", {method:"DELETE"});
-        const d = await r.json();
-        if(!r.ok || d.success !== true) throw new Error(d.detail || "Profil silinemedi.");
-        adminPendingDeleteUsername = "";
-        closeModals();
-        alert(d.message || "Profil silindi.");
-        await openAdminProfileManagement();
-    }catch(e){
-        alert("Profil silinemedi: " + e.message);
-    }finally{
-        if(button){button.disabled=false;button.textContent="Profili Sil";}
-    }
-}
-
-async function sendPresenceHeartbeat(){
-    const username = String(currentUser || "").trim().toLowerCase();
-    if(!username) return;
-    try{
-        await fetch(API + "/presence/heartbeat", {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({username})
-        });
-    }catch(_){}
-}
-setInterval(sendPresenceHeartbeat, 30000);
-window.addEventListener("load", () => { sendPresenceHeartbeat(); });
-
-async function openKarvisBrain(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("karvisBrainModal").classList.add("show");
-    const box=$("karvisBrainContent");
-    box.textContent="Sistem durumu okunuyor...";
-    try{
-        const r=await fetch(API+"/brain");
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail || "Beyin durumu alınamadı.");
-        box.innerHTML=`
-            <p>🟢 <strong>Durum:</strong> ${escapeHTML(d.state || "UNKNOWN")}</p>
-            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "-")}</p>
-            <p>🧩 <strong>Modüller:</strong></p>
-            <div>${(d.modules || []).map(x=>`<span style="display:inline-block;margin:4px;padding:6px 9px;border:1px solid rgba(0,220,255,.22);border-radius:8px;">${escapeHTML(x)}</span>`).join("")}</div>`;
-    }catch(e){
-        box.textContent="Sistem beyni alınamadı: "+e.message;
-    }
-}
-
-/* ============================================================
-   WEB PUSH / IPHONE BILDIRIMLERI
-   ============================================================ */
-
-let karvisPushRegistration = null;
-
-function urlBase64ToUint8Array(base64String){
-    const padding = "=".repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-    const rawData = atob(base64);
-    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-}
-
-let karvisPushSyncTimer = null;
-let karvisPushSyncRunning = false;
-
-async function syncKarvisPushSubscription(silent=true){
-    if(!currentUser || !window.isSecureContext || !("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) return false;
-    if(Notification.permission !== "granted") return false;
-    if(karvisPushSyncRunning) return false;
-    karvisPushSyncRunning = true;
-    try{
-        const configResponse = await fetch(API + "/push/config", {cache:"no-store"});
-        const config = await configResponse.json();
-        if(!config.configured || !config.public_key) return false;
-
-        const registration = await registerKarvisServiceWorker();
-        if(!registration) return false;
-        let subscription = await registration.pushManager.getSubscription();
-
-        // Mevcut abonelik varsa tekrar subscribe etmeyiz; yalnızca sunucuya
-        // yeniden kaydederek Render yeniden başlatmalarında senkronu onarırız.
-        if(!subscription){
-            subscription = await registration.pushManager.subscribe({
-                userVisibleOnly:true,
-                applicationServerKey:urlBase64ToUint8Array(config.public_key)
-            });
-        }
-
-        const response = await fetch(API + "/push/subscribe", {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({username:currentUser, subscription:subscription.toJSON()})
-        });
-        const data = await response.json();
-        if(!response.ok) throw new Error(data.detail || "Push aboneliği senkronize edilemedi.");
-
-        localStorage.setItem("karvis_push_enabled", "true");
-        return true;
-    }catch(error){
-        if(!silent) throw error;
-        return false;
-    }finally{
-        karvisPushSyncRunning = false;
-    }
-}
-
-function startKarvisPushAutoSync(){
-    if(karvisPushSyncTimer) clearInterval(karvisPushSyncTimer);
-    // Uygulama açık kaldığı sürece aboneliği periyodik olarak sunucuya tazeler.
-    karvisPushSyncTimer = setInterval(() => syncKarvisPushSubscription(true), 15 * 60 * 1000);
-    window.addEventListener("focus", () => syncKarvisPushSubscription(true));
-    window.addEventListener("pageshow", () => syncKarvisPushSubscription(true));
-    document.addEventListener("visibilitychange", () => {
-        if(document.visibilityState === "visible") syncKarvisPushSubscription(true);
-    });
-}
-
-async function registerKarvisServiceWorker(){
-    if(!("serviceWorker" in navigator) || !("PushManager" in window)) return null;
-    if(!karvisPushRegistration){
-        karvisPushRegistration = await navigator.serviceWorker.register("/service-worker.js");
-    }
-    return karvisPushRegistration;
-}
-
-async function enableKarvisPush(){
-    if(!currentUser){ alert("Önce profilinize giriş yapın."); return; }
-    if(!window.isSecureContext){ alert("Bildirimler yalnızca HTTPS üzerinden kullanılabilir."); return; }
-    if(!( "Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
-        alert("Bu cihaz/tarayıcı Web Push bildirimlerini desteklemiyor."); return;
-    }
-    try{
-        const configResponse = await fetch(API + "/push/config", {cache:"no-store"});
-        const config = await configResponse.json();
-        if(!config.configured || !config.public_key){
-            alert("K.A.R.V.I.S. bildirim sunucusu henüz yapılandırılmamış."); return;
-        }
-        const permission = Notification.permission === "granted"
-            ? "granted"
-            : await Notification.requestPermission();
-        if(permission !== "granted"){
-            const st=$("pushStatusText"); if(st) st.textContent="Bildirim izni verilmedi.";
-            return;
-        }
-        const ok = await syncKarvisPushSubscription(false);
-        if(!ok) throw new Error("Push aboneliği oluşturulamadı.");
-        await refreshPushStatus();
-        startKarvisPushAutoSync();
-    }catch(error){
-        alert("Bildirim kurulamadı: " + error.message);
-    }
-}
-async function refreshPushStatus(){
-    const st=$("pushStatusText"), btn=$("pushToggleButton");
-    if(!st || !btn) return;
-
-    if(!window.isSecureContext || !("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)){
-        st.textContent="Bu cihazda bildirim desteği yok.";
-        btn.textContent="Desteklenmiyor";
-        btn.disabled=true;
-        return;
-    }
-
-    if(Notification.permission === "denied"){
-        st.textContent="Bildirimler iPhone Ayarları'ndan engellenmiş.";
-        btn.textContent="Engelli";
-        btn.disabled=true;
-        return;
-    }
-
-    if(Notification.permission === "granted"){
-        try{
-            const registration = await registerKarvisServiceWorker();
-            const subscription = await registration.pushManager.getSubscription();
-            if(subscription){
-                st.textContent="Bildirimler açık ✓";
-                btn.textContent="Kapat";
-                btn.disabled=false;
-                return;
-            }
-        }catch(e){}
-    }
-
-    st.textContent="Bildirimler kapalı";
-    btn.textContent="Aç";
-    btn.disabled=false;
-}
-
-async function toggleKarvisPush(){
-    if(!currentUser) return;
-    const btn=$("pushToggleButton");
-    if(btn) btn.disabled=true;
-
-    try{
-        const registration = await registerKarvisServiceWorker();
-        const subscription = registration
-            ? await registration.pushManager.getSubscription()
-            : null;
-
-        if(subscription){
-            const response = await fetch(API + "/push/unsubscribe", {
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify({
-                    username:currentUser,
-                    endpoint:subscription.endpoint
-                })
-            });
-            const data = await response.json();
-            if(!response.ok) throw new Error(data.detail || "Abonelik kapatılamadı.");
-            await subscription.unsubscribe();
-            localStorage.removeItem("karvis_push_enabled");
-            await refreshPushStatus();
-            return;
-        }
-
-        await enableKarvisPush();
-    }catch(error){
-        if(btn) btn.disabled=false;
-        alert("Bildirim ayarı değiştirilemedi: " + error.message);
-    }
-}
-
-
-// Uygulama her açıldığında sunucu ile push aboneliğini sessizce eşitle.
-// Böylece Render yeniden başlasa bile kullanıcı tekrar "Kapat/Aç" yapmak zorunda kalmaz.
-setTimeout(() => {
-    startKarvisPushAutoSync();
-    syncKarvisPushSubscription(true);
-}, 1200);
-
-async function openAdminNotifications(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("adminNotificationModal").classList.add("show");
-    const status=$("notificationSendStatus");
-    status.textContent="Abonelik durumu kontrol ediliyor...";
-    try{
-        const r=await fetch(API+"/admin/push-status?username=murat");
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail || "Bildirim durumu alınamadı.");
-        status.textContent = d.configured
-            ? `🟢 Push hazır · ${d.total} aktif cihaz aboneliği`
-            : "🔴 Push yapılandırılmamış";
-    }catch(e){ status.textContent="Hata: "+e.message; }
-}
-
-async function sendAdminNotification(){
-    if(currentUser !== "murat") return;
-    const target=$("notificationTarget").value;
-    const title=$("notificationTitle").value.trim() || "K.A.R.V.I.S.";
-    const body=$("notificationBody").value.trim();
-    const url=$("notificationUrl").value.trim() || "/";
-    const status=$("notificationSendStatus");
-    if(!body){ alert("Bildirim mesajını yazın."); return; }
-    status.textContent="Gönderiliyor...";
-    try{
-        const r=await fetch(API+"/admin/notifications/send",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({username:"murat",target,title,body,url})
-        });
-        const d=await r.json();
-        if(!r.ok) throw new Error(d.detail || "Bildirim gönderilemedi.");
-        status.textContent = d.sent > 0
-            ? `🟢 Gönderildi · ${d.sent} cihaz · ${d.removed || 0} geçersiz abonelik temizlendi.`
-            : `🔴 Gönderilemedi · ${d.removed || 0} geçersiz abonelik temizlendi · ${d.failed || 0} hata. ${d.errors?.[0] || "Kullanıcı uygulamayı yeniden açtığında abonelik otomatik eşitlenecek."}`;
-        $("notificationBody").value="";
-    }catch(e){ status.textContent="🔴 "+e.message; }
-}
-
-async function openAdminStats(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("adminStatsModal").classList.add("show");
-    const box = $("adminStatsContent");
-    box.textContent = "Yükleniyor...";
-    try{
-        const r = await fetch(API + "/admin/stats?username=murat");
-        const d = await r.json();
-        if(!r.ok) throw new Error(d.detail || "İstatistikler alınamadı.");
-        box.innerHTML = `
-            <p>👥 <strong>Toplam profil:</strong> ${d.users}</p>
-            <p>📋 <strong>Toplam kullanıcı isteği:</strong> ${d.requests}</p>
-            <p>🔴 <strong>Yeni istek:</strong> ${d.unread_requests}</p>
-            <p>🟢 <strong>Tamamlanan:</strong> ${d.completed_requests}</p>
-            <p>🚨 <strong>Kayıtlı hata:</strong> ${d.errors}</p>
-            <p>🧠 <strong>AI:</strong> ${escapeHTML(d.ai || "offline")}</p>
-            <p>⚙️ <strong>Sürüm:</strong> ${escapeHTML(d.version || "")}</p>`;
-    }catch(e){ box.textContent = "Hata: " + e.message; }
-}
-
-function openDevelopmentMemory(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("developmentMemoryModal").classList.add("show");
-}
-
-/* ============================================================
-   ERRORS
-   ============================================================ */
-
-async function openErrors(){
-    if(currentUser !== "murat") return;
-    closeSidebar();
-    $("errorModal").classList.add("show");
-    $("errorContent").textContent = "Yükleniyor...";
-    $("errorSummary").textContent = "Yükleniyor...";
-
-    try{
-        const response = await fetch(API + "/admin/errors?username=murat");
-        const data = await response.json();
-        if(!response.ok) throw new Error(data.detail || "Hatalar alınamadı.");
-
-        $("errorSummary").innerHTML =
-            `🔴 Açık: <strong>${data.open || 0}</strong> &nbsp; | &nbsp; 🟢 Çözülen: <strong>${data.resolved || 0}</strong>`;
-
-        const errors = data.errors || [];
-        if(!errors.length){
-            $("errorContent").textContent = "Kayıtlı sistem hatası bulunmuyor.";
-            return;
-        }
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "error-list";
-
-        errors.slice().reverse().forEach(item => {
-            const card = document.createElement("div");
-            card.className = "error-item";
-            card.style.whiteSpace = "pre-wrap";
-            const resolved = item.status === "resolved";
-            const title = item.error || item.message || "Bilinmeyen hata.";
-            card.innerHTML = `
-                <div style="font-weight:700;">${resolved ? "🟢" : "🔴"} ${escapeHTML(title)}</div>
-                <div style="opacity:.75;margin-top:5px;">${escapeHTML(item.time || "")}</div>
-                <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap;">
-                    <button class="modal-button" style="width:auto;padding:8px 12px;" onclick="analyzeAdminError('${item.id}')">🧠 AI Analiz</button>
-                    ${resolved
-                        ? `<button class="modal-button secondary-button" style="width:auto;padding:8px 12px;" onclick="reopenAdminError('${item.id}')">↩️ Yeniden Aç</button>`
-                        : `<button class="modal-button" style="width:auto;padding:8px 12px;" onclick="resolveAdminError('${item.id}')">✅ Çözüldü</button>`}
-                </div>`;
-            wrapper.appendChild(card);
-        });
-        $("errorContent").innerHTML = "";
-        $("errorContent").appendChild(wrapper);
-    }catch(error){
-        $("errorContent").textContent = "Hatalar alınamadı:\n" + error.message;
-    }
-}
-
-async function analyzeAdminError(id){
-    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/analyze?username=murat", {method:"POST"});
-    const data = await response.json();
-    if(!response.ok){ alert(data.detail || "Analiz yapılamadı."); return; }
-    alert("🧠 K.A.R.V.I.S. HATA ANALİZİ\n\n" + (data.analysis || "Analiz bulunamadı."));
-}
-
-async function resolveAdminError(id){
-    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/resolve?username=murat", {method:"POST"});
-    const data = await response.json();
-    if(!response.ok){ alert(data.detail || "Hata güncellenemedi."); return; }
-    openErrors();
-}
-
-async function reopenAdminError(id){
-    const response = await fetch(API + "/admin/errors/" + encodeURIComponent(id) + "/reopen?username=murat", {method:"POST"});
-    const data = await response.json();
-    if(!response.ok){ alert(data.detail || "Hata güncellenemedi."); return; }
-    openErrors();
-}
-
-/* ============================================================
-   NORMAL EĞLENCE MODU
-   ============================================================ */
-
-function toggleFunMode(){
-
-    funMode = !funMode;
-
-    document.body.classList.toggle(
-        "fun-mode",
-        funMode
-    );
-
-    closeSidebar();
-
-    addMessage(
-        funMode
-            ? "Eğlence Modu aktif. 😈"
-            : "Profesyonel Moda geri döndüm.",
-        "ai"
-    );
-
-    updateStatus();
-}
-
-/* ============================================================
-   KEYBOARD
-   ============================================================ */
-
-function handleKey(e){
-
-    if(e.key === "Enter"){
-
-        e.preventDefault();
-
-        sendMessage();
-    }
-}
-
-/* ============================================================
-   PASSWORD + SUDE PERSONAL TOOLS
-   ============================================================ */
-async function estimateSudeCalories(){const meal=$("sudeFoodName").value.trim();if(!meal){alert("Önce yiyecek veya öğün adını yaz.");return;}$("sudeCalorieEstimate").textContent="Tahmin hazırlanıyor...";try{const r=await fetch(API+"/sude/estimate-calories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",meal})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Tahmin yapılamadı.");if(!d.success)throw new Error(d.explanation||"Tahmin yapılamadı.");$("sudeFoodCalories").value=d.estimate;$("sudeCalorieEstimate").textContent=`Yaklaşık ${d.estimate} kcal — ${d.explanation} ${d.disclaimer||""}`;}catch(e){$("sudeCalorieEstimate").textContent=e.message;}}
-function openAdminPasswordReset(){if(currentUser!=="murat"){alert("Bu işlem yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminPasswordResetModal").classList.add("show");}
-async function adminResetPassword(){if(currentUser!=="murat"){alert("Yetkisiz işlem.");return;}const target=$("resetTargetUser").value,password=$("resetNewPassword").value;if(password.length<6){alert("Şifre en az 6 karakter olmalı.");return;}try{const r=await fetch(API+"/admin/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"murat",target_username:target,new_password:password})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre sıfırlanamadı.");alert(d.message||"Şifre sıfırlandı.");$("resetNewPassword").value="";closeModals();}catch(e){alert(e.message);}}
-function openPasswordChange(){ closeSidebar(); $("passwordModal").classList.add("show"); }
-async function changeOwnPassword(){
-    const current=$("currentPassword").value, next=$("newPassword").value, confirmPass=$("confirmPassword").value;
-    if(next.length<6){alert("Yeni şifre en az 6 karakter olmalı.");return;}
-    if(next!==confirmPass){alert("Yeni şifreler eşleşmiyor.");return;}
-    try{const r=await fetch(API+"/account/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,current_password:current,new_password:next})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre değiştirilemedi.");alert("Şifren güncellendi.");["currentPassword","newPassword","confirmPassword"].forEach(id=>$(id).value="");closeModals();}catch(e){alert(e.message);}
-}
-async function openSudeSection(section){
-    if(currentUser!=="sude"){alert("Bu bölüm yalnızca Sude profiline açıktır.");return;}
-    const panels={food:"sudeFoodModal",bmi:"sudeBmiModal",tasks:"sudeTasksModal"};
-    const id=panels[section]; if(!id)return;
-    closeSidebar(); closeModals(); $(id).classList.add("show");
-    if(["food","tasks"].includes(section)) await refreshSudeWorld();
-}
-async function refreshSudeWorld(){
-    try{
-        const r=await fetch(API+"/sude/world?username=sude");const d=await r.json();if(!r.ok)throw new Error(d.detail||"Bilgiler yüklenemedi.");const w=d.world||{};
-        const foodList=$("sudeFoodList");if(foodList){const now=new Date();const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;const foods=(w.food_log||[]).filter(x=>x.date===today);foodList.innerHTML=foods.slice().reverse().map(x=>`<div class="sude-task">${escapeHTML(x.name)} <span style="margin-left:auto">${Number(x.calories)||0} kcal</span></div>`).join("")||"<small>Bugün henüz kayıt yok.</small>";}
-        const taskList=$("sudeTaskList");if(taskList)taskList.innerHTML=(w.tasks||[]).slice().reverse().map(t=>`<div class="sude-task"><span>${t.done?"✅":"🌱"} ${escapeHTML(t.title)}</span>${t.done?"<small>Tamamlandı</small>":`<button onclick="completeSudeTask('${t.id}')">Tamamla</button>`}</div>`).join("")||"<small>İlk görevini ekle!</small>";
-    }catch(e){alert(e.message);}
-}
-async function addSudeFood(){const name=$("sudeFoodName").value.trim(), calories=$("sudeFoodCalories").value;if(!name||calories===""){alert("Yiyecek adı ve yaklaşık kalori gir.");return;}try{const r=await fetch(API+"/sude/food",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",name,calories})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Kayıt yapılamadı.");$("sudeFoodName").value="";$("sudeFoodCalories").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
-async function addSudeTask(){const title=$("sudeTaskTitle").value.trim();if(!title)return;try{const r=await fetch(API+"/sude/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",title})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev eklenemedi.");$("sudeTaskTitle").value="";await refreshSudeWorld();}catch(e){alert(e.message);}}
-async function completeSudeTask(id){try{const r=await fetch(API+"/sude/tasks/"+encodeURIComponent(id)+"/complete?username=sude",{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Görev tamamlanamadı.");await refreshSudeWorld();}catch(e){alert(e.message);}}
-async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("sudeWeight").value;try{const r=await fetch(API+"/sude/bmi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",height,weight})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"VKİ hesaplanamadı.");$("sudeBmiResult").textContent=`VKİ: ${d.bmi} · ${d.category}. ${d.note}`;}catch(e){alert(e.message);}}
-/* ============================================================
-   KARVIS ARENA
-   ============================================================ */
-let arenaAttemptId=null, arenaQuestionIndex=0, arenaAnswered=false, arenaStartedAt=0;
-let arenaDuelPollTimer=null, arenaDuelRenderedKey="", arenaDuelLoadInFlight=false;
-function arenaEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";const duelSelect=$("arenaDuelOpponent");if(duelSelect){[...duelSelect.options].forEach(o=>o.disabled=o.value===currentUser);if(duelSelect.value===currentUser){const other=[...duelSelect.options].find(o=>o.value!==currentUser);if(other)duelSelect.value=other.value;}}$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";await loadArenaOverview();}
-async function adminResetArena(){
- if(currentUser!=="murat"){alert("Bu işlem yalnızca yönetici profiline açıktır.");return;}
- const ok=confirm("DİKKAT! Tüm profillerin Arena puanları, rozetleri, sıralaması ve oyun geçmişi kalıcı olarak silinecek. Bildirimler etkilenmeyecek. Devam edilsin mi?");
- if(!ok)return;
- const typed=prompt("Onaylamak için ARENA SIFIRLA yaz:");
- if(typed!=="ARENA SIFIRLA"){alert("İşlem iptal edildi.");return;}
- try{const r=await fetch(API+"/arena/reset?username="+encodeURIComponent(currentUser),{method:"POST"});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena sıfırlanamadı.");alert(d.message||"Arena sıfırlandı.");arenaAttemptId=null;await loadArenaOverview();}
- catch(e){alert(e.message||"Arena sıfırlanırken hata oluştu.");}
-}
-async function refreshArenaTable(){
- const button=$("arenaRefreshButton"),status=$("arenaRefreshStatus");
- if(button)button.disabled=true;
- if(button)button.textContent="⏳ Yenileniyor…";
- if(status)status.textContent="Puan tablosu güncelleniyor…";
- try{await loadArenaOverview({fromRefresh:true});if(status)status.textContent="✅ Puan tablosu güncellendi.";}
- catch(e){if(status)status.textContent="⚠️ Tablo yenilenemedi: "+(e.message||"Sunucu yanıt vermedi.");}
- finally{if(button){button.disabled=false;button.textContent="🔄 Tabloyu yenile";}}
-}
-async function loadArenaOverview(options={}){
- const status=$("arenaRefreshStatus");
- let timeoutId;
- try{
-  const controller=new AbortController();
-  timeoutId=setTimeout(()=>controller.abort(),12000);
-  const r=await fetch(API+"/arena/overview?username="+encodeURIComponent(currentUser),{signal:controller.signal});
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Arena yüklenemedi.");
-  $("arenaMyPoints").textContent=Number(d.player?.points||0).toLocaleString("tr-TR");$("arenaMyLeague").textContent=d.player?.league||"Bronz";$("arenaMyRank").textContent=(d.player?.rank?d.player.rank+". sıradasın":"Henüz sıralama yok");
-  $("arenaLeaderboard").innerHTML=(d.leaderboard||[]).map((p,i)=>`<div class="sude-task"><strong>${i+1}.</strong><span>${arenaEscape(p.name)}</span><span style="margin-left:auto;font-weight:800">${Number(p.points||0).toLocaleString("tr-TR")} puan</span><small>${arenaEscape(p.league)}</small></div>`).join("")||"Henüz puan yok.";
-  $("arenaBadges").innerHTML=(d.player?.badges||[]).map(b=>`<span class="badge">🏅 ${arenaEscape(b)}</span>`).join(" ")||"Henüz rozet kazanılmadı. İlk yarışmanı tamamla!";
-  $("arenaHistory").innerHTML=(d.player?.history||[]).map(x=>`<div class="sude-task"><span>${arenaEscape(x.title)}</span><span style="margin-left:auto">${Number(x.score||0)} puan</span></div>`).join("")||"Henüz yarışma tamamlanmadı.";
-  $("arenaDuelHistory").innerHTML=(d.player?.duel_history||[]).map(x=>{const correct=Number.isFinite(Number(x.correct_answers))?Number(x.correct_answers):Number(x.correct_wins||0);const wrong=Number.isFinite(Number(x.wrong_answers))?Number(x.wrong_answers):Math.max(0,5-correct);const delta=Number(x.points_delta||0);const outcome=delta>0?"Kazandın":delta<0?"Kaybettin":"Berabere";return `<div class="sude-task" style="display:grid;grid-template-columns:1fr auto;gap:5px 10px"><span><strong>${outcome}</strong> · Rakip: ${arenaEscape(x.opponent)}</span><span style="font-weight:800">${delta>0?"+":""}${delta} puan</span><small>${correct} doğru · ${wrong} yanlış</small><small style="text-align:right">${arenaEscape(x.date||"")}</small></div>`;}).join("")||"Henüz düello oynanmadı.";
-  await loadArenaDuels();
-  if(status&&!options.fromRefresh)status.textContent="Puan tablosu hazır.";
- }catch(e){
-  const message=e.name==="AbortError"?"Sunucu 12 saniye içinde yanıt vermedi.":(e.message||"Arena yüklenemedi.");
-  $("arenaLeaderboard").textContent=message;
-  if(status)status.textContent="⚠️ "+message;
-  if(!options.fromRefresh)$("arenaGameArea").innerHTML=`<p>${arenaEscape(message)} Tabloyu yenile düğmesini tekrar deneyebilirsin.</p>`;
-  throw e;
- }finally{if(timeoutId)clearTimeout(timeoutId);}
-}
-
-function arenaDuelName(username){
- return ({karahan:"KARAHAN INC.",betul:"Betül",sinem:"Sinem",ilknur:"İlknur",murat:"Murat",sude:"Sude"})[username]||username;
-}
-async function sendArenaDuelRequest(){
- const opponent=$("arenaDuelOpponent").value;
- const stake=Number($("arenaDuelStake").value);
- const status=$("arenaDuelStatus");
- if(opponent===currentUser){status.textContent="Kendine düello gönderemezsin.";return;}
- if(!Number.isSafeInteger(stake)||stake<1){status.textContent="1 veya daha fazla puan gir.";return;}
- status.textContent="Düello isteği gönderiliyor…";
- try{
-  const r=await fetch(API+"/arena/duel/request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,opponent,stake})});
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Düello isteği gönderilemedi.");
-  status.textContent=`✅ ${arenaDuelName(opponent)} profiline ${stake} puanlık istek gönderildi.`;
-  await loadArenaDuels();
- }catch(e){status.textContent="⚠️ "+(e.message||"İstek gönderilemedi.");}
-}
-async function respondArenaDuel(duelId,accept){
- try{
-  const r=await fetch(API+"/arena/duel/respond",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,duel_id:duelId,accept})});
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"İşlem yapılamadı.");
-  $("arenaDuelStatus").textContent=d.message||"İşlem tamamlandı.";
-  await loadArenaDuels();
- }catch(e){$("arenaDuelStatus").textContent="⚠️ "+(e.message||"İşlem yapılamadı.");}
-}
-async function answerArenaDuel(choice,duelId,questionIndex){
- const area=$("arenaDuelActive");
- const buttons=area.querySelectorAll(".arena-duel-answer");buttons.forEach(b=>b.disabled=true);
- const feedback=$("arenaDuelFeedback");if(feedback)feedback.textContent="Cevap gönderiliyor…";
- try{
-  const r=await fetch(API+"/arena/duel/answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,duel_id:duelId,answer:choice})});
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Cevap gönderilemedi.");
-  if(feedback)feedback.textContent=d.waiting?"Cevabın alındı. Rakibin cevap vermesi bekleniyor…":"İki cevap da alındı. Sonraki soru hazırlanıyor…";
-  if(d.finished){
-   const result=d.result||{};
-   const won=result.winner===currentUser;
-   const draw=!result.winner;
-   $("arenaDuelStatus").textContent=draw?"⚖️ Düello berabere bitti; puan aktarılmadı.":(won?`🏆 Düelloyu kazandın! +${Number(result.stake||0)} puan.`:`Düelloyu kaybettin. -${Number(result.stake||0)} puan.`);
-   await loadArenaOverview();
-  }else{
-   await loadArenaDuels();
-  }
- }catch(e){if(feedback)feedback.textContent=e.message;buttons.forEach(b=>b.disabled=false);}
-}
-async function refreshArenaDuel(forceRender=false){
- const button=$("arenaDuelRefreshButton");
- if(button){button.disabled=true;button.textContent="⏳ Düello yenileniyor…";}
- if(forceRender) arenaDuelRenderedKey="";
- try{
-  await loadArenaDuels();
-  const status=$("arenaDuelStatus");
-  if(status) status.textContent="🔄 Düello durumu sunucudan yenilendi.";
- }catch(e){
-  const status=$("arenaDuelStatus");
-  if(status) status.textContent="⚠️ Düello yenilenemedi: "+(e.message||"Bağlantı hatası");
- }finally{
-  if(button){button.disabled=false;button.textContent="🔄 Düelloyu yenile";}
- }
-}
-async function resetStuckArenaDuel(duelId){
- const status=$("arenaDuelStatus");
- if(!confirm("Bu düellonun en az 60 saniyedir takıldığı doğrulanırsa iptal edilecek. Puan aktarılmayacak. Devam edilsin mi?"))return;
- const button=$("arenaDuelResetButton");if(button){button.disabled=true;button.textContent="⏳ Kontrol ediliyor…";}
- try{
-  const r=await fetch(API+"/arena/duel/reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,duel_id:duelId})});
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Düello sıfırlanamadı.");
-  arenaDuelRenderedKey="";if(status)status.textContent="✅ "+(d.message||"Takılan düello sıfırlandı.");
-  await loadArenaDuels();
- }catch(e){if(status)status.textContent="⚠️ "+(e.message||"Düello sıfırlanamadı.");}
- finally{if(button){button.disabled=false;button.textContent="🛑 Takılan düelloyu sıfırla";}}
-}
-
-async function loadArenaDuels(){
- if(arenaDuelLoadInFlight)return;
- arenaDuelLoadInFlight=true;
- try{
-  const r=await fetch(API+"/arena/duels?username="+encodeURIComponent(currentUser));
-  const d=await r.json();if(!r.ok)throw new Error(d.detail||"Düellolar yüklenemedi.");
-  const requests=$("arenaDuelRequests");
-  let requestHtml="";
-  (d.pending_incoming||[]).forEach(x=>{requestHtml+=`<div class="sude-card"><strong>📨 ${arenaEscape(arenaDuelName(x.challenger))}</strong> sana ${Number(x.stake)} puanlık düello gönderdi.<div class="sude-grid"><button class="sude-btn" onclick="respondArenaDuel('${arenaEscape(x.duel_id)}',true)">Kabul et</button><button class="sude-btn" onclick="respondArenaDuel('${arenaEscape(x.duel_id)}',false)">Reddet</button></div></div>`;});
-  (d.pending_outgoing||[]).forEach(x=>{requestHtml+=`<div class="sude-card">⏳ ${arenaEscape(arenaDuelName(x.opponent))} profilinin ${Number(x.stake)} puanlık düello isteğini yanıtlaması bekleniyor.</div>`;});
-  requests.innerHTML=requestHtml;
-  const active=d.active_duel, area=$("arenaDuelActive");
-  const duelRefreshButton=$("arenaDuelRefreshButton");
-  if(duelRefreshButton) duelRefreshButton.style.display=active ? "block" : "none";
-  if(active){
-   const q=active.question;
-   const stuck = Number(active.round_age_seconds||0)>=60 && (Number(active.round_answer_count||0)===1 || Number(active.round_age_seconds||0)>=120);
-   const renderKey=active.duel_id+":"+active.question_index+":"+(active.answered?"answered":"question")+":"+(stuck?"stuck":"normal");
-   const resetButton = stuck ? `<button id="arenaDuelResetButton" class="sude-btn" style="width:100%;margin-top:10px;border:1px solid #d97757" onclick="resetStuckArenaDuel('${arenaEscape(active.duel_id)}')">🛑 Takılan düelloyu sıfırla</button>` : "";
-   if(active.status==="active" && q && !active.answered){
-    if(arenaDuelRenderedKey!==renderKey){
-     arenaDuelRenderedKey=renderKey;
-     area.innerHTML=`<div class="sude-card"><h3>⚔️ Özel Düello · Soru ${Number(active.question_index)+1}/5</h3><p>${arenaEscape(arenaDuelName(active.challenger===currentUser?active.opponent:active.challenger))} ile ${Number(active.stake)} puan için yarışıyorsun.</p><p><strong>${arenaEscape(q.prompt)}</strong></p><div>${(q.options||[]).map((o,i)=>`<button class="arena-option arena-duel-answer" onclick="answerArenaDuel(${i},'${arenaEscape(active.duel_id)}',${Number(active.question_index)})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaDuelFeedback" aria-live="polite"></p>${resetButton}</div>`;
-    }
-   }else if(active.status==="active" && active.answered){
-    arenaDuelRenderedKey=renderKey;
-    area.innerHTML=`<div class="sude-card"><h3>⏳ Cevabın kaydedildi</h3><p>Rakibin aynı soruyu cevaplayana kadar bekle. Sonraki soru otomatik yüklenecek.</p><p>Tur ${Number(active.question_index)+1}/5</p>${resetButton}</div>`;
-   }
-  }else{
-   arenaDuelRenderedKey="";
-   area.innerHTML="";
-   // Surface most recently completed outcome from the personal three-game history.
-   const recent=(d.duel_history||[])[0];
-   if(recent && $("arenaDuelStatus").textContent==="") $("arenaDuelStatus").textContent=`Son düello: ${recent.outcome} (${recent.points_delta>0?"+":""}${recent.points_delta} puan).`;
-  }
-  if(arenaDuelPollTimer)clearTimeout(arenaDuelPollTimer);
-  arenaDuelLoadInFlight=false;
-  if($("arenaModal").classList.contains("show"))arenaDuelPollTimer=setTimeout(loadArenaDuels,700);
- }catch(e){
-  $("arenaDuelStatus").textContent="Düello durumu alınamadı: "+(e.message||"Bağlantı hatası");
-  if(arenaDuelPollTimer)clearTimeout(arenaDuelPollTimer);
-  arenaDuelLoadInFlight=false;
-  if($("arenaModal").classList.contains("show"))arenaDuelPollTimer=setTimeout(loadArenaDuels,2000);
- }
-}
-async function startArena(mode){
- const area=$("arenaGameArea");area.innerHTML="<p>Yarışma hazırlanıyor…</p>";arenaAttemptId=null;arenaQuestionIndex=0;arenaAnswered=false;
- try{const r=await fetch(API+"/arena/start",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,mode})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Yarışma başlatılamadı.");arenaAttemptId=d.attempt_id;renderArenaQuestion(d.question,d.question_number,d.total_questions);await loadArenaOverview();}catch(e){area.innerHTML=`<p>${arenaEscape(e.message)}</p>`;}}
-function renderArenaQuestion(q,num,total){arenaAnswered=false;arenaStartedAt=Date.now();const area=$("arenaGameArea");area.innerHTML=`<div class="sude-card"><p>Tur ${num}/${total}</p><h3>${arenaEscape(q.prompt)}</h3><div>${(q.options||[]).map((o,i)=>`<button class="arena-option" onclick="answerArena(${i})">${String.fromCharCode(65+i)}. ${arenaEscape(o)}</button>`).join("")}</div><p id="arenaAnswerFeedback" aria-live="polite"></p></div>`;}
-async function answerArena(choice){if(!arenaAttemptId||arenaAnswered)return;arenaAnswered=true;document.querySelectorAll(".arena-option").forEach(b=>b.disabled=true);const feedback=$("arenaAnswerFeedback");if(feedback)feedback.textContent="Cevap kontrol ediliyor…";
- try{const r=await fetch(API+"/arena/answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,attempt_id:arenaAttemptId,answer:choice,elapsed_ms:Date.now()-arenaStartedAt})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Cevap gönderilemedi.");if(feedback)feedback.textContent=(d.correct?"✅ Doğru!":"❌ Bu cevap doğru değil.")+` ${d.message||""} · ${Number(d.points_awarded||0)>0?"+":""}${Number(d.points_awarded||0)} puan`;
- setTimeout(async()=>{if(d.finished){arenaAttemptId=null;$("arenaGameArea").innerHTML=`<div class="sude-card"><h3>🏁 Yarışma tamamlandı!</h3><p>Bu yarışmada ${d.score} puan kazandın.</p><button class="sude-btn" onclick="openArena()">Sonuçları ve sıralamayı yenile</button></div>`;await loadArenaOverview();}else{renderArenaQuestion(d.question,d.question_number,d.total_questions);}},850);
- }catch(e){arenaAnswered=false;if(feedback)feedback.textContent=e.message;}}
-
-/* ============================================================
-   INITIALIZE
-   ============================================================ */
-
-function initialize(){
-
-    const savedUser =
-        localStorage.getItem(
-            "karvis_user"
-        );
-
-    if(
-        [
-            "karahan",
-            "betul",
-            "sinem",
-            "ilknur",
-            "murat",
-            "sude"
-        ].includes(savedUser)
-    ){
-
-        currentUser =
-            savedUser;
-    }
-
-    currentMode =
-        currentUser === "ilknur"
-            ? (
-                localStorage.getItem(
-                    "karvis_mode"
-                ) || "lesson"
+            outline[
+                "conclusion"
+            ].get(
+                "visual_query",
+                f"{topic} conclusion"
             )
-            : currentUser === "karahan"
-                ? (localStorage.getItem("karvis_mode") || "normal")
-                : "normal";
+        )
 
-    applyUserTheme();
+        images = {}
 
-    updateSidebar();
+        total_tasks = len(
+            image_tasks
+        )
 
-    showGreeting();
+        completed = 0
 
-    updateStatus();
+        # ----------------------------------------------------
+        # PARALLEL IMAGE SEARCH
+        # ----------------------------------------------------
 
-    setTimeout(
-        () =>
-            $("messageInput").focus(),
-        150
-    );
-}
+        with ThreadPoolExecutor(
+            max_workers=4
+        ) as executor:
 
-initialize();
+            futures = {
 
-</script>
+                executor.submit(
+                    find_unique_image,
 
-<script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
-</body>
-</html>
+                    queries,
+
+                    used_urls,
+
+                    used_hashes,
+
+                    lock
+
+                ):
+                    key
+
+                for key, queries
+                in image_tasks.items()
+            }
+
+            for future in as_completed(
+                futures
+            ):
+
+                key = futures[
+                    future
+                ]
+
+                try:
+
+                    images[key] = (
+                        future.result()
+                    )
+
+                except Exception:
+
+                    images[key] = None
+
+                completed += 1
+
+                progress = (
+                    40
+                    +
+                    int(
+                        completed
+                        /
+                        max(
+                            1,
+                            total_tasks
+                        )
+                        *
+                        35
+                    )
+                )
+
+                worker_progress(
+
+                    job_id,
+
+                    progress,
+
+                    (
+                        "Fotoğraflar araştırılıyor "
+                        f"({completed}/{total_tasks})..."
+                    ),
+
+                    "visuals"
+                )
+
+        # ----------------------------------------------------
+        # VISUAL CHECK
+        # ----------------------------------------------------
+
+        worker_progress(
+            job_id,
+            76,
+            "Görseller kontrol ediliyor...",
+            "design"
+        )
+
+        worker_progress(
+            job_id,
+            78,
+            "Profesyonel slaytlar oluşturuluyor...",
+            "design"
+        )
+
+        # ----------------------------------------------------
+        # PDF
+        # ----------------------------------------------------
+
+        pdf_filename = (
+            create_presentation_pdf(
+
+                job_id,
+
+                outline,
+
+                images,
+
+                progress_callback=lambda p, m:
+                    worker_progress(
+                        job_id,
+                        p,
+                        m
+                    )
+            )
+        )
+
+        # ----------------------------------------------------
+        # FINAL
+        # ----------------------------------------------------
+
+        worker_progress(
+            job_id,
+            99,
+            "Bitirmek üzereyim...",
+            "finish"
+        )
+
+        time.sleep(
+            0.15
+        )
+
+        update_job(
+
+            job_id,
+
+            status="completed",
+
+            stage="finish",
+
+            progress=100,
+
+            message=
+                "Sunum hazırlandı.",
+
+            file=
+                pdf_filename,
+
+            download_url=
+                f"/generated/{pdf_filename}"
+        )
+
+    except Exception as e:
+
+        save_error(
+            "Presentation worker error",
+            traceback.format_exc()
+        )
+
+        update_job(
+
+            job_id,
+
+            status="error",
+
+            stage="error",
+
+            progress=0,
+
+            message=
+                "Sunum oluşturulamadı.",
+
+            error=
+                str(e)
+        )
 
 
-/* KARVIS evaluation: compact class-level report, no per-question dump */
-.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
-.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
-.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
-@media(max-width:600px){
- .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
- .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
- .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
- .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
- .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
- .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
- .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
- .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
-}
+# ============================================================
+# HOME
+# ============================================================
+
+@app.get("/")
+async def home():
+
+    if not INDEX_FILE.exists():
+
+        return JSONResponse({
+
+            "app":
+                "K.A.R.V.I.S.",
+
+            "version":
+                APP_VERSION,
+
+            "status":
+                "online"
+        })
+
+    return FileResponse(
+        INDEX_FILE
+    )
+
+
+@app.get("/service-worker.js")
+async def service_worker():
+    file = BASE_DIR / "service-worker.js"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="Service worker bulunamadı.")
+    return FileResponse(file, media_type="application/javascript")
+
+
+@app.get("/manifest.json")
+async def manifest():
+    file = BASE_DIR / "manifest.json"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="Manifest bulunamadı.")
+    return FileResponse(file, media_type="application/manifest+json")
+
+
+@app.get("/icon-192.png")
+async def icon_192():
+    file = BASE_DIR / "icon-192.png"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="İkon bulunamadı.")
+    return FileResponse(file, media_type="image/png")
+
+
+@app.get("/icon-512.png")
+async def icon_512():
+    file = BASE_DIR / "icon-512.png"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="İkon bulunamadı.")
+    return FileResponse(file, media_type="image/png")
+
+
+# ============================================================
+# HEALTH
+# ============================================================
+
+@app.get("/health")
+async def health():
+
+    return {
+
+        "status":
+            "online",
+
+        "app":
+            "K.A.R.V.I.S.",
+
+        "version":
+            APP_VERSION,
+
+        "groq":
+            bool(
+                GROQ_API_KEY
+            ),
+
+        "openrouter":
+            bool(
+                OPENROUTER_API_KEY
+            ),
+
+        "google_image_search":
+            bool(
+                GOOGLE_IMAGE_API_KEY
+                and
+                GOOGLE_CSE_ID
+            ),
+
+        "research_engine":
+            True,
+
+        "wikipedia":
+            True,
+
+        "openverse":
+            True,
+
+        "presentation_engine":
+            APP_VERSION
+    }
+
+
+# ============================================================
+# K.A.R.V.I.S. CORE STATUS
+# ============================================================
+
+@app.get("/live-status")
+async def live_status():
+    return {
+        "status": "online",
+        "version": APP_VERSION,
+        "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
+        "research": True,
+        "weather": True,
+        "presentation": True,
+        "memory": True,
+    }
+
+
+@app.get("/radar")
+async def radar():
+    return {
+        "items": [
+            {"name": "AI Engine", "status": "ONLINE" if (GROQ_API_KEY or OPENROUTER_API_KEY) else "OFFLINE"},
+            {"name": "Web Research", "status": "ONLINE"},
+            {"name": "Weather", "status": "ONLINE"},
+            {"name": "Presentation Engine", "status": "ONLINE"},
+            {"name": "Memory Core", "status": "ONLINE"},
+        ]
+    }
+
+
+@app.get("/brain")
+async def brain():
+    return {
+        "version": APP_VERSION,
+        "modules": [
+            "CHAT",
+            "WEB RESEARCH",
+            "MEMORY",
+            "WEATHER",
+            "PRESENTATION",
+            "PROFILE ENGINE",
+        ],
+        "state": "READY",
+    }
+
+
+# ============================================================
+# EPHEMERAL CHAT CONTEXT (RAM ONLY; NEVER WRITTEN TO DATABASE)
+# ============================================================
+
+# Context exists only in server memory. It is not persisted to PostgreSQL,
+# JSON files, or browser storage. Starting a new chat uses a new ID.
+_CHAT_CONTEXTS = {}
+_CHAT_CONTEXT_MAX_TURNS = 10
+
+
+def _get_chat_context(conversation_id, username):
+    if not conversation_id:
+        return []
+    key = (str(username or "karahan")[:40], str(conversation_id)[:120])
+    return list(_CHAT_CONTEXTS.get(key, []))
+
+
+def _append_chat_context(conversation_id, username, user_message, assistant_message):
+    if not conversation_id:
+        return
+    key = (str(username or "karahan")[:40], str(conversation_id)[:120])
+    history = _CHAT_CONTEXTS.setdefault(key, [])
+    history.append({"role": "user", "content": str(user_message)[:6000]})
+    history.append({"role": "assistant", "content": str(assistant_message)[:6000]})
+    # Keep only the most recent turns and discard empty contexts.
+    _CHAT_CONTEXTS[key] = history[-(_CHAT_CONTEXT_MAX_TURNS * 2):]
+    # Soft bound to prevent unbounded RAM growth from abandoned chats.
+    if len(_CHAT_CONTEXTS) > 500:
+        oldest_key = next(iter(_CHAT_CONTEXTS))
+        if oldest_key != key:
+            _CHAT_CONTEXTS.pop(oldest_key, None)
+
+
+def _format_chat_context(history):
+    if not history:
+        return "Önceki mesaj yok; bu sohbetin ilk mesajı."
+    return "\\n".join(
+        ("Kullanıcı: " if item.get("role") == "user" else "K.A.R.V.I.S.: ")
+        + str(item.get("content", ""))
+        for item in history[-(_CHAT_CONTEXT_MAX_TURNS * 2):]
+    )
+
+
+# ============================================================
+# CHAT
+# ============================================================
+
+@app.post("/chat")
+async def chat(
+    request: ChatRequest
+):
+    message = (
+        request.message
+        or ""
+    ).strip()
+
+    if not message:
+        return {
+            "response": "Nasıl yardımcı olabilirim efendim?",
+            "message": "Nasıl yardımcı olabilirim efendim?"
+        }
+
+    username = (
+        request.username
+        or "karahan"
+    ).strip().lower()
+
+    mode = (
+        request.mode
+        or "normal"
+    ).strip().lower()
+
+    conversation_id = (request.conversation_id or "").strip()[:120]
+    chat_history = _get_chat_context(conversation_id, username)
+
+    user = USERS.get(username)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Geçersiz profil.")
+
+    # Kullanıcı özellik önerisi algılama: yalnızca gerçek öneri kalıplarında kaydet.
+    feature_request = detect_user_feature_request(message)
+    if feature_request and username not in {"karahan", "murat"}:
+        save_user_request(username, message)
+
+    # Yetkili Murat, kayıtlı istekleri doğal dille sorabilir.
+    admin_request_query = (
+        username == "murat"
+        and any(term in normalize_request_text(message) for term in [
+            "kullanıcıların istekleri", "kullanicilarin istekleri",
+            "kullanıcı istekleri", "kullanici istekleri",
+            "kullanıcıların önerileri", "kullanicilarin onerileri"
+        ])
+    )
+    if admin_request_query:
+        answer = requests_answer_for_admin()
+        return {"response": answer, "message": answer}
+
+    if feature_request and username not in {"karahan", "murat"}:
+        answer = feature_request_ack(username)
+        return {"response": answer, "message": answer, "feature_request_saved": True}
+
+    # --------------------------------------------------------
+    # PROFILE / MODE
+    # --------------------------------------------------------
+    if (
+        user.get("role") == "teacher"
+        or
+        user.get("style") == "academic"
+        or
+        mode in {
+            "academic",
+            "research",
+            "lesson",
+            "quiz",
+            "article",
+            "teacher"
+        }
+    ):
+        system_prompt = ACADEMIC_SYSTEM
+        mode_instruction = (
+            f"Akademik çalışma modu: {mode}. "
+            "Kullanıcıya 'Hocam' diye hitap et."
+        )
+    else:
+        system_prompt = PROFESSIONAL_SYSTEM
+        mode_instruction = (
+            f"Çalışma modu: {mode}."
+        )
+
+    # --------------------------------------------------------
+    # SMART WEB DECISION
+    # --------------------------------------------------------
+    use_web = needs_web_research(
+        message,
+        username,
+        mode
+    )
+
+    research = None
+    research_context = ""
+
+    # Hava durumu soruları web karar katmanından bağımsız olarak canlı veri servisine gider.
+    # Böylece kısa/doğal ifadeler yüzünden hava durumu araştırmasının atlanması önlenir.
+    if is_weather_request(message):
+        try:
+            weather = fetch_denizli_weather()
+            if weather:
+                weather_context = weather_context_for_ai(weather, message)
+                research = {
+                    "query": "Denizli canlı saatlik hava durumu",
+                    "sources": [{
+                        "title": "Denizli saatlik hava durumu",
+                        "text": weather_context,
+                        "url": "",
+                        "source": weather.get("source", "hava servisi")
+                    }],
+                    "context": weather_context
+                }
+            else:
+                save_error(
+                    "Canlı hava durumu verisi alınamadı",
+                    "Open-Meteo ve wttr.in servislerinden sonuç alınamadı. Ayrıntılar varsa önceki 'Weather services unavailable' kaydında bulunur.",
+                    category="weather",
+                    severity="warning",
+                )
+        except Exception as weather_exc:
+            save_error(
+                "Hava durumu isteği işlenemedi",
+                traceback.format_exc(),
+                category="weather",
+                severity="error",
+            )
+
+    if use_web and research is None:
+        try:
+            research = perform_smart_research(
+                message,
+                username,
+                mode
+            )
+            research_context = research.get(
+                "context",
+                ""
+            )
+        except Exception:
+            save_error(
+                "Smart research error",
+                traceback.format_exc()
+            )
+            research = None
+            research_context = ""
+
+    if research and not research_context:
+        research_context = research.get("context", "")
+
+    # --------------------------------------------------------
+    # PROFILE-SPECIFIC RESEARCH PERSONALITY
+    # --------------------------------------------------------
+    character_instruction = profile_research_instruction(
+        username
+    )
+
+    if research:
+        web_instruction = f"""
+Bu cevap için internet araştırması yapıldı.
+
+Araştırma sorgusu:
+{research.get("query", "")}
+
+Aşağıdaki kaynaklar araştırma bağlamıdır:
+{research_context}
+
+KURALLAR:
+- Yalnızca kaynakların desteklediği güncel bilgileri kullan.
+- Kaynaklarda bulunmayan ayrıntıları uydurma.
+- Kaynaklar arasında çelişki varsa bunu açıkça belirt.
+- Güncel bilgi olduğunu ve mümkünse tarih/kapsamını belirt.
+- Kullanıcı istemedikçe araştırma sürecini anlatma.
+- URL, link, ham kaynak listesi veya "Kaynaklar:" bölümü oluşturma.
+- Araştırma sonucunu doğrudan doğal cevabın içine yedir.
+- Hava durumu cevabını kısa ve sade tut: mevcut sıcaklık + önemli hava durumu + yakın saatlerdeki önemli değişiklik + gerekiyorsa tek pratik öneri. Genellikle 1-3 cümle yeterlidir.
+- Hava durumu için verilen canlı veriyi aynen kullan; tahmin uydurma.
+- Yerel gündemde en önemli güncel olayı önce söyle, sonra yalnızca gerekli kısa bağlamı ver.
+- Genel cevaplarda gereksiz uzun açıklamalardan kaçın; doğru ve anlaşılır olmayı önceliklendir.
+- Kaynak adını yalnızca doğruluk için gerçekten gerekli olduğunda metin içinde an.
+"""
+    else:
+        web_instruction = """
+Bu soru için internet araştırması gerekli görülmedi.
+Harici web kaynağı kullanma ve güncel olmayan bir bilgiyi
+güncelmiş gibi sunma. Genel bilgin ve konuşma bağlamınla cevap ver.
+"""
+
+    prompt = f"""
+Kullanıcı profili:
+{username}
+
+{mode_instruction}
+
+{character_instruction}
+
+{web_instruction}
+
+ÖNCEKİ MESAJLAR (yalnızca bu aktif sohbetin geçici bağlamı):
+{_format_chat_context(chat_history)}
+
+Kullanıcının son mesajı:
+{message}
+
+Yanıtı doğrudan ver. Önceki mesajlarla ilgili kısa takip sorularını bağlama göre yorumla.
+Kullanıcı açıkça istemediyse gereksiz uzun açıklamalar yapma.
+Bilmediğin bilgileri uydurma.
+"""
+
+    result = ask_ai(
+        prompt,
+        system_prompt,
+        fast=True
+    )
+
+    if not result:
+        result = (
+            "Şu anda yapay zeka servislerine "
+            "bağlanamıyorum. API anahtarlarını "
+            "kontrol etmen gerekiyor."
+        )
+
+    # Sohbet bağlamını yalnızca RAM'de tut; PostgreSQL veya dosyaya yazma.
+    _append_chat_context(
+        conversation_id,
+        username,
+        message,
+        result
+    )
+
+    # Web kaynakları kullanıcıya link listesi olarak basılmaz.
+    # Araştırma yalnızca cevabın doğruluğunu ve güncelliğini besler.
+    return {
+        "response": result,
+        "message": result,
+        "web_research": bool(research),
+        "sources_count": (
+            len(research.get("sources", []))
+            if research
+            else 0
+        )
+    }
+
+
+# ============================================================
+# PRESENTATION ROUTE
+# ============================================================
+
+@app.post("/presentation")
+async def create_presentation(
+    request: PresentationRequest,
+    background_tasks: BackgroundTasks
+):
+
+    topic = (
+        request.topic
+        or ""
+    ).strip()
+
+    if not topic:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Sunum konusu boş olamaz."
+        )
+
+    try:
+
+        requested_count = int(
+            request.slide_count
+        )
+
+    except Exception:
+
+        requested_count = 7
+
+    slide_count = max(
+        5,
+        min(
+            requested_count,
+            12
+        )
+    )
+
+    job_id = create_job()
+
+    background_tasks.add_task(
+
+        presentation_worker,
+
+        job_id,
+
+        topic,
+
+        slide_count
+    )
+
+    return {
+
+        "success":
+            True,
+
+        "job_id":
+            job_id,
+
+        "status":
+            "queued",
+
+        "stage":
+            "analysis",
+
+        "progress":
+            0,
+
+        "message":
+            "Konu analiz ediliyor..."
+    }
+
+
+# ============================================================
+# PRESENTATION STATUS
+# ============================================================
+
+@app.get(
+    "/presentation-status/{job_id}"
+)
+async def presentation_status(
+    job_id: str
+):
+
+    with presentation_lock:
+
+        job = PRESENTATION_JOBS.get(
+            job_id
+        )
+
+        if not job:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Sunum bulunamadı."
+            )
+
+        return dict(
+            job
+        )
+
+
+# ============================================================
+# GENERATED FILES
+# ============================================================
+
+@app.get(
+    "/generated/{filename}"
+)
+async def generated_file(
+    filename: str
+):
+
+    safe_name = Path(
+        filename
+    ).name
+
+    file_path = (
+        GENERATED_DIR
+        /
+        safe_name
+    )
+
+    if (
+        not file_path.exists()
+        or
+        not file_path.is_file()
+    ):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Dosya bulunamadı."
+        )
+
+    if safe_name.lower().endswith(
+        ".pdf"
+    ):
+
+        return FileResponse(
+
+            path=file_path,
+
+            media_type=
+                "application/pdf",
+
+            filename=
+                safe_name,
+
+            headers={
+
+                "Content-Disposition":
+                    f'attachment; filename="{safe_name}"'
+            }
+        )
+
+    return FileResponse(
+        path=file_path
+    )
+
+
+# ============================================================
+# ACCOUNT PASSWORD MANAGEMENT
+# ============================================================
+class PasswordChangeRequest(BaseModel):
+    username: str
+    current_password: str = ""
+    new_password: str
+
+class AdminPasswordResetRequest(BaseModel):
+    username: str = "murat"
+    target_username: str
+    new_password: str
+
+@app.post("/account/change-password")
+async def change_password(data: PasswordChangeRequest):
+    username = data.username.strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    records = _load_password_store()
+    record = records.get(username)
+    if record and not _verify_password(data.current_password, record):
+        raise HTTPException(status_code=401, detail="Mevcut şifre hatalı.")
+    if not record and USERS[username].get("password") != data.current_password:
+        raise HTTPException(status_code=401, detail="Mevcut şifre hatalı.")
+    _set_password(username, data.new_password)
+    USERS[username]["password"] = ""
+    return {"success": True, "message": "Şifre güncellendi."}
+
+@app.post("/admin/password-reset")
+async def admin_password_reset(data: AdminPasswordResetRequest):
+    require_admin(data.username)
+    target = data.target_username.strip().lower()
+    if target not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    _set_password(target, data.new_password)
+    USERS[target]["password"] = ""
+    return {"success": True, "message": f"{USERS[target]['name']} profilinin şifresi sıfırlandı."}
+
+
+# ============================================================
+# SUDE'S WORLD API
+# ============================================================
+@app.get("/sude/world")
+async def sude_world(username: str = "sude"):
+    if username.strip().lower() != "sude":
+        raise HTTPException(status_code=403, detail="Bu dünya yalnızca Sude profiline açıktır.")
+    _, state = _get_sude_state()
+    return {"success": True, "world": state}
+
+@app.post("/sude/bmi")
+async def sude_bmi(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    try:
+        weight = float(data.get("weight")); height = float(data.get("height"))
+        if not (20 <= weight <= 350 and 80 <= height <= 250): raise ValueError()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Boyu cm, kiloyu kg olarak geçerli girin.")
+    bmi = weight / ((height / 100) ** 2)
+    category = "Düşük kilo" if bmi < 18.5 else "Normal aralık" if bmi < 25 else "Fazla kilo aralığı" if bmi < 30 else "Obezite aralığı"
+    return {"success": True, "bmi": round(bmi, 1), "category": category, "note": "VKİ yalnızca genel bir tarama ölçütüdür; tek başına tanı koymaz ve yaş/gebelik/kas oranı gibi etkenleri değerlendirmez."}
+
+@app.post("/sude/estimate-calories")
+async def sude_estimate_calories(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    meal = str(data.get("meal", "")).strip()[:500]
+    if not meal: raise HTTPException(status_code=400, detail="Yiyecek veya öğün adı gerekli.")
+    prompt = ("Tahmini kalori hesaplayıcısı olarak yanıtla. Kullanıcının yazdığı yiyecek/öğün için porsiyon bilgisi yoksa standart bir porsiyon varsay. "
+              "Yalnızca şu biçimde yanıt ver: KALORI: <tam sayı>\nACIKLAMA: <kısa porsiyon varsayımı>. Kesinlik iddia etme.\nÖğün: " + meal)
+    answer = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True) or ""
+    match = re.search(r"KALORI\s*:\s*(\d{1,4})", answer, re.IGNORECASE)
+    calories = max(0, min(5000, int(match.group(1)))) if match else None
+    explanation_match = re.search(r"ACIKLAMA\s*:\s*(.+)", answer, re.IGNORECASE | re.DOTALL)
+    explanation = explanation_match.group(1).strip()[:500] if explanation_match else "Porsiyon ve hazırlanışa göre değişebilir."
+    if calories is None:
+        return {"success": False, "estimate": None, "explanation": "Güvenilir bir tahmin üretilemedi. Porsiyon miktarını ve malzemeleri daha ayrıntılı yaz."}
+    return {"success": True, "estimate": calories, "explanation": explanation, "disclaimer": "Bu değer yaklaşık tahmindir; ürün etiketi veya ölçülmüş malzeme değerinin yerini tutmaz."}
+
+@app.post("/sude/food")
+async def sude_add_food(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude":
+        raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    name = str(data.get("name", "")).strip()[:120]
+    try: calories = max(0, min(5000, int(float(data.get("calories", 0)))))
+    except Exception: calories = 0
+    if not name: raise HTTPException(status_code=400, detail="Yiyecek adı gerekli.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        state["food_log"].append({"id": uuid.uuid4().hex, "name": name, "calories": calories, "date": time.strftime("%Y-%m-%d"), "created_at": time.strftime("%H:%M")})
+        state["food_log"] = state["food_log"][-200:]
+        state["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.post("/sude/tasks")
+async def sude_add_task(data: dict):
+    if str(data.get("username", "sude")).lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    title = str(data.get("title", "")).strip()[:120]
+    if not title: raise HTTPException(status_code=400, detail="Görev adı gerekli.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        state["tasks"].append({"id": uuid.uuid4().hex, "title": title, "done": False, "date": time.strftime("%Y-%m-%d")})
+        state["tasks"] = state["tasks"][-100:]
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+@app.post("/sude/tasks/{task_id}/complete")
+async def sude_complete_task(task_id: str, username: str = "sude"):
+    if username.strip().lower() != "sude": raise HTTPException(status_code=403, detail="Yetkisiz profil.")
+    with sude_lock:
+        all_data, state = _get_sude_state()
+        task = next((x for x in state["tasks"] if x.get("id") == task_id), None)
+        if not task: raise HTTPException(status_code=404, detail="Görev bulunamadı.")
+        if not task.get("done"):
+            task["done"] = True
+            state["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        write_json_file(SUDE_WORLD_FILE, all_data)
+    return {"success": True, "world": state}
+
+
+
+# ============================================================
+# MEMORY
+# ============================================================
+
+@app.get("/memory")
+async def get_memory(username: str = "karahan"):
+    username = username.strip().lower()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    with memory_lock:
+        stored = read_json_file(MEMORY_FILE, [])
+        # Backward compatibility: existing legacy memory remains attached to the main owner profile.
+        if isinstance(stored, dict):
+            memories = stored.get(username, [])
+        else:
+            memories = stored if username == "karahan" and isinstance(stored, list) else []
+        return {"memory": memories}
+
+@app.post("/memory")
+async def add_memory(data: dict):
+    username = str(data.get("username", "karahan")).strip().lower()
+    text = str(data.get("text", "")).strip()
+    if username not in USERS: raise HTTPException(status_code=401, detail="Geçersiz profil.")
+    if not text: return {"success": False}
+    with memory_lock:
+        stored = read_json_file(MEMORY_FILE, [])
+        if not isinstance(stored, dict):
+            stored = {"karahan": stored if isinstance(stored, list) else []}
+        memories = stored.get(username, [])
+        if not isinstance(memories, list): memories = []
+        memories.append({"id": uuid.uuid4().hex, "text": text[:2000], "created_at": time.strftime("%Y-%m-%d %H:%M:%S")})
+        stored[username] = memories[-200:]
+        write_json_file(MEMORY_FILE, stored)
+    return {"success": True, "memory": stored[username]}
+
+
+# ============================================================
+# NEW CHAT
+# ============================================================
+
+@app.post("/new-chat")
+async def new_chat():
+
+    return {
+
+        "success":
+            True,
+
+        "message":
+            "Yeni sohbet başlatıldı."
+    }
+
+
+# ============================================================
+# ADMIN DASHBOARD API
+# ============================================================
+
+# ============================================================
+# ADMIN PROFILE MANAGEMENT + ONLINE PRESENCE
+# ============================================================
+PRESENCE_FILE = BASE_DIR / "karvis_presence.json"
+PRESENCE_LOCK = threading.Lock()
+PRESENCE_TTL_SECONDS = 90
+
+class PresenceHeartbeatRequest(BaseModel):
+    username: str
+
+@app.post("/presence/heartbeat")
+async def presence_heartbeat(data: PresenceHeartbeatRequest):
+    username = str(data.username or "").strip().lower()
+    if username not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    now = time.time()
+    with PRESENCE_LOCK:
+        presence = read_json_file(PRESENCE_FILE, {})
+        if not isinstance(presence, dict):
+            presence = {}
+        presence[username] = now
+        # Prune stale entries to keep the file small.
+        presence = {u: ts for u, ts in presence.items() if isinstance(ts, (int, float)) and now - ts <= 86400}
+        write_json_file(PRESENCE_FILE, presence)
+    return {"success": True}
+
+@app.get("/admin/active-users")
+async def admin_active_users(username: str = "murat"):
+    require_admin(username)
+    now = time.time()
+    with PRESENCE_LOCK:
+        presence = read_json_file(PRESENCE_FILE, {})
+    if not isinstance(presence, dict):
+        presence = {}
+    users = []
+    for uname, info in USERS.items():
+        last_seen = presence.get(uname)
+        online = isinstance(last_seen, (int, float)) and now - last_seen <= PRESENCE_TTL_SECONDS
+        users.append({"username": uname, "name": info.get("name", uname), "online": online})
+    users.sort(key=lambda item: (not item["online"], str(item["name"]).casefold()))
+    return {"success": True, "users": users}
+
+@app.get("/admin/profiles")
+async def admin_profiles(username: str = "murat"):
+    require_admin(username)
+    registered = _read_persistent_profiles()
+    profiles = []
+    for uname, info in USERS.items():
+        profiles.append({
+            "username": uname,
+            "name": info.get("name", uname),
+            "deletable": uname in registered and info.get("role") == "user"
+        })
+    profiles.sort(key=lambda item: str(item["name"]).casefold())
+    return {"success": True, "profiles": profiles}
+
+@app.delete("/admin/profiles/{target_username}")
+async def admin_delete_profile(target_username: str, username: str = "murat"):
+    require_admin(username)
+    target = str(target_username or "").strip().lower()
+    registered = _read_persistent_profiles()
+    if target not in USERS:
+        raise HTTPException(status_code=404, detail="Profil bulunamadı.")
+    if target == "murat" or target not in registered or USERS[target].get("role") != "user":
+        raise HTTPException(status_code=400, detail="Yerleşik veya yönetici profilleri bu ekrandan silinemez.")
+    # Remove from persistent profile storage without touching exams, Arena, or other application data.
+    if _profile_db_configured() and _init_profile_database():
+        try:
+            conn = _profile_db_connect()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("DELETE FROM karvis_user_profiles WHERE username=%s", (target,))
+            conn.close()
+        except Exception as exc:
+            print(f"KARVIS profile delete failed: {exc}", flush=True)
+            raise HTTPException(status_code=503, detail="Profil veritabanından silinemedi.")
+    else:
+        local_profiles = read_json_file(REGISTERED_USERS_FILE, {})
+        if not isinstance(local_profiles, dict):
+            local_profiles = {}
+        local_profiles.pop(target, None)
+        write_json_file(REGISTERED_USERS_FILE, local_profiles)
+    with password_lock:
+        password_records = read_json_file(PASSWORD_FILE, {})
+        if isinstance(password_records, dict):
+            password_records.pop(target, None)
+            write_json_file(PASSWORD_FILE, password_records)
+    with PRESENCE_LOCK:
+        presence = read_json_file(PRESENCE_FILE, {})
+        if isinstance(presence, dict):
+            presence.pop(target, None)
+            write_json_file(PRESENCE_FILE, presence)
+    USERS.pop(target, None)
+    return {"success": True, "message": f"{target} profili silindi."}
+
+
+def require_admin(username):
+    if str(username or "").strip().lower() != "murat":
+        raise HTTPException(status_code=403, detail="Bu alan yalnızca Murat yetkili profiline açıktır.")
+
+
+@app.get("/admin/stats")
+async def admin_stats(username: str = "murat"):
+    require_admin(username)
+    requests = get_user_requests()
+    errors = read_json_file(ERROR_FILE, [])
+    return {
+        "success": True,
+        "users": len(USERS),
+        "requests": len(requests),
+        "unread_requests": sum(1 for x in requests if not x.get("read", False)),
+        "errors": len(errors),
+        "version": APP_VERSION,
+        "ai": "Groq" if GROQ_API_KEY else ("OpenRouter" if OPENROUTER_API_KEY else "offline"),
+    }
+
+
+# ============================================================
+# ERRORS
+# ============================================================
+
+@app.get("/errors")
+async def errors():
+
+    return {
+
+        "errors":
+            read_json_file(
+                ERROR_FILE,
+                []
+            )
+    }
+
+
+# ============================================================
+# ADMIN ERROR CENTER
+# ============================================================
+
+def get_error_items():
+    data = read_json_file(ERROR_FILE, [])
+    if not isinstance(data, list):
+        data = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        item.setdefault("id", uuid.uuid4().hex)
+        item.setdefault("status", "open")
+        item.setdefault("category", "legacy")
+        item.setdefault("severity", "error")
+        item.setdefault("details", "")
+    return [item for item in data if isinstance(item, dict)]
+
+
+@app.get("/admin/errors")
+async def admin_errors(username: str = "murat"):
+    require_admin(username)
+    data = get_error_items()
+    # ID'leri kalıcılaştır. Eski errors.json kayıtları da panelde yönetilebilir.
+    with error_lock:
+        write_json_file(ERROR_FILE, data)
+    return {
+        "success": True,
+        "errors": data,
+        "open": sum(1 for x in data if x.get("status") != "resolved"),
+        "resolved": sum(1 for x in data if x.get("status") == "resolved")
+    }
+
+
+@app.post("/admin/errors/{error_id}/resolve")
+async def resolve_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    with error_lock:
+        data = get_error_items()
+        for item in data:
+            if item.get("id") == error_id:
+                item["status"] = "resolved"
+                item["resolved_at"] = datetime.now().isoformat(timespec="seconds")
+                write_json_file(ERROR_FILE, data)
+                return {"success": True, "error": item}
+    raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+
+@app.post("/admin/errors/{error_id}/reopen")
+async def reopen_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    with error_lock:
+        data = get_error_items()
+        for item in data:
+            if item.get("id") == error_id:
+                item["status"] = "open"
+                item.pop("resolved_at", None)
+                write_json_file(ERROR_FILE, data)
+                return {"success": True, "error": item}
+    raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+
+@app.post("/admin/errors/{error_id}/analyze")
+async def analyze_admin_error(error_id: str, username: str = "murat"):
+    require_admin(username)
+    data = get_error_items()
+    target = next((x for x in data if x.get("id") == error_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Hata kaydı bulunamadı.")
+
+    prompt = (
+        "K.A.R.V.I.S. sistem yöneticisi için aşağıdaki hata kaydını analiz et. "
+        "Türkçe ve kısa yanıt ver. Şu başlıkları kullan: Muhtemel neden, Etki, "
+        "Önerilen çözüm, Öncelik. Bilmediğin şeyi kesinmiş gibi söyleme.\n\n"
+        f"Hata zamanı: {target.get('time','')}\n"
+        f"Hata: {target.get('error', target.get('message',''))}\n"
+        f"Detay: {target.get('details','')}"
+    )
+    analysis = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True)
+    if not analysis:
+        analysis = "AI hata analizi şu anda kullanılamıyor. Hata kaydının ayrıntılarını manuel olarak inceleyin."
+    return {"success": True, "analysis": analysis}
+
+
+# ============================================================
+# STARTUP
+# ============================================================
+
+@app.on_event("startup")
+async def startup():
+
+    GENERATED_DIR.mkdir(
+        exist_ok=True
+    )
+
+    if _profile_db_configured():
+        if _init_profile_database():
+            _migrate_local_profiles_to_db()
+            _load_registered_users()
+            print("KARVIS profiles: PostgreSQL persistence enabled.", flush=True)
+        else:
+            print("KARVIS profiles: database unavailable; new account creation will be blocked rather than lost.", flush=True)
+
+    if push_database_configured():
+        init_push_database()
+        migrate_push_json_to_database()
+
+    if arena_database_configured():
+        if init_arena_database():
+            print("KARVIS Arena: Supabase database connected.")
+        else:
+            print("KARVIS Arena: Supabase unavailable; Arena requests may return 503.")
+
+    start_self_push_worker()
+
+    print("=" * 65)
+
+    print(
+        "K.A.R.V.I.S. - KARAHAN INC."
+    )
+
+    print(
+        f"Version: {APP_VERSION}"
+    )
+
+    print(
+        "Backend: ONLINE"
+    )
+
+    print(
+        "Groq:",
+        "ACTIVE"
+        if GROQ_API_KEY
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "OpenRouter:",
+        "ACTIVE"
+        if OPENROUTER_API_KEY
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "Google Search:",
+        "ACTIVE"
+        if (
+            GOOGLE_IMAGE_API_KEY
+            and
+            GOOGLE_CSE_ID
+        )
+        else
+        "NOT CONFIGURED"
+    )
+
+    print(
+        "Wikipedia Research: ENABLED"
+    )
+
+    print(
+        "Openverse Images: ENABLED"
+    )
+
+    print(
+        "Google Images Fallback: ENABLED"
+    )
+
+    print(
+        "Fact-Based Presentation: ENABLED"
+    )
+
+    print(
+        "Duplicate Slide Protection: ENABLED"
+    )
+
+    print(
+        "Per-Slide AI Generation: ENABLED"
+    )
+
+    print(
+        "Source Footer: ENABLED"
+    )
+
+    print(
+        "Dynamic Text Fit: ENABLED"
+    )
+
+    print(
+        "Academic Teacher Mode: ENABLED"
+    )
+
+    print(
+        "Profile Login: ENABLED"
+    )
+
+
+    print(
+        "Betül Entertainment Mode: ENABLED"
+    )
+
+    print(
+        "Betül Instagram Simulation: ENABLED"
+    )
+
+    print(
+        "PDF Download: ENABLED"
+    )
+
+    print(
+        "Live Presentation Progress: ENABLED"
+    )
+
+    print(
+        "Presentation Engine: 16:9"
+    )
+
+    print("=" * 65)
+
+
+# ============================================================
+# LOCAL RUN
+# ============================================================
+
+if __name__ == "__main__":
+
+    import uvicorn
+
+    uvicorn.run(
+
+        "main:app",
+
+        host="0.0.0.0",
+
+        port=int(
+            os.getenv(
+                "PORT",
+                "8000"
+            )
+        ),
+
+        reload=False
+    )
