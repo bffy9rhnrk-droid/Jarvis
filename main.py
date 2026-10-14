@@ -1994,7 +1994,7 @@ def _validate_exam_questions(questions):
         if not prompt: raise HTTPException(status_code=400, detail=f"{idx}. sorunun metni boş olamaz.")
         if qtype not in {"multiple_choice", "true_false", "open_ended"}:
             raise HTTPException(status_code=400, detail=f"{idx}. soru türü desteklenmiyor.")
-        item = {"id": str(q.get("id") or uuid.uuid4().hex), "prompt": prompt, "type": qtype, "points": max(1, min(100, int(q.get("points", 1))))}
+        item = {"id": str(q.get("id") or uuid.uuid4().hex), "prompt": prompt, "type": qtype, "points": 10}
         if qtype == "multiple_choice":
             opts = [str(x).strip()[:300] for x in q.get("options", []) if str(x).strip()]
             if len(opts) < 2 or len(opts) > 6: raise HTTPException(status_code=400, detail=f"{idx}. soru 2-6 seçenek içermelidir.")
@@ -2058,11 +2058,11 @@ KALİTE STANDARTLARI
 7. Ders uygunsa yalnızca hatırlamayı değil, yorumlama, uygulama, analiz ve problem çözmeyi de ölç. Ancak konu dışı veya verilen kapsamın gerektirmediği bilgi isteme.
 8. Doğru/yanlış sorularında yalnızca tek bir temel yargı bulunsun; ifade yoruma açık olmasın. Açık uçlu sorularda beklenen cevabı ve temel değerlendirme ölçütünü correct_answer alanında kısa ve net ver.
 9. Bir soru için güvenilir, tek bir cevap belirlenemiyorsa o soruyu üretme; yerine sağlam bir soru yaz. Kaynak, mevzuat maddesi, tarih veya istatistik uydurma.
-10. Soruların puanları pozitif tam sayı olsun. İstenen soru türlerinin tümünü kullanmaya çalış; türler arasında sayı dağılımı mümkün olduğunca dengeli olsun. Toplam soru sayısı tam olarak {count} olmalı.
+10. Her soru tam olarak 10 puandır; points alanını 10 olarak ver. İstenen soru türlerinin tümünü kullanmaya çalış; türler arasında sayı dağılımı mümkün olduğunca dengeli olsun. Toplam soru sayısı tam olarak {count} olmalı.
 
 ÇIKTI KURALLARI
 Yalnızca geçerli JSON döndür. Markdown, kod çiti veya açıklama ekleme. Şema:
-{{"title":"sınavın kısa ve profesyonel başlığı","description":"kapsamı ve ölçülen becerileri belirten kısa açıklama","questions":[{{"type":"multiple_choice|true_false|open_ended","prompt":"tam soru kökü","points":1,"options":["A seçeneği","B seçeneği","C seçeneği","D seçeneği"],"correct_index":0,"correct_answer":"açık uçlu cevap anahtarı veya doğru/yanlış için boolean"}}]}}
+{{"title":"sınavın kısa ve profesyonel başlığı","description":"kapsamı ve ölçülen becerileri belirten kısa açıklama","questions":[{{"type":"multiple_choice|true_false|open_ended","prompt":"tam soru kökü","points":10,"options":["A seçeneği","B seçeneği","C seçeneği","D seçeneği"],"correct_index":0,"correct_answer":"açık uçlu cevap anahtarı veya doğru/yanlış için boolean"}}]}}
 
 Şema uygulaması: multiple_choice için options dizisinde tam 4 seçenek ve 0-3 arası correct_index ver; true_false için correct_answer alanı yalnızca true veya false olsun; open_ended için correct_answer alanına beklenen cevap ile gerekiyorsa temel puanlama ölçütünü yaz. Kullanılmayan türe ait alanları eklemek zorunda değilsin. JSON kaçış karakterleri ve tırnakları doğru olsun. Soru sayısı tam olarak {count} olsun.'''
     result = ask_ai(prompt, system_prompt="Kıdemli bir branş öğretmeni, sınav yazarı ve ölçme-değerlendirme uzmanı gibi davran. Akademik doğruluğu, kazanım uyumunu, tek doğru cevabı, güçlü çeldiricileri ve gerçek sınav dilini önceliklendir. Çıktı biçimi talimatlarına eksiksiz uy.", fast=False)
@@ -2138,7 +2138,7 @@ async def get_exam_for_student(exam_id: str, username: str):
         starts = ends = None
     if username.strip().lower() != "ilknur" and starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
     if username.strip().lower() != "ilknur" and ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
-    return {"success":True,"exam":{"id":exam["id"],"title":exam["title"],"subject":exam.get("subject",""),"description":exam.get("description",""),"duration_minutes":exam.get("duration_minutes",0),"starts_at":exam.get("starts_at",""),"ends_at":exam.get("ends_at",""),"questions":[{"id":q["id"],"prompt":q["prompt"],"type":q["type"],"points":q["points"],**({"options":q.get("options",[])} if q["type"]=="multiple_choice" else {})} for q in exam.get("questions",[])]}}
+    return {"success":True,"exam":{"id":exam["id"],"title":exam["title"],"subject":exam.get("subject",""),"description":exam.get("description",""),"duration_minutes":exam.get("duration_minutes",0),"starts_at":exam.get("starts_at",""),"ends_at":exam.get("ends_at",""),"questions":[{"id":q["id"],"prompt":q["prompt"],"type":q["type"],"points":10,**({"options":q.get("options",[])} if q["type"]=="multiple_choice" else {})} for q in exam.get("questions",[])]}}
 
 
 
@@ -2196,7 +2196,7 @@ async def submit_exam(exam_id: str, req: ExamSubmitRequest):
         deadline_expired = bool(ends and now >= ends)
         timed_out = duration_expired or deadline_expired or bool(req.submitted_automatically)
         answer_map = {str(a.get("question_id")): a.get("answer") for a in req.answers if isinstance(a, dict)}
-        total = sum(int(q.get("points",1)) for q in exam["questions"])
+        total = 10 * len(exam["questions"])
         score=0; details=[]
         for q in exam["questions"]:
             ans=answer_map.get(q["id"]); correct=None
@@ -2204,11 +2204,11 @@ async def submit_exam(exam_id: str, req: ExamSubmitRequest):
             elif q["type"]=="true_false": correct=isinstance(ans,bool) and ans==q.get("correct_answer")
             else:
                 correct = None
-            earned=int(q.get("points",1)) if correct is True and not timed_out else 0
+            earned=10 if correct is True and not timed_out else 0
             if timed_out and q["type"] == "open_ended":
                 correct = None
             score+=earned
-            details.append({"question_id":q["id"],"answer":ans,"correct":correct,"earned_points":earned,"max_points":int(q.get("points",1)),"manual_review":q["type"]=="open_ended"})
+            details.append({"question_id":q["id"],"answer":ans,"correct":correct,"earned_points":earned,"max_points":10,"manual_review":q["type"]=="open_ended"})
         submission={"id":uuid.uuid4().hex,"exam_id":exam_id,"username":username,"submitted_at":datetime.utcnow().isoformat()+"Z","score":score,"max_score":total,"percent":round(score*100/total,2) if total else 0,"answers":details,"status":"time_expired" if timed_out else ("pending_review" if any(x.get("manual_review") for x in details) else "graded"),"timed_out":timed_out}
         data["submissions"].append(submission); _save_exam_store(data)
     return {"success":True,"result":{"score":score,"max_score":total,"percent":submission["percent"],"answers":details},"message":"Sınav yanıtlarınız kaydedildi."}
@@ -2243,8 +2243,8 @@ async def teacher_grade_open_answer(exam_id: str, req: ExamGradeRequest):
         answer = next((a for a in submission.get("answers", []) if a.get("question_id")==req.question_id), None)
         question = next((q for q in exam.get("questions", []) if q.get("id")==req.question_id), None)
         if not answer or not question or question.get("type") != "open_ended": raise HTTPException(status_code=400, detail="Açık uçlu soru bulunamadı.")
-        points = max(0, min(int(question.get("points", 1)), int(req.points_awarded)))
-        old = int(answer.get("earned_points", 0)); answer.update({"correct": points == int(question.get("points", 1)), "earned_points": points, "feedback": str(req.feedback or "")[:1000], "manual_review": False})
+        points = max(0, min(10, int(req.points_awarded)))
+        old = int(answer.get("earned_points", 0)); answer.update({"correct": points == 10, "earned_points": points, "feedback": str(req.feedback or "")[:1000], "manual_review": False})
         submission["score"] = max(0, int(submission.get("score", 0)) + points - old)
         submission["percent"] = round(submission["score"]*100/int(submission.get("max_score", 1) or 1), 2)
         submission["status"] = "pending_review" if any(a.get("manual_review") for a in submission.get("answers", [])) else "graded"
@@ -2297,24 +2297,63 @@ async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
         "pass_rate_percent": round(100 * sum(1 for x in scores if x >= 50) / len(scores), 1) if scores else 0,
         "pending_open_answers": sum(1 for sub in submissions for a in sub.get("answers", []) if a.get("manual_review")),
     }
-    # Analyze only aggregate/question-level evidence; do not send student names or raw student answers.
-    ai_analysis = "Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça konu analizi oluşacaktır."
-    if submissions and weak:
-        compact = [{"soru": x["prompt"][:240], "yanlis_yuzdesi": x["incorrect_percent"], "bos_cevap": x["unanswered"], "yanit_sayisi": x["responses"]} for x in weak]
+    # KARVIS Değerlendirmesi: aggregate-only, evidence-based class-level analysis.
+    ai_analysis = "Henüz yeterli yanıt verisi yok. Öğrenciler sınavı tamamladıkça sınıfın güçlü ve geliştirilmesi gereken noktaları belirlenecektir."
+    if submissions and question_stats:
+        compact = []
+        for x in question_stats:
+            response_count = int(x.get("responses") or 0)
+            incorrect_count = int(x.get("incorrect") or 0)
+            blank_count = int(x.get("unanswered") or 0)
+            review_count = int(x.get("manual_review_count") or 0)
+            evaluable = max(0, response_count - review_count)
+            correct_count = max(0, evaluable - incorrect_count - blank_count)
+            compact.append({
+                "soru": str(x.get("prompt", ""))[:240],
+                "yanit_sayisi": response_count,
+                "degerlendirilebilir_yanit": evaluable,
+                "dogru_sayisi_tahmini": correct_count,
+                "yanlis_sayisi": incorrect_count,
+                "bos_sayisi": blank_count,
+                "yanlis_yuzdesi": x.get("incorrect_percent"),
+                "bos_yuzdesi": round(100 * blank_count / response_count, 1) if response_count else None,
+                "acik_uclu_degerlendirme_bekleyen": review_count,
+                "basari_yuzdesi": round(100 * correct_count / evaluable, 1) if evaluable else None,
+            })
         prompt = (
-            "Türkçe bir öğretmen gibi ölçme-değerlendirme raporu hazırla. Yalnızca aşağıdaki gerçek sınav istatistiklerine dayan; "
-            "soru metninden konu/kazanım çıkarımını kesin değil olası olarak belirt. Öğrenci adı veya cevap uydurma. "
-            "Kısa ve uygulanabilir rapor yaz: (1) sınıfın güçlü olduğu noktalar, (2) en çok hata yapılan sorular ve yüzdeleri, "
-            "(3) muhtemel kavram yanılgısı ancak soru metni destekliyorsa, (4) öğretmenin sonraki ders için 2-3 somut etkinliği, "
-            "(5) verinin sınırları. Yanlış oranı için yalnızca cevaplanmış ve otomatik değerlendirilebilen yanıtları esas al.\n"
-            f"Ders: {str(exam.get('subject',''))[:100]}\nSınav: {str(exam.get('title',''))[:140]}\nİstatistikler: {json.dumps(compact, ensure_ascii=False)}"
+            "Türkçe, anlaşılır ve profesyonel bir rapor hazırla. Raporun başlığı tam olarak 'KARVIS Değerlendirmesi' olsun. "
+            "Bu rapor sınıf düzeyindedir; öğrenci isimlerini isteme veya üretme. Yalnızca verilen sınav verilerine dayan, "
+            "veride olmayan konu/kazanım bilgisini kesin gerçek gibi sunma. Soru metni bir konuya işaret ediyorsa bunu olası yorum olarak belirt. "
+            "Raporu şu başlıklarla düzenle: "
+            "1) Sınıfın güçlü olduğu noktalar: başarı yüzdesi yüksek soruları ve verinin izin verdiği çıkarımları belirt. "
+            "2) Geliştirilmesi gereken/zayıf noktalar: yanlış ve boş oranı yüksek soruları sayılarıyla belirt. "
+            "3) Neden zorlanıyor olabilirler: yalnızca soru metni ve sonuçlar destekliyorsa olası açıklamalar yaz; kesin olmayanı açıkça olasılık olarak belirt. "
+            "4) Önerilen öğretim yöntemleri: her zayıf nokta için somut yöntem öner (ör. kavram haritası/görsel anlatım, adım adım model çözüm, "
+            "öğretmen eşliğinde örnek, küçük grup çalışması, hata analizi, aralıklı kısa tekrar ve hedefli mini test). Yöntemi ilgili bulguya bağla. "
+            "5) Bir sonraki ders için kısa uygulama planı: 2-3 uygulanabilir adım ve öğrenmeyi kontrol edecek kısa ölçme önerisi. "
+            "6) Veri sınırlılıkları: az katılımı, yanıt sayısını ve öğretmen değerlendirmesi bekleyen açık uçlu soruları dikkate al. "
+            "Güçlü soru yoksa güçlü yön uydurma; yeterli veri olmadığını söyle. Başarı yüzdesini yalnızca otomatik değerlendirilebilen yanıtlar için yorumla. "
+            "Sadece genel motivasyon cümleleri yazma; bulgu ve önerileri somutlaştır.\n"
+            f"Ders: {str(exam.get('subject',''))[:100]}\n"
+            f"Sınav: {str(exam.get('title',''))[:140]}\n"
+            f"Katılım: {len(submissions)}\n"
+            f"Sınıf ortalaması: %{summary['average_percent']}\n"
+            f"Soru istatistikleri: {json.dumps(compact, ensure_ascii=False)}"
         )
         try:
-            result = ask_ai(prompt, system_prompt="Sen deneyimli bir öğretmen ve ölçme-değerlendirme uzmanısın. Kanıta dayalı, açık, uygulanabilir geri bildirim ver. Veride olmayan bilgi üretme; belirsizliği açıkça belirt.", fast=True)
+            result = ask_ai(
+                prompt,
+                system_prompt=(
+                    "Sen KARVIS'sin; deneyimli bir öğretmen ve ölçme-değerlendirme uzmanı gibi davran. "
+                    "Kanıta dayalı, tarafsız, uygulanabilir sınıf analizi sun. Veride olmayan bilgi üretme; "
+                    "belirsizliği ve örneklem sınırlılıklarını açıkça belirt. Türkçe yaz."
+                ),
+                fast=True
+            )
             if result and str(result).strip():
-                ai_analysis = str(result).strip()[:6000]
+                ai_analysis = str(result).strip()[:8000]
         except Exception:
-            ai_analysis = "KARVIS değerlendirmesi şu anda üretilemedi. Aşağıdaki soru bazlı istatistikler kullanılabilir."
+            ai_analysis = "KARVIS Değerlendirmesi şu anda üretilemedi. Soru bazlı istatistikleri ve doğru/yanlış/boş sayılarını kullanarak sınıfın gelişim alanlarını inceleyebilirsiniz."
     student_stats = []
     for sub in submissions:
         answer_by_q = {str(a.get("question_id")): a for a in sub.get("answers", [])}
