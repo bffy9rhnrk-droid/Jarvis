@@ -2302,18 +2302,72 @@ async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
     if submissions and weak:
         compact = [{"soru": x["prompt"][:240], "yanlis_yuzdesi": x["incorrect_percent"], "bos_cevap": x["unanswered"], "yanit_sayisi": x["responses"]} for x in weak]
         prompt = (
-            "Türkçe bir öğretmen için sınıf öğrenme boşluklarını değerlendir. Sadece aşağıdaki sınav istatistiklerine dayan; "
-            "soru metninden konu/kazanım çıkarımını kesin değil olası olarak belirt. Öğrenci adı üretme, veri uydurma. "
-            "En fazla 5 kısa madde: zorlanılan olası konular, kanıt (yanlış yüzdesi), önerilen tekrar/etkinlik ve veri sınırlaması.\n"
+            "Türkçe bir öğretmen gibi ölçme-değerlendirme raporu hazırla. Yalnızca aşağıdaki gerçek sınav istatistiklerine dayan; "
+            "soru metninden konu/kazanım çıkarımını kesin değil olası olarak belirt. Öğrenci adı veya cevap uydurma. "
+            "Kısa ve uygulanabilir rapor yaz: (1) sınıfın güçlü olduğu noktalar, (2) en çok hata yapılan sorular ve yüzdeleri, "
+            "(3) muhtemel kavram yanılgısı ancak soru metni destekliyorsa, (4) öğretmenin sonraki ders için 2-3 somut etkinliği, "
+            "(5) verinin sınırları. Yanlış oranı için yalnızca cevaplanmış ve otomatik değerlendirilebilen yanıtları esas al.\n"
             f"Ders: {str(exam.get('subject',''))[:100]}\nSınav: {str(exam.get('title',''))[:140]}\nİstatistikler: {json.dumps(compact, ensure_ascii=False)}"
         )
         try:
-            result = ask_ai(prompt, system_prompt="Sen ölçme-değerlendirme uzmanısın. Yalnızca verilen istatistiklerden temkinli sonuç çıkar.", fast=True)
+            result = ask_ai(prompt, system_prompt="Sen deneyimli bir öğretmen ve ölçme-değerlendirme uzmanısın. Kanıta dayalı, açık, uygulanabilir geri bildirim ver. Veride olmayan bilgi üretme; belirsizliği açıkça belirt.", fast=True)
             if result and str(result).strip():
                 ai_analysis = str(result).strip()[:6000]
         except Exception:
             ai_analysis = "KARVIS değerlendirmesi şu anda üretilemedi. Aşağıdaki soru bazlı istatistikler kullanılabilir."
-    return {"success": True, "exam": {"id": exam_id, "title": exam.get("title", ""), "subject": exam.get("subject", "")}, "summary": summary, "question_stats": question_stats, "likely_gaps": weak, "karvis_evaluation": ai_analysis}
+    student_stats = []
+    for sub in submissions:
+        answer_by_q = {str(a.get("question_id")): a for a in sub.get("answers", [])}
+        answer_rows = []
+        correct_count = wrong_count = blank_count = 0
+        for index, q in enumerate(questions, 1):
+            ans = answer_by_q.get(str(q.get("id")), {})
+            raw_answer = ans.get("answer")
+            qtype = q.get("type", "multiple_choice")
+            if qtype == "multiple_choice":
+                options = q.get("options", []) or []
+                selected = options[raw_answer] if isinstance(raw_answer, int) and 0 <= raw_answer < len(options) else ""
+                correct_index = q.get("correct_index")
+                correct_text = options[correct_index] if isinstance(correct_index, int) and 0 <= correct_index < len(options) else ""
+                selected_display = (chr(65 + raw_answer) + " — " + str(selected)) if selected != "" else "Boş bırakıldı"
+                correct_display = (chr(65 + correct_index) + " — " + str(correct_text)) if correct_text else "Doğru cevap tanımlı değil"
+            elif qtype == "true_false":
+                selected_display = ("Doğru" if raw_answer is True else "Yanlış") if isinstance(raw_answer, bool) else "Boş bırakıldı"
+                correct_display = "Doğru" if q.get("correct_answer") is True else "Yanlış"
+            else:
+                selected_display = str(raw_answer or "").strip() or "Boş bırakıldı"
+                correct_display = str(q.get("correct_answer") or "Öğretmen değerlendirmesi gerekir")
+            if ans.get("manual_review"):
+                status = "Değerlendirme bekliyor"
+            elif not str(raw_answer if raw_answer is not None else "").strip():
+                status = "Boş"
+                blank_count += 1
+            elif ans.get("correct") is True:
+                status = "Doğru"
+                correct_count += 1
+            elif ans.get("correct") is False:
+                status = "Yanlış"
+                wrong_count += 1
+            else:
+                status = "Değerlendirme bekliyor"
+            answer_rows.append({
+                "question_number": index, "question_id": q.get("id"),
+                "prompt": q.get("prompt", ""), "type": qtype,
+                "selected_answer": selected_display, "correct_answer": correct_display,
+                "status": status, "earned_points": ans.get("earned_points", 0),
+                "max_points": ans.get("max_points", q.get("points", 1)),
+                "feedback": ans.get("feedback", "")
+            })
+        student_stats.append({
+            "submission_id": sub.get("id"), "username": sub.get("username", "Öğrenci"),
+            "submitted_at": sub.get("submitted_at", ""),
+            "score": sub.get("score", 0), "max_score": sub.get("max_score", 0),
+            "percent": sub.get("percent", 0), "status": sub.get("status", "graded"),
+            "correct_count": correct_count, "wrong_count": wrong_count,
+            "blank_count": blank_count, "answers": answer_rows
+        })
+    student_stats.sort(key=lambda s: (float(s.get("percent") or 0), int(s.get("correct_count") or 0)), reverse=True)
+    return {"success": True, "exam": {"id": exam_id, "title": exam.get("title", ""), "subject": exam.get("subject", "")}, "summary": summary, "question_stats": question_stats, "likely_gaps": weak, "karvis_evaluation": ai_analysis, "student_stats": student_stats}
 
 
 # ============================================================
