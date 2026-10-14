@@ -2129,14 +2129,14 @@ select option:checked{background:#087f9b!important;color:#fff!important}
   </div>
   <section class="arena-card" id="arenaDuelCard">
     <h3>⚔️ Özel Düello — puanına meydan oku</h3>
-    <p>Bir rakip seç, bahis puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
+    <p>Bir rakip seç, tecrübe puanını belirle ve 5 ortak soruda yarış. Doğru cevap önceliklidir; eşitlikte daha hızlı cevap kazanır.</p>
     <div class="sude-grid">
       <div><label for="arenaDuelOpponent">Rakip profil</label>
         <select id="arenaDuelOpponent" class="sude-field" aria-label="Rakip profil">
           <option value="">Profiller yükleniyor…</option>
         </select>
       </div>
-      <div><label for="arenaDuelStake">Bahis puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
+      <div><label for="arenaDuelStake">Tecrübe puanı (serbest)</label><input id="arenaDuelStake" class="sude-field" type="number" min="1" max="1000000" step="1" placeholder="Örn. 100"></div>
     </div>
     <button class="sude-btn" onclick="sendArenaDuelRequest()">📨 Düello isteği gönder</button>
     <div id="arenaDuelStatus" aria-live="polite" style="margin-top:10px;font-size:13px"></div>
