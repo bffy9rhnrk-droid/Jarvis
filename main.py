@@ -332,29 +332,16 @@ def get_push_subscriptions():
             data = {}
             for row in rows:
                 item = dict(row)
-                # Normalize DB usernames exactly as the login and notification
-                # endpoints do. Older rows may have been saved with mixed case.
-                stored_username = str(item.pop("username", "") or "").strip().lower()
-                if not stored_username:
-                    continue
                 item["keys"] = {"p256dh": item.pop("p256dh"), "auth": item.pop("auth")}
                 for k in ("updated_at", "last_success_at", "last_failure_at"):
                     if item.get(k) is not None:
                         item[k] = item[k].isoformat()
-                data.setdefault(stored_username, []).append(item)
+                data.setdefault(item.pop("username"), []).append(item)
             return data
         except Exception:
             save_error("Push database read error", traceback.format_exc())
     with push_lock:
-        raw_data = read_json_file(PUSH_SUBSCRIPTION_FILE, {})
-    if not isinstance(raw_data, dict):
-        return {}
-    normalized = {}
-    for stored_username, items in raw_data.items():
-        key = str(stored_username or "").strip().lower()
-        if key and isinstance(items, list):
-            normalized.setdefault(key, []).extend(items)
-    return normalized
+        return read_json_file(PUSH_SUBSCRIPTION_FILE, {})
 
 
 def save_push_subscriptions(data):
@@ -468,14 +455,8 @@ def send_push_to_user(username, title, body, url="/"):
 
     username = str(username or "").strip().lower()
     data = get_push_subscriptions()
-    # Resolve legacy subscription keys case-insensitively, including records
-    # created before usernames were normalized. Merge only matching profile
-    # keys; never send a single-user notification to unrelated profiles.
     items = list(data.get(username, []))
-    if not items:
-        for stored_username, stored_items in data.items():
-            if str(stored_username or "").strip().lower() == username:
-                items.extend(stored_items or [])
+    subscriptions = len(items)
     sent = 0
     removed = 0
     failed = 0
@@ -515,10 +496,7 @@ def send_push_to_user(username, title, body, url="/"):
             errors.append(detail[:300])
             save_error("Web Push send error", traceback.format_exc())
 
-    result = {"sent": sent, "removed": removed, "failed": failed, "errors": errors[:5]}
-    if not items:
-        result["errors"] = [f"{USERS.get(username, {}).get('name', username)} profiline ait kayıtlı bildirim aboneliği bulunamadı."]
-    return result
+    return {"sent": sent, "subscriptions": subscriptions, "removed": removed, "failed": failed, "errors": errors[:5]}
 
 
 def send_push_to_all(title, body, url="/"):
@@ -526,16 +504,18 @@ def send_push_to_all(title, body, url="/"):
     total_sent = 0
     total_removed = 0
     total_failed = 0
+    total_subscriptions = 0
     all_errors = []
     for username in list(data):
         if str(username).strip().lower() == "karahan":
             continue
         result = send_push_to_user(username, title, body, url)
         total_sent += result.get("sent", 0)
+        total_subscriptions += result.get("subscriptions", 0)
         total_removed += result.get("removed", 0)
         total_failed += result.get("failed", 0)
         all_errors.extend(result.get("errors", []))
-    return {"sent": total_sent, "removed": total_removed, "failed": total_failed, "errors": all_errors[:10]}
+    return {"sent": total_sent, "subscriptions": total_subscriptions, "removed": total_removed, "failed": total_failed, "errors": all_errors[:10]}
 
 
 # ============================================================
