@@ -1605,14 +1605,15 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
     <button
         class="menu-item"
-        onclick="toggleProfileOptions()">
-        ◉ Profil Değiştir
+        onclick="openProfileLoginFromSidebar()">
+        ↪ Giriş Yap
     </button>
 
-    <div id="profileSidebarOptions" style="display:none;padding-left:14px;">
-        <button class="menu-item" onclick="openProfileLoginFromSidebar()">↪ Profile Giriş</button>
-        <button class="menu-item" onclick="openRegisterFromSidebar()">＋ Yeni Profil</button>
-    </div>
+    <button
+        class="menu-item"
+        onclick="openRegisterFromSidebar()">
+        ＋ Kayıt Ol
+    </button>
 
     <button
         class="menu-item"
@@ -1820,7 +1821,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 </div>
 
 <div id="registerModal" class="modal">
-    <h2>Yeni KARVIS Hesabı</h2>
+    <h2>KARVIS'e Kayıt Ol</h2>
     <p style="opacity:.8;font-size:13px">Yeni hesaplar standart kullanıcı olarak açılır.</p>
     <input id="registerDisplayName" placeholder="Adınız / görünen ad" autocomplete="name" maxlength="60">
     <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter)" autocomplete="username" maxlength="24">
