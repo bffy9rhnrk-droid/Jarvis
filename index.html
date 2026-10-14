@@ -1452,6 +1452,35 @@ select option:checked{background:#087f9b!important;color:#fff!important}
  .karvis-stats-modal .stats-karvis-content p{font-size:12px;padding:10px}
 }
 
+
+/* Individual student analytics */
+.stats-view-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}
+.stats-view-tabs button{min-height:43px;border:1px solid rgba(0,229,255,.2);border-radius:12px;background:rgba(0,229,255,.035);color:inherit;font-size:12px;font-weight:800}
+.stats-view-tabs button.active{background:rgba(0,229,255,.13);border-color:#00d9ef;color:#25e4f4;box-shadow:inset 0 0 0 1px rgba(0,229,255,.12)}
+.stats-student-list{display:grid;gap:8px}
+.stats-student-row{display:flex;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;padding:12px;border:1px solid rgba(0,229,255,.14);border-radius:14px;background:linear-gradient(120deg,rgba(0,229,255,.055),rgba(255,255,255,.018));color:inherit}
+.stats-student-rank{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:rgba(0,229,255,.12);color:#39e4f2;font-weight:900}
+.stats-student-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.stats-student-main strong{font-size:13px;overflow-wrap:anywhere}
+.stats-student-main small,.stats-student-score small{font-size:10px;opacity:.68;line-height:1.4}
+.stats-student-score{display:flex;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap}
+.stats-student-score strong{font-size:15px;color:#38e6f1}
+.stats-student-chevron{font-size:22px;color:#35d8e8}
+.stats-student-detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 10px;padding:13px;border:1px solid rgba(0,229,255,.3);border-radius:14px;background:rgba(0,229,255,.06)}
+.stats-student-detail-head h3{margin:0 0 4px;font-size:15px}
+.stats-student-detail-head p{margin:0;font-size:11px;opacity:.72}
+.stats-student-detail-head button{border:1px solid rgba(0,229,255,.25);border-radius:9px;background:rgba(0,229,255,.07);color:inherit;padding:8px 10px}
+.stats-student-answer-list{display:grid;gap:10px}
+.stats-student-answer{padding:13px;border:1px solid rgba(130,170,190,.18);border-radius:14px;background:rgba(255,255,255,.025);min-width:0}
+.stats-student-answer-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stats-student-question{font-size:13px;line-height:1.55;margin:10px 0}
+.stats-answer-detail{display:flex;flex-direction:column;gap:4px;padding:9px 10px;border-radius:10px;background:rgba(255,90,110,.06);margin-top:7px;overflow-wrap:anywhere}
+.stats-answer-detail small{font-size:10px;opacity:.7}
+.stats-answer-detail strong{font-size:12px;line-height:1.5;white-space:pre-wrap}
+.correct-answer-detail{background:rgba(0,220,150,.07);border:1px solid rgba(0,220,150,.13)}
+.stats-points-detail{margin-top:8px;font-size:10px;opacity:.68}
+@media(max-width:420px){.stats-student-row{padding:10px;gap:7px}.stats-student-main small{font-size:9px}.stats-student-score strong{font-size:13px}.stats-view-tabs button{font-size:11px}}
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3160,8 +3189,30 @@ async function loadTeacherExamAnalysis(){
     }).join('');
     const evaluation=escapeHTML(d.karvis_evaluation||'Henüz yeterli yanıt verisi yok.');
     const subject=escapeHTML(d.exam?.subject||'Seçilen sınav');
-    box.innerHTML=`<div class="stats-exam-heading"><span class="stats-subject-pill">${subject}</span><span class="stats-question-count">${questions.length} soru</span></div>${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section><section class="stats-karvis-evaluation"><div class="stats-karvis-icon">♧</div><div class="stats-karvis-content"><h3>KARVIS değerlendirmesi</h3><p>${evaluation}</p><small>Değerlendirme yalnızca mevcut sınav yanıtlarına dayanır; az katılımda sonuçlar kesin kabul edilmemelidir.</small></div></section>`;
+    const students=d.student_stats||[];
+    window.currentExamStudentStats=students;
+    const studentCards=students.map((s,i)=>`<button type="button" class="stats-student-row" onclick="showStudentAnswerDetails(${i})"><span class="stats-student-rank">${i+1}</span><span class="stats-student-main"><strong>${escapeHTML(s.username||'Öğrenci')}</strong><small>${Number(s.correct_count)||0} doğru · ${Number(s.wrong_count)||0} yanlış · ${Number(s.blank_count)||0} boş</small></span><span class="stats-student-score"><strong>%${Math.round(Number(s.percent)||0)}</strong><small>${Number(s.score)||0}/${Number(s.max_score)||0} puan</small></span><span class="stats-student-chevron">›</span></button>`).join('');
+    const generalPanel=`<div id="statsGeneralPanel">${cards}<section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">▤</span><div><h3>Soru bazlı başarı</h3><p>Öğrencilerin her soruya verdiği yanıtların analizi.</p></div></header><div class="stats-question-list">${questionCards||'<div class="stats-empty"><strong>Henüz yanıt yok</strong><span>Öğrenciler sınavı tamamladıkça soru analizi burada görünecek.</span></div>'}</div></section><section class="stats-karvis-evaluation"><div class="stats-karvis-icon">♧</div><div class="stats-karvis-content"><h3>KARVIS öğretmen değerlendirmesi</h3><p>${evaluation}</p><small>Yorumlar mevcut yanıt verilerine dayanır. Açık uçlu ve henüz puanlanmamış cevaplar kesin başarı hesabına katılmaz.</small></div></section></div>`;
+    const individualPanel=`<div id="statsIndividualPanel" style="display:none"><section class="stats-question-section"><header class="stats-section-heading"><span class="stats-section-icon">♙</span><div><h3>Bireysel öğrenci sonuçları</h3><p>Başarı sırasına göre. Öğrenciye dokunarak verdiği cevapları ve cevap anahtarını görüntüle.</p></div></header><div class="stats-student-list">${studentCards||'<div class="stats-empty"><strong>Henüz öğrenci sonucu yok</strong><span>Öğrenciler sınavı teslim ettikçe burada listelenecek.</span></div>'}</div><div id="statsStudentDetail"></div></section></div>`;
+    box.innerHTML=`<div class="stats-exam-heading"><span class="stats-subject-pill">${subject}</span><span class="stats-question-count">${questions.length} soru · ${students.length} öğrenci</span></div><div class="stats-view-tabs"><button type="button" class="active" onclick="switchStatsView('general',this)">Genel istatistik</button><button type="button" onclick="switchStatsView('individual',this)">Bireysel istatistik</button></div>${generalPanel}${individualPanel}`;
   }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>İstatistikler yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}finally{if(btn)btn.disabled=false;}
+}
+
+function switchStatsView(view,button){
+ const general=$('statsGeneralPanel'), individual=$('statsIndividualPanel');
+ if(general)general.style.display=view==='general'?'block':'none';
+ if(individual)individual.style.display=view==='individual'?'block':'none';
+ document.querySelectorAll('.stats-view-tabs button').forEach(b=>b.classList.toggle('active',b===button));
+}
+function showStudentAnswerDetails(index){
+ const student=(window.currentExamStudentStats||[])[index], target=$('statsStudentDetail');
+ if(!student||!target)return;
+ const rows=(student.answers||[]).map(a=>{
+   const cls=a.status==='Doğru'?'good':a.status==='Yanlış'?'bad':a.status==='Boş'?'neutral':'mid';
+   return `<article class="stats-student-answer"><div class="stats-student-answer-top"><strong>Soru ${a.question_number}</strong><span class="stats-status ${cls}">${escapeHTML(a.status)}</span></div><p class="stats-student-question">${escapeHTML(a.prompt||'Soru metni yok')}</p><div class="stats-answer-detail"><small>Öğrencinin cevabı</small><strong>${escapeHTML(a.selected_answer||'Cevap yok')}</strong></div><div class="stats-answer-detail correct-answer-detail"><small>Doğru cevap</small><strong>${escapeHTML(a.correct_answer||'Belirtilmemiş')}</strong></div><div class="stats-points-detail">${Number(a.earned_points)||0} / ${Number(a.max_points)||0} puan${a.feedback?` · ${escapeHTML(a.feedback)}`:''}</div></article>`;
+ }).join('');
+ target.innerHTML=`<div class="stats-student-detail-head"><div><h3>${escapeHTML(student.username||'Öğrenci')}</h3><p>${Number(student.correct_count)||0} doğru · ${Number(student.wrong_count)||0} yanlış · ${Number(student.blank_count)||0} boş</p></div><button type="button" onclick="$('statsStudentDetail').innerHTML=''" aria-label="Detayı kapat">Kapat ×</button></div><div class="stats-student-answer-list">${rows||'<p>Bu öğrenci için cevap detayı bulunamadı.</p>'}</div>`;
+ target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 async function showTeacherExamResults(id){
