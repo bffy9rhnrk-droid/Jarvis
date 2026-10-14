@@ -3275,52 +3275,49 @@ async function loadTeacherExamAnalysis(){
   }catch(e){if(box)box.innerHTML=`<div class="stats-empty"><strong>İstatistikler yüklenemedi</strong><span>${escapeHTML(e.message)}</span></div>`;}finally{if(btn)btn.disabled=false;}
 }
 
+function karvisReportToHtml(value){
+  const escaped=escapeHTML(String(value??'').replace(/\r/g,'')).trim();
+  if(!escaped)return '<p>Henüz değerlendirme oluşturulamadı.</p>';
+  const lines=escaped.split('\n');
+  let out='',inList=false;
+  const closeList=()=>{if(inList){out+='</ul>';inList=false;}};
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line||/^[-*_]{3,}$/.test(line)){closeList();continue;}
+    const heading=line.match(/^#{1,4}\s+(.+)$/);
+    if(heading){closeList();out+=`<h4>${heading[1].replace(/\*\*(.*?)\*\*/g,'$1')}</h4>`;continue;}
+    const item=line.match(/^(?:[-*•]|\d+[.)])\s+(.+)$/);
+    if(item){
+      if(!inList){out+='<ul>';inList=true;}
+      out+=`<li>${item[1].replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</li>`;
+      continue;
+    }
+    closeList();
+    out+=`<p>${line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</p>`;
+  }
+  closeList();
+  return out;
+}
+
 async function loadKarvisEvaluation(){
   if(currentUser!=='ilknur'){alert('KARVIS Değerlendirmesi yalnızca İlknur öğretmen profiline açıktır.');return;}
   const id=$('karvisEvaluationExamSelect')?.value, box=$('karvisEvaluationResults'), btn=$('karvisEvaluationRunBtn');
   if(!id){if(box)box.innerHTML='<div class="karvis-eval-empty"><strong>Bir sınav seç</strong><br>Önce analiz edilecek sınavı seç.</div>';return;}
   if(btn){btn.disabled=true;btn.textContent='KARVIS analiz ediyor…';}
-  if(box)box.innerHTML='<div class="karvis-eval-empty"><strong>🧠 KARVIS verileri inceliyor</strong><br>Soru başarılarını karşılaştırıyor ve sınıfın gelişim alanlarını değerlendiriyor…</div>';
+  if(box)box.innerHTML='<div class="karvis-eval-empty"><strong>🧠 KARVIS verileri inceliyor</strong><br>Sınıfın genel durumunu değerlendirip uygulanabilir pekiştirme planı hazırlıyor…</div>';
   try{
     const r=await fetch(API+'/teacher/exams/'+encodeURIComponent(id)+'/analysis?username='+encodeURIComponent(currentUser));
     const d=await r.json();if(!r.ok)throw new Error(d.detail||'KARVIS analizi alınamadı.');
-    const s=d.summary||{}, qs=Array.isArray(d.question_stats)?d.question_stats:[];
-    const submitted=Number(s.submission_count)||0, avg=Number(s.average_percent)||0;
+    const s=d.summary||{};
+    const submitted=Number(s.submission_count)||0, avg=Math.round(Number(s.average_percent)||0);
     const pct=n=>Math.max(0,Math.min(100,Math.round(Number(n)||0)));
     const safe=v=>escapeHTML(String(v??''));
-    const evaluated=qs.map((q,i)=>{
-      const n=Number(q.responses)||0, wrong=Number(q.incorrect)||0, blank=Number(q.unanswered)||0, review=Number(q.manual_review_count)||0;
-      const evaluable=Math.max(0,n-review), correct=Math.max(0,evaluable-wrong-blank);
-      const success=evaluable?Math.round(correct/evaluable*100):null;
-      return {...q,index:i+1,responses:n,wrong,blank,review,evaluable,success};
-    });
-    const valid=evaluated.filter(q=>q.success!==null);
-    const weak=[...valid].sort((a,b)=>a.success-b.success).filter(q=>q.success<60);
-    const strong=[...valid].sort((a,b)=>b.success-a.success).filter(q=>q.success>=70);
     const metric=(label,value,foot)=>`<article class="karvis-eval-metric"><small>${safe(label)}</small><strong>${safe(value)}</strong><small class="metric-foot">${safe(foot||'Sınav verilerinden hesaplandı')}</small></article>`;
-    const topicCard=q=>{
-      const level=q.success>=70?'good':q.success>=50?'mid':'bad';
-      const state=q.success>=70?'Güçlü sonuç':q.success>=50?'Geliştirilebilir':'Öncelikli gelişim';
-      const prompt=String(q.prompt||'Soru metni bulunamadı').trim();
-      const name=prompt.length>92?prompt.slice(0,89)+'…':prompt;
-      return `<article class="karvis-eval-topic ${level}"><div class="karvis-eval-topic-head"><div class="karvis-eval-topic-name">Soru ${q.index}: ${safe(name)}</div><strong class="karvis-eval-topic-pct">%${q.success}</strong></div><div class="karvis-eval-topic-bar"><span style="width:${pct(q.success)}%"></span></div><small>${state} · ${q.evaluable} değerlendirilebilir yanıt<br>${q.wrong} yanlış · ${q.blank} boş${q.review?` · ${q.review} açık uçlu değerlendirme bekliyor`:''}</small></article>`;
-    };
-    const questionHtml=evaluated.map(q=>{
-      const level=q.success===null?'':q.success>=70?'good':q.success>=50?'mid':'';
-      const label=q.success===null?'Yetersiz veri':q.success>=70?'Güçlü sonuç':q.success>=50?'Kısmen anlaşıldı':'Gelişim alanı';
-      return `<article class="karvis-eval-question"><div class="karvis-eval-question-head"><strong>${q.index}. ${safe(q.prompt||'Soru metni bulunamadı')}</strong><span class="karvis-eval-pill ${level}">${label}</span></div><div class="karvis-eval-bar"><span style="width:${pct(q.success)}%"></span></div><small>${q.success===null?'Başarı yüzdesi hesaplanamadı':`Başarı: %${q.success}`} · Yanlış: ${q.wrong} · Boş: ${q.blank}${q.review?` · Öğretmen kontrolü bekleyen: ${q.review}`:''}</small></article>`;
-    }).join('');
-    const evaluation=String(d.karvis_evaluation||'KARVIS henüz yorum oluşturamadı. Soru bazlı sonuçlar aşağıda gösteriliyor.');
+    const evaluation=String(d.karvis_evaluation||'KARVIS henüz yorum oluşturamadı. Lütfen analizi yeniden çalıştır.');
     const title=safe(d.exam?.title||'Seçilen sınav'), subject=safe(d.exam?.subject||'Ders belirtilmedi');
-    const best=valid.length?Math.max(...valid.map(q=>q.success)):0;
-    const insightWeak=weak.slice(0,3).map(q=>`<article class="karvis-eval-insight"><h4>⚠ Soru ${q.index} · Öncelikli gelişim (%${q.success})</h4><p>Bu soruda ${q.wrong} yanlış ve ${q.blank} boş yanıt var. Önce sorunun ölçtüğü kavramı kısa bir örnekle yeniden anlatın; ardından çözümü adım adım modelleyin. Öğrencilerden düşünme basamaklarını açıklamalarını isteyin ve benzer iki soruluk mini kontrol uygulayın.</p></article>`).join('');
-    const insightStrong=strong.slice(0,2).map(q=>`<article class="karvis-eval-insight"><h4>✓ Soru ${q.index} · Görece güçlü alan (%${q.success})</h4><p>Başarıyı kalıcılaştırmak için benzer kazanımı farklı bir örneğe aktarın ve biraz daha zorlayıcı bir uygulama sorusuyla pekiştirin.</p></article>`).join('');
     box.innerHTML=`
-      <div class="karvis-eval-metrics">${metric('SINAV',title,subject)}${metric('SINIF ORTALAMASI','%'+pct(avg),submitted?'Katılan öğrencilerin ortalaması':'Henüz katılım yok')}${metric('KATILIM',submitted+' öğrenci',submitted?'Sınavı teslim eden öğrenci':'Henüz yanıt gönderilmedi')}${metric('EN YÜKSEK SORU BAŞARISI','%'+best,valid.length?'Otomatik değerlendirilebilen yanıtlar':'Yeterli veri yok')}</div>
-      <section class="karvis-eval-section"><h3>📊 Konu ve soru başarı haritası</h3><p class="karvis-eval-intro">Başarı kartları soru metni ve yanıt sonuçlarından oluşturulur. Soru metni doğrudan konu adını göstermiyorsa konu adı varsayılmaz.</p><div class="karvis-eval-topic-grid">${evaluated.length?evaluated.map(topicCard).join(''):'<div class="karvis-eval-empty">Bu sınav için soru verisi bulunamadı.</div>'}</div></section>
-      <section class="karvis-eval-section"><h3>🧠 KARVIS yapay zekâ değerlendirmesi</h3><p class="karvis-eval-intro">Sınıfın performansı, güçlü yönleri, gelişim alanları ve sonraki ders için öneriler.</p><div class="karvis-eval-ai-report"><div class="karvis-eval-report">${safe(evaluation)}</div></div></section>
-      <section class="karvis-eval-section"><h3>🛠 Geliştirme yöntemleri</h3><p class="karvis-eval-intro">Öneriler, en düşük başarı yüzdeli sorulardan çıkarılmıştır. Konu adı soru metniyle doğrulanabildiği ölçüde yorumlanmalıdır.</p><div class="karvis-eval-insight-grid">${insightWeak||'<article class="karvis-eval-insight"><h4>Öncelikli eksik alan belirlenemedi</h4><p>Yeterli değerlendirilebilir veri yok veya düşük başarı gösteren soru tespit edilmedi. Öğrenmenin kalıcılığını farklı örneklerden oluşan kısa bir pekiştirme testiyle kontrol edin.</p></article>'}${insightStrong}</div></section>
-      <section class="karvis-eval-section"><h3>🔎 Ayrıntılı soru analizi</h3><p class="karvis-eval-intro">Açık uçlu, öğretmen kontrolü bekleyen yanıtlar başarı hesabından ayrı tutulur.</p>${questionHtml||'<div class="karvis-eval-empty">Soru istatistiği bulunamadı.</div>'}</section>
+      <div class="karvis-eval-metrics">${metric('SINAV',title,subject)}${metric('SINIF ORTALAMASI','%'+pct(avg),submitted?'Katılan öğrencilerin ortalaması':'Henüz katılım yok')}${metric('KATILIM',submitted+' öğrenci',submitted?'Sınavı teslim eden öğrenci':'Henüz yanıt gönderilmedi')}${metric('GEÇME ORANI','%'+pct(s.pass_rate_percent),submitted?'En az %50 alan öğrenciler':'Henüz veri yok')}</div>
+      <section class="karvis-eval-section karvis-eval-summary"><h3>🧠 KARVIS sınıf değerlendirmesi</h3><p class="karvis-eval-intro">Sorular tek tek listelenmez. Sınıfın genel performansı, öğrenme ihtiyaçları ve uygulanabilir pekiştirme planı sunulur.</p><div class="karvis-eval-ai-report"><div class="karvis-eval-report karvis-eval-report-formatted">${karvisReportToHtml(evaluation)}</div></div></section>
       ${submitted===0?'<div class="karvis-eval-empty"><strong>Henüz öğrenci yanıtı yok</strong><br>Öğrenciler sınavı tamamladıktan sonra değerlendirmeyi yeniden çalıştır.</div>':''}`;
   }catch(e){if(box)box.innerHTML=`<div class="karvis-eval-empty"><strong>KARVIS analizi yüklenemedi</strong><br>${escapeHTML(e.message)}</div>`;}
   finally{if(btn){btn.disabled=false;btn.textContent='🧠 KARVIS ile değerlendir';}}
@@ -5672,3 +5669,25 @@ initialize();
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
+
+
+/* KARVIS evaluation: compact class-level report, no per-question dump */
+.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
+.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
+.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
+@media(max-width:600px){
+ .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
+ .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
+ .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
+ .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
+ .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
+ .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
+ .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
+ .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
+}
