@@ -480,6 +480,8 @@ button:active{
 /* ============================================================
    SIDEBAR
    ============================================================ */
+#sidebarProfileCard{white-space:normal;}
+#sidebarLogoutButton{width:100%;text-align:center;}
 
 .sidebar{
     position:fixed;
@@ -1603,17 +1605,15 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
     <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
 
-    <button
-        class="menu-item"
-        onclick="openProfileLoginFromSidebar()">
-        ↪ Giriş Yap
-    </button>
-
-    <button
-        class="menu-item"
-        onclick="openRegisterFromSidebar()">
-        ＋ Kayıt Ol
-    </button>
+    <div id="sidebarAuthArea">
+      <button id="sidebarLoginButton" class="menu-item" onclick="openProfileLoginFromSidebar()">↪ Giriş Yap</button>
+      <button id="sidebarRegisterButton" class="menu-item" onclick="openRegisterFromSidebar()">＋ Kayıt Ol</button>
+      <div id="sidebarProfileCard" class="menu-item" style="display:none;cursor:default;border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);">
+        <div style="font-size:10px;letter-spacing:1.4px;opacity:.65;margin-bottom:5px;">AKTİF PROFİL</div>
+        <div id="sidebarProfileName" style="font-size:15px;font-weight:800;overflow-wrap:anywhere;">Profil</div>
+        <button id="sidebarLogoutButton" class="menu-item" style="margin:12px 0 0;background:rgba(255,90,90,.08);border-color:rgba(255,90,90,.28);color:#ff9a9a;" onclick="logoutProfile()">↪ Çıkış Yap</button>
+      </div>
+    </div>
 
     <button
         class="menu-item"
@@ -2329,7 +2329,8 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
 const API = "";
 
-let currentUser = "karahan";
+let currentUser = localStorage.getItem("karvis_user") || "karahan";
+window.KARVIS_PROFILE_NAMES = {karahan:"KARAHAN INC.",betul:"Betül",sinem:"Sinem",ilknur:"İlknur",murat:"Murat",sude:"Sude"};
 let currentMode = "normal";
 // RAM-only server context is keyed by a per-tab chat ID, not saved to localStorage.
 let currentConversationId = (window.crypto && crypto.randomUUID)
@@ -2613,6 +2614,7 @@ async function login(){
             currentMode
         );
         sendPresenceHeartbeat();
+        if(typeof syncKarvisPushSubscription === "function") syncKarvisPushSubscription(true);
 
         $("usernameInput").value = "";
         $("passwordInput").value = "";
@@ -3012,12 +3014,21 @@ function updateSidebar(){
     const karahanCoreMenu = $("karahanCoreMenu");
     const sudeMenu = $("sudeMenu");
     const studentExamTrackingMenu = $("studentExamTrackingMenu");
+    const loggedIn = Boolean(currentUser && currentUser !== "karahan");
+    const loginButton = $("sidebarLoginButton");
+    const registerButton = $("sidebarRegisterButton");
+    const profileCard = $("sidebarProfileCard");
+    const profileName = $("sidebarProfileName");
+    if(loginButton) loginButton.style.display = loggedIn ? "none" : "block";
+    if(registerButton) registerButton.style.display = loggedIn ? "none" : "block";
+    if(profileCard) profileCard.style.display = loggedIn ? "block" : "none";
+    if(profileName) profileName.textContent = "Profil: " + ((window.KARVIS_PROFILE_NAMES && window.KARVIS_PROFILE_NAMES[currentUser]) || currentUser);
 
     teacherMenu.style.display =
         currentUser === "ilknur" ? "block" : "none";
     // Öğretmen dışındaki bütün giriş yapmış profiller (sonradan oluşturulanlar dahil) sınavları takip edebilir.
     if(studentExamTrackingMenu){
-        studentExamTrackingMenu.style.display = currentUser && currentUser !== "ilknur" ? "flex" : "none";
+        studentExamTrackingMenu.style.display = loggedIn && currentUser !== "ilknur" ? "flex" : "none";
     }
 
     if(karahanCoreMenu){
@@ -3050,6 +3061,17 @@ function updateSidebar(){
 
     if(currentUser === "murat")
         refreshRequestBadge();
+}
+
+function logoutProfile(){
+    currentUser = "karahan";
+    currentMode = "normal";
+    funMode = false;
+    localStorage.removeItem("karvis_user");
+    localStorage.setItem("karvis_mode", "normal");
+    document.body.classList.remove("fun-mode");
+    closeModals(); closeSidebar(); stopKarvisVoice();
+    applyUserTheme(); updateSidebar(); showGreeting(); updateStatus();
 }
 
 function returnToKarahan(){
@@ -3362,6 +3384,7 @@ async function showTeacherExamResults(id){
  }catch(e){alert(e.message);}}
 
 async function openStudentExams(){
+  if(!currentUser || currentUser==="karahan"){alert("Sınav Takibi için önce kendi profilinize giriş yapın.");openProfileLogin();return;}
   closeSidebar();closeModals();$('studentExamModal').classList.add('show');$('studentExamWork').style.display='none';$('studentExamList').style.display='block';
   if(currentUser==='ilknur'){$('studentExamList').innerHTML='<p>Öğretmen profili için Sınav Yönetimi bölümünü kullanın.</p>';return;}
   try{const r=await fetch(API+'/exams?username='+encodeURIComponent(currentUser));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Sınavlar alınamadı.');$('studentExamList').innerHTML=(d.exams||[]).map(e=>`<div class="sude-card" style="margin:8px 0"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(e.subject||'Ders belirtilmedi')} · ${e.question_count} soru · ${Number(e.duration_minutes)||'Sınırsız'} ${Number(e.duration_minutes)?'dakika':''}</p><p>${escapeHTML(e.description||'')}</p>${e.starts_at?`<p>Başlangıç: ${escapeHTML(new Date(e.starts_at).toLocaleString())}</p>`:''}${e.ends_at?`<p>Bitiş: ${escapeHTML(new Date(e.ends_at).toLocaleString())}</p>`:''}${e.submitted?'<strong>✅ Teslim edildi</strong>':`<button class="settings-choice" onclick="startStudentExam('${e.id}')">Sınava gir</button>`}</div>`).join('')||'<p>Şu anda yayımlanmış sınav yok.</p>';}
@@ -5385,7 +5408,10 @@ async function refreshKarvisProfileOptions(){
         const response = await fetch(API + "/profiles/list");
         const data = await response.json();
         if(!response.ok) throw new Error(data.detail || "Profil listesi alınamadı.");
-        profiles = Array.isArray(data.profiles) ? data.profiles : [];
+        profiles = Array.isArray(data.profiles) ? data.profiles.filter(p => String(p.username||"").toLowerCase() !== "karahan") : [];
+        window.KARVIS_PROFILE_NAMES = window.KARVIS_PROFILE_NAMES || {};
+        profiles.forEach(p => { window.KARVIS_PROFILE_NAMES[String(p.username||"").toLowerCase()] = String(p.name || p.username || "Profil"); });
+        updateSidebar();
     }catch(error){
         selects.forEach(({el})=>{ if(el && !el.options.length) el.innerHTML='<option value="">Profil listesi yüklenemedi</option>'; });
         throw error;
@@ -5661,7 +5687,7 @@ async function calculateSudeBMI(){const height=$("sudeHeight").value,weight=$("s
 let arenaAttemptId=null, arenaQuestionIndex=0, arenaAnswered=false, arenaStartedAt=0;
 let arenaDuelPollTimer=null, arenaDuelRenderedKey="", arenaDuelLoadInFlight=false;
 function arenaEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function openArena(){closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";try{await refreshKarvisProfileOptions();}catch(e){$("arenaDuelStatus").textContent="Profil listesi alınamadı: "+(e.message||"Sunucu hatası");}await loadArenaOverview();}
+async function openArena(){if(!currentUser || currentUser==="karahan"){alert("KARVIS Arena’yı kullanmak için önce kendi profilinize giriş yapın.");openProfileLogin();return;}closeSidebar();closeModals();$("arenaModal").classList.add("show");$("arenaAdminTools").style.display=currentUser==="murat"?"block":"none";$("arenaGameArea").innerHTML="<p>Yarışma verileri yükleniyor…</p>";try{await refreshKarvisProfileOptions();}catch(e){$("arenaDuelStatus").textContent="Profil listesi alınamadı: "+(e.message||"Sunucu hatası");}await loadArenaOverview();}
 async function adminResetArena(){
  if(currentUser!=="murat"){alert("Bu işlem yalnızca yönetici profiline açıktır.");return;}
  const ok=confirm("DİKKAT! Tüm profillerin Arena puanları, rozetleri, sıralaması ve oyun geçmişi kalıcı olarak silinecek. Bildirimler etkilenmeyecek. Devam edilsin mi?");
