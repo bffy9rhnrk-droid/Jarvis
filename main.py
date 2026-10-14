@@ -2321,37 +2321,47 @@ async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
                 "basari_yuzdesi": round(100 * correct_count / evaluable, 1) if evaluable else None,
             })
         prompt = (
-            "Türkçe, anlaşılır ve profesyonel bir rapor hazırla. Raporun başlığı tam olarak 'KARVIS Değerlendirmesi' olsun. "
-            "Bu rapor sınıf düzeyindedir; öğrenci isimlerini isteme veya üretme. Yalnızca verilen sınav verilerine dayan, "
-            "veride olmayan konu/kazanım bilgisini kesin gerçek gibi sunma. Soru metni bir konuya işaret ediyorsa bunu olası yorum olarak belirt. "
-            "Raporu şu başlıklarla düzenle: "
-            "1) Sınıfın güçlü olduğu noktalar: başarı yüzdesi yüksek soruları ve verinin izin verdiği çıkarımları belirt. "
-            "2) Geliştirilmesi gereken/zayıf noktalar: yanlış ve boş oranı yüksek soruları sayılarıyla belirt. "
-            "3) Neden zorlanıyor olabilirler: yalnızca soru metni ve sonuçlar destekliyorsa olası açıklamalar yaz; kesin olmayanı açıkça olasılık olarak belirt. "
-            "4) Önerilen öğretim yöntemleri: her zayıf nokta için somut yöntem öner (ör. kavram haritası/görsel anlatım, adım adım model çözüm, "
-            "öğretmen eşliğinde örnek, küçük grup çalışması, hata analizi, aralıklı kısa tekrar ve hedefli mini test). Yöntemi ilgili bulguya bağla. "
-            "5) Bir sonraki ders için kısa uygulama planı: 2-3 uygulanabilir adım ve öğrenmeyi kontrol edecek kısa ölçme önerisi. "
-            "6) Veri sınırlılıkları: az katılımı, yanıt sayısını ve öğretmen değerlendirmesi bekleyen açık uçlu soruları dikkate al. "
-            "Güçlü soru yoksa güçlü yön uydurma; yeterli veri olmadığını söyle. Başarı yüzdesini yalnızca otomatik değerlendirilebilen yanıtlar için yorumla. "
-            "Sadece genel motivasyon cümleleri yazma; bulgu ve önerileri somutlaştır.\n"
-            f"Ders: {str(exam.get('subject',''))[:100]}\n"
-            f"Sınav: {str(exam.get('title',''))[:140]}\n"
-            f"Katılım: {len(submissions)}\n"
-            f"Sınıf ortalaması: %{summary['average_percent']}\n"
-            f"Soru istatistikleri: {json.dumps(compact, ensure_ascii=False)}"
+            "Türkçe, profesyonel ve uygulanabilir bir SINIF GENELİ değerlendirme yaz. "
+            "Başlıklar: Genel değerlendirme; Güçlü yönler; Pekiştirilmesi gereken öğrenmeler; "
+            "Nasıl pekiştirilmeli?; Bir sonraki ders için uygulama planı; Veri sınırlılığı. "
+            "ÇOK ÖNEMLİ: Soruları tek tek ASLA yazma; soru numarası, soru metni, tablo veya soru başına liste oluşturma. "
+            "Sonuçları yalnızca sınıf düzeyinde özetle; gerekiyorsa konu/kazanım yalnızca veriden güvenle çıkarılabiliyorsa an, "
+            "aksi halde 'ilgili kazanım' gibi genel ifade kullan. "
+            "Somut bir pekiştirme planı ver: kısa tekrar, öğretmen modellemesi, rehberli uygulama, eşli/küçük grup etkinliği, "
+            "aralıklı tekrar ve 3-5 soruluk mini ölçme. Önerileri sınıf verisine bağla. "
+            "Veride olmayan nedenleri kesin gerçek gibi sunma; tahminleri olasılık olarak belirt. "
+            "Katılım azsa veya açık uçlu cevaplar öğretmen kontrolü bekliyorsa bunu açıkça belirt. "
+            "Markdown başlıkları ve madde işaretleri kullan; tablo kullanma. 350-550 kelime arasında kal, raporu tamamla ve yarım bırakma.\\n"
+            f"Ders: {str(exam.get('subject',''))[:100]}\\n"
+            f"Sınav: {str(exam.get('title',''))[:140]}\\n"
+            f"Katılım: {len(submissions)} öğrenci\\n"
+            f"Sınıf ortalaması: %{summary['average_percent']}\\n"
+            f"Başarı oranı %70 ve üzeri soru sayısı: {sum(1 for x in question_stats if x.get('incorrect_percent') is not None and (100 - x['incorrect_percent']) >= 70)}\\n"
+            f"Başarı oranı %50 altı soru sayısı: {sum(1 for x in question_stats if x.get('incorrect_percent') is not None and (100 - x['incorrect_percent']) < 50)}\\n"
+            f"Yanlış oranı yüksek yanıtların toplamı: {sum(int(x.get('incorrect') or 0) for x in question_stats)}\\n"
+            f"Boş yanıtların toplamı: {sum(int(x.get('unanswered') or 0) for x in question_stats)}\\n"
+            f"Öğretmen değerlendirmesi bekleyen açık uçlu yanıt: {summary['pending_open_answers']}\\n"
+            "Soru bazlı ham veri (yalnızca toplulaştırma için; raporda tek tek aktarma): "
+            + json.dumps([{
+                "yanit_sayisi": x.get("responses"),
+                "yanlis_sayisi": x.get("incorrect"),
+                "bos_sayisi": x.get("unanswered"),
+                "yanlis_yuzdesi": x.get("incorrect_percent"),
+                "acik_uclu_bekleyen": x.get("manual_review_count")
+            } for x in question_stats], ensure_ascii=False)
         )
         try:
             result = ask_ai(
                 prompt,
                 system_prompt=(
-                    "Sen KARVIS'sin; deneyimli bir öğretmen ve ölçme-değerlendirme uzmanı gibi davran. "
-                    "Kanıta dayalı, tarafsız, uygulanabilir sınıf analizi sun. Veride olmayan bilgi üretme; "
-                    "belirsizliği ve örneklem sınırlılıklarını açıkça belirt. Türkçe yaz."
+                    "Sen KARVIS'sin; deneyimli bir öğretmen ve ölçme-değerlendirme uzmanısın. "
+                    "Yalnızca sınıf genelini değerlendir. Soruları tek tek asla sıralama. "
+                    "Eksiksiz, kısa ve uygulanabilir Türkçe rapor üret; veride olmayan bilgiyi uydurma."
                 ),
                 fast=True
             )
             if result and str(result).strip():
-                ai_analysis = str(result).strip()[:8000]
+                ai_analysis = str(result).strip()[:12000]
         except Exception:
             ai_analysis = "KARVIS Değerlendirmesi şu anda üretilemedi. Soru bazlı istatistikleri ve doğru/yanlış/boş sayılarını kullanarak sınıfın gelişim alanlarını inceleyebilirsiniz."
     student_stats = []
