@@ -5483,7 +5483,11 @@ async function sendAdminNotification(){
         if(!r.ok) throw new Error(d.detail || "Bildirim gönderilemedi.");
         status.textContent = d.sent > 0
             ? `🟢 Gönderildi · ${d.sent} cihaz · ${d.removed || 0} geçersiz abonelik temizlendi.`
-            : `🔴 Gönderilemedi · ${d.removed || 0} geçersiz abonelik temizlendi · ${d.failed || 0} hata. ${d.errors?.[0] || "Kullanıcı uygulamayı yeniden açtığında abonelik otomatik eşitlenecek."}`;
+            : (target !== "all" && (d.subscriptions || 0) === 0)
+                ? `🟠 ${target} profili için kayıtlı bildirim aboneliği yok. Bildirim alacak cihazda bu profile giriş yapın, bildirim iznini açın ve KARVIS'i yeniden açın.`
+                : (d.subscriptions || 0) > 0 && (d.failed || 0) === 0
+                    ? `🟠 Abonelik mevcut ancak hiçbir cihaza gönderilemedi. Cihazın internetini, bildirim iznini ve service worker durumunu kontrol edin.`
+                    : `🔴 Gönderilemedi · ${d.removed || 0} geçersiz abonelik temizlendi · ${d.failed || 0} hata. ${d.errors?.[0] || "Sunucu yanıtında ayrıntılı hata yok."}`;
         $("notificationBody").value="";
     }catch(e){ status.textContent="🔴 "+e.message; }
 }
