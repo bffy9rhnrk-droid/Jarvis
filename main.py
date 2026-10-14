@@ -8405,6 +8405,18 @@ async def presence_heartbeat(data: PresenceHeartbeatRequest):
         write_json_file(PRESENCE_FILE, presence)
     return {"success": True}
 
+@app.get("/profiles/list")
+async def list_profile_options():
+    """Return only public profile identifiers and display names for dynamic UI selectors."""
+    profiles = [
+        {"username": str(uname), "name": str(info.get("name") or uname)}
+        for uname, info in USERS.items()
+        if isinstance(info, dict)
+    ]
+    profiles.sort(key=lambda item: item["name"].casefold())
+    return {"success": True, "profiles": profiles}
+
+
 @app.get("/admin/active-users")
 async def admin_active_users(username: str = "murat"):
     require_admin(username)
