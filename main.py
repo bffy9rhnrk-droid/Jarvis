@@ -1805,10 +1805,8 @@ async def register_account(data: RegisterRequest):
             raise HTTPException(status_code=503, detail="Profil veritabanı kontrol edilemedi. Lütfen tekrar deneyin.")
     if len(display_name) < 2 or len(display_name) > 60:
         raise HTTPException(status_code=400, detail="Görünen ad 2-60 karakter arasında olmalı.")
-    if len(password) < 8:
-        raise HTTPException(status_code=400, detail="Şifre en az 8 karakter olmalı.")
-    if not any(ch.isalpha() for ch in password) or not any(ch.isdigit() for ch in password):
-        raise HTTPException(status_code=400, detail="Şifre en az bir harf ve bir rakam içermeli.")
+    if len(password) < 4:
+        raise HTTPException(status_code=400, detail="Şifre en az 4 karakter olmalı.")
 
     # Persist profile + salted password hash in PostgreSQL when configured.
     # If the database is unavailable, use local JSON but explicitly report that it is not durable on Render.
@@ -8215,8 +8213,8 @@ async def change_password(data: PasswordChangeRequest):
     username = data.username.strip().lower()
     if username not in USERS:
         raise HTTPException(status_code=404, detail="Profil bulunamadı.")
-    if len(data.new_password) < 6:
-        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    if len(data.new_password) < 4:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 4 karakter olmalı.")
     records = _load_password_store()
     record = records.get(username)
     if record and not _verify_password(data.current_password, record):
@@ -8233,8 +8231,8 @@ async def admin_password_reset(data: AdminPasswordResetRequest):
     target = data.target_username.strip().lower()
     if target not in USERS:
         raise HTTPException(status_code=404, detail="Profil bulunamadı.")
-    if len(data.new_password) < 6:
-        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+    if len(data.new_password) < 4:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 4 karakter olmalı.")
     _set_password(target, data.new_password)
     USERS[target]["password"] = ""
     return {"success": True, "message": f"{USERS[target]['name']} profilinin şifresi sıfırlandı."}
