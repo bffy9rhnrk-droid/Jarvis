@@ -1825,7 +1825,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
     <p style="opacity:.8;font-size:13px">Yeni hesaplar standart kullanıcı olarak açılır.</p>
     <input id="registerDisplayName" placeholder="Adınız / görünen ad" autocomplete="name" maxlength="60">
     <input id="registerUsername" placeholder="Kullanıcı adı (3-24 karakter)" autocomplete="username" maxlength="24">
-    <input id="registerPassword" type="password" placeholder="Şifre (en az 8 karakter, harf ve rakam)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
+    <input id="registerPassword" type="password" placeholder="Şifre (en az 4 karakter)" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
     <input id="registerPasswordConfirm" type="password" placeholder="Şifreyi tekrar girin" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();registerAccount();}">
     <button id="registerButton" class="modal-button" onclick="registerAccount()">Hesap Oluştur</button>
     <button class="modal-button secondary-button" onclick="backToLoginModal()">Giriş Ekranına Dön</button>
@@ -2087,12 +2087,12 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 
 </div>
 
-<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="betul">Betül</option><option value="sinem">Sinem</option><option value="ilknur">İlknur</option><option value="sude">Sude</option><option value="murat">Murat</option><option value="karahan">KARAHAN INC.</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 6 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
+<div id="adminPasswordResetModal" class="modal"><h2>🔐 Kullanıcı Şifresi Sıfırla</h2><select id="resetTargetUser" class="voice-select" style="width:100%;max-width:none;margin-bottom:10px"><option value="">Profiller yükleniyor...</option></select><input id="resetNewPassword" type="password" placeholder="Yeni şifre (en az 4 karakter)"><button class="modal-button" onclick="adminResetPassword()">Şifreyi Sıfırla</button><button class="modal-button secondary-button" onclick="closeModals()">Kapat</button></div>
 <!-- ACCOUNT PASSWORD MODAL -->
 <div id="passwordModal" class="modal">
   <h2>🔐 Şifre Değiştir</h2>
   <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Mevcut şifre">
-  <input id="newPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre (en az 6 karakter)">
+  <input id="newPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre (en az 4 karakter)">
   <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre tekrar">
   <button class="modal-button" onclick="changeOwnPassword()">Şifreyi Güncelle</button>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
@@ -5605,12 +5605,35 @@ function handleKey(e){
    PASSWORD + SUDE PERSONAL TOOLS
    ============================================================ */
 async function estimateSudeCalories(){const meal=$("sudeFoodName").value.trim();if(!meal){alert("Önce yiyecek veya öğün adını yaz.");return;}$("sudeCalorieEstimate").textContent="Tahmin hazırlanıyor...";try{const r=await fetch(API+"/sude/estimate-calories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"sude",meal})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Tahmin yapılamadı.");if(!d.success)throw new Error(d.explanation||"Tahmin yapılamadı.");$("sudeFoodCalories").value=d.estimate;$("sudeCalorieEstimate").textContent=`Yaklaşık ${d.estimate} kcal — ${d.explanation} ${d.disclaimer||""}`;}catch(e){$("sudeCalorieEstimate").textContent=e.message;}}
-function openAdminPasswordReset(){if(currentUser!=="murat"){alert("Bu işlem yalnızca Murat profiline açıktır.");return;}closeSidebar();$("adminPasswordResetModal").classList.add("show");}
-async function adminResetPassword(){if(currentUser!=="murat"){alert("Yetkisiz işlem.");return;}const target=$("resetTargetUser").value,password=$("resetNewPassword").value;if(password.length<6){alert("Şifre en az 6 karakter olmalı.");return;}try{const r=await fetch(API+"/admin/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"murat",target_username:target,new_password:password})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre sıfırlanamadı.");alert(d.message||"Şifre sıfırlandı.");$("resetNewPassword").value="";closeModals();}catch(e){alert(e.message);}}
+async function openAdminPasswordReset(){
+    if(currentUser!=="murat"){alert("Bu işlem yalnızca Murat profiline açıktır.");return;}
+    closeSidebar();
+    const modal=$("adminPasswordResetModal"), select=$("resetTargetUser");
+    modal.classList.add("show");
+    const previous=select.value;
+    select.replaceChildren(new Option("Profiller yükleniyor...",""));
+    try{
+        const response=await fetch(API+"/profiles/list");
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.detail||"Profil listesi alınamadı.");
+        const profiles=Array.isArray(data.profiles)?data.profiles:[];
+        select.replaceChildren();
+        profiles.forEach(profile=>{
+            const option=new Option(String(profile.name||profile.username),String(profile.username||""));
+            select.add(option);
+        });
+        if(previous && [...select.options].some(option=>option.value===previous)) select.value=previous;
+        if(!select.options.length) select.add(new Option("Kayıtlı profil bulunamadı",""));
+    }catch(error){
+        select.replaceChildren(new Option("Profil listesi yüklenemedi",""));
+        alert(error.message||"Profil listesi alınamadı.");
+    }
+}
+async function adminResetPassword(){if(currentUser!=="murat"){alert("Yetkisiz işlem.");return;}const target=$("resetTargetUser").value,password=$("resetNewPassword").value;if(password.length<4){alert("Şifre en az 4 karakter olmalı.");return;}try{const r=await fetch(API+"/admin/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"murat",target_username:target,new_password:password})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre sıfırlanamadı.");alert(d.message||"Şifre sıfırlandı.");$("resetNewPassword").value="";closeModals();}catch(e){alert(e.message);}}
 function openPasswordChange(){ closeSidebar(); $("passwordModal").classList.add("show"); }
 async function changeOwnPassword(){
     const current=$("currentPassword").value, next=$("newPassword").value, confirmPass=$("confirmPassword").value;
-    if(next.length<6){alert("Yeni şifre en az 6 karakter olmalı.");return;}
+    if(next.length<4){alert("Yeni şifre en az 4 karakter olmalı.");return;}
     if(next!==confirmPass){alert("Yeni şifreler eşleşmiyor.");return;}
     try{const r=await fetch(API+"/account/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:currentUser,current_password:current,new_password:next})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Şifre değiştirilemedi.");alert("Şifren güncellendi.");["currentPassword","newPassword","confirmPassword"].forEach(id=>$(id).value="");closeModals();}catch(e){alert(e.message);}
 }
