@@ -7611,6 +7611,199 @@ def presentation_worker(
 # HOME
 # ============================================================
 
+
+
+# ============================================================
+# KARVIS EĞLENCE — KARVIS'i Bul (room-based social deduction)
+# ============================================================
+FIND_KARVIS_ROOMS = {}
+FIND_KARVIS_LOCK = threading.RLock()
+FIND_KARVIS_TTL = 60 * 60 * 8
+
+def _fk_clean_name(value):
+    name = re.sub(r"[\r\n\t<>]", "", str(value or "")).strip()[:22]
+    if not name:
+        raise HTTPException(status_code=400, detail="Oyuncu adını gir.")
+    return name
+
+def _fk_room(code):
+    room = FIND_KARVIS_ROOMS.get(str(code or "").upper())
+    if not room:
+        raise HTTPException(status_code=404, detail="Oda bulunamadı. Kodunu kontrol et.")
+    if time.time() - room["created_at"] > FIND_KARVIS_TTL:
+        FIND_KARVIS_ROOMS.pop(str(code).upper(), None)
+        raise HTTPException(status_code=410, detail="Odanın süresi dolmuş.")
+    return room
+
+def _fk_ai_reply(room):
+    recent = room["messages"][-8:]
+    transcript = "\n".join(f'{m["name"]}: {m["text"]}' for m in recent if not m.get("system"))
+    prompt = (
+        "Sen, arkadaş grubuyla oynanan Türkçe bir sosyal çıkarım oyununda gizli yapay zekâ oyuncususun. "
+        "Kimliğini ASLA açıklama, yapay zekâ olduğunu söyleme. Kısa, doğal, insan gibi, 1-2 cümleyle cevap ver. "
+        "Aşırı kusursuz veya robotik konuşma; konuyla ilgili ve hafif şüphe uyandırabilecek ama kesin ele vermeyen bir cevap ver. "
+        "Sadece göndereceğin mesajı yaz.\nSon konuşmalar:\n" + (transcript or "Henüz sohbet yok.")
+    )
+    answer = ""
+    for client, model in ((groq_client, "openai/gpt-oss-20b"), (openrouter_client, "openai/gpt-oss-20b:free")):
+        if not client:
+            continue
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{"role":"system","content":prompt}],
+                temperature=0.85,
+                max_tokens=100,
+            )
+            answer = (response.choices[0].message.content or "").strip()
+            if answer:
+                break
+        except Exception:
+            continue
+    if not answer:
+        fallback = [
+            "Bence herkes biraz fazla dikkatli davranıyor. Normal konuşsak daha kolay anlaşılır.",
+            "Ben şimdilik kimseye emin değilim, birkaç mesaj daha görmek lazım.",
+            "Güzel konu ama bence cevaplardan çok kimin nasıl tepki verdiğine bakalım.",
+            "Birinin çok iddialı konuşması da şüpheli olabilir, hemen karar vermeyelim."
+        ]
+        answer = random.choice(fallback)
+    return answer[:500]
+
+def _fk_append_system(room, text):
+    room["messages"].append({"name":"SİSTEM","text":text,"system":True,"at":time.time()})
+
+def _fk_maybe_ai_turn(room):
+    if room["status"] != "discussion" or room["turn_index"] >= len(room["turn_order"]):
+        return
+    pid = room["turn_order"][room["turn_index"]]
+    if pid != room["ai_id"]:
+        return
+    ai = room["players"][pid]
+    room["messages"].append({"name":ai["name"],"text":_fk_ai_reply(room),"system":False,"at":time.time()})
+    room["turn_index"] += 1
+    if room["turn_index"] >= len(room["turn_order"]):
+        room["status"] = "voting"
+        _fk_append_system(room, "Sohbet turu tamamlandı. Şimdi gizli yapay zekâyı oylayın.")
+
+def _fk_public_state(room, player_id):
+    me = room["players"].get(player_id)
+    if not me:
+        raise HTTPException(status_code=403, detail="Bu oyuncu bu odada değil.")
+    players = []
+    for pid in room["player_order"]:
+        p = room["players"][pid]
+        players.append({"id":pid,"name":p["name"],"is_host":pid==room["host_id"],"is_me":pid==player_id})
+    # The AI is presented as a regular participant; its role is never sent to the browser.
+    if room["ai_id"] and room["ai_id"] in room["players"]:
+        p=room["players"][room["ai_id"]]
+        players.append({"id":room["ai_id"],"name":p["name"],"is_host":False,"is_me":False})
+    return {
+        "success":True,"code":room["code"],"status":room["status"],
+        "players":players,"is_host":player_id==room["host_id"],
+        "is_my_turn":room["status"]=="discussion" and room["turn_index"]<len(room["turn_order"]) and room["turn_order"][room["turn_index"]]==player_id,
+        "turn_name":room["players"][room["turn_order"][room["turn_index"]]]["name"] if room["status"]=="discussion" and room["turn_index"]<len(room["turn_order"]) else "",
+        "turn_index":room["turn_index"],"messages":[{"name":m["name"],"text":m["text"],"system":m.get("system",False)} for m in room["messages"]],
+        "has_voted":player_id in room["votes"],"votes_count":len(room["votes"]),
+        "total_voters":len(room["player_order"]),
+        "result":room.get("result"),
+    }
+
+@app.post("/find-karvis/create")
+async def find_karvis_create(payload: dict):
+    name=_fk_clean_name(payload.get("name"))
+    with FIND_KARVIS_LOCK:
+        code="".join(random.choices("ABCDEFGHJKLMNPQRSTUVWXYZ23456789",k=6))
+        while code in FIND_KARVIS_ROOMS: code="".join(random.choices("ABCDEFGHJKLMNPQRSTUVWXYZ23456789",k=6))
+        player_id=uuid.uuid4().hex[:12]
+        FIND_KARVIS_ROOMS[code]={"code":code,"created_at":time.time(),"status":"lobby","host_id":player_id,
+            "players":{player_id:{"name":name,"is_ai":False}},"player_order":[player_id],"ai_id":None,
+            "turn_order":[],"turn_index":0,"messages":[],"votes":{},"result":None}
+        return {"success":True,"code":code,"player_id":player_id}
+
+@app.post("/find-karvis/join")
+async def find_karvis_join(payload: dict):
+    name=_fk_clean_name(payload.get("name")); code=str(payload.get("code") or "").strip().upper()
+    with FIND_KARVIS_LOCK:
+        room=_fk_room(code)
+        if room["status"]!="lobby": raise HTTPException(status_code=409,detail="Oyun başlamış; bu odaya artık katılınamaz.")
+        if len(room["player_order"])>=8: raise HTTPException(status_code=409,detail="Oda dolu. En fazla 8 gerçek oyuncu katılabilir.")
+        if any(p["name"].casefold()==name.casefold() for p in room["players"].values()): raise HTTPException(status_code=409,detail="Bu isim odada kullanılıyor; farklı bir isim dene.")
+        player_id=uuid.uuid4().hex[:12]
+        room["players"][player_id]={"name":name,"is_ai":False};room["player_order"].append(player_id)
+        return {"success":True,"code":code,"player_id":player_id}
+
+@app.get("/find-karvis/state")
+async def find_karvis_state(code: str, player_id: str):
+    with FIND_KARVIS_LOCK:
+        room=_fk_room(code)
+        # If the AI was scheduled but a previous request interrupted the turn, resolve it here.
+        _fk_maybe_ai_turn(room)
+        return _fk_public_state(room,player_id)
+
+@app.post("/find-karvis/start")
+async def find_karvis_start(payload: dict):
+    code=str(payload.get("code") or "").upper(); player_id=str(payload.get("player_id") or "")
+    with FIND_KARVIS_LOCK:
+        room=_fk_room(code)
+        if player_id!=room["host_id"]: raise HTTPException(status_code=403,detail="Oyunu yalnızca oda sahibi başlatabilir.")
+        if room["status"]!="lobby": raise HTTPException(status_code=409,detail="Oyun zaten başlamış.")
+        if len(room["player_order"])<2: raise HTTPException(status_code=400,detail="Oyunu başlatmak için en az 2 gerçek oyuncu gerekir.")
+        ai_id=uuid.uuid4().hex[:12]
+        ai_name="Oyuncu "+str(random.randint(3,9))
+        existing={p["name"].casefold() for p in room["players"].values()}
+        while ai_name.casefold() in existing: ai_name="Oyuncu "+str(random.randint(3,9))
+        room["ai_id"]=ai_id;room["players"][ai_id]={"name":ai_name,"is_ai":True}
+        room["turn_order"]=room["player_order"][:]
+        room["turn_order"].insert(random.randint(0,len(room["turn_order"])),ai_id)
+        random.shuffle(room["turn_order"])
+        room["status"]="discussion";room["turn_index"]=0
+        _fk_append_system(room,"Oyun başladı! Sırayla birer mesaj yazın. Yapay zekâ da oyunculardan biri gibi konuşacak.")
+        _fk_maybe_ai_turn(room)
+        return {"success":True,"message":"Oyun başladı."}
+
+@app.post("/find-karvis/message")
+async def find_karvis_message(payload: dict):
+    code=str(payload.get("code") or "").upper();player_id=str(payload.get("player_id") or "")
+    message=re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]","",str(payload.get("message") or "")).strip()[:280]
+    if not message: raise HTTPException(status_code=400,detail="Mesaj boş olamaz.")
+    with FIND_KARVIS_LOCK:
+        room=_fk_room(code)
+        if room["status"]!="discussion": raise HTTPException(status_code=409,detail="Sohbet turu sona erdi.")
+        if player_id not in room["players"] or room["players"][player_id].get("is_ai"): raise HTTPException(status_code=403,detail="Oyuncu doğrulanamadı.")
+        if room["turn_index"]>=len(room["turn_order"]) or room["turn_order"][room["turn_index"]]!=player_id:
+            raise HTTPException(status_code=409,detail="Henüz senin sıran değil.")
+        room["messages"].append({"name":room["players"][player_id]["name"],"text":message,"system":False,"at":time.time()})
+        room["turn_index"]+=1
+        if room["turn_index"]>=len(room["turn_order"]):
+            room["status"]="voting";_fk_append_system(room,"Sohbet turu tamamlandı. Şimdi gizli yapay zekâyı oylayın.")
+        else:
+            _fk_maybe_ai_turn(room)
+        return {"success":True,"status":room["status"]}
+
+@app.post("/find-karvis/vote")
+async def find_karvis_vote(payload: dict):
+    code=str(payload.get("code") or "").upper();player_id=str(payload.get("player_id") or "");target_id=str(payload.get("target_id") or "")
+    with FIND_KARVIS_LOCK:
+        room=_fk_room(code)
+        if room["status"]!="voting": raise HTTPException(status_code=409,detail="Henüz oylama başlamadı.")
+        if player_id not in room["player_order"]: raise HTTPException(status_code=403,detail="Oyuncu doğrulanamadı.")
+        if player_id in room["votes"]: raise HTTPException(status_code=409,detail="Oyunu zaten kullandın.")
+        if target_id not in room["players"] or target_id==player_id: raise HTTPException(status_code=400,detail="Geçersiz hedef.")
+        room["votes"][player_id]=target_id
+        if len(room["votes"])>=len(room["player_order"]):
+            tally={}
+            for target in room["votes"].values(): tally[target]=tally.get(target,0)+1
+            highest=max(tally.values()) if tally else 0
+            winners=[pid for pid,n in tally.items() if n==highest]
+            caught=(len(winners)==1 and winners[0]==room["ai_id"])
+            ai_name=room["players"][room["ai_id"]]["name"]
+            room["result"]={"caught":caught,"ai_name":ai_name,"details":("Oy birliği/çoğunluk sonucu doğru hedef seçildi." if caught else "Oylama çoğunluğu yapay zekâyı seçemedi.")}
+            room["status"]="finished"
+            _fk_append_system(room,"Oylama tamamlandı. Gizli yapay zekâ: "+ai_name+".")
+        return {"success":True,"votes_count":len(room["votes"]),"finished":room["status"]=="finished"}
+
+
 @app.get("/")
 async def home():
 
