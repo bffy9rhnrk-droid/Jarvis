@@ -1547,11 +1547,11 @@ select option:checked{background:#087f9b!important;color:#fff!important}
    ============================================================ */
 :root{--discover-nav-height:70px}
 .main{height:calc(100dvh - 72px - var(--discover-nav-height));min-height:0}
-.karvis-bottom-nav{position:fixed;z-index:80;left:0;right:0;bottom:0;height:calc(var(--discover-nav-height) + env(safe-area-inset-bottom));padding:7px 8px calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;gap:3px;background:rgba(2,7,10,.96);border-top:1px solid rgba(0,229,255,.17);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;height:52px;padding:3px 0;border:0;border-radius:12px;background:transparent;color:rgba(220,240,248,.58);font-size:10px;font-weight:750}
-.karvis-nav-button .nav-icon{font-size:20px;line-height:1.1}
-.karvis-nav-button.active{color:#00e5ff}
-.karvis-nav-home{justify-self:center;width:49px;height:49px;border-radius:50%;border:1px solid rgba(0,229,255,.8);background:radial-gradient(circle,rgba(0,229,255,.22),rgba(0,229,255,.04));color:#00e5ff;font-size:24px;font-weight:950;box-shadow:0 0 17px rgba(0,229,255,.23),inset 0 0 13px rgba(0,229,255,.12)}
+.karvis-bottom-nav{position:fixed;z-index:80;left:0;right:0;bottom:calc(-1 * var(--karvis-keyboard-height, 0px));height:calc(var(--discover-nav-height) + env(safe-area-inset-bottom));padding:7px 8px calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(5,15,21,.97),rgba(2,7,10,.99));border-top:1px solid rgba(0,229,255,.22);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 -8px 28px rgba(0,0,0,.22);transition:bottom .12s ease}
+.karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;height:56px;padding:4px 0;border:1px solid transparent;border-radius:15px;background:transparent;color:rgba(220,240,248,.52);font-size:11px;font-weight:800;letter-spacing:.15px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
+.karvis-nav-button .nav-icon{font-size:21px;line-height:1.1;filter:drop-shadow(0 0 0 transparent)}
+.karvis-nav-button.active{color:#00e5ff;background:linear-gradient(180deg,rgba(0,229,255,.09),rgba(0,229,255,.025));border-color:rgba(0,229,255,.12);text-shadow:0 0 12px rgba(0,229,255,.22)}
+.karvis-nav-home{justify-self:center;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(0,229,255,.88);background:radial-gradient(circle at 40% 30%,rgba(0,229,255,.25),rgba(0,229,255,.055));color:#00e5ff;font-size:26px;font-weight:950;box-shadow:0 0 23px rgba(0,229,255,.24),inset 0 0 16px rgba(0,229,255,.14);text-shadow:0 0 13px rgba(0,229,255,.5);transition:transform .2s ease,box-shadow .2s ease}
 #discoverScreen{position:fixed;z-index:30;top:72px;bottom:calc(var(--discover-nav-height) + env(safe-area-inset-bottom));left:0;right:0;display:none;flex-direction:column;min-height:0;background:radial-gradient(circle at 50% 0,rgba(0,229,255,.055),transparent 35%),#02070a}
 #discoverScreen.open{display:flex}
 .discover-header{flex:none;padding:16px 15px 10px;border-bottom:1px solid rgba(0,229,255,.11);background:rgba(2,7,10,.94)}
@@ -6147,6 +6147,31 @@ initialize();
     panel.querySelector(".discover-explanation").textContent=item.explanation||"";
     panel.classList.add("show");
   };
+  // iOS Safari shrinks the visual viewport when the keyboard opens. Counter-offset the fixed nav
+  // by the keyboard height so it stays at the physical bottom, behind the keyboard, not above it.
+  (function keepBottomNavBelowKeyboard(){
+    const nav = document.querySelector(".karvis-bottom-nav");
+    const input = document.getElementById("messageInput");
+    if(!nav || !window.visualViewport || !input) return;
+    let raf = 0;
+    const update = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const vv = window.visualViewport;
+        const focused = document.activeElement === input;
+        const keyboardHeight = focused ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+        document.documentElement.style.setProperty("--karvis-keyboard-height", keyboardHeight > 100 ? keyboardHeight + "px" : "0px");
+        document.body.classList.toggle("karvis-keyboard-open", keyboardHeight > 100);
+      });
+    };
+    visualViewport.addEventListener("resize", update);
+    visualViewport.addEventListener("scroll", update);
+    input.addEventListener("focus", update);
+    input.addEventListener("blur", () => { document.documentElement.style.setProperty("--karvis-keyboard-height","0px"); document.body.classList.remove("karvis-keyboard-open"); });
+    window.addEventListener("orientationchange", update);
+    update();
+  })();
+
   feedEl.addEventListener("scroll",()=>{
     if(!screenEl.classList.contains("open") || loading || exhausted) return;
     if(feedEl.scrollTop + feedEl.clientHeight >= feedEl.scrollHeight - 500) loadMore(false);
