@@ -1541,6 +1541,54 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 @media(max-width:720px){.karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.karvis-eval-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.karvis-eval-hero{align-items:flex-start;padding:15px;gap:12px}.karvis-eval-orb{flex-basis:46px;height:46px;font-size:22px;border-radius:14px}.karvis-eval-filter{grid-template-columns:1fr}.karvis-eval-filter label{grid-column:auto}.karvis-eval-filter .exam-generate-button{width:100%;white-space:normal}.karvis-eval-metrics{gap:8px}.karvis-eval-metric{padding:12px;min-height:100px}.karvis-eval-topic-grid,.karvis-eval-insight-grid{grid-template-columns:1fr}.karvis-eval-report{font-size:12px}}
 
+
+/* KARVIS EĞLENCE menu and social deduction game */
+.karvis-fun-title{margin:20px 5px 10px;color:#54e5f2;font-weight:900}
+.fun-menu-item{display:flex;flex-direction:column;gap:4px}
+.fun-menu-item small{font-size:10px;opacity:.58}
+.find-karvis-modal{width:min(96vw,760px)!important;max-width:760px!important;max-height:92dvh!important;padding:clamp(15px,3vw,25px)!important}
+.find-hero{padding:17px;border:1px solid rgba(0,229,255,.25);border-radius:18px;background:radial-gradient(circle at 90% 0%,rgba(0,229,255,.12),transparent 40%),rgba(0,229,255,.035);margin-bottom:14px}
+.find-hero h2{margin:0 0 7px}.find-hero p{margin:0;line-height:1.6;font-size:12px;opacity:.75}
+.find-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.find-card{min-width:0;padding:13px;border:1px solid rgba(0,229,255,.16);border-radius:14px;background:rgba(255,255,255,.025)}
+.find-field{width:100%;height:44px;padding:0 12px;border-radius:11px;border:1px solid rgba(0,229,255,.2);background:#0b1920;color:#fff;margin:7px 0}
+.find-action{width:100%;min-height:44px;padding:10px 12px;border:1px solid rgba(0,229,255,.25);border-radius:11px;background:rgba(0,229,255,.09);color:#e9fcff;font-weight:800;margin-top:7px}
+.find-action.primary{background:#00d9ee;color:#001014;border-color:#00d9ee}
+.find-status{font-size:12px;line-height:1.55;opacity:.8;min-height:18px;margin:8px 0}
+.find-room-code{font-size:26px;letter-spacing:.18em;font-weight:900;color:#45e5f1}
+.find-player-list{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.find-player{padding:7px 10px;border:1px solid rgba(0,229,255,.18);border-radius:9px;font-size:11px;background:rgba(0,229,255,.04)}
+.find-chat{height:min(32vh,280px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(0,0,0,.16)}
+.find-chat-line{padding:9px 11px;border-radius:11px;background:rgba(255,255,255,.045);font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.find-chat-line strong{color:#4adce9}.find-chat-line.system{color:#ffcf77;background:rgba(255,190,70,.06)}
+.find-chat-form{display:flex;gap:8px;margin-top:9px}.find-chat-form input{flex:1;min-width:0}
+.find-vote-row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;margin:6px 0}
+.find-vote-row button{padding:8px 12px;border-radius:9px;background:rgba(0,229,255,.1);color:#fff;border:1px solid rgba(0,229,255,.25)}
+@media(max-width:540px){.find-grid{grid-template-columns:1fr}.find-chat-form{flex-direction:column}.find-chat-form button{width:100%}}
+
+
+
+/* KARVIS evaluation: compact class-level report, no per-question dump */
+.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
+.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
+.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
+@media(max-width:600px){
+ .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
+ .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
+ .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
+ .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
+ .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
+ .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
+ .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
+ .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
+ }
+
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1603,7 +1651,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         ＋ Yeni Sohbet
     </button>
 
-    <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
+
 
     <div id="sidebarAuthArea">
       <button id="sidebarLoginButton" class="menu-item" onclick="openProfileLoginFromSidebar()">↪ Giriş Yap</button>
@@ -1620,6 +1668,10 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         onclick="openSettings()">
         ⚙ Ayarlar
     </button>
+
+    <div class="academic-title karvis-fun-title">🎮 KARVIS EĞLENCE</div>
+    <button class="menu-item arena-menu-item" onclick="openArena()"><span class="arena-menu-label">🏆 KARVIS ARENA</span><span class="arena-new-badge">NEW</span></button>
+    <button class="menu-item fun-menu-item" onclick="openFindKarvis()"><span>🕵️ KARVIS’i Bul</span><small>Yapay zekâyı yakala</small></button>
 
     <button
         id="funButton"
@@ -2118,6 +2170,51 @@ select option:checked{background:#087f9b!important;color:#fff!important}
   <p class="sude-subtitle">Kendine uygun küçük hedefler belirle ve tamamladıkça işaretle.</p>
   <section class="sude-card"><input id="sudeTaskTitle" class="sude-field" placeholder="Örn. 10 dakika yürüyüş"><button class="sude-btn" onclick="addSudeTask()">＋ Görev ekle</button><div id="sudeTaskList"></div></section>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
+</div>
+
+<!-- KARVIS EĞLENCE: KARVIS'i Bul -->
+<div id="findKarvisModal" class="modal find-karvis-modal">
+  <div class="find-hero">
+    <div style="font-size:10px;letter-spacing:.16em;font-weight:900;color:#45e5f1;margin-bottom:7px">KARVIS EĞLENCE · SOSYAL ÇIKARIM</div>
+    <h2>🕵️ KARVIS’i Bul</h2>
+    <p>Odayı kur, arkadaşlarını kodla davet et. Herkes sırayla konuşur; aranızda gizlenen yapay zekâyı bulmak için sonunda oy verirsiniz.</p>
+  </div>
+  <section id="findLobbySetup" class="find-grid">
+    <div class="find-card">
+      <h3>🚪 Oda oluştur</h3>
+      <label for="findDisplayName">Oyuncu adın</label>
+      <input id="findDisplayName" class="find-field" maxlength="22" placeholder="Adını yaz">
+      <button class="find-action primary" onclick="createFindKarvisRoom()">＋ Yeni oda oluştur</button>
+    </div>
+    <div class="find-card">
+      <h3>🔑 Odaya katıl</h3>
+      <label for="findJoinCode">Oda kodu</label>
+      <input id="findJoinCode" class="find-field" maxlength="6" placeholder="Örn. A7K2QF" autocapitalize="characters">
+      <button class="find-action" onclick="joinFindKarvisRoom()">Odaya katıl →</button>
+    </div>
+  </section>
+  <div id="findKarvisRoomArea" style="display:none">
+    <div class="find-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><small style="opacity:.65">ODA KODU</small><div id="findRoomCode" class="find-room-code">------</div></div>
+        <button class="find-action" style="width:auto" onclick="copyFindRoomCode()">📋 Kodu kopyala</button>
+      </div>
+      <div id="findRoomStatus" class="find-status">Oda hazırlanıyor…</div>
+      <div id="findPlayerList" class="find-player-list"></div>
+      <div id="findHostControls"><button class="find-action primary" onclick="startFindKarvisGame()">Oyunu başlat</button><p style="font-size:10px;opacity:.6">En az 2 gerçek oyuncu gerekir. Yapay zekânın kimliği sunucu tarafında gizli tutulur.</p></div>
+    </div>
+    <div id="findGameArea" style="display:none;margin-top:12px">
+      <div class="find-card">
+        <div id="findRoundStatus" class="find-status"></div>
+        <div id="findChatLog" class="find-chat" aria-live="polite"></div>
+        <div id="findChatComposer" class="find-chat-form"><input id="findChatInput" class="find-field" maxlength="280" placeholder="Sıran gelince mesajını yaz…"><button class="find-action primary" style="width:auto;margin:7px 0" onclick="sendFindKarvisMessage()">Gönder</button></div>
+        <div id="findVoteArea" style="display:none;margin-top:12px"><h3>🗳️ Yapay zekâ kim?</h3><div id="findVoteOptions"></div></div>
+        <div id="findResultArea" class="find-status"></div>
+      </div>
+    </div>
+  </div>
+  <p id="findGlobalStatus" class="find-status" aria-live="polite"></p>
+  <button class="modal-button secondary-button" onclick="closeFindKarvis()">Kapat</button>
 </div>
 
 <!-- KARVIS ARENA -->
@@ -5860,6 +5957,90 @@ async function answerArena(choice){if(!arenaAttemptId||arenaAnswered)return;aren
  setTimeout(async()=>{if(d.finished){arenaAttemptId=null;$("arenaGameArea").innerHTML=`<div class="sude-card"><h3>🏁 Yarışma tamamlandı!</h3><p>Bu yarışmada ${d.score} puan kazandın.</p><button class="sude-btn" onclick="openArena()">Sonuçları ve sıralamayı yenile</button></div>`;await loadArenaOverview();}else{renderArenaQuestion(d.question,d.question_number,d.total_questions);}},850);
  }catch(e){arenaAnswered=false;if(feedback)feedback.textContent=e.message;}}
 
+
+/* ============================================================
+   KARVIS EĞLENCE — KARVIS'i Bul
+   ============================================================ */
+let findKarvisRoomCode="", findKarvisPlayerId="", findKarvisPollTimer=null, findKarvisSnapshot="";
+function findEsc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function openFindKarvis(){
+ closeSidebar();closeModals();
+ $("findKarvisModal").classList.add("show");
+ $("findDisplayName").value=(currentUser&&currentUser!=="karahan")?({"murat":"Murat","sinem":"Sinem","betul":"Betül","ilknur":"İlknur","sude":"Sude"}[currentUser]||currentUser):"";
+ $("findGlobalStatus").textContent="";
+ if(findKarvisRoomCode)pollFindKarvisRoom(); 
+}
+function closeFindKarvis(){
+ if(findKarvisPollTimer)clearTimeout(findKarvisPollTimer);
+ findKarvisPollTimer=null;
+ $("findKarvisModal").classList.remove("show");
+}
+async function findKarvisApi(path,body){
+ const r=await fetch(API+"/find-karvis/"+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+ const d=await r.json();if(!r.ok)throw new Error(d.detail||"İşlem başarısız oldu.");return d;
+}
+function findKarvisSetRoom(d){
+ findKarvisRoomCode=d.code;findKarvisPlayerId=d.player_id;
+ $("findLobbySetup").style.display="none";$("findKarvisRoomArea").style.display="block";
+ $("findRoomCode").textContent=d.code;
+}
+async function createFindKarvisRoom(){
+ const name=$("findDisplayName").value.trim();if(!name){$("findGlobalStatus").textContent="Önce oyuncu adını yaz.";return;}
+ try{const d=await findKarvisApi("create",{name});findKarvisSetRoom(d);$("findGlobalStatus").textContent="Oda oluşturuldu. Kodu arkadaşlarınla paylaş.";await pollFindKarvisRoom();}
+ catch(e){$("findGlobalStatus").textContent="⚠️ "+e.message;}
+}
+async function joinFindKarvisRoom(){
+ const name=$("findDisplayName").value.trim(),code=$("findJoinCode").value.trim().toUpperCase();
+ if(!name||!code){$("findGlobalStatus").textContent="Oyuncu adı ve oda kodunu gir.";return;}
+ try{const d=await findKarvisApi("join",{name,code});findKarvisSetRoom(d);$("findGlobalStatus").textContent="Odaya katıldın.";await pollFindKarvisRoom();}
+ catch(e){$("findGlobalStatus").textContent="⚠️ "+e.message;}
+}
+function copyFindRoomCode(){if(findKarvisRoomCode){if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(findKarvisRoomCode).then(()=>{$("findGlobalStatus").textContent="Oda kodu kopyalandı.";}).catch(()=>{$("findGlobalStatus").textContent="Oda kodun: "+findKarvisRoomCode;});else $("findGlobalStatus").textContent="Oda kodun: "+findKarvisRoomCode;}}
+async function startFindKarvisGame(){
+ try{await findKarvisApi("start",{code:findKarvisRoomCode,player_id:findKarvisPlayerId});await pollFindKarvisRoom();}
+ catch(e){$("findRoomStatus").textContent="⚠️ "+e.message;}
+}
+async function sendFindKarvisMessage(){
+ const input=$("findChatInput"),message=input.value.trim();if(!message)return;
+ input.disabled=true;
+ try{await findKarvisApi("message",{code:findKarvisRoomCode,player_id:findKarvisPlayerId,message});input.value="";await pollFindKarvisRoom();}
+ catch(e){$("findRoomStatus").textContent="⚠️ "+e.message;}
+ finally{input.disabled=false;}
+}
+async function voteFindKarvis(targetId){
+ try{await findKarvisApi("vote",{code:findKarvisRoomCode,player_id:findKarvisPlayerId,target_id:targetId});await pollFindKarvisRoom();}
+ catch(e){$("findResultArea").textContent="⚠️ "+e.message;}
+}
+async function pollFindKarvisRoom(){
+ if(!findKarvisRoomCode)return;
+ try{
+  const d=await findKarvisApi("state?code="+encodeURIComponent(findKarvisRoomCode)+"&player_id="+encodeURIComponent(findKarvisPlayerId));
+  const players=d.players||[];
+  $("findPlayerList").innerHTML=players.map(p=>`<span class="find-player">${findEsc(p.name)}${p.is_host?" · Oda sahibi":""}${p.is_me?" · Sen":""}</span>`).join("");
+  $("findRoomStatus").textContent=d.status==="lobby"?"Oyuncular bekleniyor…":d.status==="discussion"?"Sohbet turu devam ediyor.":d.status==="voting"?"Oylama başladı.":d.status==="finished"?"Oyun tamamlandı.":"";
+  $("findHostControls").style.display=d.is_host&&d.status==="lobby"?"block":"none";
+  $("findGameArea").style.display=d.status==="lobby"?"none":"block";
+  $("findRoundStatus").textContent=d.turn_name?(d.is_my_turn?"🎙️ Sıra sende!":"🎙️ Sıra: "+d.turn_name):"Sohbet tamamlandı; oyunu kullan.";
+  const chat=d.messages||[];
+  const snap=JSON.stringify([d.status,d.turn_index,chat.length,d.votes_count,d.result]);
+  if(snap!==findKarvisSnapshot){
+   findKarvisSnapshot=snap;
+   $("findChatLog").innerHTML=chat.map(m=>`<div class="find-chat-line ${m.system?"system":""}"><strong>${findEsc(m.name)}:</strong> ${findEsc(m.text)}</div>`).join("");
+   $("findChatLog").scrollTop=$("findChatLog").scrollHeight;
+  }
+  $("findChatComposer").style.display=d.status==="discussion"&&d.is_my_turn?"flex":"none";
+  $("findVoteArea").style.display=d.status==="voting"?"block":"none";
+  if(d.status==="voting"){
+   $("findVoteOptions").innerHTML=players.filter(p=>!p.is_me).map(p=>`<div class="find-vote-row"><span>${findEsc(p.name)}</span><button onclick="voteFindKarvis('${findEsc(p.id)}')" ${d.has_voted?"disabled":""}>Oy ver</button></div>`).join("");
+   $("findResultArea").textContent=`Oylar: ${d.votes_count||0}/${d.total_voters||players.length-1}`;
+  }else if(d.status==="finished"){
+   $("findVoteArea").style.display="none";$("findChatComposer").style.display="none";
+   $("findResultArea").textContent=d.result?`${d.result.caught?"🎉 Tebrikler! Yapay zekâyı buldunuz.":"🤖 Yapay zekâ aranızda gizlenmeyi başardı."} Gizli oyuncu: ${d.result.ai_name}. ${d.result.details||""}`:"Oyun tamamlandı.";
+  }else $("findResultArea").textContent="";
+ }catch(e){$("findRoomStatus").textContent="Bağlantı kurulamadı: "+e.message;}
+ finally{if(findKarvisPollTimer)clearTimeout(findKarvisPollTimer);if($("findKarvisModal").classList.contains("show"))findKarvisPollTimer=setTimeout(pollFindKarvisRoom,1800);}
+}
+
 /* ============================================================
    INITIALIZE
    ============================================================ */
@@ -5919,25 +6100,3 @@ initialize();
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
 </body>
 </html>
-
-
-/* KARVIS evaluation: compact class-level report, no per-question dump */
-.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
-.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
-.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
-@media(max-width:600px){
- .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
- .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
- .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
- .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
- .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
- .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
- .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
- .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
-}
