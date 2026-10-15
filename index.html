@@ -1541,97 +1541,6 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 @media(max-width:720px){.karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.karvis-eval-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.karvis-eval-hero{align-items:flex-start;padding:15px;gap:12px}.karvis-eval-orb{flex-basis:46px;height:46px;font-size:22px;border-radius:14px}.karvis-eval-filter{grid-template-columns:1fr}.karvis-eval-filter label{grid-column:auto}.karvis-eval-filter .exam-generate-button{width:100%;white-space:normal}.karvis-eval-metrics{gap:8px}.karvis-eval-metric{padding:12px;min-height:100px}.karvis-eval-topic-grid,.karvis-eval-insight-grid{grid-template-columns:1fr}.karvis-eval-report{font-size:12px}}
 
-
-/* ============================================================
-   KARVIS KEŞFET — isolated responsive feed
-   ============================================================ */
-:root{--discover-nav-height:70px}
-.main{height:calc(100dvh - 72px - var(--discover-nav-height));min-height:0}
-.karvis-bottom-nav{position:fixed;z-index:80;left:12px;right:12px;bottom:calc(8px + env(safe-area-inset-bottom));height:calc(var(--discover-nav-height) - 2px);padding:7px 8px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(12,31,44,.60),rgba(2,10,17,.48));border:1px solid rgba(64,207,242,.30);border-radius:25px;backdrop-filter:blur(32px) saturate(175%);-webkit-backdrop-filter:blur(32px) saturate(175%);box-shadow:0 10px 34px rgba(0,0,0,.32),inset 0 1px 0 rgba(210,250,255,.10),0 0 24px rgba(0,190,230,.06);transition:opacity .18s ease,transform .18s ease,background .2s ease;transform:translateZ(0)}
-body.karvis-keyboard-open .karvis-bottom-nav{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(18px)}
-.karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;height:54px;padding:4px 0;border:1px solid transparent;border-radius:16px;background:transparent;color:rgba(211,235,246,.66);font-size:10px;font-weight:750;letter-spacing:.2px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
-.karvis-nav-button .nav-icon{font-size:22px;line-height:1.05;filter:drop-shadow(0 0 7px rgba(0,205,245,.10))}
-.karvis-nav-button.active{color:#52e8ff;background:linear-gradient(180deg,rgba(0,213,255,.17),rgba(0,130,180,.06));border-color:rgba(64,220,255,.20);text-shadow:0 0 13px rgba(0,210,255,.28);box-shadow:inset 0 1px 0 rgba(210,250,255,.07)}
-.karvis-nav-home{justify-self:center;width:50px;height:50px;border-radius:18px;border:1px solid rgba(75,226,255,.80);background:radial-gradient(circle at 35% 25%,rgba(0,229,255,.35),rgba(0,105,150,.13) 68%,rgba(0,30,45,.25));color:#73efff;font-size:25px;font-weight:950;box-shadow:0 0 22px rgba(0,205,245,.20),inset 0 0 17px rgba(0,229,255,.15),inset 0 1px 0 rgba(255,255,255,.16);text-shadow:0 0 13px rgba(0,229,255,.48);transition:transform .2s ease,box-shadow .2s ease}
-@media(max-width:420px){.karvis-bottom-nav{left:9px;right:9px;border-radius:22px;padding-left:5px;padding-right:5px}.karvis-nav-button{font-size:9px}.karvis-nav-button .nav-icon{font-size:21px}.karvis-nav-home{width:46px;height:46px;border-radius:16px}}
-.karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;height:56px;padding:4px 0;border:1px solid transparent;border-radius:15px;background:transparent;color:rgba(220,240,248,.52);font-size:11px;font-weight:800;letter-spacing:.15px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
-.karvis-nav-button .nav-icon{font-size:21px;line-height:1.1;filter:drop-shadow(0 0 0 transparent)}
-.karvis-nav-button.active{color:#00e5ff;background:linear-gradient(180deg,rgba(0,229,255,.09),rgba(0,229,255,.025));border-color:rgba(0,229,255,.12);text-shadow:0 0 12px rgba(0,229,255,.22)}
-.karvis-nav-home{justify-self:center;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(0,229,255,.88);background:radial-gradient(circle at 40% 30%,rgba(0,229,255,.25),rgba(0,229,255,.055));color:#00e5ff;font-size:26px;font-weight:950;box-shadow:0 0 23px rgba(0,229,255,.24),inset 0 0 16px rgba(0,229,255,.14);text-shadow:0 0 13px rgba(0,229,255,.5);transition:transform .2s ease,box-shadow .2s ease}
-#discoverScreen{position:fixed;z-index:30;top:72px;bottom:calc(var(--discover-nav-height) + env(safe-area-inset-bottom));left:0;right:0;display:none;flex-direction:column;min-height:0;background:radial-gradient(circle at 50% 0,rgba(0,229,255,.055),transparent 35%),#02070a}
-#discoverScreen.open{display:flex}
-.discover-header{flex:none;padding:16px 15px 10px;border-bottom:1px solid rgba(0,229,255,.11);background:rgba(2,7,10,.94)}
-.discover-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.discover-title{font-size:21px;font-weight:900;letter-spacing:.2px}
-.discover-subtitle{margin-top:4px;color:rgba(255,255,255,.48);font-size:11px}
-.discover-search-button{width:40px;height:40px;border:1px solid rgba(0,229,255,.2);border-radius:13px;background:rgba(0,229,255,.05);color:#00e5ff;font-size:18px}
-.discover-mode-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.discover-mode-tab{min-width:0;min-height:42px;padding:9px 5px;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:rgba(255,255,255,.035);color:rgba(255,255,255,.65);font-size:12px;font-weight:850}
-.discover-mode-tab.active{border-color:rgba(0,229,255,.6);background:rgba(0,229,255,.1);color:#00e5ff;box-shadow:inset 0 0 0 1px rgba(0,229,255,.06)}
-#discoverFeed{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:13px 12px 22px;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.25) transparent}
-.discover-card{overflow:hidden;margin:0 auto 15px;max-width:680px;border:1px solid rgba(0,229,255,.15);border-radius:20px;background:linear-gradient(145deg,rgba(10,24,34,.98),rgba(4,12,18,.98));box-shadow:0 9px 26px rgba(0,0,0,.16)}
-.discover-cover{position:relative;display:flex;align-items:center;justify-content:center;min-height:142px;padding:20px;overflow:hidden;background:radial-gradient(circle at 50% 40%,rgba(0,229,255,.22),transparent 60%),linear-gradient(135deg,#0b2734,#0a111e)}
-.discover-cover::before,.discover-cover::after{content:"";position:absolute;border:1px solid rgba(0,229,255,.14);border-radius:50%;width:190px;height:190px;transform:rotate(-24deg)}
-.discover-cover::after{width:240px;height:240px;border-style:dashed;transform:rotate(35deg)}
-.discover-cover.fun{background:radial-gradient(circle at 50% 40%,rgba(179,100,255,.25),transparent 60%),linear-gradient(135deg,#251337,#0d101f)}
-.discover-cover.riddle{background:radial-gradient(circle at 50% 40%,rgba(61,220,157,.2),transparent 60%),linear-gradient(135deg,#0b2a26,#0d111b)}
-.discover-cover-emoji{position:relative;z-index:1;font-size:56px;filter:drop-shadow(0 0 18px rgba(0,229,255,.25))}
-.discover-card-body{padding:15px 15px 12px}
-.discover-card-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-.discover-chip{display:inline-flex;align-items:center;max-width:75%;padding:5px 8px;border-radius:8px;background:rgba(0,229,255,.08);color:#70eaff;font-size:10px;font-weight:850;letter-spacing:.4px}
-.discover-chip.fun{background:rgba(179,100,255,.12);color:#d4b4ff}
-.discover-chip.riddle{background:rgba(61,220,157,.1);color:#91efc2}
-.discover-card h2{margin:0 0 9px;font-size:19px;line-height:1.35;font-weight:850}
-.discover-card-text{margin:0;color:rgba(240,248,252,.78);font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
-.discover-source{margin-top:12px;color:rgba(255,255,255,.4);font-size:10px;line-height:1.5;overflow-wrap:anywhere}
-.discover-actions{display:flex;align-items:center;gap:8px;padding:0 14px 14px}
-.discover-action{min-height:38px;padding:8px 11px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(255,255,255,.035);color:rgba(240,248,252,.76);font-size:12px;font-weight:750}
-.discover-action.liked{border-color:rgba(255,94,142,.35);color:#ff719b;background:rgba(255,94,142,.08)}
-.discover-action.saved{border-color:rgba(0,229,255,.35);color:#00e5ff;background:rgba(0,229,255,.08)}
-.discover-action.primary{margin-left:auto;border-color:rgba(0,229,255,.32);color:#00e5ff;background:rgba(0,229,255,.07)}
-.discover-answer{display:none;margin:0 14px 13px;padding:12px;border:1px solid rgba(61,220,157,.2);border-radius:12px;background:rgba(61,220,157,.06);font-size:13px;line-height:1.65}
-.discover-answer.show{display:block}
-.discover-answer strong{color:#91efc2}
-.discover-loading,.discover-empty{max-width:680px;margin:18px auto;padding:22px 15px;text-align:center;border:1px solid rgba(0,229,255,.13);border-radius:16px;background:rgba(0,229,255,.035);color:rgba(255,255,255,.64);font-size:13px;line-height:1.6}
-.discover-loading .spinner{display:inline-block;width:15px;height:15px;margin-right:8px;vertical-align:-3px;border:2px solid rgba(0,229,255,.2);border-top-color:#00e5ff;border-radius:50%;animation:spin .8s linear infinite}
-body.discover-open .main{visibility:hidden}
-body.discover-open .karvis-bottom-nav{border-top-color:rgba(0,229,255,.25)}
-@media(min-width:760px){#discoverFeed{padding:20px 24px}.discover-card{margin-bottom:20px}.discover-cover{min-height:190px}.discover-card-body{padding:20px}.discover-card h2{font-size:22px}}
-@media(max-width:420px){.discover-title{font-size:19px}.discover-header{padding:13px 11px 9px}.discover-mode-tab{font-size:11px}.discover-card h2{font-size:17px}.discover-card-text{font-size:13px}.discover-cover{min-height:120px}.discover-cover-emoji{font-size:48px}.discover-actions{gap:6px;padding-left:10px;padding-right:10px}.discover-action{padding:8px 9px;font-size:11px}}
-
-
-/* Recovered evaluation styles that had been outside the document */
-/* KARVIS evaluation: compact class-level report, no per-question dump */
-.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
-.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
-.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
-.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
-.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
-.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
-@media(max-width:600px){
- .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
- .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
- .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
- .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
- .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
- .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
- .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
- .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
-}
-
-/* iPhone keyboard fix: hide bottom navigation while typing */
-body.karvis-keyboard-open .karvis-bottom-nav{
-  display:none !important;
-  visibility:hidden !important;
-  opacity:0 !important;
-  pointer-events:none !important;
-}
-body.karvis-keyboard-open .input-area{
-  bottom: max(10px, env(safe-area-inset-bottom));
-}
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2335,30 +2244,6 @@ body.karvis-keyboard-open .input-area{
   <div id="studentExamWork" style="display:none"></div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
-
-
-<!-- ============================================================
-     KARVIS KEŞFET — independent view; existing chat remains intact
-     ============================================================ -->
-<section id="discoverScreen" aria-label="KARVIS Keşfet">
-  <div class="discover-header">
-    <div class="discover-heading">
-      <div>
-        <div class="discover-title">✦ Keşfet</div>
-        <div class="discover-subtitle">Her kaydırmada yeni bir şey keşfet</div>
-      </div>
-      <button class="discover-search-button" type="button" aria-label="Yenile" onclick="refreshDiscoverFeed()">↻</button>
-    </div>
-    <div class="discover-mode-tabs" role="tablist" aria-label="Keşfet modları">
-      <button class="discover-mode-tab active" data-discover-mode="info" onclick="switchDiscoverMode('info')">💡 Bilgi</button>
-      <button class="discover-mode-tab" data-discover-mode="fun" onclick="switchDiscoverMode('fun')">😂 Eğlence</button>
-      <button class="discover-mode-tab" data-discover-mode="riddle" onclick="switchDiscoverMode('riddle')">🧩 Bilmece</button>
-    </div>
-  </div>
-  <div id="discoverFeed" aria-live="polite">
-    <div class="discover-loading"><span class="spinner"></span>Keşfet hazırlanıyor…</div>
-  </div>
-</section>
 
 <!-- ============================================================
      MAIN
@@ -6032,206 +5917,27 @@ initialize();
 </script>
 
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
-
-<!-- KARVIS bottom navigation -->
-<nav class="karvis-bottom-nav" aria-label="Ana gezinme">
-  <button class="karvis-nav-button" id="navDiscoverButton" onclick="openDiscover()"><span class="nav-icon">⌕</span><span>Keşfet</span></button>
-  <button class="karvis-nav-button" id="navArenaButton" onclick="navOpenArena()"><span class="nav-icon">♜</span><span>Arena</span></button>
-  <button class="karvis-nav-home" type="button" aria-label="KARVIS ana ekranı" onclick="showHome()">K</button>
-  <button class="karvis-nav-button active" id="navChatButton" onclick="navOpenChat()"><span class="nav-icon">◌</span><span>Sohbet</span></button>
-  <button class="karvis-nav-button" id="navMenuButton" onclick="navOpenMenu()"><span class="nav-icon">☰</span><span>Menü</span></button>
-</nav>
-
-
-<script>
-/* KARVIS Keşfet controller: isolated from the existing chat/Arena controllers. */
-(function(){
-  const feedEl = document.getElementById("discoverFeed");
-  const screenEl = document.getElementById("discoverScreen");
-  if(!feedEl || !screenEl) return;
-  let mode = "info";
-  let offset = 0;
-  let loading = false;
-  let exhausted = false;
-  let generation = 0;
-  const seen = new Set();
-  const itemsById = new Map();
-  const batchSize = 6;
-
-  function esc(value){
-    return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-  function getStoredSet(key){
-    try{
-      const data = JSON.parse(localStorage.getItem(key) || "[]");
-      return new Set(Array.isArray(data) ? data : []);
-    }catch(_){ return new Set(); }
-  }
-  function saveSet(key,set){
-    try{localStorage.setItem(key,JSON.stringify(Array.from(set).slice(-500)));}catch(_){}
-  }
-  function likedSet(){return getStoredSet("karvis_discover_likes");}
-  function savedSet(){return getStoredSet("karvis_discover_bookmarks");}
-  function modeLabel(value){return value==="fun"?"EĞLENCE":value==="riddle"?"BİLMECE":"BİLGİ";}
-  function cardMarkup(item){
-    const id = String(item.id || "");
-    const liked = likedSet().has(id);
-    const saved = savedSet().has(id);
-    const isRiddle = item.mode === "riddle";
-    const cls = item.mode === "fun" ? "fun" : isRiddle ? "riddle" : "";
-    const source = item.url
-      ? `<a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" style="color:#70eaff">Kaynağı aç ↗</a>`
-      : esc(item.source || "KARVIS");
-    const difficulty = isRiddle && item.difficulty ? " · " + esc(item.difficulty) : "";
-    return `<article class="discover-card" data-discover-card="${esc(id)}">
-      <div class="discover-cover ${cls}"><span class="discover-cover-emoji">${esc(item.emoji || (isRiddle?"🧩":item.mode==="fun"?"😂":"💡"))}</span></div>
-      <div class="discover-card-body">
-        <div class="discover-card-meta"><span class="discover-chip ${cls}">${esc(item.category || modeLabel(item.mode))}${difficulty}</span><span style="font-size:10px;color:rgba(255,255,255,.38)">KARVIS KEŞFET</span></div>
-        <h2>${esc(item.title || "Keşfet")}</h2>
-        <p class="discover-card-text">${esc(item.text || "")}</p>
-        <div class="discover-source">${source}${item.verified ? " · Kaynak bağlantısı mevcut" : ""}</div>
-      </div>
-      ${isRiddle ? `<div class="discover-answer" id="discover-answer-${esc(id)}"><strong>Cevap:</strong> <span class="discover-answer-text"></span><br><span class="discover-explanation"></span></div>` : ""}
-      <div class="discover-actions">
-        <button class="discover-action ${liked?"liked":""}" onclick="toggleDiscoverLike('${esc(id)}')">${liked?"♥":"♡"} ${liked?"Beğenildi":"Beğen"}</button>
-        <button class="discover-action ${saved?"saved":""}" onclick="toggleDiscoverSave('${esc(id)}')">${saved?"▣ Kaydedildi":"▢ Kaydet"}</button>
-        ${isRiddle ? `<button class="discover-action primary" onclick="revealDiscoverAnswer('${esc(id)}')">Cevabı gör</button>` : ""}
-      </div>
-    </article>`;
-  }
-  function loadingMarkup(message){
-    return `<div class="discover-loading"><span class="spinner"></span>${esc(message || "Yeni içerikler yükleniyor…")}</div>`;
-  }
-  async function loadMore(reset){
-    if(reset){
-      generation++;
-      loading=false;
-      offset=0;exhausted=false;seen.clear();itemsById.clear();
-      feedEl.innerHTML=loadingMarkup("Keşfet hazırlanıyor…");
-    }
-    if(loading || (exhausted && !reset)) return;
-    const myGeneration = generation;
-    loading=true;
-    if(!reset) feedEl.insertAdjacentHTML("beforeend",loadingMarkup());
-    try{
-      const response = await fetch((typeof API!=="undefined"?API:"")+"/discover/feed?mode="+encodeURIComponent(mode)+"&offset="+offset+"&limit="+batchSize,{headers:{"Accept":"application/json"}});
-      const payload = await response.json();
-      if(!response.ok) throw new Error(payload.detail || "İçerikler yüklenemedi.");
-      if(myGeneration !== generation) return;
-      const items = Array.isArray(payload.items) ? payload.items : [];
-      const html = [];
-      for(const item of items){
-        if(!item || !item.id || seen.has(item.id)) continue;
-        seen.add(item.id);itemsById.set(String(item.id),item);html.push(cardMarkup(item));
-      }
-      const loaders=feedEl.querySelectorAll(".discover-loading");
-      loaders.forEach(el=>el.remove());
-      if(html.length){
-        feedEl.insertAdjacentHTML("beforeend",html.join(""));
-        offset += batchSize;
-      }else if(offset===0){
-        feedEl.innerHTML=`<div class="discover-empty">Şimdilik içerik bulunamadı. Yenilemek için üstteki ↻ simgesine dokun.</div>`;
-      }
-      exhausted = payload.has_more === false;
-      if(!exhausted && items.length===0) exhausted=true;
-    }catch(error){
-      if(myGeneration===generation){
-        feedEl.querySelectorAll(".discover-loading").forEach(el=>el.remove());
-        if(offset===0) feedEl.innerHTML=`<div class="discover-empty">İçerikler şu anda yüklenemedi.<br><br><button class="discover-action primary" onclick="refreshDiscoverFeed()">Yeniden dene</button><div style="margin-top:8px;font-size:11px;opacity:.7">${esc(error.message||"Sunucu bağlantısı kurulamadı.")}</div></div>`;
-      }
-    }finally{
-      if(myGeneration===generation) loading=false;
-    }
-  }
-  window.openDiscover = function(){
-    screenEl.classList.add("open");
-    document.body.classList.add("discover-open");
-    document.getElementById("navDiscoverButton")?.classList.add("active");
-    document.getElementById("navChatButton")?.classList.remove("active");
-    if(!screenEl.dataset.loaded){screenEl.dataset.loaded="1";loadMore(true);}
-  };
-  window.showHome = function(){
-    screenEl.classList.remove("open");
-    document.body.classList.remove("discover-open");
-    document.getElementById("navDiscoverButton")?.classList.remove("active");
-    document.getElementById("navChatButton")?.classList.add("active");
-  };
-  window.navOpenChat = function(){window.showHome();document.getElementById("messageInput")?.focus({preventScroll:true});};
-  window.navOpenMenu = function(){window.showHome();if(typeof openSidebar==="function")openSidebar();};
-  window.navOpenArena = function(){window.showHome();if(typeof openArena==="function")openArena();};
-  window.switchDiscoverMode = function(nextMode){
-    if(!["info","fun","riddle"].includes(nextMode) || mode===nextMode) return;
-    mode=nextMode;
-    document.querySelectorAll("[data-discover-mode]").forEach(button=>button.classList.toggle("active",button.dataset.discoverMode===mode));
-    screenEl.dataset.loaded="1";
-    loadMore(true);
-  };
-  window.refreshDiscoverFeed = function(){loadMore(true);};
-  window.toggleDiscoverLike = function(id){
-    const set=likedSet();if(set.has(id))set.delete(id);else set.add(id);saveSet("karvis_discover_likes",set);refreshCard(id);
-  };
-  window.toggleDiscoverSave = function(id){
-    const set=savedSet();if(set.has(id))set.delete(id);else set.add(id);saveSet("karvis_discover_bookmarks",set);refreshCard(id);
-  };
-  function refreshCard(id){
-    const item=itemsById.get(String(id));const old=feedEl.querySelector(`[data-discover-card="${CSS.escape(String(id))}"]`);
-    if(!item||!old)return;const temp=document.createElement("div");temp.innerHTML=cardMarkup(item);old.replaceWith(temp.firstElementChild);
-  }
-  window.revealDiscoverAnswer = function(id){
-    const item=itemsById.get(String(id));const panel=document.getElementById("discover-answer-"+id);
-    if(!item||!panel)return;
-    panel.querySelector(".discover-answer-text").textContent=item.answer||"Bu bilmece için cevap hazırlanamadı.";
-    panel.querySelector(".discover-explanation").textContent=item.explanation||"";
-    panel.classList.add("show");
-  };
-  // iOS keyboard handling: hide the bottom navigation immediately when the message field
-  // receives focus. Do not rely only on viewport-height calculations, which vary in iOS Safari
-  // and installed web apps. Restore it only after focus leaves the input and the keyboard closes.
-  (function keepBottomNavBelowKeyboard(){
-    const input = document.getElementById("messageInput");
-    if (!input) return;
-    let blurTimer = null;
-    const markKeyboardOpen = () => {
-      if (blurTimer) clearTimeout(blurTimer);
-      document.body.classList.add("karvis-keyboard-open");
-    };
-    const markKeyboardClosed = () => {
-      if (blurTimer) clearTimeout(blurTimer);
-      blurTimer = setTimeout(() => {
-        const active = document.activeElement;
-        const stillTyping = active === input ||
-          (active && /^(INPUT|TEXTAREA)$/.test(active.tagName));
-        if (!stillTyping) document.body.classList.remove("karvis-keyboard-open");
-      }, 180);
-    };
-    input.addEventListener("focus", markKeyboardOpen);
-    input.addEventListener("blur", markKeyboardClosed);
-    document.addEventListener("focusin", (event) => {
-      if (event.target === input) markKeyboardOpen();
-    });
-    document.addEventListener("focusout", (event) => {
-      if (event.target === input) markKeyboardClosed();
-    });
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", () => {
-        if (document.activeElement === input && window.visualViewport.height < window.innerHeight * 0.78) {
-          markKeyboardOpen();
-        }
-      });
-    }
-    window.addEventListener("orientationchange", () => {
-      if (document.activeElement === input) markKeyboardOpen();
-    });
-  })();
-
-  feedEl.addEventListener("scroll",()=>{
-    if(!screenEl.classList.contains("open") || loading || exhausted) return;
-    if(feedEl.scrollTop + feedEl.clientHeight >= feedEl.scrollHeight - 500) loadMore(false);
-  },{passive:true});
-})();
-</script>
-
 </body>
 </html>
+
+
+/* KARVIS evaluation: compact class-level report, no per-question dump */
+.karvis-evaluation-modal .karvis-eval-summary{max-width:100%;min-width:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4{margin:18px 0 7px;color:#56deec;font-size:15px;line-height:1.45}
+.karvis-evaluation-modal .karvis-eval-report-formatted h4:first-child{margin-top:0}
+.karvis-evaluation-modal .karvis-eval-report-formatted p{margin:7px 0 12px;line-height:1.75}
+.karvis-evaluation-modal .karvis-eval-report-formatted ul{margin:7px 0 15px;padding-left:22px}
+.karvis-evaluation-modal .karvis-eval-report-formatted li{margin:6px 0;padding-left:3px;line-height:1.65}
+.karvis-evaluation-modal .karvis-eval-report-formatted strong{color:#f2fbff}
+@media(max-width:600px){
+ .karvis-evaluation-modal{width:calc(100vw - 14px)!important;max-height:92dvh!important;padding:12px!important}
+ .karvis-evaluation-modal .karvis-eval-hero{gap:11px;padding:14px;border-radius:16px}
+ .karvis-evaluation-modal .karvis-eval-orb{flex-basis:42px;height:42px;font-size:22px}
+ .karvis-evaluation-modal .karvis-eval-hero h2{font-size:19px!important}
+ .karvis-evaluation-modal .karvis-eval-hero p:last-child{font-size:12px}
+ .karvis-evaluation-modal .karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .karvis-evaluation-modal .karvis-eval-metric{min-height:88px;padding:11px}
+ .karvis-evaluation-modal .karvis-eval-section{padding:13px;margin:12px 0}
+ .karvis-evaluation-modal .karvis-eval-report-formatted{font-size:13px;line-height:1.7}
+}
