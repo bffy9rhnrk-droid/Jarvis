@@ -8804,6 +8804,23 @@ Aşağıdaki JSON biçiminde yalnızca çıktı ver:
     )
     answer = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True)
     parsed = extract_json(answer or "")
+    if isinstance(parsed, list):
+        parsed = {"items": parsed}
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
+        # Some model responses wrap JSON in markdown or return a JSON array directly.
+        raw = str(answer or "").strip()
+        try:
+            import re
+            match = re.search(r"\{[\s\S]*\}", raw)
+            if match:
+                parsed = json.loads(match.group(0))
+            else:
+                match = re.search(r"\[[\s\S]*\]", raw)
+                parsed = {"items": json.loads(match.group(0))} if match else {}
+        except Exception:
+            parsed = {}
+    if isinstance(parsed, list):
+        parsed = {"items": parsed}
     if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
         return []
     results = []
@@ -8866,7 +8883,7 @@ async def discover_feed(mode: str = "info", offset: int = 0, limit: int = 6):
         items = []
         for entry in found[:limit]:
             title = clean_text(entry.get("title", ""))[:140]
-            body = clean_text(entry.get("text", ""))[:1100]
+            body = clean_text(entry.get("text", ""))[:360]
             if not title or not body:
                 continue
             items.append({
@@ -8881,32 +8898,43 @@ async def discover_feed(mode: str = "info", offset: int = 0, limit: int = 6):
                 "verified": bool(entry.get("url"))
             })
         if not items:
-            # Honest fallback: no fabricated source labels or claims of live verification.
-            items = [{
-                "id": _discover_item_id("info-fallback", topic, offset),
-                "mode": "info",
-                "title": "Yeni bilgiler hazırlanıyor",
-                "text": "Şu anda güvenilir bir kaynak sonucu alınamadı. Biraz sonra tekrar deneyebilir veya başka bir moda geçebilirsin.",
-                "category": "Bilgi",
-                "emoji": "🔎",
-                "source": "KARVIS",
-                "url": "",
-                "verified": False
-            }]
+            # Short, evergreen fallback cards keep the feed useful when search providers are unavailable.
+            quick_facts = [
+                ("Ahtapotların üç kalbi var", "İki kalp kanı solungaçlara, biri vücudun geri kalanına pompalar.", "Hayvanlar", "🐙"),
+                ("Venüs'te bir gün çok uzun", "Venüs kendi ekseni etrafında, Güneş'in çevresinde dolanmasından daha yavaş döner.", "Uzay", "🪐"),
+                ("Bal arıları dans ederek anlatır", "Arılar, yiyeceğin yönünü ve yaklaşık uzaklığını dans hareketleriyle aktarabilir.", "Doğa", "🐝"),
+                ("Yıldırım Güneş'ten daha sıcak olabilir", "Yıldırım kanalındaki hava çok kısa süreliğine Güneş'in yüzeyinden daha sıcak değerlere ulaşabilir.", "Bilim", "⚡"),
+                ("Oxford Üniversitesi çok eski", "Oxford'da eğitim 11. yüzyılın sonlarında yapılıyordu; üniversitenin kesin kuruluş tarihi bilinmiyor.", "Tarih", "📚"),
+                ("Uzay tamamen sessizdir", "Ses dalgaları yayılmak için maddeye ihtiyaç duyar; boş uzayda normal ses iletilemez.", "Uzay", "🌌"),
+            ]
+            start = offset % len(quick_facts)
+            for i in range(min(limit, len(quick_facts))):
+                title, body, category, emoji = quick_facts[(start + i) % len(quick_facts)]
+                items.append({"id": _discover_item_id("info-fallback", title, offset), "mode":"info", "title":title, "text":body, "category":category, "emoji":emoji, "source":"KARVIS kısa bilgi", "url":"", "verified":False})
     else:
         items = _discover_ai_items(mode, limit)
-        if not items:
-            items = [{
-                "id": _discover_item_id(mode, f"fallback-{offset}"),
-                "mode": mode,
-                "title": "Yeni içerik hazırlanıyor",
-                "text": "KARVIS şu anda yeni içerik oluşturamadı. Biraz sonra yeniden deneyebilirsin.",
-                "category": "KARVIS",
-                "emoji": "✨",
-                "source": "KARVIS",
-                "url": "",
-                "verified": False
-            }]
+        if not items and mode == "fun":
+            fallback_fun = [
+                ("Beyin mi, pil mi?", "Telefonun %1 şarjda ve bir arkadaşın sana 'çok önemli' diye 17 dakikalık ses kaydı attı. İlk ne yaparsın?", "Günlük hayat", "😂"),
+                ("Hangisini seçerdin?", "Bir hafta boyunca sadece şarkı söyleyerek konuşmak mı, yoksa her cümlenin sonuna 'saygılarımla' eklemek mi?", "Hangisini seçerdin?", "🎭"),
+                ("Gizli süper gücün", "Her kapıyı açtığında arkadan epik film müziği çalıyor. İlk nereye girerdin?", "Absürt senaryo", "🦸"),
+                ("Arkadaş grubu klasiği", "Planı yapan kişi 'ben çıkıyorum' der ama hâlâ havlusuyla evde. Bu kişiyi grupta ne diye kaydedersin?", "Arkadaş ortamı", "😅"),
+                ("Zamanı durdurabilsen", "Zamanı 10 dakika durdurabiliyorsun ama her kullandığında saçların farklı bir renge dönüşüyor. Kullanır mıydın?", "Hayal et", "⏳"),
+                ("Son lokma savaşı", "Masada son patates kızartması kaldı. Herkes birbirine bakıyor. En mantıklı hamlen ne?", "Mizah", "🍟"),
+            ]
+            items = [{"id":_discover_item_id("fun-fallback", title, offset), "mode":"fun", "title":title, "text":body, "category":cat, "emoji":emoji, "source":"KARVIS Eğlence", "url":"", "verified":False} for title,body,cat,emoji in fallback_fun[offset % len(fallback_fun):] + fallback_fun[:offset % len(fallback_fun)]]
+            items = items[:limit]
+        elif not items and mode == "riddle":
+            fallback_riddles = [
+                ("Gittikçe ıslanan şey", "Kurudukça değil, başkasını kuruladıkça ıslanan şey nedir?", "Havlu", "Bir havlu suyu emdikçe ıslanır ve diğer şeyleri kurutur.", "Kolay"),
+                ("Ağzı var, konuşmaz", "Ağzı vardır ama konuşmaz; yatağı vardır ama uyumaz. Nedir?", "Nehir", "Nehir yatağında akar ve nehrin başlangıç ya da döküldüğü kısım için ağız ifadesi kullanılır.", "Orta"),
+                ("Senden hep önde", "Seni takip eder ama ışık yoksa kaybolabilir. Nedir?", "Gölgen", "Gölge ışığın geliş yönüne göre oluşur.", "Kolay"),
+                ("Ne kadar alırsan büyür", "İçinden ne kadar çok alırsan o kadar büyüyen şey nedir?", "Çukur", "Toprak aldıkça çukur genişler veya derinleşir.", "Kolay"),
+                ("Şehirleri var, evleri yok", "Şehirleri, yolları ve denizleri vardır ama insanı yoktur. Nedir?", "Harita", "Harita yerleri gösterir, kendisi gerçek bir şehir değildir.", "Kolay"),
+                ("Kırmadan kullanamazsın", "Kullanmadan önce kırman gereken şey nedir?", "Yumurta", "Yemek hazırlarken yumurtayı kırarak açarsın.", "Kolay"),
+            ]
+            items = [{"id":_discover_item_id("riddle-fallback", title, offset), "mode":"riddle", "title":title, "text":body, "category":"Bilmece", "emoji":"🧩", "difficulty":difficulty, "answer":answer, "explanation":explanation, "source":"KARVIS Bilmece", "url":"", "verified":False} for title,body,answer,explanation,difficulty in fallback_riddles[offset % len(fallback_riddles):] + fallback_riddles[:offset % len(fallback_riddles)]]
+            items = items[:limit]
     with _DISCOVER_CACHE_LOCK:
         _DISCOVER_CACHE[cache_key] = (now, items)
         # Keep this lightweight cache bounded.
