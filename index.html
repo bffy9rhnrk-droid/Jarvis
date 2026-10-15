@@ -1541,50 +1541,6 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 @media(max-width:720px){.karvis-eval-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.karvis-eval-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.karvis-eval-hero{align-items:flex-start;padding:15px;gap:12px}.karvis-eval-orb{flex-basis:46px;height:46px;font-size:22px;border-radius:14px}.karvis-eval-filter{grid-template-columns:1fr}.karvis-eval-filter label{grid-column:auto}.karvis-eval-filter .exam-generate-button{width:100%;white-space:normal}.karvis-eval-metrics{gap:8px}.karvis-eval-metric{padding:12px;min-height:100px}.karvis-eval-topic-grid,.karvis-eval-insight-grid{grid-template-columns:1fr}.karvis-eval-report{font-size:12px}}
 
-
-
-/* KARVIS NEON EXPERIENCE — additive visual layer; existing app logic preserved */
-:root{--kv-cyan:#25e7ff;--kv-purple:#a855f7;--kv-pink:#ff4fd8;--kv-panel:rgba(7,20,35,.82)}
-body{background:radial-gradient(ellipse at 50% 22%,rgba(0,176,255,.17),transparent 34%),radial-gradient(ellipse at 82% 75%,rgba(168,85,247,.12),transparent 36%),#030711!important}
-.header{background:rgba(3,8,20,.88);border-bottom-color:rgba(37,231,255,.25);box-shadow:0 8px 35px rgba(0,0,0,.2)}
-.logo-small{background:linear-gradient(145deg,rgba(37,231,255,.18),rgba(168,85,247,.18));border-color:var(--kv-cyan);color:#fff;text-shadow:0 0 12px var(--kv-cyan);box-shadow:0 0 24px rgba(37,231,255,.3),inset 0 0 18px rgba(168,85,247,.18)}
-.brand-title{background:linear-gradient(90deg,#fff,var(--kv-cyan),#c5a4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.menu-button{border-color:rgba(37,231,255,.38);background:linear-gradient(135deg,rgba(37,231,255,.14),rgba(168,85,247,.12));box-shadow:0 0 18px rgba(37,231,255,.08)}
-.hud{background:radial-gradient(ellipse at 50% 38%,rgba(0,190,255,.07),transparent 40%)}
-.hud-core{filter:drop-shadow(0 0 20px rgba(37,231,255,.18))}
-.ring.one{border-width:2px;border-color:rgba(37,231,255,.58);box-shadow:0 0 30px rgba(37,231,255,.08)}
-.ring.two{border-color:rgba(168,85,247,.7)}
-.ring.three{border-width:2px;box-shadow:0 0 24px rgba(37,231,255,.16)}
-.core{background:radial-gradient(circle at 30% 25%,rgba(37,231,255,.22),rgba(4,14,28,.96) 70%);text-shadow:0 0 22px var(--kv-cyan);border-color:#8af7ff;box-shadow:0 0 34px rgba(37,231,255,.6),inset 0 0 25px rgba(37,231,255,.2)}
-.status{padding:7px 13px;border:1px solid rgba(37,231,255,.2);border-radius:99px;background:rgba(3,15,29,.72);backdrop-filter:blur(12px);text-shadow:0 0 12px rgba(37,231,255,.4)}
-.input{border-color:rgba(37,231,255,.38);background:rgba(5,14,29,.96);box-shadow:0 0 24px rgba(37,231,255,.07)}
-.send{background:linear-gradient(135deg,#25e7ff,#8a7dff);box-shadow:0 0 22px rgba(37,231,255,.28)}
-.message.ai{background:linear-gradient(135deg,rgba(0,190,255,.13),rgba(168,85,247,.08));border-color:rgba(37,231,255,.25);box-shadow:0 8px 24px rgba(0,0,0,.14)}
-.sidebar{background:rgba(3,8,20,.97);border-right-color:rgba(37,231,255,.3);backdrop-filter:blur(22px)}
-.menu-item{border-color:rgba(255,255,255,.07);background:linear-gradient(110deg,rgba(37,231,255,.035),rgba(168,85,247,.035))}
-.menu-item.active,.menu-item:hover{box-shadow:0 0 18px rgba(37,231,255,.1);background:linear-gradient(110deg,rgba(37,231,255,.13),rgba(168,85,247,.09))}
-/* Mobile-first discovery dock */
-.kv-dock{position:fixed;z-index:35;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(440px,calc(100vw - 22px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:7px;border:1px solid rgba(37,231,255,.22);border-radius:22px;background:rgba(3,10,22,.91);backdrop-filter:blur(22px);box-shadow:0 8px 35px rgba(0,0,0,.42),0 0 25px rgba(37,231,255,.07)}
-.kv-dock button{min-width:0;min-height:49px;border:1px solid transparent;border-radius:15px;background:transparent;color:#a9c8db;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:700;padding:4px 2px}
-.kv-dock button span{font-size:19px;line-height:1.1}
-.kv-dock button:active,.kv-dock button:focus-visible{outline:none;border-color:rgba(37,231,255,.45);background:linear-gradient(145deg,rgba(37,231,255,.18),rgba(168,85,247,.16));color:#fff}
-.kv-dock .kv-dock-core{margin-top:-19px;min-height:57px;border-radius:50%;border:1px solid rgba(37,231,255,.65);background:radial-gradient(circle,rgba(37,231,255,.28),rgba(86,55,180,.3));box-shadow:0 0 22px rgba(37,231,255,.3);color:#fff}
-.kv-dock .kv-dock-core span{font-size:24px;text-shadow:0 0 12px var(--kv-cyan)}
-.kv-discover-modal{width:min(94vw,680px);padding:18px;background:linear-gradient(150deg,#071326,#09091a 75%);border-color:rgba(37,231,255,.32)}
-.kv-discover-hero{padding:18px;border-radius:18px;border:1px solid rgba(168,85,247,.35);background:radial-gradient(ellipse at 90% 0%,rgba(168,85,247,.22),transparent 55%),linear-gradient(130deg,rgba(0,190,255,.12),rgba(7,13,31,.7));margin-bottom:14px}
-.kv-discover-eyebrow{font-size:10px;letter-spacing:.18em;color:#7eeeff;font-weight:900}
-.kv-discover-hero h2{margin:8px 0;color:#fff;font-size:25px}
-.kv-discover-hero p{font-size:13px;line-height:1.55;color:#b8ccdf;margin:0}
-.kv-discover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.kv-discover-card{min-width:0;text-align:left;padding:14px;border-radius:16px;border:1px solid rgba(37,231,255,.19);background:linear-gradient(145deg,rgba(37,231,255,.08),rgba(168,85,247,.07));color:#fff;min-height:115px}
-.kv-discover-card span{display:block;font-size:24px;margin-bottom:10px}
-.kv-discover-card strong{display:block;font-size:13px;margin-bottom:5px}
-.kv-discover-card small{font-size:11px;line-height:1.45;color:#a9c4d8}
-@media(min-width:700px){.kv-dock{bottom:14px}.main{height:calc(100vh - 72px);padding-bottom:68px}}
-@media(max-width:699px){.header{height:64px;padding:0 12px}.main{height:calc(100dvh - 64px);padding-bottom:75px}.hud-core{top:32%;width:min(210px,58vw);height:min(210px,58vw)}.ring.one{width:100%;height:100%}.ring.two{width:81%;height:81%}.ring.three{width:62%;height:62%}.core{width:39%;height:39%;font-size:34px}.status{top:calc(32% + min(116px,31vw));font-size:9px}.chat{bottom:94px;max-height:34%}.input-area{bottom:10px;height:54px}.kv-dock{bottom:max(6px,env(safe-area-inset-bottom));}.kv-dock button{min-height:45px}.kv-dock .kv-dock-core{min-height:53px}.kv-discover-modal{padding:14px}.kv-discover-hero h2{font-size:22px}}
-@media(max-height:700px) and (max-width:699px){.hud-core{top:28%;width:155px;height:155px}.status{top:calc(28% + 88px)}.chat{max-height:36%;bottom:82px}.input-area{height:48px}.kv-dock button{min-height:40px}}
-@media(prefers-reduced-motion:reduce){.ring,.logo-small{animation:none!important}}
-
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2286,23 +2242,6 @@ body{background:radial-gradient(ellipse at 50% 22%,rgba(0,176,255,.17),transpare
 <div id="studentExamModal" class="modal exam-modal exam-student-modal" style="max-width:980px;">
   <h2>📝 Sınavlar</h2><div id="studentExamList">Sınavlar yükleniyor…</div>
   <div id="studentExamWork" style="display:none"></div>
-  <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
-</div>
-
-<div id="kvDiscoverModal" class="modal kv-discover-modal" aria-labelledby="kvDiscoverTitle">
-  <div class="kv-discover-hero">
-    <div class="kv-discover-eyebrow">KARVIS • DISCOVER</div>
-    <h2 id="kvDiscoverTitle">Bugün ne keşfediyoruz?</h2>
-    <p>Bir başlık seç; KARVIS seninle sohbet ederek konuyu derinleştirsin.</p>
-  </div>
-  <div class="kv-discover-grid">
-    <button class="kv-discover-card" onclick="startDiscovery('Bana uzay ve evren hakkında şaşırtıcı 5 bilgi anlat.')"><span>🌌</span><strong>Evrenin sırları</strong><small>Kara delikler, gezegenler ve bilinmeyenler</small></button>
-    <button class="kv-discover-card" onclick="startDiscovery('Yapay zekânın geleceğini ilginç örneklerle anlat ve benimle tartış.')"><span>🤖</span><strong>Yapay zekâ</strong><small>Gelecek, robotlar ve yeni teknolojiler</small></button>
-    <button class="kv-discover-card" onclick="startDiscovery('Bana kısa ve ilginç bir tarih olayı anlat, sonunda bir soru sor.')"><span>🏛️</span><strong>Tarihten bir olay</strong><small>Şaşırtıcı olaylar ve gizemler</small></button>
-    <button class="kv-discover-card" onclick="startDiscovery('Bana 3 soruluk eğlenceli bir mantık meydan okuması yap; cevaplarımı tek tek bekle.')"><span>🧠</span><strong>Zihin meydan okuması</strong><small>Mantığını test et, cevaplarını dene</small></button>
-    <button class="kv-discover-card" onclick="startDiscovery('Günlük hayatta işime yarayacak 5 pratik bilgi ver.')"><span>⚡</span><strong>Pratik bilgiler</strong><small>Günlük hayatta işe yarayan ipuçları</small></button>
-    <button class="kv-discover-card" onclick="startDiscovery('Benimle yeni bir konu keşfetmek için önce ilgi alanlarımı sor.')"><span>✨</span><strong>Bana özel keşif</strong><small>İlgi alanına göre yeni bir konu bul</small></button>
-  </div>
   <button class="modal-button secondary-button" onclick="closeModals()">Kapat</button>
 </div>
 
@@ -5921,21 +5860,6 @@ async function answerArena(choice){if(!arenaAttemptId||arenaAnswered)return;aren
  setTimeout(async()=>{if(d.finished){arenaAttemptId=null;$("arenaGameArea").innerHTML=`<div class="sude-card"><h3>🏁 Yarışma tamamlandı!</h3><p>Bu yarışmada ${d.score} puan kazandın.</p><button class="sude-btn" onclick="openArena()">Sonuçları ve sıralamayı yenile</button></div>`;await loadArenaOverview();}else{renderArenaQuestion(d.question,d.question_number,d.total_questions);}},850);
  }catch(e){arenaAnswered=false;if(feedback)feedback.textContent=e.message;}}
 
-function openKvDiscover(){
-  closeSidebar();
-  closeModals();
-  const modal=document.getElementById("kvDiscoverModal");
-  if(modal) modal.classList.add("show");
-}
-function startDiscovery(prompt){
-  closeModals();
-  const input=document.getElementById("messageInput");
-  if(!input) return;
-  input.value=prompt;
-  if(typeof sendMessage==="function") sendMessage();
-  else input.focus();
-}
-
 /* ============================================================
    INITIALIZE
    ============================================================ */
@@ -5993,14 +5917,6 @@ initialize();
 </script>
 
 <script>window.addEventListener("load",()=>{ registerKarvisServiceWorker().catch(()=>{}); });</script>
-<nav class="kv-dock" aria-label="KARVIS hızlı gezinme">
-  <button onclick="newChat()"><span>☷</span>Sohbet</button>
-  <button onclick="openKvDiscover()"><span>✦</span>Keşfet</button>
-  <button class="kv-dock-core" onclick="closeModals();document.getElementById('messageInput').focus()" aria-label="KARVIS asistan"><span>K</span></button>
-  <button onclick="openArena()"><span>🏆</span>Arena</button>
-  <button onclick="openSidebar()"><span>☰</span>Menü</button>
-</nav>
-
 </body>
 </html>
 
