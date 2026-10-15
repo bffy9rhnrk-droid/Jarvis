@@ -1547,7 +1547,13 @@ select option:checked{background:#087f9b!important;color:#fff!important}
    ============================================================ */
 :root{--discover-nav-height:70px}
 .main{height:calc(100dvh - 72px - var(--discover-nav-height));min-height:0}
-.karvis-bottom-nav{position:fixed;z-index:80;left:0;right:0;bottom:calc(-1 * var(--karvis-keyboard-height, 0px));height:calc(var(--discover-nav-height) + env(safe-area-inset-bottom));padding:7px 8px calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(5,15,21,.97),rgba(2,7,10,.99));border-top:1px solid rgba(0,229,255,.22);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 -8px 28px rgba(0,0,0,.22);transition:bottom .12s ease}
+.karvis-bottom-nav{position:fixed;z-index:80;left:12px;right:12px;bottom:calc(8px + env(safe-area-inset-bottom));height:calc(var(--discover-nav-height) - 2px);padding:7px 8px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(12,31,44,.60),rgba(2,10,17,.48));border:1px solid rgba(64,207,242,.30);border-radius:25px;backdrop-filter:blur(32px) saturate(175%);-webkit-backdrop-filter:blur(32px) saturate(175%);box-shadow:0 10px 34px rgba(0,0,0,.32),inset 0 1px 0 rgba(210,250,255,.10),0 0 24px rgba(0,190,230,.06);transition:opacity .18s ease,transform .18s ease,background .2s ease;transform:translateZ(0)}
+body.karvis-keyboard-open .karvis-bottom-nav{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(18px)}
+.karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;height:54px;padding:4px 0;border:1px solid transparent;border-radius:16px;background:transparent;color:rgba(211,235,246,.66);font-size:10px;font-weight:750;letter-spacing:.2px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
+.karvis-nav-button .nav-icon{font-size:22px;line-height:1.05;filter:drop-shadow(0 0 7px rgba(0,205,245,.10))}
+.karvis-nav-button.active{color:#52e8ff;background:linear-gradient(180deg,rgba(0,213,255,.17),rgba(0,130,180,.06));border-color:rgba(64,220,255,.20);text-shadow:0 0 13px rgba(0,210,255,.28);box-shadow:inset 0 1px 0 rgba(210,250,255,.07)}
+.karvis-nav-home{justify-self:center;width:50px;height:50px;border-radius:18px;border:1px solid rgba(75,226,255,.80);background:radial-gradient(circle at 35% 25%,rgba(0,229,255,.35),rgba(0,105,150,.13) 68%,rgba(0,30,45,.25));color:#73efff;font-size:25px;font-weight:950;box-shadow:0 0 22px rgba(0,205,245,.20),inset 0 0 17px rgba(0,229,255,.15),inset 0 1px 0 rgba(255,255,255,.16);text-shadow:0 0 13px rgba(0,229,255,.48);transition:transform .2s ease,box-shadow .2s ease}
+@media(max-width:420px){.karvis-bottom-nav{left:9px;right:9px;border-radius:22px;padding-left:5px;padding-right:5px}.karvis-nav-button{font-size:9px}.karvis-nav-button .nav-icon{font-size:21px}.karvis-nav-home{width:46px;height:46px;border-radius:16px}}
 .karvis-nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;height:56px;padding:4px 0;border:1px solid transparent;border-radius:15px;background:transparent;color:rgba(220,240,248,.52);font-size:11px;font-weight:800;letter-spacing:.15px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
 .karvis-nav-button .nav-icon{font-size:21px;line-height:1.1;filter:drop-shadow(0 0 0 transparent)}
 .karvis-nav-button.active{color:#00e5ff;background:linear-gradient(180deg,rgba(0,229,255,.09),rgba(0,229,255,.025));border-color:rgba(0,229,255,.12);text-shadow:0 0 12px rgba(0,229,255,.22)}
@@ -6160,8 +6166,9 @@ initialize();
         const vv = window.visualViewport;
         const focused = document.activeElement === input;
         const keyboardHeight = focused ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
-        document.documentElement.style.setProperty("--karvis-keyboard-height", keyboardHeight > 100 ? keyboardHeight + "px" : "0px");
-        document.body.classList.toggle("karvis-keyboard-open", keyboardHeight > 100);
+        const keyboardOpen = focused && keyboardHeight > 100;
+        document.documentElement.style.setProperty("--karvis-keyboard-height", keyboardOpen ? keyboardHeight + "px" : "0px");
+        document.body.classList.toggle("karvis-keyboard-open", keyboardOpen);
       });
     };
     visualViewport.addEventListener("resize", update);
