@@ -8760,6 +8760,164 @@ async def startup():
     print("=" * 65)
 
 
+
+
+# ============================================================
+# KARVIS KEŞFET — additive content feed (keeps existing features)
+# ============================================================
+_DISCOVER_CACHE = {}
+_DISCOVER_CACHE_LOCK = threading.Lock()
+_DISCOVER_CACHE_TTL = 240
+_DISCOVER_INFO_TOPICS = [
+    "şaşırtıcı bilim gerçekleri", "uzay hakkında ilginç bilgiler",
+    "otomobiller ve motor teknolojisi", "insan beyni ve hafıza",
+    "hayvanlar hakkında ilginç bilgiler", "teknoloji ve yapay zekâ",
+    "tarihî keşifler", "denizler ve okyanuslar", "spor bilimi",
+    "günlük hayatta kullanılan teknolojiler"
+]
+
+def _discover_item_id(mode, title, offset=0):
+    raw = f"{mode}|{title}|{offset}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:18]
+
+def _discover_ai_items(mode, count=6):
+    if mode == "fun":
+        instructions = """
+Türkçe, gençlerin ilgisini çekecek özgün ve kısa eğlence kartları üret.
+Çeşitler: komik günlük yaşam durumları, absürt varsayımlar, arkadaş ortamı mizahı,
+'Hangisini seçerdin?' ve kısa interaktif senaryolar. Kullanıcıya gerçek kişilerin
+gizli düşüncelerini bildiğini iddia etme; bunu açıkça hayalî senaryo olarak sun.
+Aşağıdaki JSON biçiminde yalnızca çıktı ver:
+{"items":[{"title":"kısa başlık","text":"2-4 cümlelik eğlenceli içerik","category":"Mizah|Senaryo|Hangisini seçerdin?","emoji":"😂"}]}
+"""
+    else:
+        instructions = """
+Türkçe, özgün ve çözümü tutarlı bilmeceler üret. Kolay, orta ve zor seviyeler karışık olsun.
+Sorunun cevabını 'answer' alanında, kısa açıklamasını 'explanation' alanında ver;
+arayüz cevabı kullanıcı tahmin etmeden göstermeyecek. Aynı bilmeceyi tekrar etme.
+Aşağıdaki JSON biçiminde yalnızca çıktı ver:
+{"items":[{"title":"kısa başlık","text":"bilmece metni","category":"Bilmece","difficulty":"Kolay|Orta|Zor","answer":"cevap","explanation":"kısa açıklama","emoji":"🧩"}]}
+"""
+    prompt = (
+        instructions
+        + f"\nTam olarak {count} farklı kart üret. Başlıklar kısa, içerikler anlaşılır olsun."
+    )
+    answer = ask_ai(prompt, PROFESSIONAL_SYSTEM, fast=True)
+    parsed = extract_json(answer or "")
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
+        return []
+    results = []
+    for entry in parsed["items"][:count]:
+        if not isinstance(entry, dict):
+            continue
+        title = clean_text(entry.get("title", ""))[:140]
+        body = clean_text(entry.get("text", ""))[:1200]
+        if not title or not body:
+            continue
+        item = {
+            "id": _discover_item_id(mode, title),
+            "mode": mode,
+            "title": title,
+            "text": body,
+            "category": clean_text(entry.get("category", "Eğlence" if mode == "fun" else "Bilmece"))[:60],
+            "emoji": clean_text(entry.get("emoji", "😂" if mode == "fun" else "🧩"))[:8],
+            "source": "KARVIS Yapay Zekâ",
+            "url": "",
+            "verified": False
+        }
+        if mode == "riddle":
+            item["difficulty"] = clean_text(entry.get("difficulty", "Orta"))[:20]
+            item["answer"] = clean_text(entry.get("answer", ""))[:300]
+            item["explanation"] = clean_text(entry.get("explanation", ""))[:500]
+        results.append(item)
+    return results
+
+@app.get("/discover/feed")
+async def discover_feed(mode: str = "info", offset: int = 0, limit: int = 6):
+    """Keşfet feed; new endpoints only, existing chat/profile/Arena APIs untouched."""
+    mode = str(mode or "info").strip().lower()
+    if mode not in {"info", "fun", "riddle"}:
+        raise HTTPException(status_code=400, detail="Geçersiz Keşfet modu.")
+    offset = max(0, min(int(offset or 0), 10000))
+    limit = max(1, min(int(limit or 6), 8))
+    cache_key = f"{mode}:{offset}:{limit}"
+    now = time.time()
+    with _DISCOVER_CACHE_LOCK:
+        cached = _DISCOVER_CACHE.get(cache_key)
+        if cached and now - cached[0] < _DISCOVER_CACHE_TTL:
+            return {"mode": mode, "items": cached[1], "has_more": True, "cached": True}
+
+    if mode == "info":
+        topic = _DISCOVER_INFO_TOPICS[(offset // limit) % len(_DISCOVER_INFO_TOPICS)]
+        found = []
+        try:
+            found = search_wikipedia(topic, language="tr", limit=limit)
+        except Exception:
+            found = []
+        if len(found) < 3:
+            try:
+                extra = search_google_web(topic)
+                if not extra:
+                    extra = search_duckduckgo_web(topic)
+                known = {str(x.get("url", "")) for x in found}
+                found.extend(x for x in extra if str(x.get("url", "")) not in known)
+            except Exception:
+                pass
+        items = []
+        for entry in found[:limit]:
+            title = clean_text(entry.get("title", ""))[:140]
+            body = clean_text(entry.get("text", ""))[:1100]
+            if not title or not body:
+                continue
+            items.append({
+                "id": _discover_item_id("info", entry.get("url") or title, offset),
+                "mode": "info",
+                "title": title,
+                "text": body,
+                "category": "Bilgi",
+                "emoji": "💡",
+                "source": clean_text(entry.get("source", "Web"))[:80],
+                "url": str(entry.get("url", ""))[:1000],
+                "verified": bool(entry.get("url"))
+            })
+        if not items:
+            # Honest fallback: no fabricated source labels or claims of live verification.
+            items = [{
+                "id": _discover_item_id("info-fallback", topic, offset),
+                "mode": "info",
+                "title": "Yeni bilgiler hazırlanıyor",
+                "text": "Şu anda güvenilir bir kaynak sonucu alınamadı. Biraz sonra tekrar deneyebilir veya başka bir moda geçebilirsin.",
+                "category": "Bilgi",
+                "emoji": "🔎",
+                "source": "KARVIS",
+                "url": "",
+                "verified": False
+            }]
+    else:
+        items = _discover_ai_items(mode, limit)
+        if not items:
+            items = [{
+                "id": _discover_item_id(mode, f"fallback-{offset}"),
+                "mode": mode,
+                "title": "Yeni içerik hazırlanıyor",
+                "text": "KARVIS şu anda yeni içerik oluşturamadı. Biraz sonra yeniden deneyebilirsin.",
+                "category": "KARVIS",
+                "emoji": "✨",
+                "source": "KARVIS",
+                "url": "",
+                "verified": False
+            }]
+    with _DISCOVER_CACHE_LOCK:
+        _DISCOVER_CACHE[cache_key] = (now, items)
+        # Keep this lightweight cache bounded.
+        if len(_DISCOVER_CACHE) > 80:
+            oldest = sorted(_DISCOVER_CACHE.items(), key=lambda pair: pair[1][0])[:20]
+            for key, _ in oldest:
+                _DISCOVER_CACHE.pop(key, None)
+    return {"mode": mode, "items": items, "has_more": True, "cached": False}
+
+
+
 # ============================================================
 # LOCAL RUN
 # ============================================================
