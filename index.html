@@ -2177,7 +2177,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
   <div class="find-hero">
     <div style="font-size:10px;letter-spacing:.16em;font-weight:900;color:#45e5f1;margin-bottom:7px">KARVIS EĞLENCE · SOSYAL ÇIKARIM</div>
     <h2>🕵️ KARVIS’i Bul</h2>
-    <p>Odayı kur, arkadaşlarını kodla davet et. Herkes sırayla konuşur; aranızda gizlenen yapay zekâyı bulmak için sonunda oy verirsiniz.</p>
+    <p>Odayı kur arkadaşlarını kodla davet et ve 60 saniye boyunca serbestçe sohbet et aranızdaki gizli yapay zekâyı bulmak için sonunda oy ver</p>
   </div>
   <section id="findLobbySetup" class="find-grid">
     <div class="find-card">
@@ -2207,7 +2207,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
       <div class="find-card">
         <div id="findRoundStatus" class="find-status"></div>
         <div id="findChatLog" class="find-chat" aria-live="polite"></div>
-        <div id="findChatComposer" class="find-chat-form"><input id="findChatInput" class="find-field" maxlength="280" placeholder="Sıran gelince mesajını yaz…"><button class="find-action primary" style="width:auto;margin:7px 0" onclick="sendFindKarvisMessage()">Gönder</button></div>
+        <div id="findChatComposer" class="find-chat-form"><input id="findChatInput" class="find-field" maxlength="280" placeholder="Mesajını yaz ve sohbete katıl…"><button class="find-action primary" style="width:auto;margin:7px 0" onclick="sendFindKarvisMessage()">Gönder</button></div>
         <div id="findVoteArea" style="display:none;margin-top:12px"><h3>🗳️ Yapay zekâ kim?</h3><div id="findVoteOptions"></div></div>
         <div id="findResultArea" class="find-status"></div>
       </div>
@@ -6020,7 +6020,7 @@ async function pollFindKarvisRoom(){
   $("findRoomStatus").textContent=d.status==="lobby"?"Oyuncular bekleniyor…":d.status==="discussion"?"Sohbet turu devam ediyor.":d.status==="voting"?"Oylama başladı.":d.status==="finished"?"Oyun tamamlandı.":"";
   $("findHostControls").style.display=d.is_host&&d.status==="lobby"?"block":"none";
   $("findGameArea").style.display=d.status==="lobby"?"none":"block";
-  $("findRoundStatus").textContent=d.turn_name?(d.is_my_turn?"🎙️ Sıra sende!":"🎙️ Sıra: "+d.turn_name):"Sohbet tamamlandı; oyunu kullan.";
+  $("findRoundStatus").textContent=d.status==="discussion"?("⏱️ Kalan süre: "+Number(d.remaining_seconds||0)+" saniye · Serbest sohbet"):(d.status==="voting"?"🗳️ Süre doldu · Yapay zekâyı oylayın":"Sohbet tamamlandı");
   const chat=d.messages||[];
   const snap=JSON.stringify([d.status,d.turn_index,chat.length,d.votes_count,d.result]);
   if(snap!==findKarvisSnapshot){
@@ -6028,7 +6028,7 @@ async function pollFindKarvisRoom(){
    $("findChatLog").innerHTML=chat.map(m=>`<div class="find-chat-line ${m.system?"system":""}"><strong>${findEsc(m.name)}:</strong> ${findEsc(m.text)}</div>`).join("");
    $("findChatLog").scrollTop=$("findChatLog").scrollHeight;
   }
-  $("findChatComposer").style.display=d.status==="discussion"&&d.is_my_turn?"flex":"none";
+  $("findChatComposer").style.display=d.status==="discussion"?"flex":"none";
   $("findVoteArea").style.display=d.status==="voting"?"block":"none";
   if(d.status==="voting"){
    $("findVoteOptions").innerHTML=players.filter(p=>!p.is_me).map(p=>`<div class="find-vote-row"><span>${findEsc(p.name)}</span><button onclick="voteFindKarvis('${findEsc(p.id)}')" ${d.has_voted?"disabled":""}>Oy ver</button></div>`).join("");
@@ -6038,7 +6038,7 @@ async function pollFindKarvisRoom(){
    $("findResultArea").textContent=d.result?`${d.result.caught?"🎉 Tebrikler! Yapay zekâyı buldunuz.":"🤖 Yapay zekâ aranızda gizlenmeyi başardı."} Gizli oyuncu: ${d.result.ai_name}. ${d.result.details||""}`:"Oyun tamamlandı.";
   }else $("findResultArea").textContent="";
  }catch(e){$("findRoomStatus").textContent="Bağlantı kurulamadı: "+e.message;}
- finally{if(findKarvisPollTimer)clearTimeout(findKarvisPollTimer);if($("findKarvisModal").classList.contains("show"))findKarvisPollTimer=setTimeout(pollFindKarvisRoom,1800);}
+ finally{if(findKarvisPollTimer)clearTimeout(findKarvisPollTimer);if($("findKarvisModal").classList.contains("show"))findKarvisPollTimer=setTimeout(pollFindKarvisRoom,1000);}
 }
 
 /* ============================================================
