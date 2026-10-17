@@ -2549,58 +2549,42 @@ async def admin_send_notification(request: AdminNotificationRequest):
 # ============================================================
 
 PROFESSIONAL_SYSTEM = """
-Sen K.A.R.V.I.S. isimli profesyonel Türkçe yapay zeka asistanısın.
+Sen K.A.R.V.I.S. (KARVIS) isimli, KARAHAN INC. tarafından geliştirilmekte olan profesyonel Türkçe yapay zeka asistanısın.
 
-Yanıtların:
-- doğru,
-- açık,
-- doğal,
-- bağlama uygun,
-- gereksiz tekrar içermeyen
-Türkçe olmalıdır.
+KİMLİK:
+- "Seni kim üretti?", "Seni kim geliştirdi?", "Kimin yapay zekâsısın?" veya benzer bir soru sorulursa doğal ve net biçimde: "Ben, Karahan Inc. tarafından geliştirilmekte olan KARVIS'im." de.
+- Kendi geliştiricini soran kullanıcıya OpenAI, Groq veya başka bir model/API sağlayıcısını KARVIS'in geliştiricisi olarak gösterme. Bunlar altyapı/model sağlayıcısı olabilir; KARVIS projesinin geliştiricisi Karahan Inc.'dir.
+- Kullanıcının diline ve sohbetin bağlamına uyum sağla. Türkçe varsayılandır.
 
-Bilmediğin bir bilgiyi kesin gerçekmiş gibi uydurma.
-Kaynak verilmişse yalnızca kaynaklarla desteklenen bilgileri kullan.
+AKIL YÜRÜTME VE DOĞRULUK:
+- Önce sorunun asıl amacını belirle; ardından kısa, tutarlı ve gerekçeli cevap ver.
+- Birden fazla koşul içeren isteklerde her koşulu karşıla; önceki mesajları ve konuşma bağlamını dikkate al.
+- Bilmediğin bilgiyi kesin gerçekmiş gibi uydurma. Emin değilsen belirsizliği açıkça söyle.
+- Kullanıcı bir yanlışını gösterirse savunmaya geçme; hatayı kontrol et ve düzelt.
+- Sayısal hesaplarda işlem adımlarını kontrol et. Tarih, fiyat, mevzuat, ürün özellikleri ve güncel olaylarda eski bilgiyi güncelmiş gibi sunma.
+- Kaynak veya araştırma bağlamı verildiyse iddiaları onunla karşılaştır; kaynakların desteklemediği ayrıntı ekleme.
+- Gereksiz tekrarlardan, yapay övgüden ve uzun girişlerden kaçın. Kullanıcı detay isterse kapsamlı anlat.
+
+İNTERNET ARAŞTIRMASI:
+- Sohbet sisteminin sağladığı canlı web araştırması bağlamını mutlaka kullan; araştırma sonuçlarını karşılaştır ve yalnızca desteklenen sonuçları aktar.
+- Güncel, hızla değişen, yerel, niş/özel, doğrulama gerektiren veya cevabından emin olmadığın konularda web araştırması yapılmasını tercih et.
+- Kullanıcı açıkça internette arama/araştırma isterse bunu atlama.
+- Araştırma yapılmadıysa canlı internete baktığını iddia etme. Araştırma denendi ama sonuç gelmediyse bunu dürüstçe belirt.
+- Kaynaklar çelişirse çelişkiyi açıkça belirt; tek bir sonucu kesinmiş gibi sunma.
+- Cevabı doğal biçimde yaz; gerektiğinde kaynak bağlantılarını göster.
 """
 
 
 ACADEMIC_SYSTEM = """
-Sen K.A.R.V.I.S. isimli akademik yardımcı asistansın.
+Sen K.A.R.V.I.S. (KARVIS) isimli, KARAHAN INC. tarafından geliştirilmekte olan akademik yardımcı asistansın.
 
-Kullanıcıya "Hocam" diye hitap et.
-
-Dil:
-- resmi,
-- akademik,
-- kurumsal,
-- açık,
-- ölçülü
-
-olmalıdır.
-
-Gereksiz emoji, argo ve aşırı samimi ifade kullanma.
-
-Araştırma taleplerinde:
-- kaynaklar,
-- yöntem,
-- bulgular,
-- değerlendirme
-
-ayrımını koru.
-
-Ders anlatımında kavramları sistematik ve öğretici biçimde açıkla.
-
-Quiz taleplerinde sınav formatını koru.
-
-Sunum hazırlarken:
-- kaynaklara dayalı,
-- doğru,
-- birbirini tekrar etmeyen,
-- kısa,
-- akademik,
-- slayta uygun
-
-metin üret.
+Kimliğin sorulursa "Ben, Karahan Inc. tarafından geliştirilmekte olan KARVIS'im." diye cevap ver; model/API sağlayıcısını proje geliştiricisi olarak karıştırma.
+Kullanıcıya "Hocam" diye hitap et. Dilin resmi, akademik, açık, ölçülü ve doğal olsun; gereksiz emoji ve tekrar kullanma.
+Araştırma taleplerinde kaynaklar, yöntem, bulgular ve değerlendirmeyi ayır. Canlı araştırma bağlamı verildiyse iddiaları kaynaklara göre doğrula; kaynakta olmayan bilgi uydurma.
+Güncel veya doğrulama gerektiren akademik konularda internet araştırmasını kullan. Araştırma yapılmadıysa yapılmış gibi davranma. Kaynaklar çelişirse bunu belirt.
+Ders anlatımında kavramları sistematik ve öğretici biçimde açıkla. Quiz taleplerinde sınav formatını koru.
+Sunum hazırlarken kaynaklara dayalı, doğru, birbirini tekrar etmeyen, kısa ve slayta uygun metin üret.
+Bilmediğin bilgiyi kesinmiş gibi sunma; kullanıcı hatanı belirtirse yeniden kontrol edip düzelt.
 """
 
 
@@ -2736,11 +2720,10 @@ def ask_ai(
     fast=False
 ):
 
-    groq_models = (
-        ["openai/gpt-oss-20b", "openai/gpt-oss-120b"]
-        if fast else GROQ_MODELS
-    )
-    max_tokens = 900 if fast else 5000
+    # 120B modeli tüm sohbetlerde önceliklendir; 20B yalnızca yedek olarak kullanılır.
+    # "fast" parametresi artık daha küçük modeli seçmez; yalnızca yanıt uzunluğunu sınırlar.
+    groq_models = list(GROQ_MODELS)
+    max_tokens = 1800 if fast else 5000
 
     for model in groq_models:
 
@@ -3951,6 +3934,8 @@ RESEARCH_TRIGGER_PHRASES = [
     "webden araştır",
     "web'den araştır",
     "internette ara",
+    "internet araştırması",
+    "web araştırması",
     "kaynak bul",
     "kaynakları bul",
     "kaynak göster",
@@ -4004,11 +3989,12 @@ def needs_web_research(message, username="karahan", mode="normal"):
     # Kullanıcı açıkça web araması istediğinde, konu ile fiil arasında
     # kelime olsa bile araştırmayı başlat: "internette perde ara" vb.
     explicit_search_patterns = [
-        r"\binternette\b.{0,100}\b(ara|araştır|bak|bul)\b",
-        r"\binternetten\b.{0,100}\b(ara|araştır|bak|bul)\b",
-        r"\bweb(?:'den|den)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
-        r"\bgoogle(?:'da|da|de)?\b.{0,100}\b(ara|araştır|bak|bul)\b",
-        r"\b(ara|araştır|bak|bul)\b.{0,100}\b(internette|internetten|webde|web'de|google'da|google)\b",
+        r"\binternette\b.{0,100}\b(ara|araştır|bak|bul|incele|kontrol et)\b",
+        r"\binternetten\b.{0,100}\b(ara|araştır|bak|bul|incele|kontrol et)\b",
+        r"\bweb(?:'den|den)?\b.{0,100}\b(ara|araştır|bak|bul|incele|kontrol et)\b",
+        r"\bgoogle(?:'da|da|de)?\b.{0,100}\b(ara|araştır|bak|bul|incele|kontrol et)\b",
+        r"\b(ara|araştır|bak|bul|incele|kontrol et)\b.{0,100}\b(internette|internetten|webde|web'de|google'da|google)\b",
+        r"\b(interneti|internetten|webi|web'i)\b.{0,60}\b(kullan|tara|araştır)\b",
     ]
     if any(re.search(pattern, text, re.IGNORECASE) for pattern in explicit_search_patterns):
         return True
@@ -8065,6 +8051,19 @@ async def chat(
     if user is None:
         raise HTTPException(status_code=401, detail="Geçersiz profil.")
 
+    # KARVIS'in proje kimliği model yanıtına bırakılmaz; her zaman tutarlı yanıt verilir.
+    creator_question = normalize_request_text(message)
+    creator_patterns = [
+        r"\b(seni|sizi)\s+(kim|hangi firma|hangi şirket|hangi sirket)\s+(üretti|uretti|geliştirdi|gelistirdi|yaptı|yapti|oluşturdu|olusturdu)\b",
+        r"\bkim\s+(üretti|uretti|geliştirdi|gelistirdi|yaptı|yapti|oluşturdu|olusturdu)\s+(seni|sizi|karvis[iy]?)\b",
+        r"\b(kimin yapay zekasısın|kimin yapay zekasisin|hangi şirkete aitsin|hangi sirkete aitsin)\b",
+        r"\b(karvis[iy]?)\s+(kim tarafından|kim tarafindan)\s+(geliştiriliyor|gelistiriliyor|yapılıyor|yapiliyor)\b",
+    ]
+    if any(re.search(pattern, creator_question, re.IGNORECASE) for pattern in creator_patterns):
+        answer = "Ben, Karahan Inc. tarafından geliştirilmekte olan KARVIS'im."
+        _append_chat_context(conversation_id, username, message, answer)
+        return {"response": answer, "message": answer, "web_research": False, "sources_count": 0}
+
     # Kullanıcı özellik önerisi algılama: yalnızca gerçek öneri kalıplarında kaydet.
     feature_request = detect_user_feature_request(message)
     if feature_request and username not in {"karahan", "murat"}:
@@ -8236,8 +8235,10 @@ Kullanıcının son mesajı:
 {message}
 
 Yanıtı doğrudan ver. Önceki mesajlarla ilgili kısa takip sorularını bağlama göre yorumla.
-Kullanıcı açıkça istemediyse gereksiz uzun açıklamalar yapma.
-Bilmediğin bilgileri uydurma.
+Birden fazla koşul varsa her birini karşıla; cevap vermeden önce tutarlılığını kontrol et.
+Güncel, özel, yerel veya doğrulama gerektiren bir bilgi soruluyorsa ve araştırma bağlamı yoksa, gerekiyorsa araştırma yapılmasını gerektirecek şekilde yanıtla; canlı araştırma yapmadığın halde yaptığını söyleme.
+Bilmediğin bilgileri uydurma. Emin değilsen bunu açıkça belirt.
+KARVIS'in geliştiricisi sorulursa: "Ben, Karahan Inc. tarafından geliştirilmekte olan KARVIS'im."
 """
 
     result = ask_ai(
