@@ -8061,39 +8061,39 @@ def _format_chat_context(history):
     )
 
 
-def _get_profile_memory_context(username, max_items=25, max_chars=5000):
-    """Load saved memories for this profile only; never mix profiles."""
-    try:
-        with memory_lock:
-            stored = read_json_file(MEMORY_FILE, [])
-    except Exception:
-        return ""
+# ============================================================
+# SMART COMMANDS: VIDEO SEARCH / OPEN
+# ============================================================
 
-    username = str(username or "karahan").strip().lower()
-    if isinstance(stored, dict):
-        memories = stored.get(username, [])
-    elif username == "karahan" and isinstance(stored, list):
-        memories = stored
-    else:
-        memories = []
+class OpenVideoRequest(BaseModel):
+    query: str
+    username: str = "karahan"
 
-    if not isinstance(memories, list):
-        return ""
 
-    lines = []
-    for item in memories[-max_items:]:
-        value = str(item.get("text", "") if isinstance(item, dict) else item).strip()
-        if value:
-            lines.append("- " + value[:700])
-    if not lines:
-        return ""
+@app.post("/commands/open-video")
+async def open_video_command(request: OpenVideoRequest):
+    """Return safe, device-independent video search destinations.
 
-    rendered = "\n".join(lines)
-    if len(rendered) > max_chars:
-        rendered = rendered[-max_chars:]
-        if "\n" in rendered:
-            rendered = rendered[rendered.find("\n") + 1:]
-    return rendered
+    The browser opens the chosen URL on the user's own device (Windows/iPhone).
+    This endpoint does not execute operating-system commands.
+    """
+    query = (request.query or "").strip()
+    if not query:
+        raise HTTPException(status_code=400, detail="Açılacak video veya konu belirtilmedi.")
+    query = query[:240]
+    from urllib.parse import quote_plus
+    q = quote_plus(query)
+    return {
+        "success": True,
+        "action": "open_video_search",
+        "query": query,
+        "message": f'{query} için video araması hazırlanıyor.',
+        "sources": [
+            {"name": "YouTube", "url": f"https://www.youtube.com/results?search_query={q}"},
+            {"name": "Google Videolar", "url": f"https://www.google.com/search?tbm=vid&q={q}"},
+            {"name": "DuckDuckGo Videolar", "url": f"https://duckduckgo.com/?q={q}&iax=videos&ia=videos"}
+        ]
+    }
 
 
 # ============================================================
@@ -8127,7 +8127,6 @@ async def chat(
 
     conversation_id = (request.conversation_id or "").strip()[:120]
     chat_history = _get_chat_context(conversation_id, username)
-    profile_memory_context = _get_profile_memory_context(username)
 
     user = USERS.get(username)
     if user is None:
@@ -8312,10 +8311,6 @@ Kullanıcı profili:
 
 ÖNCEKİ MESAJLAR (yalnızca bu aktif sohbetin geçici bağlamı):
 {_format_chat_context(chat_history)}
-
-BU PROFİLİN KAYITLI HAFIZASI (başka profillerin kayıtlarını kullanma):
-{profile_memory_context or "Bu profil için kayıtlı hafıza yok."}
-Hafıza kayıtlarını yalnızca ilgili olduklarında kullan; eski veya çelişkili bilgi varsa kesin gerçek gibi sunma.
 
 Kullanıcının son mesajı:
 {message}
