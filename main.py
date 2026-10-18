@@ -8072,27 +8072,75 @@ class OpenVideoRequest(BaseModel):
 
 @app.post("/commands/open-video")
 async def open_video_command(request: OpenVideoRequest):
-    """Return safe, device-independent video search destinations.
+    """Find a concrete YouTube watch URL when yt-dlp is installed.
 
-    The browser opens the chosen URL on the user's own device (Windows/iPhone).
-    This endpoint does not execute operating-system commands.
+    The browser opens the YouTube watch page on the user's own device.
+    We intentionally return a watch-page URL, not an expiring media stream URL.
     """
     query = (request.query or "").strip()
     if not query:
         raise HTTPException(status_code=400, detail="Açılacak video veya konu belirtilmedi.")
     query = query[:240]
+
+    # yt-dlp is installed through requirements.txt. It searches public YouTube
+    # results and returns canonical watch URLs. No video is downloaded.
+    try:
+        import yt_dlp
+        opts = {
+            "quiet": True,
+            "no_warnings": True,
+            "skip_download": True,
+            "extract_flat": True,
+            "playlistend": 8,
+            "socket_timeout": 12,
+            "noplaylist": True,
+        }
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            result = ydl.extract_info(f"ytsearch8:{query}", download=False)
+        entries = result.get("entries") or []
+        candidates = []
+        for entry in entries:
+            if not entry:
+                continue
+            video_id = entry.get("id")
+            webpage_url = entry.get("webpage_url") or (f"https://www.youtube.com/watch?v={video_id}" if video_id else None)
+            title = (entry.get("title") or "").strip()
+            availability = str(entry.get("availability") or "").lower()
+            if not video_id or not webpage_url or availability in {"private", "premium_only", "subscriber_only", "needs_auth"}:
+                continue
+            if not str(video_id).replace("-", "").replace("_", "").isalnum():
+                continue
+            candidates.append({"title": title or query, "url": webpage_url, "id": video_id})
+        if candidates:
+            chosen = candidates[0]
+            return {
+                "success": True,
+                "action": "open_video",
+                "query": query,
+                "video": chosen,
+                "candidates": candidates[:5],
+                "message": f'"{chosen["title"]}" videosu bulundu.',
+                "sources": [{"name": "YouTube", "url": chosen["url"]}],
+            }
+    except ImportError:
+        # Deployment without updated requirements: fall through to a safe search URL.
+        pass
+    except Exception as exc:
+        # Do not fail the whole chat if YouTube blocks or throttles the lookup.
+        print(f"Video arama hatası: {type(exc).__name__}: {exc}", flush=True)
+
     from urllib.parse import quote_plus
     q = quote_plus(query)
     return {
         "success": True,
         "action": "open_video_search",
         "query": query,
-        "message": f'{query} için video araması hazırlanıyor.',
+        "video": None,
+        "message": "Doğrudan video bağlantısı bulunamadı; arama sonuçları açılıyor.",
         "sources": [
             {"name": "YouTube", "url": f"https://www.youtube.com/results?search_query={q}"},
             {"name": "Google Videolar", "url": f"https://www.google.com/search?tbm=vid&q={q}"},
-            {"name": "DuckDuckGo Videolar", "url": f"https://duckduckgo.com/?q={q}&iax=videos&ia=videos"}
-        ]
+        ],
     }
 
 
