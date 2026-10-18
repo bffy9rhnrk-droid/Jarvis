@@ -7,3 +7,4 @@ requests
 Pillow
 pywebpush
 psycopg2-binary
+yt-dlp>=2025.1.15
