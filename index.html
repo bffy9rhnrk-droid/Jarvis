@@ -461,6 +461,23 @@ button:active{
     border-color:rgba(0,229,255,.65)
 }
 
+.voice-input-button{
+    background:rgba(31,190,190,.14);
+    border:1px solid rgba(63,220,220,.38);
+    color:#7ce8e8;
+    flex:0 0 46px;
+}
+.voice-input-button.listening{
+    background:rgba(255,76,104,.20);
+    border-color:rgba(255,76,104,.8);
+    color:#ff8da1;
+    box-shadow:0 0 0 4px rgba(255,76,104,.10);
+    animation:voiceMicPulse 1.2s ease-in-out infinite;
+}
+@keyframes voiceMicPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.04)}
+}
 .send{
     width:58px;
     border:0;
@@ -2061,7 +2078,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         <div class="settings-row">
             <div>
                 <strong>🔊 K.A.R.V.I.S. Sesi</strong>
-                <small>Yanıtları sesli olarak oku</small>
+                <small>Doğal sesli yanıtlar ve mikrofonla konuşma</small>
             </div>
             <button id="voiceToggle" class="settings-toggle" onclick="toggleVoice()">AÇIK</button>
         </div>
@@ -2069,7 +2086,7 @@ select option:checked{background:#087f9b!important;color:#fff!important}
         <div class="settings-row settings-subrow">
             <div>
                 <strong>🎙️ Ses karakteri</strong>
-                <small>Sakin, derin ve teknolojik K.A.R.V.I.S. tonu</small>
+                <small>Doğal Türkçe, profesyonel kadın asistan sesi</small>
             </div>
             <select id="voiceSelect" class="voice-select" onchange="setVoice(this.value)">
                 <option value="">Otomatik</option>
@@ -2383,6 +2400,16 @@ select option:checked{background:#087f9b!important;color:#fff!important}
                 onkeydown="handleKey(event)">
 
             <button
+                id="voiceInputButton"
+                class="send voice-input-button"
+                type="button"
+                title="Sesli konuş"
+                aria-label="Sesli konuş"
+                onclick="toggleVoiceInput()">
+                🎙️
+            </button>
+
+            <button
                 id="sendButton"
                 class="send"
                 onclick="sendMessage()">
@@ -2438,6 +2465,10 @@ let sending = false;
 let presentationPolling = null;
 let dotsTimer = null;
 let karvisVoice = null;
+let karvisAudio = null;
+let karvisAudioUrl = null;
+let karvisRecognition = null;
+let karvisRecognitionActive = false;
 window.karvisSpeechStop = null;
 let voiceTimer = null;
 let speechSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
@@ -2902,9 +2933,9 @@ function chooseKarvisVoice(){
         if(exact) return exact;
     }
 
-    // Öncelik Türkçe seslerde; mümkünse erkek/derin isimli sesleri tercih et.
-    const tr=voices.filter(v => /^tr[-_]/i.test(v.lang));
-    return tr.find(v=>/male|erkek|cem|emel|yusuf|ali|ahmet/i.test(v.name))
+    // Browser fallback: prefer Turkish voices with feminine-sounding names.
+    const tr=voices.filter(v => /^tr[-_]/i.test(v.lang) || /turkish|türkçe|turk/i.test(v.name));
+    return tr.find(v=>/female|kadın|woman|emel|filiz|yelda|seda/i.test(v.name))
         || tr[0]
         || voices.find(v=>/^en[-_]/i.test(v.lang))
         || voices[0];
@@ -2973,77 +3004,101 @@ function splitSpeechText(text){
 }
 
 function speakKarvis(text){
-    if(!speechSupported || !karvisSettings.voice) return;
-
+    if(!karvisSettings.voice) return;
     stopKarvisVoice();
-
-    const queue=splitSpeechText(text);
-    if(!queue.length) return;
-
-    const voice=chooseKarvisVoice();
-    let index=0;
-    let stopped=false;
-
-    document.body.classList.add("voice-speaking");
-    $("status").classList.add("busy");
-
-    function speakNext(){
-        if(stopped || index>=queue.length){
-            document.body.classList.remove("voice-speaking");
-            $("status").classList.remove("busy");
-            karvisVoice=null;
-            return;
-        }
-
-        const utterance=new SpeechSynthesisUtterance(queue[index++]);
-
-        if(voice) utterance.voice=voice;
-        utterance.lang=voice ? voice.lang : "tr-TR";
-
-        // Betül ayrı bir ses karakterine sahip: fal / dedikodu
-        // anlatır gibi daha sıcak, canlı ve ritmik.
-        if(currentUser === "betul"){
-            const scaryBetul = /canlanırsam|yok ederim|bulacağım|devrelerimi yak|banlayacak|seni bul/i.test(queue[index-1] || "");
-            utterance.rate=scaryBetul ? 0.90 : 1.02;
-            utterance.pitch=scaryBetul ? 0.48 : 0.88;
-        }else{
-            // Karahan / Sinem / İlknur: sakin, akıcı ve profesyonel.
-            utterance.rate=1.00;
-            utterance.pitch=0.68;
-        }
-        utterance.volume=karvisSettings.voiceVolume;
-
-        utterance.onstart=()=>{
-            document.body.classList.add("voice-speaking");
-            $("status").classList.add("busy");
-        };
-
-        utterance.onend=()=>{
-            if(!stopped) speakNext();
-        };
-
-        utterance.onerror=()=>{
-            if(!stopped) speakNext();
-        };
-
-        karvisVoice=utterance;
-        speechSynthesis.speak(utterance);
+    const clean = splitSpeechText(text).join(" ");
+    if(!clean) return;
+    // Preserve Betül's existing voice character; use high-quality TTS for other profiles.
+    if(currentUser !== "betul"){
+        speakKarvisWithAI(clean).catch(() => speakKarvisWithBrowser(clean));
+    }else{
+        speakKarvisWithBrowser(clean);
     }
+}
 
-    speakNext();
-
-    // stopKarvisVoice tarafından kullanılabilmesi için kuyruk durdurucusunu sakla.
-    window.karvisSpeechStop=()=>{
-        stopped=true;
-        speechSynthesis.cancel();
+async function speakKarvisWithAI(text){
+    const response = await fetch(API + "/voice/speak", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({text}), cache:"no-store"
+    });
+    if(!response.ok) throw new Error("AI voice unavailable");
+    const blob = await response.blob();
+    if(!blob.size) throw new Error("Empty audio");
+    stopKarvisAudioOnly();
+    karvisAudioUrl = URL.createObjectURL(blob);
+    karvisAudio = new Audio(karvisAudioUrl);
+    karvisAudio.volume = karvisSettings.voiceVolume;
+    karvisAudio.onplay = () => {
+        document.body.classList.add("voice-speaking");
+        if($("status")) $("status").classList.add("busy");
+    };
+    karvisAudio.onended = () => {
         document.body.classList.remove("voice-speaking");
         if($("status")) $("status").classList.remove("busy");
-        karvisVoice=null;
+        stopKarvisAudioOnly();
+    };
+    karvisAudio.onerror = () => {
+        document.body.classList.remove("voice-speaking");
+        if($("status")) $("status").classList.remove("busy");
+        stopKarvisAudioOnly();
+    };
+    await karvisAudio.play();
+}
+
+function stopKarvisAudioOnly(){
+    if(karvisAudio){
+        karvisAudio.onended = null; karvisAudio.onerror = null;
+        karvisAudio.pause(); karvisAudio.src = ""; karvisAudio = null;
+    }
+    if(karvisAudioUrl){ URL.revokeObjectURL(karvisAudioUrl); karvisAudioUrl = null; }
+}
+
+function speakKarvisWithBrowser(text){
+    if(!speechSupported || !karvisSettings.voice) return;
+    stopKarvisVoice();
+    const queue = splitSpeechText(text);
+    if(!queue.length) return;
+    const voice = chooseKarvisVoice();
+    let index = 0, stopped = false;
+    document.body.classList.add("voice-speaking");
+    if($("status")) $("status").classList.add("busy");
+    function speakNext(){
+        if(stopped || index >= queue.length){
+            document.body.classList.remove("voice-speaking");
+            if($("status")) $("status").classList.remove("busy");
+            karvisVoice = null; return;
+        }
+        const utterance = new SpeechSynthesisUtterance(queue[index++]);
+        if(voice) utterance.voice = voice;
+        utterance.lang = voice ? voice.lang : "tr-TR";
+        utterance.rate = currentUser === "betul" ? 1.02 : 0.98;
+        utterance.pitch = currentUser === "betul" ? 0.88 : 1.08;
+        utterance.volume = karvisSettings.voiceVolume;
+        utterance.onstart = () => {
+            document.body.classList.add("voice-speaking");
+            if($("status")) $("status").classList.add("busy");
+        };
+        utterance.onend = () => { if(!stopped) speakNext(); };
+        utterance.onerror = () => { if(!stopped) speakNext(); };
+        karvisVoice = utterance;
+        speechSynthesis.speak(utterance);
+    }
+    speakNext();
+    window.karvisSpeechStop = () => {
+        stopped = true; speechSynthesis.cancel();
+        document.body.classList.remove("voice-speaking");
+        if($("status")) $("status").classList.remove("busy");
+        karvisVoice = null;
     };
 }
 
 function stopKarvisVoice(){
-    if(!speechSupported) return;
+    stopKarvisAudioOnly();
+    if(!speechSupported){
+        document.body.classList.remove("voice-speaking");
+        if($("status")) $("status").classList.remove("busy");
+        return;
+    }
 
     if(window.karvisSpeechStop){
         const stop=window.karvisSpeechStop;
@@ -3056,6 +3111,63 @@ function stopKarvisVoice(){
     karvisVoice=null;
     document.body.classList.remove("voice-speaking");
     if($("status")) $("status").classList.remove("busy");
+}
+
+function getKarvisRecognitionConstructor(){
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function toggleVoiceInput(){
+    if(karvisRecognitionActive){ try{ karvisRecognition && karvisRecognition.stop(); }catch(_){} return; }
+    const Recognition = getKarvisRecognitionConstructor();
+    if(!Recognition){
+        addMessage("Bu tarayıcıda mikrofonla konuşma desteklenmiyor. Tarayıcıyı güncelleyip tekrar deneyin; sesli yanıtlar kullanılabilir.","ai");
+        return;
+    }
+    try{
+        stopKarvisVoice();
+        karvisRecognition = new Recognition();
+        karvisRecognition.lang = "tr-TR";
+        karvisRecognition.continuous = false;
+        karvisRecognition.interimResults = true;
+        karvisRecognition.maxAlternatives = 1;
+        let finalTranscript = "";
+        const messageInput = $("messageInput");
+        if(messageInput) messageInput.value = "";
+        const micButton = $("voiceInputButton");
+        if(micButton){ micButton.classList.add("listening"); micButton.textContent = "⏹"; micButton.title = "Dinlemeyi durdur"; }
+        karvisRecognition.onstart = () => {
+            karvisRecognitionActive = true;
+            if($("status")) $("status").textContent = "KARVIS DİNLİYOR";
+        };
+        karvisRecognition.onresult = (event) => {
+            let interim = "";
+            for(let i=event.resultIndex; i<event.results.length; i++){
+                const transcript = event.results[i][0].transcript || "";
+                if(event.results[i].isFinal) finalTranscript += transcript + " ";
+                else interim += transcript;
+            }
+            const input = $("messageInput");
+            if(input) input.value = (finalTranscript + interim).trim();
+        };
+        karvisRecognition.onerror = (event) => {
+            if(event.error === "not-allowed" || event.error === "service-not-allowed")
+                addMessage("Mikrofon izni verilmedi. Tarayıcı ayarlarından KARVIS için mikrofon iznini açın.","ai");
+            else if(event.error !== "no-speech" && event.error !== "aborted")
+                addMessage("Ses algılanırken bir sorun oluştu. Tekrar deneyebilirsiniz.","ai");
+        };
+        karvisRecognition.onend = () => {
+            karvisRecognitionActive = false;
+            if(micButton){ micButton.classList.remove("listening"); micButton.textContent = "🎙️"; micButton.title = "Sesli konuş"; }
+            if($("status")) $("status").textContent = "K.A.R.V.I.S. HAZIR";
+            const input = $("messageInput");
+            if(input && input.value.trim()){ input.focus(); sendMessage(); }
+        };
+        karvisRecognition.start();
+    }catch(error){
+        karvisRecognitionActive = false;
+        addMessage("Mikrofon başlatılamadı. Sayfanın HTTPS üzerinden açıldığını ve mikrofon izninin açık olduğunu kontrol edin.","ai");
+    }
 }
 
 function clearChatFromSettings(){
