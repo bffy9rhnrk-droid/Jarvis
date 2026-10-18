@@ -4195,6 +4195,53 @@ ${message}
    SEND MESSAGE
    ============================================================ */
 
+function detectVideoCommand(text){
+    const value = (text || "").trim();
+    // Only intercept clear action requests, not general questions about video.
+    const patterns = [
+        /^(?:karvis[, ]*)?(?:bana )?(.*?)(?: videosunu| videosu| video(?:sunu)?)(?: aç| oynat)\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:youtube(?:'da|da)? )?(?:aç|başlat|oynat)\s+(.+?)\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:internetten )?(?:bir )?video aç\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:youtube'da|youtube da|internette) (.+?) (?:videosunu|videosu) aç\s*[.!?]*$/i
+    ];
+    for (const pattern of patterns){
+        const match = value.match(pattern);
+        if(match){
+            let query = (match[1] || "").trim();
+            if(!query || /^(?:bir|video|videoyu)$/i.test(query)) query = "popüler videolar";
+            return query;
+        }
+    }
+    return null;
+}
+
+async function runVideoCommand(query){
+    // Open a tab synchronously to avoid iOS/desktop popup blockers.
+    const tab = window.open("about:blank", "_blank");
+    if(!tab){
+        addMessage("Tarayıcı yeni sekmeyi engelledi. KARVIS için açılır pencerelere izin verip tekrar dene.", "ai");
+        return;
+    }
+    tab.document.title = "KARVIS video arıyor...";
+    tab.document.body.innerHTML = "<p style='font:16px sans-serif;padding:24px'>KARVIS video kaynaklarını hazırlıyor…</p>";
+    try{
+        const response = await fetch(API + "/commands/open-video", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({query, username:currentUser})
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.detail || "Video araması hazırlanamadı.");
+        const source = (data.sources || []).find(item => item.name === "YouTube") || (data.sources || [])[0];
+        if(!source || !source.url) throw new Error("Uygun video kaynağı bulunamadı.");
+        tab.location.href = source.url;
+        addMessage("Video aramasını YouTube'da açtım: " + data.query, "ai");
+    }catch(error){
+        try{tab.close();}catch(_){}
+        addMessage("Video açamadım: " + error.message, "ai");
+    }
+}
+
 async function sendMessage(){
 
     if(sending)
@@ -4219,6 +4266,18 @@ async function sendMessage(){
         message,
         "user"
     );
+
+    const videoQuery = detectVideoCommand(message);
+    if(videoQuery !== null){
+        try{
+            await runVideoCommand(videoQuery);
+        }finally{
+            sending = false;
+            setBusy(false);
+            input.focus();
+        }
+        return;
+    }
 
     /*
        BETÜL ÖZEL SİSTEMLERİ
