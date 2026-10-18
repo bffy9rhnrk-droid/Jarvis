@@ -8061,6 +8061,41 @@ def _format_chat_context(history):
     )
 
 
+def _get_profile_memory_context(username, max_items=25, max_chars=5000):
+    """Load saved memories for this profile only; never mix profiles."""
+    try:
+        with memory_lock:
+            stored = read_json_file(MEMORY_FILE, [])
+    except Exception:
+        return ""
+
+    username = str(username or "karahan").strip().lower()
+    if isinstance(stored, dict):
+        memories = stored.get(username, [])
+    elif username == "karahan" and isinstance(stored, list):
+        memories = stored
+    else:
+        memories = []
+
+    if not isinstance(memories, list):
+        return ""
+
+    lines = []
+    for item in memories[-max_items:]:
+        value = str(item.get("text", "") if isinstance(item, dict) else item).strip()
+        if value:
+            lines.append("- " + value[:700])
+    if not lines:
+        return ""
+
+    rendered = "\n".join(lines)
+    if len(rendered) > max_chars:
+        rendered = rendered[-max_chars:]
+        if "\n" in rendered:
+            rendered = rendered[rendered.find("\n") + 1:]
+    return rendered
+
+
 # ============================================================
 # CHAT
 # ============================================================
@@ -8092,6 +8127,7 @@ async def chat(
 
     conversation_id = (request.conversation_id or "").strip()[:120]
     chat_history = _get_chat_context(conversation_id, username)
+    profile_memory_context = _get_profile_memory_context(username)
 
     user = USERS.get(username)
     if user is None:
@@ -8276,6 +8312,10 @@ Kullanıcı profili:
 
 ÖNCEKİ MESAJLAR (yalnızca bu aktif sohbetin geçici bağlamı):
 {_format_chat_context(chat_history)}
+
+BU PROFİLİN KAYITLI HAFIZASI (başka profillerin kayıtlarını kullanma):
+{profile_memory_context or "Bu profil için kayıtlı hafıza yok."}
+Hafıza kayıtlarını yalnızca ilgili olduklarında kullan; eski veya çelişkili bilgi varsa kesin gerçek gibi sunma.
 
 Kullanıcının son mesajı:
 {message}
