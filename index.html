@@ -4196,20 +4196,24 @@ ${message}
    ============================================================ */
 
 function detectVideoCommand(text){
-    const value = (text || "").trim();
-    // Only intercept clear action requests, not general questions about video.
+    const value = (text || "").trim().replace(/\s+/g, " ");
+    // Intercept explicit requests to open/search for a video before the AI can invent a URL.
     const patterns = [
-        /^(?:karvis[, ]*)?(?:bana )?(.*?)(?: videosunu| videosu| video(?:sunu)?)(?: aç| oynat)\s*[.!?]*$/i,
-        /^(?:karvis[, ]*)?(?:youtube(?:'da|da)? )?(?:aç|başlat|oynat)\s+(.+?)\s*[.!?]*$/i,
-        /^(?:karvis[, ]*)?(?:internetten )?(?:bir )?video aç\s*[.!?]*$/i,
-        /^(?:karvis[, ]*)?(?:youtube'da|youtube da|internette) (.+?) (?:videosunu|videosu) aç\s*[.!?]*$/i
+        /^(?:karvis[, ]*)?(?:bana )?(.+?)\s+(?:videosunu|videosu|video(?:sunu)?)\s+(?:aç|oynat|başlat)\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:youtube(?:'da|da)?\s+)?(?:aç|başlat|oynat)\s+(.+?)\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:internetten\s+)?(?:bir\s+)?video\s+aç\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:youtube'da|youtube da|internette)\s+(.+?)\s+(?:videosunu|videosu)\s+aç\s*[.!?]*$/i,
+        /^(?:karvis[, ]*)?(?:şunu|bunu)\s+aç\s*:\s*(.+)$/i,
+        /^(?:karvis[, ]*)?(?:video|youtube)\s+(?:ara|bul)\s+(.+?)\s*[.!?]*$/i
     ];
     for (const pattern of patterns){
         const match = value.match(pattern);
         if(match){
             let query = (match[1] || "").trim();
-            if(!query || /^(?:bir|video|videoyu)$/i.test(query)) query = "popüler videolar";
-            return query;
+            if(!query || /^(?:bir|video|videoyu|youtube)$/i.test(query)) query = "popüler videolar";
+            // Do not treat generic commands as a literal search phrase.
+            query = query.replace(/^(?:bana|lütfen)\s+/i, "").trim();
+            return query || "popüler videolar";
         }
     }
     return null;
@@ -4232,10 +4236,16 @@ async function runVideoCommand(query){
         });
         const data = await response.json();
         if(!response.ok) throw new Error(data.detail || "Video araması hazırlanamadı.");
-        const source = (data.sources || []).find(item => item.name === "YouTube") || (data.sources || [])[0];
+        const source = (data.video && data.video.url)
+            ? {name:"YouTube", url:data.video.url}
+            : ((data.sources || []).find(item => item.name === "YouTube") || (data.sources || [])[0]);
         if(!source || !source.url) throw new Error("Uygun video kaynağı bulunamadı.");
         tab.location.href = source.url;
-        addMessage("Video aramasını YouTube'da açtım: " + data.query, "ai");
+        if(data.video && data.video.title){
+            addMessage("Bulduğum videoyu açıyorum: “" + data.video.title + "”. Video YouTube tarafından kaldırılmış, bölgeye kapatılmış veya oturum gerektiriyorsa oynatılamayabilir.", "ai");
+        }else{
+            addMessage("Doğrudan kullanılabilir video bağlantısı bulamadım; YouTube arama sonuçlarını açtım: " + data.query + ".", "ai");
+        }
     }catch(error){
         try{tab.close();}catch(_){}
         addMessage("Video açamadım: " + error.message, "ai");
