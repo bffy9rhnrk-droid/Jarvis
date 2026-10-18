@@ -38,7 +38,7 @@ except Exception:
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from pydantic import BaseModel
 
@@ -7970,6 +7970,62 @@ async def health():
         "presentation_engine":
             APP_VERSION
     }
+
+
+# ============================================================
+# KARVIS VOICE ENGINE (OPTIONAL OPENAI TTS)
+# ============================================================
+
+# Keep the TTS key server-side. Groq/OpenRouter chat keys do not authorize
+# OpenAI's audio endpoint. Configure OPENAI_TTS_API_KEY or OPENAI_API_KEY.
+OPENAI_TTS_API_KEY = (
+    os.getenv("OPENAI_TTS_API_KEY", "")
+    or os.getenv("OPENAI_API_KEY", "")
+).strip()
+
+
+@app.post("/voice/speak")
+async def karvis_voice_speak(payload: dict):
+    """Generate natural Turkish speech; browser speech remains the fallback."""
+    if not OPENAI_TTS_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="Yapay zekâ ses servisi yapılandırılmamış. Tarayıcı sesi kullanılabilir."
+        )
+
+    text = str(payload.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Seslendirilecek metin boş.")
+    if len(text) > 4000:
+        text = text[:4000]
+
+    try:
+        result = requests.post(
+            "https://api.openai.com/v1/audio/speech",
+            headers={
+                "Authorization": f"Bearer {OPENAI_TTS_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "gpt-4o-mini-tts",
+                "voice": "nova",
+                "input": text,
+                "instructions": (
+                    "Speak in Turkish (Türkiye). Use a professional female AI assistant voice: "
+                    "clear, calm, confident, warm, natural pacing, accurate Turkish pronunciation. "
+                    "Do not sound theatrical or overly excited."
+                ),
+                "response_format": "mp3",
+            },
+            timeout=45,
+        )
+        if not result.ok:
+            raise HTTPException(status_code=502, detail="Yapay zekâ ses servisi yanıt vermedi.")
+        return Response(content=result.content, media_type="audio/mpeg", headers={"Cache-Control": "no-store"})
+    except HTTPException:
+        raise
+    except requests.RequestException:
+        raise HTTPException(status_code=502, detail="Ses üretimi sırasında bağlantı hatası oluştu.")
 
 
 # ============================================================
