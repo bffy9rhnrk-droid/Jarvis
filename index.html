@@ -1643,6 +1643,72 @@ select option:checked{background:#087f9b!important;color:#fff!important}
 @media (prefers-reduced-motion: reduce){
   .karvis-stats-modal *,.karvis-stats-modal *::before,.karvis-stats-modal *::after{animation:none!important}
 }
+
+/* ===== KARVIS komut paneli v3 ===== */
+@keyframes composerScan{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes composerBlink{0%,49%{opacity:1}50%,100%{opacity:.25}}
+body .input-area{
+    left:12px;right:12px;bottom:14px;height:auto;min-height:52px;box-sizing:border-box;
+    display:flex;align-items:center;gap:8px;padding:5px 5px 5px 14px;border-radius:19px;
+    background:linear-gradient(180deg,rgba(12,30,40,.82),rgba(3,10,14,.95));
+    border:1px solid rgba(var(--accent-rgb,0,229,255),.26);
+    box-shadow:0 12px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04),0 0 22px rgba(var(--accent-rgb,0,229,255),.10);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+    transition:border-color .25s ease,box-shadow .3s ease,transform .3s ease;
+}
+body .input-area::before{
+    content:"";position:absolute;left:20px;right:20px;top:-1px;height:1px;pointer-events:none;opacity:0;
+    background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb,0,229,255),.95),transparent);
+    background-size:200% 100%;transition:opacity .3s ease;
+}
+body .input-area:focus-within{
+    border-color:rgba(var(--accent-rgb,0,229,255),.7);
+    box-shadow:0 12px 36px rgba(0,0,0,.55),0 0 0 3px rgba(var(--accent-rgb,0,229,255),.09),0 0 30px rgba(var(--accent-rgb,0,229,255),.22);
+}
+body .input-area:focus-within::before{opacity:1;animation:composerScan 2.6s linear infinite}
+body .input-area .composer-prompt{
+    flex:0 0 auto;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:20px;font-weight:700;line-height:1;
+    color:rgba(var(--accent-rgb,0,229,255),.9);text-shadow:0 0 10px rgba(var(--accent-rgb,0,229,255),.7);
+    animation:composerBlink 1.3s steps(2,start) infinite;user-select:none;
+}
+body .input-area .input{
+    flex:1;min-width:0;height:36px;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:none;
+    color:#eafcff;font-size:16px;letter-spacing:.2px;
+}
+body .input-area .input:focus{border:0;outline:none}
+body .input-area .input::placeholder{color:rgba(190,235,245,.40)}
+body .input-area .send{
+    flex:0 0 38px;width:38px;height:38px;padding:0;border-radius:12px;display:grid;place-items:center;
+    cursor:pointer;font-size:0;line-height:0;transition:transform .15s ease,box-shadow .2s ease,background .2s ease,color .2s ease,opacity .2s ease;
+}
+body .input-area .send svg{width:17px;height:17px;display:block}
+body .input-area .voice-input-button{
+    background:rgba(var(--accent-rgb,0,229,255),.08);
+    border:1px solid rgba(var(--accent-rgb,0,229,255),.36);
+    color:rgba(var(--accent-rgb,0,229,255),1);
+}
+body .input-area .voice-input-button:hover{background:rgba(var(--accent-rgb,0,229,255),.16)}
+body .input-area .voice-input-button.listening{
+    background:rgba(255,76,104,.18);border-color:rgba(255,76,104,.8);color:#ff8da1;
+    box-shadow:0 0 0 4px rgba(255,76,104,.12),0 0 18px rgba(255,76,104,.35);
+}
+body .input-area #sendButton{
+    border:0;color:#001014;
+    background:linear-gradient(135deg,rgba(var(--accent-rgb,0,229,255),1),rgba(var(--accent-rgb,0,229,255),.6));
+    box-shadow:0 0 16px rgba(var(--accent-rgb,0,229,255),.40),inset 0 1px 0 rgba(255,255,255,.35);
+}
+body .input-area #sendButton:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 0 24px rgba(var(--accent-rgb,0,229,255),.6),inset 0 1px 0 rgba(255,255,255,.35)}
+body .input-area .send:active:not(:disabled){transform:scale(.93)}
+body .input-area #sendButton:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;filter:grayscale(.5)}
+body .input-area .send:focus-visible{outline:2px solid rgba(var(--accent-rgb,0,229,255),.85);outline-offset:3px}
+@media (max-width:480px){
+    body .input-area{left:8px;right:8px;bottom:10px;padding-left:12px;border-radius:17px}
+    body .input-area .send{flex-basis:36px;width:36px;height:36px;border-radius:11px}
+    body .input-area .composer-prompt{font-size:18px}
+}
+@media (prefers-reduced-motion: reduce){
+    body .input-area .composer-prompt,body .input-area::before,body .input-area.voice-input-button{animation:none!important}
+}
 </style>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2427,13 +2493,17 @@ select option:checked{background:#087f9b!important;color:#fff!important}
             class="chat">
         </div>
 
-        <div class="input-area">
+        <div class="input-area" id="composer">
+            <span class="composer-prompt" aria-hidden="true">&rsaquo;</span>
 
             <input
                 id="messageInput"
                 class="input"
+                type="text"
                 autocomplete="off"
-                placeholder="Mesajınızı yazın..."
+                enterkeyhint="send"
+                aria-label="Mesaj"
+                placeholder="KARVIS'e komut yazın…"
                 onkeydown="handleKey(event)">
 
             <button
@@ -2443,14 +2513,17 @@ select option:checked{background:#087f9b!important;color:#fff!important}
                 title="Sesli konuş"
                 aria-label="Sesli konuş"
                 onclick="toggleVoiceInput()">
-                🎙️
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/></svg>
             </button>
 
             <button
                 id="sendButton"
                 class="send"
+                type="button"
+                title="Gönder"
+                aria-label="Gönder"
                 onclick="sendMessage()">
-                ➤
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg>
             </button>
 
         </div>
@@ -2489,6 +2562,8 @@ select option:checked{background:#087f9b!important;color:#fff!important}
    ============================================================ */
 
 const API = "";
+const KARVIS_MIC_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/></svg>`;
+const KARVIS_STOP_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>`;
 
 /* ---- Oturum token'ı: giriş sonrası saklanır, same-origin isteklere otomatik eklenir ---- */
 const KARVIS_TOKEN_KEY = "karvis_auth_token";
@@ -3190,7 +3265,7 @@ function toggleVoiceInput(){
         const messageInput = $("messageInput");
         if(messageInput) messageInput.value = "";
         const micButton = $("voiceInputButton");
-        if(micButton){ micButton.classList.add("listening"); micButton.textContent = "⏹"; micButton.title = "Dinlemeyi durdur"; }
+        if(micButton){ micButton.classList.add("listening"); micButton.innerHTML = KARVIS_STOP_ICON; micButton.title = "Dinlemeyi durdur"; }
         karvisRecognition.onstart = () => {
             karvisRecognitionActive = true;
             if($("status")) $("status").textContent = "KARVIS DİNLİYOR";
@@ -3213,7 +3288,7 @@ function toggleVoiceInput(){
         };
         karvisRecognition.onend = () => {
             karvisRecognitionActive = false;
-            if(micButton){ micButton.classList.remove("listening"); micButton.textContent = "🎙️"; micButton.title = "Sesli konuş"; }
+            if(micButton){ micButton.classList.remove("listening"); micButton.innerHTML = KARVIS_MIC_ICON; micButton.title = "Sesli konuş"; }
             if($("status")) $("status").textContent = "K.A.R.V.I.S. HAZIR";
             const input = $("messageInput");
             if(input && input.value.trim()){ input.focus(); sendMessage(); }
