@@ -14,6 +14,10 @@ import hashlib
 import threading
 import traceback
 import random
+import base64
+import contextvars
+import hmac
+import secrets
 from datetime import datetime, timezone
 
 from pathlib import Path
@@ -589,10 +593,21 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def karvis_auth_context(request, call_next):
+    header = request.headers.get("authorization", "")
+    user = verify_auth_token(header[7:]) if header.lower().startswith("bearer ") else ""
+    token = _AUTH_USER.set(user)
+    try:
+        return await call_next(request)
+    finally:
+        _AUTH_USER.reset(token)
 
 
 @app.exception_handler(Exception)
@@ -1506,6 +1521,59 @@ password_lock = threading.Lock()
 sude_lock = threading.Lock()
 
 
+# ============================================================
+# İMZALI OTURUM TOKEN'LARI
+# ============================================================
+# Giriş yapan kullanıcı HMAC-SHA256 imzalı bir token alır. Yönetici ve öğretmen
+# uç noktaları artık yalnızca istemcinin gönderdiği username değerine değil, bu
+# token'daki kullanıcıya göre yetkilendirilir. KARVIS_AUTH_SECRET ortam değişkeni
+# çoklu instance/yeniden başlatma sonrası oturumların korunması için önerilir.
+AUTH_TOKEN_TTL_SECONDS = int(os.getenv("KARVIS_AUTH_TOKEN_TTL", str(60 * 60 * 24 * 7)))
+_AUTH_SECRET = (os.getenv("KARVIS_AUTH_SECRET", "").strip() or secrets.token_urlsafe(48)).encode("utf-8")
+_AUTH_USER = contextvars.ContextVar("karvis_auth_user", default="")
+
+
+def issue_auth_token(username):
+    payload = json.dumps(
+        {"u": str(username).strip().lower(), "exp": int(time.time()) + AUTH_TOKEN_TTL_SECONDS},
+        separators=(",", ":"),
+    ).encode("utf-8")
+    body = base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+    sig = hmac.new(_AUTH_SECRET, body.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{body}.{sig}"
+
+
+def verify_auth_token(token):
+    """Geçerli ve süresi dolmamış token ise kullanıcı adını, değilse boş string döner."""
+    try:
+        body, sig = str(token or "").rsplit(".", 1)
+        expected = hmac.new(_AUTH_SECRET, body.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return ""
+        padded = body + "=" * (-len(body) % 4)
+        data = json.loads(base64.urlsafe_b64decode(padded.encode("ascii")))
+        if int(data.get("exp", 0)) < int(time.time()):
+            return ""
+        return str(data.get("u", "")).strip().lower()
+    except Exception:
+        return ""
+
+
+def _is_authed_as(username, expected):
+    return bool(expected) and _AUTH_USER.get() == expected and str(username or "").strip().lower() == expected
+
+
+def _require_role(username, roles, detail):
+    requested = str(username or "").strip().lower()
+    authed = _AUTH_USER.get()
+    if not authed:
+        raise HTTPException(status_code=401, detail="Oturum doğrulanamadı. Lütfen tekrar giriş yapın.")
+    if authed != requested:
+        raise HTTPException(status_code=403, detail=detail)
+    if str((USERS.get(authed) or {}).get("role", "")) not in roles:
+        raise HTTPException(status_code=403, detail=detail)
+
+
 def _password_hash(password, salt=None):
     salt = salt or os.urandom(16).hex()
     digest = hashlib.pbkdf2_hmac("sha256", str(password).encode("utf-8"), bytes.fromhex(salt), 240000).hex()
@@ -1895,10 +1963,12 @@ async def login(
 
     password_records = _load_password_store()
     record = password_records.get(username)
-    # Legacy fallback allows one-time migration of existing installations.
-    valid = _verify_password(password, record) if record else False
-    if not valid and user.get("password"):
-        valid = user.get("password") == password
+    if record:
+        # Hash kaydı varken eski düz metin şifre artık kabul edilmez (değiştirilen şifre geçerli kalır).
+        valid = _verify_password(password, record)
+    else:
+        # Eski kurulumlar için tek seferlik geçiş: hash kaydı yoksa legacy şifre kontrol edilir.
+        valid = bool(user.get("password")) and user.get("password") == password
         if valid:
             _set_password(username, password)
             user["password"] = ""
@@ -1939,6 +2009,9 @@ async def login(
 
         "user":
             public_user,
+
+        "token":
+            issue_auth_token(username),
 
         "message":
             "Giriş başarılı."
@@ -1991,8 +2064,7 @@ def _save_exam_store(data):
 
 
 def _teacher_only(username):
-    if str(username or "").strip().lower() != "ilknur":
-        raise HTTPException(status_code=403, detail="Bu işlem yalnızca İlknur öğretmen profiline açıktır.")
+    _require_role(username, {"teacher"}, "Bu işlem yalnızca İlknur öğretmen profiline açıktır.")
 
 
 def _validate_exam_questions(questions):
@@ -2141,7 +2213,7 @@ async def get_exam_for_student(exam_id: str, username: str):
         data = _exam_store()
     exam = next((e for e in data["exams"] if e.get("id") == exam_id), None)
     if not exam: raise HTTPException(status_code=404, detail="Sınav bulunamadı.")
-    if not exam.get("published") and username.strip().lower() != "ilknur": raise HTTPException(status_code=403, detail="Bu sınav henüz yayımlanmadı.")
+    if not exam.get("published") and not _is_authed_as(username, "ilknur"): raise HTTPException(status_code=403, detail="Bu sınav henüz yayımlanmadı.")
     now = datetime.utcnow()
     try:
         starts = datetime.fromisoformat(str(exam.get("starts_at", "")).replace("Z", "+00:00")) if exam.get("starts_at") else None
@@ -2150,8 +2222,8 @@ async def get_exam_for_student(exam_id: str, username: str):
         if ends and ends.tzinfo: ends = ends.astimezone(timezone.utc).replace(tzinfo=None)
     except Exception:
         starts = ends = None
-    if username.strip().lower() != "ilknur" and starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
-    if username.strip().lower() != "ilknur" and ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
+    if not _is_authed_as(username, "ilknur") and starts and now < starts: raise HTTPException(status_code=403, detail="Sınav henüz başlamadı.")
+    if not _is_authed_as(username, "ilknur") and ends and now >= ends: raise HTTPException(status_code=403, detail="Sınavın bitiş zamanı geçti.")
     return {"success":True,"exam":{"id":exam["id"],"title":exam["title"],"subject":exam.get("subject",""),"description":exam.get("description",""),"duration_minutes":exam.get("duration_minutes",0),"starts_at":exam.get("starts_at",""),"ends_at":exam.get("ends_at",""),"questions":[{"id":q["id"],"prompt":q["prompt"],"type":q["type"],"points":10,**({"options":q.get("options",[])} if q["type"]=="multiple_choice" else {})} for q in exam.get("questions",[])]}}
 
 
@@ -2439,16 +2511,14 @@ async def teacher_exam_analysis(exam_id: str, username: str = "ilknur"):
 
 @app.get("/user-requests")
 async def user_requests(username: str = "murat"):
-    if str(username).strip().lower() != "murat":
-        raise HTTPException(status_code=403, detail="Bu alan yalnızca yetkili profile açıktır.")
+    require_admin(username)
     data = get_user_requests()
     return {"success": True, "requests": data, "count": len(data), "unread": sum(1 for x in data if not x.get("read", False))}
 
 
 @app.post("/user-requests/{request_id}/read")
 async def mark_user_request_read(request_id: str, username: str = "murat"):
-    if str(username).strip().lower() != "murat":
-        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    require_admin(username)
     with request_lock:
         data = read_json_file(REQUEST_FILE, [])
         for item in data:
@@ -2462,8 +2532,7 @@ async def mark_user_request_read(request_id: str, username: str = "murat"):
 
 @app.delete("/user-requests/{request_id}")
 async def delete_user_request(request_id: str, username: str = "murat"):
-    if str(username).strip().lower() != "murat":
-        raise HTTPException(status_code=403, detail="Yetkisiz işlem.")
+    require_admin(username)
     with request_lock:
         data = read_json_file(REQUEST_FILE, [])
         new_data = [x for x in data if x.get("id") != request_id]
@@ -8914,8 +8983,7 @@ async def admin_delete_profile(target_username: str, username: str = "murat"):
 
 
 def require_admin(username):
-    if str(username or "").strip().lower() != "murat":
-        raise HTTPException(status_code=403, detail="Bu alan yalnızca Murat yetkili profiline açıktır.")
+    _require_role(username, {"admin"}, "Bu alan yalnızca Murat yetkili profiline açıktır.")
 
 
 @app.get("/admin/stats")
